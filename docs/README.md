@@ -19,7 +19,7 @@ cd docs
 2. Start the local development server:
 
 ```
-jekyll serve
+jekyll serve --livereload
 ```
 
 3. Open your web browser and visit `http://localhost:4000` to view the website.
