@@ -27,28 +27,40 @@ def xml_without_meta(tree, output_file_name):
     for tag in metadata_tags:
         metadata = root.find(tag)
         root.remove(metadata)
-    # Handle includes
-    includes = root.findall('xi:include', {'xi': 'http://www.w3.org/2001/XInclude'})
+
+    handle_includes(root)
+
+    write_xml(output_file_name, tree)
+
+
+def handle_includes(tree):
+    includes = tree.findall(".//{http://www.w3.org/2001/XInclude}include")
+    print('includes', includes)
     for include in includes:
         print('atr',include.attrib)
         print('include: ', include.get('href'))
         if include.get('href') == 'version-info.xml':
-            #TODO: replace text
-            print('yes')
+            # replaces the version include to a "placeholder"
+            # https://pandoc.org/lua-filters.html#replacing-placeholders-with-their-metadata-value
+            xpointer = include.get('xpointer')
+            new_element = ET.Element('para')
+            new_element.text = '%' + xpointer + '%'
+            map = { c: p for p in tree.iter() for c in p }
+            parent = map[include]
+            print('parent', parent)
+            index = list(parent).index(include)
+            parent.insert(index, new_element)
         elif not include.get('xpointer'):
             new_element = ET.Element('para')
             new_element.text = '.. include::' + include.get('href')
 
-            index = list(root).index(include)
+            index = list(tree).index(include)
 
-            root.remove(include)
-            root.insert(index, new_element)
+            tree.remove(include)
+            tree.insert(index, new_element)
         else:
             #TODO: deal with this
             print('can not deal with this right now')
-
-
-    write_xml(output_file_name, tree)
 
 
 def xml_with_only_meta(tree, output_file_name):
@@ -74,7 +86,8 @@ def main():
     #TODO: find all the files that are used in includes and ignore/translate them to rst
 
     # get all the xml files
-    path = r'*.xml'
+    # path = r'*.xml'
+    path = r'resolvectl.xml'
     files = glob.glob(path)
 
     for filename in files:
