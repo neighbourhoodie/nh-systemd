@@ -28,9 +28,29 @@ def xml_without_meta(tree, output_file_name):
         metadata = root.find(tag)
         root.remove(metadata)
 
+    handle_programlisting(root)
     handle_includes(root)
 
     write_xml(output_file_name, tree)
+
+
+def handle_programlisting(tree):
+    programlistings = tree.findall(".//programlisting")
+    print('programlistings', programlistings)
+    for programlisting in programlistings:
+        # get inlcude Subelement
+        include = programlisting.find(".//{http://www.w3.org/2001/XInclude}include")
+        print('program include: ', include.get('href'))
+        filename = include.get('href')
+
+        new_element = ET.Element('para')
+        new_element.text = '{include="' + filename + '"}'
+
+        map = { c: p for p in tree.iter() for c in p }
+        parent = map[programlisting]
+        index = list(parent).index(programlisting)
+        parent.remove(programlisting)
+        parent.insert(index, new_element)
 
 
 def handle_includes(tree):
@@ -47,17 +67,18 @@ def handle_includes(tree):
             new_element.text = '%' + xpointer + '%'
             map = { c: p for p in tree.iter() for c in p }
             parent = map[include]
-            print('parent', parent)
+            # print('parent', parent)
             index = list(parent).index(include)
             parent.insert(index, new_element)
         elif not include.get('xpointer'):
             new_element = ET.Element('para')
-            new_element.text = '.. include::' + include.get('href')
+            # new_element.text = '.. include::' + include.get('href')
+            new_element.text = '{.include}\n' + include.get('href')
 
-            index = list(tree).index(include)
-
-            tree.remove(include)
-            tree.insert(index, new_element)
+            map = { c: p for p in tree.iter() for c in p }
+            parent = map[include]
+            index = list(parent).index(include)
+            parent.insert(index, new_element)
         else:
             #TODO: deal with this
             print('can not deal with this right now')
@@ -87,7 +108,7 @@ def main():
 
     # get all the xml files
     # path = r'*.xml'
-    path = r'resolvectl.xml'
+    path = r'sd_event_add_inotify.xml'
     files = glob.glob(path)
 
     for filename in files:
@@ -106,12 +127,7 @@ def main():
         # delete everything but the metatags
         xml_with_only_meta(tree, filename)
         print('only-meta xml of ', filename)
-        # resolve xmlincludes
-        # TODO don't loose xml include info in rst
-        # find out what includes there are and how many
-        # how to port that to rst
-        # subprocess.run(["xmllint", "--xinclude", output_file_name])
-        print('no-meta xml of ', filename, 'got includes')
+
         # turn into rst
         subprocess.run(["pandoc", "-t", "rst", "-f", "docbook", "-s", output_file_name, "-o", filename.replace("xml", "rst")])
         print('rst of: ', filename)
