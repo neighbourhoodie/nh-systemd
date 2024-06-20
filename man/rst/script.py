@@ -20,12 +20,14 @@ def xml_without_meta(tree, output_file_name):
     metadata_tags = ['refentryinfo','refmeta', 'refnamediv', 'refsynopsisdiv']
 
     contents = root.findall('refsect1')
-    if not contents:
+    if not len(contents):
         print('file has no contents')
         return
 
     for tag in metadata_tags:
         metadata = root.find(tag)
+        if metadata is None:
+            return
         root.remove(metadata)
 
     handle_programlisting(root)
@@ -40,6 +42,8 @@ def handle_programlisting(tree):
     for programlisting in programlistings:
         # get inlcude Subelement
         include = programlisting.find(".//{http://www.w3.org/2001/XInclude}include")
+        if not include:
+            return
         print('program include: ', include.get('href'))
         filename = include.get('href')
 
@@ -87,7 +91,7 @@ def handle_includes(tree):
 def xml_with_only_meta(tree, output_file_name):
     root = tree.getroot()
     contents = root.findall('refsect1')
-    if not contents:
+    if not len(contents):
         print('file has no contents')
         return
     for content in contents:
@@ -103,12 +107,13 @@ def main():
                     'systemd.directives.xml',
                     'systemd.index.xml',
                     'directives-template.xml',
+                    'output.xml',
                     'version-info.xml']
     #TODO: find all the files that are used in includes and ignore/translate them to rst
 
     # get all the xml files
     # path = r'*.xml'
-    path = r'sd_event_add_inotify.xml'
+    path = r'udev_device_get_syspath.xml'
     files = glob.glob(path)
 
     for filename in files:
@@ -119,14 +124,11 @@ def main():
         # copy file
         tree = ET.parse(filename)
         tree_copy = ET.parse(filename)
-        print('2 copies of: ', filename)
         # delete metatags
         output_file_name = 'output.xml'
         xml_without_meta(tree_copy, output_file_name)
-        print('no-meta xml of ', filename)
         # delete everything but the metatags
         xml_with_only_meta(tree, filename)
-        print('only-meta xml of ', filename)
 
         # turn into rst
         subprocess.run(["pandoc", "-t", "rst", "-f", "docbook", "-s", output_file_name, "-o", filename.replace("xml", "rst")])
