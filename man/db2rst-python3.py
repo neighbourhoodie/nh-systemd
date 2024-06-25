@@ -217,14 +217,12 @@ def Comment(el):
 
 # Meta refs
 
-# TODO: how to ignore/delete a tag???
-# def refentryinfo(el):
-#     # ignore
-#     ET.strip_elements(el)
+# FIXME: how to ignore/delete a tag???
+def refentryinfo(el):
+    # ignore
+    return '  '
+refmeta = refentryinfo
 
-# def refmeta(el):
-#     # ignore
-#     el
 
 def refnamediv(el):
     t = _make_title('Name', 2)
@@ -246,17 +244,17 @@ def cmdsynopsis(el):
     return _join_children(el, ' ')
 
 def arg(el):
+    text = el.text
+    if text is None:
+        text = _join_children(el, '')
     # choice: req, opt, plain
     choice = el.get("choice")
     if choice == 'opt':
-        text = el.text
-        if text is None:
-            text = _join_children(el, '')
         return f"[%s{'...' if el.get('rep') == 'repeat' else ''}]" % text
     elif choice == 'req':
-        return "{%s}" % el.text
+        return "{%s}" % text
     elif choice == 'plain':
-        return "%s" % el.text
+        return "%s" % text
     else:
         "print warning if there another choice"
         _warn("skipping arg with choice of: %s" % (choice))
