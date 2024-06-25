@@ -404,6 +404,11 @@ def computeroutput(el):
 
 
 # miscellaneous
+def keycombo(el):
+    return _join_children(el, '+')
+
+def keycap(el):
+    return ":kbd:`%s`" % el.text
 
 def para(el):
     #return _block_separated_with_blank_line(el)
