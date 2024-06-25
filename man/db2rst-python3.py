@@ -215,6 +215,53 @@ def TreeRoot(el):
 def Comment(el):
     return _indent(el, 12, ".. COMMENT: ")
 
+# Meta refs
+
+# TODO: how to ignore/delete a tag???
+# def refentryinfo(el):
+#     # ignore
+#     ET.strip_elements(el)
+
+# def refmeta(el):
+#     # ignore
+#     el
+
+def refnamediv(el):
+    t = _make_title('Name', 2)
+    return t + "\n\n" + _join_children(el, ' — ')
+
+def refsynopsisdiv(el):
+    t = _make_title('Synopsis', 2)
+    return t + "\n\n" + _join_children(el, ' ')
+
+def refname(el):
+    _has_only_text(el)
+    return "%s" % el.text
+
+def refpurpose(el):
+    _has_only_text(el)
+    return "%s" % el.text
+
+def cmdsynopsis(el):
+    return _join_children(el, ' ')
+
+def arg(el):
+    # choice: req, opt, plain
+    choice = el.get("choice")
+    if choice == 'opt':
+        text = el.text
+        if text is None:
+            text = _join_children(el, '')
+        return f"[%s{'...' if el.get('rep') == 'repeat' else ''}]" % text
+    elif choice == 'req':
+        return "{%s}" % el.text
+    elif choice == 'plain':
+        return "%s" % el.text
+    else:
+        "print warning if there another choice"
+        _warn("skipping arg with choice of: %s" % (choice))
+
+
 
 # general inline elements
 
@@ -379,14 +426,6 @@ def orderedlist(el):
 def listitem(el):
     _supports_only(el, ["para", "simpara"])
     return _concat(el)
-
-def refname(el):
-    _has_only_text(el)
-    return "\n\n.. _%s:\n\n" % el.text
-
-def refpurpose(el):
-    _has_only_text(el)
-    return "\n\n**%s**\n\n" % el.text
 
 def refsect1(el):
     return _block_separated_with_blank_line(el)
