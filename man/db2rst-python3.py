@@ -217,12 +217,13 @@ def Comment(el):
 
 # Meta refs
 
+def refentry(el):
+    return _concat(el)
+
 # FIXME: how to ignore/delete a tag???
 def refentryinfo(el):
     # ignore
     return '  '
-refmeta = refentryinfo
-
 
 def refnamediv(el):
     t = _make_title('Name', 2)
@@ -276,14 +277,20 @@ def firstterm(el):
 acronym = _no_special_markup
 
 def command(el):
+    # return ":command:``%s``" % _concat(el).strip()
     return "``%s``" % _concat(el).strip()
 option = command
+filename = command
+constant = command
 
 def optional(el):
     return "[%s]" % _concat(el).strip()
 
 def replaceable(el):
     return "<%s>" % _concat(el).strip()
+
+def term(el):
+    return _join_children(el, ' ')
 
 # links
 
@@ -318,23 +325,48 @@ def itemizedlist(el):
 def orderedlist(el):
     return _indent(el, 2, "1. ", True)
 
+def simplelist(el):
+    type = el.get("type")
+    if type == "inline":
+        return _join_children(el, ', ')
+    else:
+        return _concat(el)
+
+def member(el):
+    return _concat(el)
+
 # def listitem(el):
 #     _supports_only(el, ["para"])
 #     return _concat(el)
 
-def listitem(el):
-    return _indent(el, 2, None, True)
+# def listitem(el):
+#     return _indent(el, 2, None, True)
 
 
 # varlists
 
-# def variablelist(el):
-#     return _indent(el, 1, None, True)
+def variablelist(el):
+    return _concat(el)
 
-# def varlistentry(el):
-#     return _indent(el, 2, None, True)
+def varlistentry(el):
+    # there can be more then one term which should be comma separated but the last item is a listitem
+    #FIXME: is this too hacky?
+    elements = [i for i in el]
+    last = elements[-1]
+    return ", ".join(_conv(i) for i in elements[:-1]) + listitem(last)
+
+def listitem(el):
+    _supports_only(el, ["para", "simpara", "{http://www.w3.org/2001/XInclude}include"])
+    return _block_separated_with_blank_line(el)
 
 # sections
+
+def example(el):
+    #FIXME: too hacky?
+    elements = [i for i in el]
+    first, rest = elements[0], elements[1:]
+
+    return _make_title(_concat(first), 3) + "\n\n" + "".join(_conv(i) for i in rest)
 
 def sect1(el):
     return _block_separated_with_blank_line(el)
@@ -364,6 +396,24 @@ def date(el):
     _has_only_text(el)
     return "\n\n.. _date:\n\n%s" % el.text
 
+# references
+
+def citerefentry(el):
+    project = el.get("project")
+    #FIXME: different projects have different urls: dbus, die-net, man-pages ...
+    return ":ref:`%s/%s`" % (project, el.text) if project else ":ref:`%s`" % el.text
+
+def refmeta(el):
+    return ".. _%s:" % _join_children(el, '')
+
+def refentrytitle(el):
+    if el.get("url"):
+        return ulink(el)
+    else:
+        return _concat(el)
+
+def manvolnum(el):
+    return "(%s)" % el.text
 
 # media objects
 
@@ -425,10 +475,6 @@ def itemizedlist(el):
 
 def orderedlist(el):
     return _indent(el, 2, "1. ", True)
-
-def listitem(el):
-    _supports_only(el, ["para", "simpara"])
-    return _concat(el)
 
 def refsect1(el):
     return _block_separated_with_blank_line(el)
