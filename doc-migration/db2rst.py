@@ -290,7 +290,7 @@ def replaceable(el):
     return "<%s>" % _concat(el).strip()
 
 def term(el):
-    return _join_children(el, ' ')
+    return  _make_title(_concat(el).strip(), 4)
 
 # links
 
@@ -339,8 +339,8 @@ def member(el):
 #     _supports_only(el, ["para"])
 #     return _concat(el)
 
-# def listitem(el):
-#     return _indent(el, 2, None, True)
+def listitem(el):
+    return _indent(el, 3, None, True)
 
 
 # varlists
@@ -384,7 +384,7 @@ def section(el):
     return _block_separated_with_blank_line(el)
 
 def title(el):
-    return _make_title(_concat(el).strip(), _get_level(el))
+    return _make_title(_concat(el).strip(), _get_level(el) + 1)
 
 # bibliographic elements
 
@@ -462,7 +462,7 @@ def keycap(el):
 
 def para(el):
     #return _block_separated_with_blank_line(el)
-    return _indent(el, 3, None, True)
+    return _indent(el, 0, None, True)
 
 def simpara(el):
     return _block_separated_with_blank_line(el)
