@@ -14,10 +14,14 @@ Welcome to systemd's documentation!
 .. OR using the toctree to pull in files
    https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-toctree
 
+.. This only works if we restructure our headings to match
+   https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#sections
+   and then only have single top-level heading with the command name
+
 .. toctree::
    :maxdepth: 1
 
-   busctl-db2rst
+   busctl
 
 Indices and tables
 ==================

@@ -2,23 +2,24 @@
 
 .. _busctl(1):
 
-###########################
+Name
+####
+
 busctl — Introspect the bus
-###########################
 
 Synopsis
-========
+########
 
 ``busctl`` [OPTIONS...] [COMMAND] [<NAME>...]
 
 Description
-===========
+###########
 
    ``busctl`` may be used to
    introspect and monitor the D-Bus bus.
 
 Commands
-========
+########
 
    The following commands are understood:
 
@@ -134,7 +135,7 @@ Commands
 |v209|
 
 Options
-=======
+#######
 
    The following options are understood:
 
@@ -347,7 +348,7 @@ Options
 |version|
 
 Parameter Formatting
-====================
+####################
 
    The ``call`` and
    ``set-property`` commands take a signature string
@@ -425,9 +426,8 @@ Write and Read a Property
 ::
 
 # busctl set-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager LogLevel s debug
-# busctl get-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager LogLevel
-
-s "debug"
+   # busctl get-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager LogLevel
+   s "debug"
 
 Terse and Verbose Output
 ========================
@@ -439,14 +439,12 @@ Terse and Verbose Output
 ::
 
 $ busctl get-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager Environment
-as 2 "LANG=en_US.UTF-8" "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
-
-$ busctl get-property --verbose org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager Environment
-ARRAY "s" {
-   STRING "LANG=en_US.UTF-8";
-   STRING "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin";
-};
-
+   as 2 "LANG=en_US.UTF-8" "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+   $ busctl get-property --verbose org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager Environment
+   ARRAY "s" {
+           STRING "LANG=en_US.UTF-8";
+           STRING "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin";
+   };
 
 Invoking a Method
 =================
@@ -467,10 +465,10 @@ Invoking a Method
 ::
 
 # busctl call org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager StartUnit ss "cups.service" "replace"
-o "/org/freedesktop/systemd1/job/42684"
+   o "/org/freedesktop/systemd1/job/42684"
 
 See Also
-========
+########
 
    :ref:`dbus/None`, `D-Bus <https://www.freedesktop.org/wiki/Software/dbus>`_, :ref:`None`, :ref:`None`, :ref:`None`, :ref:`None`, :ref:`die-net/None`
 
