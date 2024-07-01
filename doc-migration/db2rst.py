@@ -412,8 +412,7 @@ def citerefentry(el):
         url = el.get("url")
         return f"`{refentrytitle}({manvolnum}) <{url}>`_"
 
-    target = el.get("target")
-    return f"`{refentrytitle}({manvolnum}) </{refentrytitle}.html#{target}>`_"
+    return f":ref:`{refentrytitle}({manvolnum})`"
 
 def refmeta(el):
     return ".. _%s:" % _join_children(el, '') + '\n\n' + _make_title(_join_children(el, ''), 1 )

@@ -9,7 +9,11 @@ Welcome to systemd's documentation!
 .. manual reference to a doc by its reference label
    see: https://www.sphinx-doc.org/en/master/usage/referencing.html#cross-referencing-arbitrary-locations
 
-:ref:`busctl(1)`
+.. Manual links
+.. ------------
+
+.. :ref:`busctl(1)`
+.. :ref:`systemd(1)`
 
 .. OR using the toctree to pull in files
    https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-toctree
@@ -22,6 +26,8 @@ Welcome to systemd's documentation!
    :maxdepth: 1
 
    busctl
+   journalctl
+   systemd
 
 Indices and tables
 ==================
