@@ -103,12 +103,17 @@ def _conv(el):
     else:
         if el.tag not in _not_handled_tags:
             # Convert xi:includes to `sphinxcontrib-globalsubs` format
-            if el.tag == "{http://www.w3.org/2001/XInclude}include":
+            if el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') == 'version-info.xml':
                 return "|%s|." % el.get("xpointer")
+            elif el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') == 'standard-options.xml':
+                return f""".. include:: standard-options.rst
+  :start-after: .. inlcusion-marker-do-not-remove {el.get("xpointer")}
+  :end-before: .. inlcusion-end-marker-do-not-remove {el.get("xpointer")}
+                        """
             else:
                 _warn("Don't know how to handle <%s>" % el.tag)
                 #_warn(" ... from path: %s" % _get_path(el))
-                _not_handled_tags.add(el.tag)
+                # _not_handled_tags.add(el.tag)
         return _concat(el)
 
 def _no_special_markup(el):
