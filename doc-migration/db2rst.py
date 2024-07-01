@@ -106,7 +106,7 @@ def _conv(el):
             if el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') == 'version-info.xml':
                 return "|%s|." % el.get("xpointer")
             elif el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') in ['standard-options.xml', 'user-system-options.xml']:
-                return f""".. include:: {el.get('href').replace('xml', 'rst')}
+                return f""".. include:: ./includes/{el.get('href').replace('xml', 'rst')}
   :start-after: .. inlcusion-marker-do-not-remove {el.get("xpointer")}
   :end-before: .. inlcusion-end-marker-do-not-remove {el.get("xpointer")}
                         """
