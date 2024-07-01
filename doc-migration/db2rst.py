@@ -447,7 +447,7 @@ def videodata(el):
         '    </video>'
 
 def programlisting(el):
-    return _indent(el, 3, "::\n\n", False) + "\n\n"
+    return f".. code-block:: \n\n{_indent(el, 3)}\n\n"
 
 def screen(el):
     return _indent(el, 3, "::\n\n", False) + "\n\n"
