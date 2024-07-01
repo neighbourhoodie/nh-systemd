@@ -15,7 +15,7 @@
     the script outputs incorrect (nested) reST (:sub:`*x*`)
     and it is up to user to decide how to change it.
 
-    Usage: db2rst-python3.py file.xml > file.rst
+    Usage: db2rst.py file.xml > file.rst
 
     Ported to Python3 in 2024 by neighbourhood.ie
 
@@ -43,9 +43,6 @@ _not_handled_tags = set()
 # to remember which id/labels are really needed
 _linked_ids = set()
 
-# to avoid duplicate substitutions
-_substitutions = set()
-
 # buffer that is flushed after the end of paragraph,
 # used for ReST substitutions
 _buffer = ""
@@ -58,7 +55,6 @@ def _main():
     sys.stderr.write("Parsing XML file `%s'...\n" % input_file)
     parser = ET.XMLParser(remove_comments=REMOVE_COMMENTS, no_network=False)
     tree = ET.parse(input_file, parser=parser)
-    # tree.xinclude() # parses includes
     for elem in tree.iter():
         if elem.tag in ("xref", "link"):
             _linked_ids.add(elem.get("linkend"))
@@ -106,6 +102,7 @@ def _conv(el):
         return Comment(el) if (el.text and not el.text.isspace()) else ""
     else:
         if el.tag not in _not_handled_tags:
+            # Convert xi:includes to `sphinxcontrib-globalsubs` format
             if el.tag == "{http://www.w3.org/2001/XInclude}include":
                 return "|%s|" % el.get("xpointer")
             else:
@@ -136,9 +133,8 @@ def _concat(el):
     "concatate .text with children (_conv'ed to text) and their tails"
     s = ""
     id = el.get("id")
-    # if id is not None and (WRITE_UNUSED_LABELS or id in _linked_ids):
-        # TODO: we don’t want this for xIncludes
-        # s += "\n\n.. _%s:\n\n" % id
+    if id is not None and (WRITE_UNUSED_LABELS or id in _linked_ids):
+        s += "\n\n.. _%s:\n\n" % id
     if el.text is not None:
         s += _remove_indent_and_escape(el.text, el.tag)
     for i in el:
@@ -334,14 +330,6 @@ def simplelist(el):
 
 def member(el):
     return _concat(el)
-
-# def listitem(el):
-#     _supports_only(el, ["para"])
-#     return _concat(el)
-
-def listitem(el):
-    return _indent(el, 3, None, True)
-
 
 # varlists
 
