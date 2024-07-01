@@ -274,11 +274,11 @@ def firstterm(el):
 acronym = _no_special_markup
 
 def command(el):
-    # return ":command:``%s``" % _concat(el).strip()
     return "``%s``" % _concat(el).strip()
 option = command
 filename = command
 constant = command
+literal = command
 
 def optional(el):
     return "[%s]" % _concat(el).strip()
@@ -456,9 +456,6 @@ def synopsis(el):
     return _indent(el, 3, "::\n\n", False) + "\n\n"
 
 def userinput(el):
-    return _indent(el, 3, "\n\n")
-
-def literal(el):
     return _indent(el, 3, "\n\n")
 
 def computeroutput(el):
