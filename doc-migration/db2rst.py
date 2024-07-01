@@ -31,7 +31,7 @@ REMOVE_COMMENTS = False
 
 # id attributes of DocBook elements are translated to ReST labels.
 # If this option is False, only labels that are used in links are generated.
-WRITE_UNUSED_LABELS = True
+WRITE_UNUSED_LABELS = False
 
 import sys
 import re
