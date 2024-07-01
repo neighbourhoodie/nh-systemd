@@ -110,6 +110,8 @@ def _conv(el):
   :start-after: .. inlcusion-marker-do-not-remove {el.get("xpointer")}
   :end-before: .. inlcusion-end-marker-do-not-remove {el.get("xpointer")}
                         """
+            elif el.tag == "{http://www.w3.org/2001/XInclude}include" and not el.get("xpointer"):
+                return f".. include:: ./includes/{el.get('href').replace('xml', 'rst')}"
             else:
                 _warn("Don't know how to handle <%s>" % el.tag)
                 #_warn(" ... from path: %s" % _get_path(el))
@@ -284,6 +286,7 @@ option = command
 filename = command
 constant = command
 literal = command
+varname = command
 
 def optional(el):
     return "[%s]" % _concat(el).strip()
