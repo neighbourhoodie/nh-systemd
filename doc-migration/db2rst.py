@@ -225,10 +225,10 @@ def refentryinfo(el):
     return '  '
 
 def refnamediv(el):
-    return '**Name** \t' + _make_title(_join_children(el, ' — '), 1)
+    return '**Name** \n\n' + _make_title(_join_children(el, ' — '), 2)
 
 def refsynopsisdiv(el):
-    return '**Synopsis** \t' + _make_title(_join_children(el, ' '), 2 )
+    return '**Synopsis** \n\n' + _make_title(_join_children(el, ' '), 3)
 
 def refname(el):
     _has_only_text(el)
@@ -416,7 +416,7 @@ def citerefentry(el):
     return f"`{refentrytitle}({manvolnum}) </{refentrytitle}.html#{target}>`_"
 
 def refmeta(el):
-    return ".. _%s:" % _join_children(el, '')
+    return ".. _%s:" % _join_children(el, '') + '\n\n' + _make_title(_join_children(el, ''), 1 )
 
 def refentrytitle(el):
     if el.get("url"):
