@@ -105,8 +105,8 @@ def _conv(el):
             # Convert xi:includes to `sphinxcontrib-globalsubs` format
             if el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') == 'version-info.xml':
                 return "|%s|." % el.get("xpointer")
-            elif el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') == 'standard-options.xml':
-                return f""".. include:: standard-options.rst
+            elif el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') in ['standard-options.xml', 'user-system-options.xml']:
+                return f""".. include:: {el.get('href').replace('xml', 'rst')}
   :start-after: .. inlcusion-marker-do-not-remove {el.get("xpointer")}
   :end-before: .. inlcusion-end-marker-do-not-remove {el.get("xpointer")}
                         """
