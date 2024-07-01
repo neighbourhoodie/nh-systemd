@@ -104,7 +104,7 @@ def _conv(el):
         if el.tag not in _not_handled_tags:
             # Convert xi:includes to `sphinxcontrib-globalsubs` format
             if el.tag == "{http://www.w3.org/2001/XInclude}include":
-                return "|%s|" % el.get("xpointer")
+                return "|%s|." % el.get("xpointer")
             else:
                 _warn("Don't know how to handle <%s>" % el.tag)
                 #_warn(" ... from path: %s" % _get_path(el))
@@ -186,8 +186,11 @@ def _indent(el, indent, first_line=None, suppress_blank_line=False):
     if suppress_blank_line:
         start = ""
 
+    # lines = [" "*indent + i for i in _concat(el).splitlines()
+    #         if i and not i.isspace()]
+    # TODO: This variant above strips empty lines within elements. We don’t want that to happen, at least not always
     lines = [" "*indent + i for i in _concat(el).splitlines()
-             if i and not i.isspace()]
+             if i]
     if first_line is not None:
         # replace indentation of the first line with prefix `first_line'
         lines[0] = first_line + lines[0][indent:]
@@ -222,12 +225,10 @@ def refentryinfo(el):
     return '  '
 
 def refnamediv(el):
-    t = _make_title('Name', 2)
-    return t + "\n\n" + _join_children(el, ' — ')
+    return '**Name** \t' + _make_title(_join_children(el, ' — '), 1)
 
 def refsynopsisdiv(el):
-    t = _make_title('Synopsis', 2)
-    return t + "\n\n" + _join_children(el, ' ')
+    return '**Synopsis** \t' + _make_title(_join_children(el, ' '), 2 )
 
 def refname(el):
     _has_only_text(el)
@@ -337,11 +338,13 @@ def variablelist(el):
     return _concat(el)
 
 def varlistentry(el):
-    # there can be more then one term which should be comma separated but the last item is a listitem
-    #FIXME: is this too hacky?
-    elements = [i for i in el]
-    last = elements[-1]
-    return ", ".join(_conv(i) for i in elements[:-1]) + listitem(last)
+    s = ""
+    for i in el:
+        if i.tag == 'term':
+            s += _conv(i) + '\n\n'
+        else:
+            s += _indent(i, 3, None, True)
+    return s
 
 def listitem(el):
     _supports_only(el, ["para", "simpara", "{http://www.w3.org/2001/XInclude}include"])
@@ -470,8 +473,7 @@ def keycap(el):
     return ":kbd:`%s`" % el.text
 
 def para(el):
-    #return _block_separated_with_blank_line(el)
-    return _indent(el, 0, None, True)
+    return _block_separated_with_blank_line(el) + '\n\n \n\n'
 
 def simpara(el):
     return _block_separated_with_blank_line(el)
