@@ -25,6 +25,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'furo'
 html_static_path = ['_static']
 html_title = ''
+html_css_files = [
+    'css/custom.css',
+]
 html_theme_options = {
   # TODO: update these `source`-options with the proper values
   "source_repository": "https://github.com/neighbourhoodie/nh-systemd",
