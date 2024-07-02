@@ -37,6 +37,8 @@ import sys
 import re
 import lxml.etree as ET
 
+from source import conf
+
 # to avoid dupliate error reports
 _not_handled_tags = set()
 
@@ -102,9 +104,10 @@ def _conv(el):
         return Comment(el) if (el.text and not el.text.isspace()) else ""
     else:
         if el.tag not in _not_handled_tags:
-            # Convert xi:includes to `sphinxcontrib-globalsubs` format
+            # Convert version references to `versionAdded` directives
             if el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') == 'version-info.xml':
-                return "|%s|." % el.get("xpointer")
+                versionString = conf.global_substitutions.get(el.get("xpointer"))
+                return f".. versionadded:: {versionString}"
             elif el.tag == "{http://www.w3.org/2001/XInclude}include" and el.get('href') in ['standard-options.xml', 'user-system-options.xml']:
                 return f""".. include:: ./includes/{el.get('href').replace('xml', 'rst')}
   :start-after: .. inclusion-marker-do-not-remove {el.get("xpointer")}
