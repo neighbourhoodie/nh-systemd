@@ -301,19 +301,46 @@ def replaceable(el):
     return "<%s>" % _concat(el).strip()
 
 def term(el):
+    if el.getparent().index(el) != 0:
+        return ' '
+
+    # Helper to extract the core of a term (eg. a command without all the options) for use as a title in the sidebar
     def getCommand(el):
-        command = None
+        command = ''
         for child in el:
-            if child.tag == 'command':
-                command = child.text
+            # varname too?
+            if child.tag in ['command', 'option', 'varname']:
+                command = child.text.rstrip('=')
                 break
         return command
-    # If this contains a <command>, split that out as the title in a new line, then repeat it with the entire term in the next line
+
+    # Sometimes, there are multiple terms for one entry. We want those displayed in a single line, so we gather them all up and parse them together
+    hasMultipleTerms = False
+    titleStrings = [getCommand(el)]
+    usageStrings = [_concat(el).strip()]
+    for term in el.itersiblings(tag='term'):
+        # We only arrive here if there is more than one `<term>` in the `el`
+        hasMultipleTerms = True
+        titleStrings.append(getCommand(term))
+        usageStrings.append(_concat(term).strip())
+
+    if hasMultipleTerms:
+        titleString = ', '.join(titleStrings)
+        usageString = ', '.join(usageStrings)
+        s = ''
+        s += _make_title(f"``{titleString}``", 4) + '\n\n'
+        if titleString != usageString:
+            s += f"*Usage:* ``{usageString}``"
+        return s
+
+    # If this contains a <command> or <option>, split that out as the title in a new line, then repeat it with the entire term in the next line
     command = getCommand(el)
     if command:
+        usageString = _concat(el).strip()
         s = ''
-        s += _make_title(command, 4) + '\n\n'
-        s += f"``{_concat(el).strip()}``"
+        s += _make_title(f"``{command}``", 4) + '\n\n'
+        if command != usageString:
+            s += f"*Usage:* ``{usageString}``"
         return s
     else:
         return  _make_title(_concat(el).strip(), 4)
