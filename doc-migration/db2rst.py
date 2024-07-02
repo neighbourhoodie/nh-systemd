@@ -284,12 +284,15 @@ def firstterm(el):
 acronym = _no_special_markup
 
 def command(el):
+    if el.getparent().tag == 'term':
+        return _concat(el).strip()
     return "``%s``" % _concat(el).strip()
 option = command
 filename = command
 constant = command
 literal = command
 varname = command
+function =  command
 
 def optional(el):
     return "[%s]" % _concat(el).strip()
@@ -298,7 +301,22 @@ def replaceable(el):
     return "<%s>" % _concat(el).strip()
 
 def term(el):
-    return  _make_title(_concat(el).strip(), 4)
+    def getCommand(el):
+        command = None
+        for child in el:
+            if child.tag == 'command':
+                command = child.text
+                break
+        return command
+    # If this contains a <command>, split that out as the title in a new line, then repeat it with the entire term in the next line
+    command = getCommand(el)
+    if command:
+        s = ''
+        s += _make_title(command, 4) + '\n\n'
+        s += f"``{_concat(el).strip()}``"
+        return s
+    else:
+        return  _make_title(_concat(el).strip(), 4)
 
 # links
 
@@ -457,7 +475,7 @@ def videodata(el):
         '    </video>'
 
 def programlisting(el):
-    return f"\n\n.. code-block:: \n\n{_indent(el, 3)}\n\n"
+    return f"\n\n.. code-block:: sh \n\n{_indent(el, 3)}\n\n"
 
 def screen(el):
     return _indent(el, 3, "::\n\n", False) + "\n\n"
