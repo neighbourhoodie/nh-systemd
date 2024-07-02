@@ -19,12 +19,20 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'furo'
 html_static_path = ['_static']
+html_title = ''
+html_theme_options = {
+  "light_logo": "systemd-logo.svg",
+  "dark_logo": "systemd-logo.svg",
+  "light_css_variables": {
+    "color-brand-primary": "#35a764",
+    "color-brand-content": "#35a764",
+  },
+}
 
 global_substitutions = {
   'v183': 'Added in version 183',
