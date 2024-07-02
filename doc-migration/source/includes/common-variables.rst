@@ -1,7 +1,7 @@
 
 
 Environment
-###########
+===========
 
 ``$SYSTEMD_LOG_LEVEL``
 ----------------------
@@ -99,24 +99,24 @@ Environment
 
    Users might want to change two options in particular:
 
-   ``K``
-   -----
-      This option instructs the pager to exit immediately when
-      :kbd:`Ctrl` + :kbd:`C` is pressed. To allow
-      ``less`` to handle :kbd:`Ctrl` + :kbd:`C`
-      itself to switch back to the pager command prompt, unset this option.
+``K``
+^^^^^
+   This option instructs the pager to exit immediately when
+   :kbd:`Ctrl` + :kbd:`C` is pressed. To allow
+   ``less`` to handle :kbd:`Ctrl` + :kbd:`C`
+   itself to switch back to the pager command prompt, unset this option.
 
-      If the value of ``$SYSTEMD_LESS`` does not include ``K``,
-      and the pager that is invoked is ``less``,
-      :kbd:`Ctrl` + :kbd:`C` will be ignored by the
-      executable, and needs to be handled by the pager.
+   If the value of ``$SYSTEMD_LESS`` does not include ``K``,
+   and the pager that is invoked is ``less``,
+   :kbd:`Ctrl` + :kbd:`C` will be ignored by the
+   executable, and needs to be handled by the pager.
 
-   ``X``
-   -----
-      This option instructs the pager to not send termcap initialization and deinitialization
-      strings to the terminal. It is set by default to allow command output to remain visible in the
-      terminal even after the pager exits. Nevertheless, this prevents some pager functionality from
-      working, in particular paged output cannot be scrolled with the mouse.
+``X``
+^^^^^
+   This option instructs the pager to not send termcap initialization and deinitialization
+   strings to the terminal. It is set by default to allow command output to remain visible in the
+   terminal even after the pager exits. Nevertheless, this prevents some pager functionality from
+   working, in particular paged output cannot be scrolled with the mouse.
 
    Note that setting the regular ``$LESS`` environment variable has no effect
    for ``less`` invocations by systemd tools.
