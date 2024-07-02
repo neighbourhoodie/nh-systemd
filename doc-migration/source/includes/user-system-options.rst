@@ -1,5 +1,5 @@
 
-.. inlcusion-marker-do-not-remove user
+.. inclusion-marker-do-not-remove user
 
 ``--user``
 ----------
@@ -7,9 +7,9 @@
    Talk to the service manager of the calling user,
    rather than the service manager of the system.
 
-.. inlcusion-end-marker-do-not-remove user
+.. inclusion-end-marker-do-not-remove user
 
-.. inlcusion-marker-do-not-remove system
+.. inclusion-marker-do-not-remove system
 
 ``--system``
 ------------
@@ -17,9 +17,9 @@
    Talk to the service manager of the system. This is the
    implied default.
 
-.. inlcusion-end-marker-do-not-remove system
+.. inclusion-end-marker-do-not-remove system
 
-.. inlcusion-marker-do-not-remove host
+.. inclusion-marker-do-not-remove host
 
 ``-H``, ``--host=``
 -------------------
@@ -35,9 +35,9 @@
    ``machinectl -H
    <HOST>``. Put IPv6 addresses in brackets.
 
-.. inlcusion-end-marker-do-not-remove host
+.. inclusion-end-marker-do-not-remove host
 
-.. inlcusion-marker-do-not-remove machine
+.. inclusion-marker-do-not-remove machine
 
 ``-M``, ``--machine=``
 ----------------------
@@ -51,9 +51,9 @@
    side may be omitted (but not both) in which case the local user name and ``.host`` are
    implied.
 
-.. inlcusion-end-marker-do-not-remove machine
+.. inclusion-end-marker-do-not-remove machine
 
-.. inlcusion-marker-do-not-remove capsule
+.. inclusion-marker-do-not-remove capsule
 
 ``-C``, ``--capsule=``
 ----------------------
@@ -62,4 +62,4 @@
    :ref:`capsule@.service(5)` for
    details about capsules.
 
-.. inlcusion-end-marker-do-not-remove capsule
+.. inclusion-end-marker-do-not-remove capsule

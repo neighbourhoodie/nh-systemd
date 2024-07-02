@@ -1,41 +1,41 @@
 
-.. inlcusion-marker-do-not-remove help
+.. inclusion-marker-do-not-remove help
 
 ``-h``, ``--help``
 ------------------
 
    Print a short help text and exit.
 
-.. inlcusion-end-marker-do-not-remove help
+.. inclusion-end-marker-do-not-remove help
 
-.. inlcusion-marker-do-not-remove version
+.. inclusion-marker-do-not-remove version
 
 ``--version``
 -------------
 
    Print a short version string and exit.
 
-.. inlcusion-end-marker-do-not-remove version
+.. inclusion-end-marker-do-not-remove version
 
-.. inlcusion-marker-do-not-remove no-pager
+.. inclusion-marker-do-not-remove no-pager
 
 ``--no-pager``
 --------------
 
    Do not pipe output into a pager.
 
-.. inlcusion-end-marker-do-not-remove no-pager
+.. inclusion-end-marker-do-not-remove no-pager
 
-.. inlcusion-marker-do-not-remove no-ask-password
+.. inclusion-marker-do-not-remove no-ask-password
 
 ``--no-ask-password``
 ---------------------
 
    Do not query the user for authentication for privileged operations.
 
-.. inlcusion-end-marker-do-not-remove no-ask-password
+.. inclusion-end-marker-do-not-remove no-ask-password
 
-.. inlcusion-marker-do-not-remove legend
+.. inclusion-marker-do-not-remove legend
 
 ``--legend=<BOOL>``
 -------------------
@@ -43,9 +43,9 @@
    Enable or disable printing of the legend, i.e. column headers and the footer with hints. The
    legend is printed by default, unless disabled with ``--quiet`` or similar.
 
-.. inlcusion-end-marker-do-not-remove legend
+.. inclusion-end-marker-do-not-remove legend
 
-.. inlcusion-marker-do-not-remove no-legend
+.. inclusion-marker-do-not-remove no-legend
 
 ``--no-legend``
 ---------------
@@ -53,9 +53,9 @@
    Do not print the legend, i.e. column headers and the
    footer with hints.
 
-.. inlcusion-end-marker-do-not-remove no-legend
+.. inclusion-end-marker-do-not-remove no-legend
 
-.. inlcusion-marker-do-not-remove cat-config
+.. inclusion-marker-do-not-remove cat-config
 
 ``--cat-config``
 ----------------
@@ -63,9 +63,9 @@
    Copy the contents of config files to standard output.
    Before each file, the filename is printed as a comment.
 
-.. inlcusion-end-marker-do-not-remove cat-config
+.. inclusion-end-marker-do-not-remove cat-config
 
-.. inlcusion-marker-do-not-remove tldr
+.. inclusion-marker-do-not-remove tldr
 
 ``--tldr``
 ----------
@@ -74,9 +74,9 @@
    configuration files are printed, comments and empty lines are skipped. Before each file, the filename
    is printed as a comment.
 
-.. inlcusion-end-marker-do-not-remove tldr
+.. inclusion-end-marker-do-not-remove tldr
 
-.. inlcusion-marker-do-not-remove json
+.. inclusion-marker-do-not-remove json
 
 ``--json=<MODE>``
 -----------------
@@ -86,9 +86,9 @@
    (for a pretty version of the same, with indentation and line breaks) or ``off`` (to turn
    off JSON output, the default).
 
-.. inlcusion-end-marker-do-not-remove json
+.. inclusion-end-marker-do-not-remove json
 
-.. inlcusion-marker-do-not-remove j
+.. inclusion-marker-do-not-remove j
 
 ``-j``
 ------
@@ -96,9 +96,9 @@
    Equivalent to ``--json=pretty`` if running on a terminal, and
    ``--json=short`` otherwise.
 
-.. inlcusion-end-marker-do-not-remove j
+.. inclusion-end-marker-do-not-remove j
 
-.. inlcusion-marker-do-not-remove signal
+.. inclusion-marker-do-not-remove signal
 
 ``-s``, ``--signal=``
 ---------------------
@@ -112,9 +112,9 @@
    immediately, and the special value ``list`` will list known values along with the
    numerical signal numbers and the program will exit immediately.
 
-.. inlcusion-end-marker-do-not-remove signal
+.. inclusion-end-marker-do-not-remove signal
 
-.. inlcusion-marker-do-not-remove image-policy-open
+.. inclusion-marker-do-not-remove image-policy-open
 
 ``--image-policy=<policy>``
 ---------------------------
@@ -125,9 +125,9 @@
    above. If not specified defaults to the ``*`` policy, i.e. all recognized file systems
    in the image are used.
 
-.. inlcusion-end-marker-do-not-remove image-policy-open
+.. inclusion-end-marker-do-not-remove image-policy-open
 
-.. inlcusion-marker-do-not-remove esp-path
+.. inclusion-marker-do-not-remove esp-path
 
 ``--esp-path=``
 ---------------
@@ -136,9 +136,9 @@
    ``/boot/``, and ``/boot/efi/`` are checked in turn. It is
    recommended to mount the ESP to ``/efi/``, if possible.
 
-.. inlcusion-end-marker-do-not-remove esp-path
+.. inclusion-end-marker-do-not-remove esp-path
 
-.. inlcusion-marker-do-not-remove boot-path
+.. inclusion-marker-do-not-remove boot-path
 
 ``--boot-path=``
 ----------------
@@ -148,9 +148,9 @@
    If not specified, ``/boot/`` is checked. It is recommended to mount the Extended Boot
    Loader partition to ``/boot/``, if possible.
 
-.. inlcusion-end-marker-do-not-remove boot-path
+.. inclusion-end-marker-do-not-remove boot-path
 
-.. inlcusion-marker-do-not-remove option-P
+.. inclusion-marker-do-not-remove option-P
 
 ``-P``
 ------
@@ -158,4 +158,4 @@
    Equivalent to ``--value`` ``--property=``, i.e. shows the value of the
    property without the property name or ``=``. Note that using ``-P`` once
    will also affect all properties listed with ``-p``/``--property=``.
-.. inlcusion-end-marker-do-not-remove option-P
+.. inclusion-end-marker-do-not-remove option-P
