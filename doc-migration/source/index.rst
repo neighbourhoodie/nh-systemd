@@ -24,6 +24,8 @@ Welcome to systemd's documentation!
    journalctl
    systemd
    os-release
+   coredumpctl
+   binfmt.d
 
 Indices and tables
 ==================
