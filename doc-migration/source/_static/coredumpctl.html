@@ -1,0 +1,127 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>coredumpctl</title><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="refentry"><a name="coredumpctl"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>coredumpctl — Retrieve and process saved core dumps and metadata</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis"><p><code class="command">coredumpctl</code>  [OPTIONS...] {COMMAND} [PID|COMM|EXE|MATCH...]</p></div></div><div class="refsect1"><a name="id-1.5"></a><h2 id="Description">Description<a class="headerlink" title="Permalink to this headline" href="#Description">¶</a></h2><p><span class="command"><strong>coredumpctl</strong></span> is a tool that can be used to retrieve and process core
+    dumps and metadata which were saved by
+    <a href="systemd-coredump.html#"><span class="citerefentry"><span class="refentrytitle">systemd-coredump</span>(8)</span></a>.
+    </p></div><div class="refsect1"><a name="id-1.6"></a><h2 id="Commands">Commands<a class="headerlink" title="Permalink to this headline" href="#Commands">¶</a></h2><p>The following commands are understood:</p><div class="variablelist"><dl class="variablelist"><dt id="list"><span class="term"><span class="command"><strong>list</strong></span></span><a class="headerlink" title="Permalink to this term" href="#list">¶</a></dt><dd><p>List core dumps captured in the journal
+        matching specified characteristics. If no command is
+        specified, this is the implied default.</p><p>The output is designed to be human readable and contains a table with the following
+        columns:</p><div class="variablelist"><dl class="variablelist"><dt id="TIME"><span class="term">TIME</span><a class="headerlink" title="Permalink to this term" href="#TIME">¶</a></dt><dd><p>The timestamp of the crash, as reported by the kernel.</p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="PID"><span class="term">PID</span><a class="headerlink" title="Permalink to this term" href="#PID">¶</a></dt><dd><p>The identifier of the process that crashed.</p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="UID"><span class="term">UID, </span><span class="term">GID</span><a class="headerlink" title="Permalink to this term" href="#UID">¶</a></dt><dd><p>The user and group identifiers of the process that crashed.</p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="SIGNAL"><span class="term">SIGNAL</span><a class="headerlink" title="Permalink to this term" href="#SIGNAL">¶</a></dt><dd><p>The signal that caused the process to crash, when applicable.
+            </p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="COREFILE"><span class="term">COREFILE</span><a class="headerlink" title="Permalink to this term" href="#COREFILE">¶</a></dt><dd><p>Information whether the coredump was stored, and whether
+            it is still accessible: "<code class="literal">none</code>" means the core was
+            not stored, "<code class="literal">-</code>" means that it was not available (for
+            example because the process was not terminated by a signal),
+            "<code class="literal">present</code>" means that the core file is accessible by the
+            current user, "<code class="literal">journal</code>" means that the core was stored
+            in the "<code class="literal">journal</code>", "<code class="literal">truncated</code>" is the
+            same as one of the previous two, but the core was too large and was not
+            stored in its entirety, "<code class="literal">error</code>" means that the core file
+            cannot be accessed, most likely because of insufficient permissions, and
+            "<code class="literal">missing</code>" means that the core was stored in a file, but
+            this file has since been removed.</p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="EXE"><span class="term">EXE</span><a class="headerlink" title="Permalink to this term" href="#EXE">¶</a></dt><dd><p>The full path to the executable. For backtraces of scripts
+            this is the name of the interpreter.</p><p><a name="v233"></a>Added in version 233.</p></dd></dl></div><p>It's worth noting that different restrictions apply to
+        data saved in the journal and core dump files saved in
+        <code class="filename">/var/lib/systemd/coredump</code>, see overview in
+        <a href="systemd-coredump.html#"><span class="citerefentry"><span class="refentrytitle">systemd-coredump</span>(8)</span></a>.
+        Thus it may very well happen that a particular core dump is still listed
+        in the journal while its corresponding core dump file has already been
+        removed.</p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="info"><span class="term"><span class="command"><strong>info</strong></span></span><a class="headerlink" title="Permalink to this term" href="#info">¶</a></dt><dd><p>Show detailed information about the last core dump
+        or core dumps matching specified characteristics
+        captured in the journal.</p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="dump"><span class="term"><span class="command"><strong>dump</strong></span></span><a class="headerlink" title="Permalink to this term" href="#dump">¶</a></dt><dd><p>Extract the last core dump matching specified
+        characteristics. The core dump will be written on standard
+        output, unless an output file is specified with
+        <code class="option">--output=</code>. </p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="debug"><span class="term"><span class="command"><strong>debug</strong></span></span><a class="headerlink" title="Permalink to this term" href="#debug">¶</a></dt><dd><p>Invoke a debugger on the last core dump
+        matching specified characteristics. By default,
+        <a href="https://man7.org/linux/man-pages/man1/gdb.1.html"><span class="citerefentry"><span class="refentrytitle">gdb</span>(1)</span></a>
+        will be used. This may be changed using the <code class="option">--debugger=</code>
+        option or the <code class="varname">$SYSTEMD_DEBUGGER</code> environment
+        variable. Use the <code class="option">--debugger-arguments=</code> option to pass extra
+        command line arguments to the debugger.</p><p><a name="v239"></a>Added in version 239.</p></dd></dl></div></div><div class="refsect1"><a name="id-1.7"></a><h2 id="Options">Options<a class="headerlink" title="Permalink to this headline" href="#Options">¶</a></h2><p>The following options are understood:</p><div class="variablelist"><dl class="variablelist"><dt id="-h"><span class="term"><code class="option">-h</code>, </span><span class="term"><code class="option">--help</code></span><a class="headerlink" title="Permalink to this term" href="#-h">¶</a></dt><dd><p><a name="help-text"></a><a name="help-para"></a>Print a short help text and exit.
+    </p></dd><dt id="--version"><span class="term"><code class="option">--version</code></span><a class="headerlink" title="Permalink to this term" href="#--version">¶</a></dt><dd><p><a name="version-text"></a>Print a short version string and exit.</p></dd><dt id="--no-pager"><span class="term"><code class="option">--no-pager</code></span><a class="headerlink" title="Permalink to this term" href="#--no-pager">¶</a></dt><dd><p>Do not pipe output into a pager.</p></dd><dt id="--no-legend"><span class="term"><code class="option">--no-legend</code></span><a class="headerlink" title="Permalink to this term" href="#--no-legend">¶</a></dt><dd><p>Do not print the legend, i.e. column headers and the
+      footer with hints.</p></dd><dt id="--json=MODE"><span class="term"><code class="option">--json=<em class="replaceable"><code>MODE</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#--json=MODE">¶</a></dt><dd><p>Shows output formatted as JSON. Expects one of "<code class="literal">short</code>" (for the
+    shortest possible output without any redundant whitespace or line breaks), "<code class="literal">pretty</code>"
+    (for a pretty version of the same, with indentation and line breaks) or "<code class="literal">off</code>" (to turn
+    off JSON output, the default).</p></dd><dt id="-1"><span class="term"><code class="option">-1</code></span><a class="headerlink" title="Permalink to this term" href="#-1">¶</a></dt><dd><p>Show information of the most recent core dump only, instead of listing all known core
+        dumps. Equivalent to <code class="option">--reverse -n 1</code>.</p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="-n INT"><span class="term"><code class="option">-n</code> <em class="replaceable"><code>INT</code></em></span><a class="headerlink" title="Permalink to this term" href="#-n%20INT">¶</a></dt><dd><p>Show at most the specified number of entries. The specified parameter must be an
+        integer greater or equal to 1.</p><p><a name="v248"></a>Added in version 248.</p></dd><dt id="-S"><span class="term"><code class="option">-S</code>, </span><span class="term"><code class="option">--since</code></span><a class="headerlink" title="Permalink to this term" href="#-S">¶</a></dt><dd><p>Only print entries which are since the specified date.</p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="-U"><span class="term"><code class="option">-U</code>, </span><span class="term"><code class="option">--until</code></span><a class="headerlink" title="Permalink to this term" href="#-U">¶</a></dt><dd><p>Only print entries which are until the specified date.</p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="-r"><span class="term"><code class="option">-r</code>, </span><span class="term"><code class="option">--reverse</code></span><a class="headerlink" title="Permalink to this term" href="#-r">¶</a></dt><dd><p>Reverse output so that the newest entries are displayed first.
+        </p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="-F FIELD"><span class="term"><code class="option">-F</code> <em class="replaceable"><code>FIELD</code></em>, </span><span class="term"><code class="option">--field=<em class="replaceable"><code>FIELD</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#-F%20FIELD">¶</a></dt><dd><p>Print all possible data values the specified
+        field takes in matching core dump entries of the
+        journal.</p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="-o FILE"><span class="term"><code class="option">-o</code> <em class="replaceable"><code>FILE</code></em>, </span><span class="term"><code class="option">--output=<em class="replaceable"><code>FILE</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#-o%20FILE">¶</a></dt><dd><p>Write the core to <code class="option">FILE</code>.
+        </p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="--debugger=DEBUGGER"><span class="term"><code class="option">--debugger=<em class="replaceable"><code>DEBUGGER</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#--debugger=DEBUGGER">¶</a></dt><dd><p>Use the given debugger for the <span class="command"><strong>debug</strong></span>
+        command. If not given and <code class="varname">$SYSTEMD_DEBUGGER</code> is unset, then
+        <a href="https://man7.org/linux/man-pages/man1/gdb.1.html"><span class="citerefentry"><span class="refentrytitle">gdb</span>(1)</span></a>
+        will be used. </p><p><a name="v239"></a>Added in version 239.</p></dd><dt id="-A ARGS"><span class="term"><code class="option">-A</code> <em class="replaceable"><code>ARGS</code></em>, </span><span class="term"><code class="option">--debugger-arguments=<em class="replaceable"><code>ARGS</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#-A%20ARGS">¶</a></dt><dd><p>Pass the given <em class="replaceable"><code>ARGS</code></em> as extra command line arguments
+        to the debugger. Quote as appropriate when <em class="replaceable"><code>ARGS</code></em> contain whitespace.
+        (See Examples.)</p><p><a name="v248"></a>Added in version 248.</p></dd><dt id="--file=GLOB"><span class="term"><code class="option">--file=<em class="replaceable"><code>GLOB</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#--file=GLOB">¶</a></dt><dd><p>Takes a file glob as an argument. If
+        specified, coredumpctl will operate on the specified journal
+        files matching <em class="replaceable"><code>GLOB</code></em> instead of the
+        default runtime and system journal paths. May be specified
+        multiple times, in which case files will be suitably
+        interleaved.</p><p><a name="v246"></a>Added in version 246.</p></dd><dt id="-D DIR"><span class="term"><code class="option">-D</code> <em class="replaceable"><code>DIR</code></em>, </span><span class="term"><code class="option">--directory=<em class="replaceable"><code>DIR</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#-D%20DIR">¶</a></dt><dd><p>Use the journal files in the specified <code class="option">DIR</code>.
+        </p><p><a name="v225"></a>Added in version 225.</p></dd><dt id="--root=ROOT"><span class="term"><code class="option">--root=<em class="replaceable"><code>ROOT</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#--root=ROOT">¶</a></dt><dd><p>Use root directory <code class="option">ROOT</code> when searching for coredumps.
+        </p><p><a name="v252"></a>Added in version 252.</p></dd><dt id="--image=image"><span class="term"><code class="option">--image=<em class="replaceable"><code>image</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#--image=image">¶</a></dt><dd><p>Takes a path to a disk image file or block device node. If specified, all operations
+        are applied to file system in the indicated disk image. This option is similar to
+        <code class="option">--root=</code>, but operates on file systems stored in disk images or block devices. The
+        disk image should either contain just a file system or a set of file systems within a GPT partition
+        table, following the <a class="ulink" href="https://uapi-group.org/specifications/specs/discoverable_partitions_specification" target="_top">Discoverable Partitions
+        Specification</a>. For further information on supported disk images, see
+        <a href="systemd-nspawn.html#"><span class="citerefentry"><span class="refentrytitle">systemd-nspawn</span>(1)</span></a>'s
+        switch of the same name.</p><p><a name="v252"></a>Added in version 252.</p></dd><dt id="--image-policy=policy"><span class="term"><code class="option">--image-policy=<em class="replaceable"><code>policy</code></em></code></span><a class="headerlink" title="Permalink to this term" href="#--image-policy=policy">¶</a></dt><dd><p>Takes an image policy string as argument, as per
+    <a href="systemd.image-policy.html#"><span class="citerefentry"><span class="refentrytitle">systemd.image-policy</span>(7)</span></a>. The
+    policy is enforced when operating on the disk image specified via <code class="option">--image=</code>, see
+    above. If not specified defaults to the "<code class="literal">*</code>" policy, i.e. all recognized file systems
+    in the image are used.</p></dd><dt id="-q"><span class="term"><code class="option">-q</code>, </span><span class="term"><code class="option">--quiet</code></span><a class="headerlink" title="Permalink to this term" href="#-q">¶</a></dt><dd><p>Suppresses informational messages about lack
+        of access to journal files and possible in-flight coredumps.
+        </p><p><a name="v233"></a>Added in version 233.</p></dd><dt id="--all"><span class="term"><code class="option">--all</code></span><a class="headerlink" title="Permalink to this term" href="#--all">¶</a></dt><dd><p>Look at all available journal files in <code class="filename">/var/log/journal/</code>
+        (excluding journal namespaces) instead of only local ones.</p><p><a name="v250"></a>Added in version 250.</p></dd></dl></div></div><div class="refsect1"><a name="id-1.8"></a><h2 id="Matching">Matching<a class="headerlink" title="Permalink to this headline" href="#Matching">¶</a></h2><p>A match can be:</p><div class="variablelist"><dl class="variablelist"><dt id="PID1"><span class="term"><em class="replaceable"><code>PID</code></em></span><a class="headerlink" title="Permalink to this term" href="#PID1">¶</a></dt><dd><p>Process ID of the
+        process that dumped
+        core. An integer.</p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="COMM"><span class="term"><em class="replaceable"><code>COMM</code></em></span><a class="headerlink" title="Permalink to this term" href="#COMM">¶</a></dt><dd><p>Name of the executable (matches
+        <code class="option">COREDUMP_COMM=</code>). Must not contain slashes.
+        </p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="EXE1"><span class="term"><em class="replaceable"><code>EXE</code></em></span><a class="headerlink" title="Permalink to this term" href="#EXE1">¶</a></dt><dd><p>Path to the executable (matches
+        <code class="option">COREDUMP_EXE=</code>). Must contain at least one
+        slash. </p><p><a name="v215"></a>Added in version 215.</p></dd><dt id="MATCH"><span class="term"><em class="replaceable"><code>MATCH</code></em></span><a class="headerlink" title="Permalink to this term" href="#MATCH">¶</a></dt><dd><p>General journalctl match filter, must contain an equals
+        sign ("<code class="literal">=</code>"). See
+        <a href="journalctl.html#"><span class="citerefentry"><span class="refentrytitle">journalctl</span>(1)</span></a>.
+        </p><p><a name="v215"></a>Added in version 215.</p></dd></dl></div></div><div class="refsect1"><a name="id-1.9"></a><h2 id="Exit status">Exit status<a class="headerlink" title="Permalink to this headline" href="#Exit%20status">¶</a></h2><p>On success, 0 is returned; otherwise, a non-zero failure
+    code is returned. Not finding any matching core dumps is treated as
+    failure.
+    </p></div><div class="refsect1"><a name="id-1.10"></a><h2 id="Environment">Environment<a class="headerlink" title="Permalink to this headline" href="#Environment">¶</a></h2><div class="variablelist"><dl class="variablelist"><dt id="$SYSTEMD_DEBUGGER"><span class="term"><code class="varname">$SYSTEMD_DEBUGGER</code></span><a class="headerlink" title="Permalink to this term" href="#%24SYSTEMD_DEBUGGER">¶</a></dt><dd><p>Use the given debugger for the <span class="command"><strong>debug</strong></span>
+        command. See the <code class="option">--debugger=</code> option.</p><p><a name="v239"></a>Added in version 239.</p></dd></dl></div></div><div class="refsect1"><a name="id-1.11"></a><h2 id="Examples">Examples<a class="headerlink" title="Permalink to this headline" href="#Examples">¶</a></h2><div class="example"><a name="id-1.11.2"></a><p class="title"><b>Example 1. List all the core dumps of a program</b></p><div class="example-contents"><pre class="programlisting">$ coredumpctl list /usr/lib64/firefox/firefox
+TIME       PID  UID  GID SIG     COREFILE EXE                         SIZE
+Tue …   8018 1000 1000 SIGSEGV missing  /usr/lib64/firefox/firefox     -
+Wed … 251609 1000 1000 SIGTRAP missing  /usr/lib64/firefox/firefox     -
+Fri … 552351 1000 1000 SIGSEGV present  /usr/lib64/firefox/firefox 28.7M
+</pre><p>The journal has three entries pertaining to <code class="filename">/usr/lib64/firefox/firefox</code>, and
+       only the last entry still has an available core file (in external storage on disk).</p><p>Note that <code class="filename">coredumpctl</code> needs access to the journal files to retrieve the
+       relevant entries from the journal. Thus, an unprivileged user will normally only see information about
+       crashing programs of this user.</p></div></div><br class="example-break"><div class="example"><a name="id-1.11.3"></a><p class="title"><b>Example 2. Invoke <span class="command">gdb</span> on the last core dump</b></p><div class="example-contents"><pre class="programlisting">$ coredumpctl debug</pre></div></div><br class="example-break"><div class="example"><a name="id-1.11.4"></a><p class="title"><b>Example 3. Use <span class="command">gdb</span> to display full register info from the last core dump</b></p><div class="example-contents"><pre class="programlisting">$ coredumpctl debug --debugger-arguments="-batch -ex 'info all-registers'"</pre></div></div><br class="example-break"><div class="example"><a name="id-1.11.5"></a><p class="title"><b>Example 4. Show information about a core dump matched by PID</b></p><div class="example-contents"><pre class="programlisting">$ coredumpctl info 6654
+           PID: 6654 (bash)
+           UID: 1000 (user)
+           GID: 1000 (user)
+        Signal: 11 (SEGV)
+     Timestamp: Mon 2021-01-01 00:00:01 CET (20s ago)
+  Command Line: bash -c $'kill -SEGV $$'
+    Executable: /usr/bin/bash
+ Control Group: /user.slice/user-1000.slice/…
+          Unit: user@1000.service
+     User Unit: vte-spawn-….scope
+         Slice: user-1000.slice
+     Owner UID: 1000 (user)
+       Boot ID: …
+    Machine ID: …
+      Hostname: …
+       Storage: /var/lib/systemd/coredump/core.bash.1000.….zst (present)
+  Size on Disk: 51.7K
+       Message: Process 130414 (bash) of user 1000 dumped core.
+
+                Stack trace of thread 130414:
+                #0  0x00007f398142358b kill (libc.so.6 + 0x3d58b)
+                #1  0x0000558c2c7fda09 kill_builtin (bash + 0xb1a09)
+                #2  0x0000558c2c79dc59 execute_builtin.lto_priv.0 (bash + 0x51c59)
+                #3  0x0000558c2c79709c execute_simple_command (bash + 0x4b09c)
+                #4  0x0000558c2c798408 execute_command_internal (bash + 0x4c408)
+                #5  0x0000558c2c7f6bdc parse_and_execute (bash + 0xaabdc)
+                #6  0x0000558c2c85415c run_one_command.isra.0 (bash + 0x10815c)
+                #7  0x0000558c2c77d040 main (bash + 0x31040)
+                #8  0x00007f398140db75 __libc_start_main (libc.so.6 + 0x27b75)
+                #9  0x0000558c2c77dd1e _start (bash + 0x31d1e)
+</pre></div></div><br class="example-break"><div class="example"><a name="id-1.11.6"></a><p class="title"><b>Example 5. Extract the last core dump of /usr/bin/bar to a file named
+      <code class="filename">bar.coredump</code></b></p><div class="example-contents"><pre class="programlisting">$ coredumpctl -o bar.coredump dump /usr/bin/bar</pre></div></div><br class="example-break"></div><div class="refsect1"><a name="id-1.12"></a><h2 id="See Also">See Also<a class="headerlink" title="Permalink to this headline" href="#See%20Also">¶</a></h2><p><span class="simplelist"><a href="systemd-coredump.html#"><span class="citerefentry"><span class="refentrytitle">systemd-coredump</span>(8)</span></a>, <a href="coredump.conf.html#"><span class="citerefentry"><span class="refentrytitle">coredump.conf</span>(5)</span></a>, <a href="systemd-journald.service.html#"><span class="citerefentry"><span class="refentrytitle">systemd-journald.service</span>(8)</span></a>, <a href="https://man7.org/linux/man-pages/man1/gdb.1.html"><span class="citerefentry"><span class="refentrytitle">gdb</span>(1)</span></a></span></p></div></div></body></html>

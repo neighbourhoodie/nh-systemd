@@ -8,6 +8,7 @@
       - [Sphinx Extensions](#sphinx-extensions)
         - [sphinxcontrib-globalsubs](#sphinxcontrib-globalsubs)
   - [Todo:](#todo)
+  - [A Strategy for embedding DocBook html pages in Sphinx](#a-strategy-for-embedding-docbook-html-pages-in-sphinx)
 
 ## Prerequisites
 
@@ -81,3 +82,30 @@ An incomplete list.
   - [ ] Build a directives index, as in `tools/make-directive-index.py`
 - [ ] See whether `tools/update-man-rules.py` does anything we don’t do
 - [ ] Make sure the `man_pages` we generate for Sphinx’s `conf.py` match the Meson rules in `man/rules/meson.build`
+
+## A Strategy for embedding DocBook html pages in Sphinx
+
+This would need to be automated:
+
+1. Get a rendered page from DocBook and save it in `/doc-migration/source/_static`
+2. Remove everything from the `jQuery` script tag to the `<hr>` tag at the end of the navi
+3. Add an `rst` file with the same name as the `html` file to `/doc-migration/source`
+4. Somehow figure out the manvolnum for this file and then generate these lines in that `rst`, for example for `coredumpctl(1)`, this will enable Sphinx to autolink this page from actual Sphinx pages:
+  ```rst
+  .. meta::
+      :title: coredumpctl
+
+  .. meta::
+      :manvolnum: 1
+
+  .. _coredumpctl(1):
+
+  ==============
+  coredumpctl(1)
+  ==============
+
+  .. raw:: html
+    :file: _static/coredumpctl.html
+  ```
+5. Add the file(name) to the `source/index.rst`, however we end up generating this file
+6. Make sure these `rst` files _are not_ used to generate `man` pages, those should still come from DocBook.
