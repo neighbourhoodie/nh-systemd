@@ -103,6 +103,8 @@ So that a `<xi:include href="standard-options.xml" xpointer="no-pager" />` turns
   :end-before: .. inclusion-end-marker-do-not-remove no-pager
 ```
 
+Files that only have content that will be included in other files and therefore should not be part of the index have the `:orphan:` tag. This will suppress warnings about this file not being in the toctree.
+
 ## Todo:
 
 An incomplete list.
