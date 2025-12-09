@@ -1,0 +1,80 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_get_monotonic_usec
+:manvolnum: 3
+:summary: Retrieve the sender timestamps and sequence number of a message
+:aliases: sd_bus_message_get_realtime_usec, sd_bus_message_get_seqnum
+
+.. _sd_bus_message_get_monotonic_usec(3):
+
+====================================
+sd_bus_message_get_monotonic_usec(3)
+====================================
+
+Name
+####
+
+sd_bus_message_get_monotonic_usec, sd_bus_message_get_realtime_usec, sd_bus_message_get_seqnum — Retrieve the sender timestamps and sequence number of a message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_get_monotonic_usec(sd_bus_message *message,
+	uint64_t *usec); .. code-block::
+
+   int sd_bus_message_get_realtime_usec(sd_bus_message *message,
+	uint64_t *usec); .. code-block::
+
+   int sd_bus_message_get_seqnum(sd_bus_message *message,
+	uint64_t *seqnum);
+
+Description
+###########
+
+:code:`sd_bus_message_get_monotonic_usec()` returns the monotonic timestamp of the time the message was sent. This value is in microseconds since the :code:`CLOCK_MONOTONIC` epoch, see :man-pages:`clock_gettime(2)` for details.
+
+Similarly, :code:`sd_bus_message_get_realtime_usec()` returns the realtime (wallclock) timestamp of the time the message was sent. This value is in microseconds since Jan 1st, 1970, i.e. in the :code:`CLOCK_REALTIME` clock.
+
+:code:`sd_bus_message_get_seqnum()` returns the kernel-assigned sequence number of the message. The kernel assigns a global, monotonically increasing sequence number to all messages transmitted on the local system, at the time the message was sent. This sequence number is useful for determining message send order, even across different buses of the local system. The sequence number combined with the boot ID of the system (as returned by :ref:`sd_id128_get_boot(3)`) is a suitable globally unique identifier for bus messages.
+
+Note that the sending order and receiving order of messages might differ, in particular for broadcast messages. This means that the sequence number and the timestamps of messages a client reads are not necessarily monotonically increasing.
+
+These timestamps and the sequence number are attached to each message by the kernel and cannot be manipulated by the sender.
+
+Note that these timestamps are only available on some bus transports, and only after support for them has been negotiated with the :ref:`sd_bus_negotiate_timestamp(3)` call.
+
+Return Value
+############
+
+On success, these calls return 0 or a positive integer. On failure, these calls return a negative errno-style error code.
+
+On success, the timestamp or sequence number is returned in the specified 64-bit unsigned integer variable.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   A specified parameter is invalid.
+
+.. systemd:option:: -ENODATA
+
+   No timestamp or sequence number information is attached to the passed message. This error is returned if the underlying transport does not support timestamping or assigning of sequence numbers, or if this feature has not been negotiated with :ref:`sd_bus_negotiate_timestamp(3)`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_get_monotonic_usec()`, :code:`sd_bus_message_get_realtime_usec()`, and :code:`sd_bus_message_get_seqnum()` were added in version 209.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_new(3)`, :ref:`sd_bus_negotiate_timestamp(3)`, :man-pages:`clock_gettime(2)`, :ref:`sd_id128_get_boot(3)`
+
+

@@ -1,0 +1,836 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.service
+:manvolnum: 5
+:summary: Service unit configuration
+
+.. _systemd.service(5):
+
+==================
+systemd.service(5)
+==================
+
+Name
+####
+
+systemd.service — Service unit configuration
+
+Synopsis
+########
+
+:code:`service.service`
+
+Description
+###########
+
+A unit configuration file whose name ends in ".service" encodes information about a process controlled and supervised by systemd.
+
+This man page lists the configuration options specific to this unit type. See :ref:`systemd.unit(5)` for the common options of all unit configuration files. The common configuration items are configured in the generic \[Unit] and \[Install] sections. The service specific configuration options are configured in the \[Service] section.
+
+Additional options are listed in :ref:`systemd.exec(5)`, which define the execution environment the commands are executed in, and in :ref:`systemd.kill(5)`, which define the way the processes of the service are terminated, and in :ref:`systemd.resource-control(5)`, which configure resource control settings for the processes of the service.
+
+If SysV init compat is enabled, systemd automatically creates service units that wrap SysV init scripts (the service name is the same as the name of the script, with a ".service" suffix added); see :ref:`systemd-sysv-generator(8)`.
+
+The :ref:`systemd-run(1)` command allows creating :code:`.service` and :code:`.scope` units dynamically and transiently from the command line.
+
+Service Templates
+#################
+
+It is possible for :code:`systemd` services to take a single argument via the ":emphasis:`service`\@:emphasis:`argument`.service" syntax. Such services are called "instantiated" services, while the unit definition without the :emphasis:`argument` parameter is called a "template". An example could be a :code:`dhcpcd@.service` service template which takes a network interface as a parameter to form an instantiated service. Within the service file, this parameter or "instance name" can be accessed with %-specifiers. See :ref:`systemd.unit(5)` for details.
+
+Automatic Dependencies
+######################
+
+Implicit Dependencies
+#####################
+
+The following dependencies are implicitly added:
+
+*    Services with :code:`Type=dbus` set automatically acquire dependencies of type :code:`Requires=` and :code:`After=` on :code:`dbus.socket`.
+
+*    Socket activated services are automatically ordered after their activating :code:`.socket` units via an automatic :code:`After=` dependency. Services also pull in all :code:`.socket` units listed in :code:`Sockets=` via automatic :code:`Wants=` and :code:`After=` dependencies.
+
+Additional implicit dependencies may be added as result of execution and resource control parameters as documented in :ref:`systemd.exec(5)` and :ref:`systemd.resource-control(5)`.
+
+Default Dependencies
+####################
+
+The following dependencies are added unless :code:`DefaultDependencies=no` is set:
+
+*    Service units will have dependencies of type :code:`Requires=` and :code:`After=` on :code:`sysinit.target`, a dependency of type :code:`After=` on :code:`basic.target` as well as dependencies of type :code:`Conflicts=` and :code:`Before=` on :code:`shutdown.target`. These ensure that normal service units pull in basic system initialization, and are terminated cleanly prior to system shutdown. Only services involved with early boot or late system shutdown should disable this option.
+
+*    Instanced service units (i.e. service units with an "@" in their name) are assigned by default a per-template slice unit (see :ref:`systemd.slice(5)`), named after the template unit, containing all instances of the specific template. This slice is normally stopped at shutdown, together with all template instances. If that is not desired, set :code:`DefaultDependencies=no` in the template unit, and either define your own per-template slice unit file that also sets :code:`DefaultDependencies=no`, or set :code:`Slice=system.slice` (or another suitable slice) in the template unit. Also see :ref:`systemd.resource-control(5)`.
+
+Options
+#######
+
+Service unit files may include \[Unit] and \[Install] sections, which are described in :ref:`systemd.unit(5)`.
+
+Service unit files must include a \[Service] section, which carries information about the service and the process it supervises. A number of options that may be used in this section are shared with other unit types. These options are documented in :ref:`systemd.exec(5)`, :ref:`systemd.kill(5)` and :ref:`systemd.resource-control(5)`. The options specific to the \[Service] section of service units are the following:
+
+.. systemd:option:: Type=
+   :group: unit-directives
+
+   Configures the mechanism via which the service notifies the manager that the service start-up has finished. One of :systemd:option:`simple`, :systemd:option:`exec`, :systemd:option:`forking`, :systemd:option:`oneshot`, :systemd:option:`dbus`, :systemd:option:`notify`, :systemd:option:`notify-reload`, or :systemd:option:`idle`:
+
+   *       If set to :systemd:option:`simple` (the default if :systemd:var:`ExecStart=` is specified but neither :systemd:var:`Type=` nor :systemd:var:`BusName=` are, and credentials are not used), the service manager will consider the unit started immediately after the main service process has been forked off (i.e. immediately after :code:`fork()`, and before various process attributes have been configured and in particular before the new process has called :code:`execve()` to invoke the actual service binary). Typically, :systemd:var:`Type=`:systemd:option:`exec` is the better choice, see below.
+
+         It is expected that the process configured with :systemd:var:`ExecStart=` is the main process of the service. In this mode, if the process offers functionality to other processes on the system, its communication channels should be installed before the service is started up (e.g. sockets set up by systemd, via socket activation), as the service manager will immediately proceed starting follow-up units, right after creating the main service process, and before executing the service's binary. Note that this means :code:`systemctl start` command lines for :systemd:option:`simple` services will report success even if the service's binary cannot be invoked successfully (for example because the selected :systemd:var:`User=` does not exist, or the service binary is missing).
+
+   *       The :systemd:option:`exec` type is similar to :systemd:option:`simple`, but the service manager will consider the unit started immediately after the main service binary has been executed. The service manager will delay starting of follow-up units until that point. (Or in other words: :systemd:option:`simple` proceeds with further jobs right after :code:`fork()` returns, while :systemd:option:`exec` will not proceed before both :code:`fork()` and :code:`execve()` in the service process succeeded.) Note that this means :code:`systemctl start` command lines for :systemd:option:`exec` services will report failure when the service's binary cannot be invoked successfully (for example because the selected :systemd:var:`User=` does not exist, or the service binary is missing). This type is implied if credentials are used (refer to :systemd:var:`LoadCredential=` in :ref:`systemd.exec(5)` for details).
+
+   *       If set to :systemd:option:`forking`, the manager will consider the unit started immediately after the binary that forked off by the manager exits. *The use of this type is discouraged, use :systemd:option:`notify`, :systemd:option:`notify-reload`, or :systemd:option:`dbus` instead.*
+
+         It is expected that the process configured with :systemd:var:`ExecStart=` will call :code:`fork()` as part of its start-up. The parent process is expected to exit when start-up is complete and all communication channels are set up. The child continues to run as the main service process, and the service manager will consider the unit started when the parent process exits. This is the behavior of traditional UNIX services. If this setting is used, it is recommended to also use the :systemd:var:`PIDFile=` option, so that systemd can reliably identify the main process of the service. The manager will proceed with starting follow-up units after the parent process exits.
+
+   *       Behavior of :systemd:option:`oneshot` is similar to :systemd:option:`exec`; however, the service manager will consider the unit up after the main process exits. It will then start follow-up units. :systemd:var:`RemainAfterExit=` is particularly useful for this type of service. :systemd:var:`Type=`:systemd:option:`oneshot` is the implied default if neither :systemd:var:`Type=` nor :systemd:var:`ExecStart=` are specified. Note that if this option is used without :systemd:var:`RemainAfterExit=` the service will never enter "active" unit state, but will directly transition from "activating" to "deactivating" or "dead", since no process is configured that shall run continuously. In particular this means that after a service of this type ran (and which has :systemd:var:`RemainAfterExit=` not set) it will not show up as started afterwards, but as dead.
+
+   *       Behavior of :systemd:option:`dbus` is similar to :systemd:option:`simple`; however, units of this type must have the :systemd:var:`BusName=` specified and the service manager will consider the unit up when the specified bus name has been acquired. This type is the default if :systemd:var:`BusName=` is specified.
+
+         Service units with this option configured implicitly gain dependencies on the :code:`dbus.socket` unit. A service unit of this type is considered to be in the activating state until the specified bus name is acquired. It is considered activated while the bus name is taken. Once the bus name is released the service is considered being no longer functional which has the effect that the service manager attempts to terminate any remaining processes belonging to the service. Services that drop their bus name as part of their shutdown logic thus should be prepared to receive a :systemd:constant:`SIGTERM` (or whichever signal is configured in :systemd:var:`KillSignal=`) as result.
+
+   *       Behavior of :systemd:option:`notify` is similar to :systemd:option:`exec`; however, it is expected that the service sends a "READY=1" notification message via :ref:`sd_notify(3)` or an equivalent call when it has finished starting up. systemd will proceed with starting follow-up units after this notification message has been sent. If this option is used, :systemd:var:`NotifyAccess=` (see below) should be set to open access to the notification socket provided by systemd. If :systemd:var:`NotifyAccess=` is missing or set to :systemd:option:`none`, it will be forcibly set to :systemd:option:`main`.
+
+         If the service supports reloading, and uses a signal to start the reload, using :systemd:option:`notify-reload` instead is recommended.
+
+   *       Behavior of :systemd:option:`notify-reload` is similar to :systemd:option:`notify`, with one difference: the :systemd:constant:`SIGHUP` UNIX process signal is sent to the service's main process when the service is asked to reload and the manager will wait for a notification about the reload being finished.
+
+         When initiating the reload process the service is expected to reply with a notification message via :ref:`sd_notify(3)` that contains the "RELOADING=1" field in combination with "MONOTONIC_USEC=" set to the current monotonic time (i.e. :systemd:constant:`CLOCK_MONOTONIC` in :man-pages:`clock_gettime(2)`) in μs, formatted as decimal string. Once reloading is complete another notification message must be sent, containing "READY=1". Using this service type and implementing this reload protocol is an efficient alternative to providing an :systemd:var:`ExecReload=` command for reloading of the service's configuration.
+
+         The signal to send can be tweaked via :systemd:var:`ReloadSignal=`, see below.
+
+   *       Behavior of :systemd:option:`idle` is very similar to :systemd:option:`simple`; however, actual execution of the service program is delayed until all active jobs are dispatched. This may be used to avoid interleaving of output of shell services with the status output on the console. Note that this type is useful only to improve console output, it is not useful as a general unit ordering tool, and the effect of this service type is subject to a 5s timeout, after which the service program is invoked anyway.
+
+   It is recommended to use :systemd:var:`Type=`:systemd:option:`exec` for long-running services, as it ensures that process setup errors (e.g. errors such as a missing service executable, or missing user) are properly tracked. However, as this service type will not propagate the failures in the service's own startup code (as opposed to failures in the preparatory steps the service manager executes before :code:`execve()`) and does not allow ordering of other units against completion of initialization of the service code itself (which for example is useful if clients need to connect to the service through some form of IPC, and the IPC channel is only established by the service itself — in contrast to doing this ahead of time through socket or bus activation or similar), it might not be sufficient for many cases. If so, :systemd:option:`notify`, :systemd:option:`notify-reload`, or :systemd:option:`dbus` (the latter only in case the service provides a D-Bus interface) are the preferred options as they allow service program code to precisely schedule when to consider the service started up successfully and when to proceed with follow-up units. The :systemd:option:`notify`/:systemd:option:`notify-reload` service types require explicit support in the service codebase (as :code:`sd_notify()` or an equivalent API needs to be invoked by the service at the appropriate time) — if it is not supported, then :systemd:option:`forking` is an alternative: it supports the traditional heavy-weight UNIX service start-up protocol. Note that using any type other than :systemd:option:`simple` possibly delays the boot process, as the service manager needs to wait for at least some service initialization to complete. (Also note it is generally not recommended to use :systemd:option:`idle` or :systemd:option:`oneshot` for long-running services.)
+
+   Note that various service settings (e.g. :systemd:var:`User=`, :systemd:var:`Group=` through libc NSS) might result in "hidden" blocking IPC calls to other services when used. Sometimes it might be advisable to use the :systemd:option:`simple` service type to ensure that the service manager's transaction logic is not affected by such potentially slow operations and hidden dependencies, as this is the only service type where the service manager will not wait for such service execution setup operations to complete before proceeding.
+
+.. systemd:option:: ExitType=
+   :group: unit-directives
+
+   Specifies when the manager should consider the service to be finished. One of :systemd:option:`main` or :systemd:option:`cgroup`:
+
+   *       If set to :systemd:option:`main` (the default), the service manager will consider the unit stopped when the main process, which is determined according to the :systemd:var:`Type=`, exits. Consequently, it cannot be used with :systemd:var:`Type=`:systemd:option:`oneshot`.
+
+   *       If set to :systemd:option:`cgroup`, the service will be considered running as long as at least one process in the cgroup has not exited.
+
+   It is generally recommended to use :systemd:var:`ExitType=`:systemd:option:`main` when a service has a known forking model and a main process can reliably be determined. :systemd:var:`ExitType=` :systemd:option:`cgroup` is meant for applications whose forking model is not known ahead of time and which might not have a specific main process. It is well suited for transient or automatically generated services, such as graphical applications inside of a desktop environment.
+
+   .. versionadded:: 250
+
+.. systemd:option:: RemainAfterExit=
+   :group: unit-directives
+
+   Takes a boolean value that specifies whether the service shall be considered active even when all its processes exited. Defaults to :systemd:option:`no`.
+
+.. systemd:option:: GuessMainPID=
+   :group: unit-directives
+
+   Takes a boolean value that specifies whether systemd should try to guess the main PID of a service if it cannot be determined reliably. This option is ignored unless :systemd:option:`Type=forking` is set and :systemd:option:`PIDFile=` is unset because for the other types or with an explicitly configured PID file, the main PID is always known. The guessing algorithm might come to incorrect conclusions if a daemon consists of more than one process. If the main PID cannot be determined, failure detection and automatic restarting of a service will not work reliably. Defaults to :systemd:option:`yes`.
+
+.. systemd:option:: PIDFile=
+   :group: unit-directives
+
+   Takes a path referring to the PID file of the service. Usage of this option is recommended for services where :systemd:var:`Type=` is set to :systemd:option:`forking`. The path specified typically points to a file below :code:`/run/`. If a relative path is specified for system service, then it is hence prefixed with :code:`/run/`, and prefixed with :code:`$XDG_RUNTIME_DIR` if specified in a user service. The service manager will read the PID of the main process of the service from this file after start-up of the service. The service manager will not write to the file configured here, although it will remove the file after the service has shut down if it still exists. The PID file does not need to be owned by a privileged user, but if it is owned by an unprivileged user additional safety restrictions are enforced: the file may not be a symlink to a file owned by a different user (neither directly nor indirectly), and the PID file must refer to a process already belonging to the service.
+
+   Note that PID files should be avoided in modern projects. Use :systemd:option:`Type=notify`, :systemd:option:`Type=notify-reload` or :systemd:option:`Type=simple` where possible, which does not require use of PID files to determine the main process of a service and avoids needless forking.
+
+.. systemd:option:: BusName=
+   :group: unit-directives
+
+   Takes a D-Bus destination name that this service shall use. This option is mandatory for services where :systemd:var:`Type=` is set to :systemd:option:`dbus`. It is recommended to always set this property if known to make it easy to map the service name to the D-Bus destination. In particular, :code:`systemctl service-log-level/service-log-target` verbs make use of this.
+
+.. systemd:option:: ExecStart=
+   :group: unit-directives
+
+   Commands that are executed when this service is started.
+
+   Unless :systemd:var:`Type=` is :systemd:option:`oneshot`, exactly one command must be given. When :systemd:var:`Type=oneshot` is used, this setting may be used multiple times to define multiple commands to execute. If the empty string is assigned to this option, the list of commands to start is reset, prior assignments of this option will have no effect. If no :systemd:var:`ExecStart=` is specified, then the service must have :systemd:var:`RemainAfterExit=yes` and at least one :systemd:var:`ExecStop=` line set. (Services lacking both :systemd:var:`ExecStart=` and :systemd:var:`ExecStop=` are not valid.)
+
+   If more than one command is configured, the commands are invoked sequentially in the order they appear in the unit file. If one of the commands fails (and is not prefixed with "-"), other lines are not executed, and the unit is considered failed.
+
+   Unless :systemd:var:`Type=forking` is set, the process started via this command line will be considered the main process of the daemon.
+
+.. systemd:option:: ExecStartPre=, ExecStartPost=
+   :group: unit-directives
+
+   Additional commands that are executed before or after the command in :systemd:var:`ExecStart=`, respectively. Syntax is the same as for :systemd:var:`ExecStart=`. Multiple command lines are allowed, regardless of the service type (i.e. :systemd:var:`Type=`), and the commands are executed one after the other, serially.
+
+   If any of those commands (not prefixed with "-") fail, the rest are not executed and the unit is considered failed.
+
+   :systemd:var:`ExecStart=` commands are only run after all :systemd:var:`ExecStartPre=` commands that were not prefixed with a "-" exit successfully.
+
+   :systemd:var:`ExecStartPost=` commands are only run after the commands specified in :systemd:var:`ExecStart=` have been invoked successfully, as determined by :systemd:var:`Type=` (i.e. the process has been started for :systemd:var:`Type=simple` or :systemd:var:`Type=idle`, the last :systemd:var:`ExecStart=` process exited successfully for :systemd:var:`Type=oneshot`, the initial process exited successfully for :systemd:var:`Type=forking`, "READY=1" is sent for :systemd:var:`Type=notify`/:systemd:var:`Type=notify-reload`, or the :systemd:var:`BusName=` has been taken for :systemd:var:`Type=dbus`).
+
+   Note that :systemd:var:`ExecStartPre=` may not be used to start long-running processes. All processes forked off by processes invoked via :systemd:var:`ExecStartPre=` will be killed before the next service process is run.
+
+   Note that if any of the commands specified in :systemd:var:`ExecStartPre=`, :systemd:var:`ExecStart=`, or :systemd:var:`ExecStartPost=` fail (and are not prefixed with "-", see above) or time out before the service is fully up, execution continues with commands specified in :systemd:var:`ExecStopPost=`, the commands in :systemd:var:`ExecStop=` are skipped.
+
+   Note that the execution of :systemd:var:`ExecStartPost=` is taken into account for the purpose of :systemd:var:`Before=`/:systemd:var:`After=` ordering constraints.
+
+.. systemd:option:: ExecCondition=
+   :group: unit-directives
+
+   Optional commands that are executed before the commands in :systemd:var:`ExecStartPre=`. Syntax is the same as for :systemd:var:`ExecStart=`. Multiple command lines are allowed, regardless of the service type (i.e. :systemd:var:`Type=`), and the commands are executed one after the other, serially.
+
+   The behavior is like an :systemd:var:`ExecStartPre=` and condition check hybrid: when an :systemd:var:`ExecCondition=` command exits with exit code 1 through 254 (inclusive), the remaining commands are skipped and the unit is *not* marked as failed. However, if an marked as failed. However, if an :systemd:var:`ExecCondition=` command exits with 255 or abnormally (e.g. timeout, killed by a signal, etc.), the unit will be considered failed (and remaining commands will be skipped). Exit code of 0 or those matching :systemd:var:`SuccessExitStatus=` will continue execution to the next commands.
+
+   The same recommendations about not running long-running processes in :systemd:var:`ExecStartPre=` also applies to :systemd:var:`ExecCondition=`. :systemd:var:`ExecCondition=` will also run the commands in :systemd:var:`ExecStopPost=`, as part of stopping the service, in the case of any non-zero or abnormal exits, like the ones described above.
+
+   .. versionadded:: 243
+
+.. systemd:option:: ExecReload=
+   :group: unit-directives
+
+   Commands to execute to trigger a configuration reload in the service. This setting may take multiple command lines, following the same scheme as described for :systemd:var:`ExecStart=` above. Use of this setting is optional. Specifier and environment variable substitution is supported here following the same scheme as for :systemd:var:`ExecStart=`.
+
+   One additional, special environment variable is set: if known, :systemd:var:`$MAINPID` is set to the main process of the daemon, and may be used for command lines like the following:
+
+     .. code-block:: sh
+
+        ExecReload=kill -HUP $MAINPID
+
+   Note however that reloading a daemon by enqueuing a signal without completion notification (as is the case with the example line above) is usually not a good choice, because this is an asynchronous operation and hence not suitable when ordering reloads of multiple services against each other. It is thus strongly recommended to either use :systemd:var:`Type=notify-reload`, or to set :systemd:var:`ExecReload=` to a command that not only triggers a configuration reload of the daemon, but also synchronously waits for it to complete. For example, :mankier:`dbus-broker(1)` uses the following:
+
+     .. code-block:: sh
+
+        ExecReload=busctl call org.freedesktop.DBus \
+                /org/freedesktop/DBus org.freedesktop.DBus \
+                ReloadConfig
+
+   This setting can be combined with :systemd:var:`Type=notify-reload`, in which case the service main process is signaled after all specified command lines finish execution. Specially, if "RELOADING=1" notification is received before :systemd:var:`ExecReload=` completes, the signaling is skipped and the service manager immediately starts listening for "READY=1".
+
+.. systemd:option:: ExecReloadPost=
+   :group: unit-directives
+
+   Commands to execute after a successful reload operation. Syntax for this setting is exactly the same as :systemd:var:`ExecReload=`.
+
+   .. versionadded:: 259
+
+.. systemd:option:: ExecStop=
+   :group: unit-directives
+
+   Commands to execute to stop the service started via :systemd:var:`ExecStart=`. This argument takes multiple command lines, following the same scheme as described for :systemd:var:`ExecStart=` above. Use of this setting is optional. After the commands configured in this option are run, it is implied that the service is stopped, and any processes remaining for it are terminated according to the :systemd:var:`KillMode=` setting (see :ref:`systemd.kill(5)`). If this option is not specified, the process is terminated by sending the signal specified in :systemd:var:`KillSignal=` or :systemd:var:`RestartKillSignal=` when service stop is requested. Specifier and environment variable substitution is supported (including :systemd:var:`$MAINPID`, see above).
+
+   Note that it is usually not sufficient to specify a command for this setting that only asks the service to terminate (for example, by sending some form of termination signal to it), but does not wait for it to do so. Since the remaining processes of the services are killed according to :systemd:var:`KillMode=` and :systemd:var:`KillSignal=` or :systemd:var:`RestartKillSignal=` as described above immediately after the command exited, this may not result in a clean stop. The specified command should hence be a synchronous operation, not an asynchronous one.
+
+   Note that the commands specified in :systemd:var:`ExecStop=` are only executed when the service started successfully first. They are not invoked if the service was never started at all, or in case its start-up failed, for example because any of the commands specified in :systemd:var:`ExecStart=`, :systemd:var:`ExecStartPre=` or :systemd:var:`ExecStartPost=` failed (and were not prefixed with "-", see above) or timed out. Use :systemd:var:`ExecStopPost=` to invoke commands when a service failed to start up correctly and is shut down again. Also note that the stop operation is always performed if the service started successfully, even if the processes in the service terminated on their own or were killed. The stop commands must be prepared to deal with that case. :systemd:var:`$MAINPID` will be unset if systemd knows that the main process exited by the time the stop commands are called.
+
+   Service restart requests are implemented as stop operations followed by start operations. This means that :systemd:var:`ExecStop=` and :systemd:var:`ExecStopPost=` are executed during a service restart operation.
+
+   It is recommended to use this setting for commands that communicate with the service requesting clean termination. For post-mortem clean-up steps use :systemd:var:`ExecStopPost=` instead.
+
+.. systemd:option:: ExecStopPost=
+   :group: unit-directives
+
+   Additional commands that are executed after the service is stopped. This includes cases where the commands configured in :systemd:var:`ExecStop=` were used, where the service does not have any :systemd:var:`ExecStop=` defined, or where the service exited unexpectedly. This argument takes multiple command lines, following the same scheme as described for :systemd:var:`ExecStart=`. Use of these settings is optional. Specifier and environment variable substitution is supported. Note that – unlike :systemd:var:`ExecStop=` – commands specified with this setting are invoked when a service failed to start up correctly and is shut down again.
+
+   It is recommended to use this setting for clean-up operations that shall be executed even when the service failed to start up correctly. Commands configured with this setting need to be able to operate even if the service failed starting up half-way and left incompletely initialized data around. As the service's processes have likely exited already when the commands specified with this setting are executed they should not attempt to communicate with them.
+
+   Note that all commands that are configured with this setting are invoked with the result code of the service, as well as the main process' exit code and status, set in the :systemd:var:`$SERVICE_RESULT`, :systemd:var:`$EXIT_CODE` and :systemd:var:`$EXIT_STATUS` environment variables, see :ref:`systemd.exec(5)` for details.
+
+   Note that the execution of :systemd:var:`ExecStopPost=` is taken into account for the purpose of :systemd:var:`Before=`/:systemd:var:`After=` ordering constraints.
+
+.. systemd:option:: RestartSec=
+   :group: unit-directives
+
+   Configures the time to sleep before restarting a service (as configured with :systemd:var:`Restart=`). Takes a unit-less value in seconds, or a time span value such as "5min 20s". Defaults to 100ms.
+
+.. systemd:option:: RestartSteps=
+   :group: unit-directives
+
+   Configures the number of steps to take to increase the interval of auto-restarts from :systemd:var:`RestartSec=` to :systemd:var:`RestartMaxDelaySec=`. Takes a positive integer or 0 to disable it. Defaults to 0.
+
+   This setting is effective only if :systemd:var:`RestartMaxDelaySec=` is also set.
+
+   .. versionadded:: 254
+
+.. systemd:option:: RestartMaxDelaySec=
+   :group: unit-directives
+
+   Configures the longest time to sleep before restarting a service as the interval goes up with :systemd:var:`RestartSteps=`. Takes a value in the same format as :systemd:var:`RestartSec=`, or "infinity" to disable the setting. Defaults to "infinity".
+
+   This setting is effective only if :systemd:var:`RestartSteps=` is also set.
+
+   .. versionadded:: 254
+
+.. systemd:option:: TimeoutStartSec=
+   :group: unit-directives
+
+   Configures the time to wait for start-up. If a daemon service does not signal start-up completion within the configured time, the service will be considered failed and will be shut down again. The precise action depends on the :systemd:var:`TimeoutStartFailureMode=` option. Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass "infinity" to disable the timeout logic. Defaults to :systemd:var:`DefaultTimeoutStartSec=` set in the manager, except when :systemd:var:`Type=oneshot` is used, in which case the timeout is disabled by default (see :ref:`systemd-system.conf(5)`).
+
+   If a service of :systemd:var:`Type=notify`/:systemd:var:`Type=notify-reload` sends "EXTEND_TIMEOUT_USEC=…", this may cause the start time to be extended beyond :systemd:var:`TimeoutStartSec=`. The first receipt of this message must occur before :systemd:var:`TimeoutStartSec=` is exceeded, and once the start time has extended beyond :systemd:var:`TimeoutStartSec=`, the service manager will allow the service to continue to start, provided the service repeats "EXTEND_TIMEOUT_USEC=…" within the interval specified until the service startup status is finished by "READY=1". (see :ref:`sd_notify(3)`).
+
+   Note that the start timeout is also applied to service reloads, regardless of whether implemented through :systemd:var:`ExecReload=` or via the reload logic enabled via :systemd:var:`Type=notify-reload`. If the reload does not complete within the configured time, the reload will be considered failed and the service will continue running with the old configuration. This will not affect the running service, but will be logged and will cause e.g. :code:`systemctl reload` to fail.
+
+   .. versionadded:: 188
+
+.. systemd:option:: TimeoutStopSec=
+   :group: unit-directives
+
+   This option serves two purposes. First, it configures the time to wait for each :systemd:var:`ExecStop=` command. If any of them times out, subsequent :systemd:var:`ExecStop=` commands are skipped and the service will be terminated by :systemd:constant:`SIGTERM`. If no :systemd:var:`ExecStop=` commands are specified, the service gets the :systemd:constant:`SIGTERM` immediately. This default behavior can be changed by the :systemd:var:`TimeoutStopFailureMode=` option. Second, it configures the time to wait for the service itself to stop. If it does not terminate in the specified time, it will be forcibly terminated by :systemd:constant:`SIGKILL` (see :systemd:var:`KillMode=` in :ref:`systemd.kill(5)`). Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass "infinity" to disable the timeout logic. Defaults to :systemd:var:`DefaultTimeoutStopSec=` from the manager configuration file (see :ref:`systemd-system.conf(5)`).
+
+   If a service of :systemd:var:`Type=notify`/:systemd:var:`Type=notify-reload` sends "EXTEND_TIMEOUT_USEC=…", this may cause the stop time to be extended beyond :systemd:var:`TimeoutStopSec=`. The first receipt of this message must occur before :systemd:var:`TimeoutStopSec=` is exceeded, and once the stop time has extended beyond :systemd:var:`TimeoutStopSec=`, the service manager will allow the service to continue to stop, provided the service repeats "EXTEND_TIMEOUT_USEC=…" within the interval specified, or terminates itself (see :ref:`sd_notify(3)`).
+
+   .. versionadded:: 188
+
+.. systemd:option:: TimeoutAbortSec=
+   :group: unit-directives
+
+   This option configures the time to wait for the service to terminate when it was aborted due to a watchdog timeout (see :systemd:var:`WatchdogSec=`). If the service has a short :systemd:var:`TimeoutStopSec=` this option can be used to give the system more time to write a core dump of the service. Upon expiration the service will be forcibly terminated by :systemd:constant:`SIGKILL` (see :systemd:var:`KillMode=` in :ref:`systemd.kill(5)`). The core file will be truncated in this case. Use :systemd:var:`TimeoutAbortSec=` to set a sensible timeout for the core dumping per service that is large enough to write all expected data while also being short enough to handle the service failure in due time.
+
+   Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass an empty value to skip the dedicated watchdog abort timeout handling and fall back :systemd:var:`TimeoutStopSec=`. Pass "infinity" to disable the timeout logic. Defaults to :systemd:var:`DefaultTimeoutAbortSec=` from the manager configuration file (see :ref:`systemd-system.conf(5)`).
+
+   If a service of :systemd:var:`Type=notify`/:systemd:var:`Type=notify-reload` handles :systemd:constant:`SIGABRT` itself (instead of relying on the kernel to write a core dump) it can send "EXTEND_TIMEOUT_USEC=…" to extended the abort time beyond :systemd:var:`TimeoutAbortSec=`. The first receipt of this message must occur before :systemd:var:`TimeoutAbortSec=` is exceeded, and once the abort time has extended beyond :systemd:var:`TimeoutAbortSec=`, the service manager will allow the service to continue to abort, provided the service repeats "EXTEND_TIMEOUT_USEC=…" within the interval specified, or terminates itself (see :ref:`sd_notify(3)`).
+
+   .. versionadded:: 243
+
+.. systemd:option:: TimeoutSec=
+   :group: unit-directives
+
+   A shorthand for configuring both :systemd:var:`TimeoutStartSec=` and :systemd:var:`TimeoutStopSec=` to the specified value.
+
+.. systemd:option:: TimeoutStartFailureMode=, TimeoutStopFailureMode=
+   :group: unit-directives
+
+   These options configure the action that is taken in case a daemon service does not signal start-up within its configured :systemd:var:`TimeoutStartSec=`, respectively if it does not stop within :systemd:var:`TimeoutStopSec=`. Takes one of :systemd:option:`terminate`, :systemd:option:`abort` and :systemd:option:`kill`. Both options default to :systemd:option:`terminate`.
+
+   If :systemd:option:`terminate` is set the service will be gracefully terminated by sending the signal specified in :systemd:var:`KillSignal=` (defaults to :systemd:constant:`SIGTERM`, see :ref:`systemd.kill(5)`). If the service does not terminate the :systemd:var:`FinalKillSignal=` is sent after :systemd:var:`TimeoutStopSec=`. If :systemd:option:`abort` is set, :systemd:var:`WatchdogSignal=` is sent instead and :systemd:var:`TimeoutAbortSec=` applies before sending :systemd:var:`FinalKillSignal=`. This setting may be used to analyze services that fail to start-up or shut-down intermittently. By using :systemd:option:`kill` the service is immediately terminated by sending :systemd:var:`FinalKillSignal=` without any further timeout. This setting can be used to expedite the shutdown of failing services.
+
+   .. versionadded:: 246
+
+.. systemd:option:: RuntimeMaxSec=
+   :group: unit-directives
+
+   Configures a maximum time for the service to run. If this is used and the service has been active for longer than the specified time it is terminated and put into a failure state. Note that this setting does not have any effect on :systemd:var:`Type=oneshot` services, as they terminate immediately after activation completed (use :systemd:var:`TimeoutStartSec=` to limit their activation). Pass "infinity" (the default) to configure no runtime limit.
+
+   If a service of :systemd:var:`Type=notify`/:systemd:var:`Type=notify-reload` sends "EXTEND_TIMEOUT_USEC=…", this may cause the runtime to be extended beyond :systemd:var:`RuntimeMaxSec=`. The first receipt of this message must occur before :systemd:var:`RuntimeMaxSec=` is exceeded, and once the runtime has extended beyond :systemd:var:`RuntimeMaxSec=`, the service manager will allow the service to continue to run, provided the service repeats "EXTEND_TIMEOUT_USEC=…" within the interval specified until the service shutdown is achieved by "STOPPING=1" (or termination). (see :ref:`sd_notify(3)`).
+
+   .. versionadded:: 229
+
+.. systemd:option:: RuntimeRandomizedExtraSec=
+   :group: unit-directives
+
+   This option modifies :systemd:var:`RuntimeMaxSec=` by increasing the maximum runtime by an evenly distributed duration between 0 and the specified value (in seconds). If :systemd:var:`RuntimeMaxSec=` is unspecified, then this feature will be disabled.
+
+   .. versionadded:: 250
+
+.. systemd:option:: WatchdogSec=
+   :group: unit-directives
+
+   Configures the watchdog timeout for a service. The watchdog is activated when the start-up is completed. The service must call :ref:`sd_notify(3)` regularly with "WATCHDOG=1" (i.e. the "keep-alive ping"). If the time between two such calls is larger than the configured time, then the service is placed in a failed state and it will be terminated with :systemd:constant:`SIGABRT` (or the signal specified by :systemd:var:`WatchdogSignal=`). By setting :systemd:var:`Restart=` to :systemd:option:`on-failure`, :systemd:option:`on-watchdog`, :systemd:option:`on-abnormal` or :systemd:option:`always`, the service will be automatically restarted. The time configured here will be passed to the executed service process in the :systemd:var:`WATCHDOG_USEC=` environment variable. This allows daemons to automatically enable the keep-alive pinging logic if watchdog support is enabled for the service. If this option is used, :systemd:var:`NotifyAccess=` (see below) should be set to open access to the notification socket provided by systemd. If :systemd:var:`NotifyAccess=` is not set, it will be implicitly set to :systemd:option:`main`. Defaults to 0, which disables this feature. The service can check whether the service manager expects watchdog keep-alive notifications. See :ref:`sd_watchdog_enabled(3)` for details. :ref:`sd_event_set_watchdog(3)` may be used to enable automatic watchdog notification support.
+
+.. systemd:option:: Restart=
+   :group: unit-directives
+
+   Configures whether the service shall be restarted when the service process exits, is killed, or a timeout is reached. The service process may be the main service process, but it may also be one of the processes specified with :systemd:var:`ExecStartPre=`, :systemd:var:`ExecStartPost=`, :systemd:var:`ExecStop=`, :systemd:var:`ExecStopPost=`, or :systemd:var:`ExecReload=`. When the death of the process is a result of systemd operation (e.g. service stop or restart), the service will not be restarted. Timeouts include missing the watchdog "keep-alive ping" deadline and a service start, reload, and stop operation timeouts.
+
+   Takes one of :systemd:option:`no`, :systemd:option:`on-success`, :systemd:option:`on-failure`, :systemd:option:`on-abnormal`, :systemd:option:`on-watchdog`, :systemd:option:`on-abort`, or :systemd:option:`always`. If set to :systemd:option:`no` (the default), the service will not be restarted. If set to :systemd:option:`on-success`, it will be restarted only when the service process exits cleanly. In this context, a clean exit means any of the following: *
+
+         exit code of 0; *
+
+         for types other than :systemd:var:`Type=oneshot`, one of the signals :systemd:constant:`SIGHUP`, :systemd:constant:`SIGINT`, :systemd:constant:`SIGTERM`, or :systemd:constant:`SIGPIPE`; *
+
+         exit statuses and signals specified in :systemd:var:`SuccessExitStatus=`. If set to :systemd:option:`on-failure`, the service will be restarted when the process exits with a non-zero exit code, is terminated by a signal (including on core dump, but excluding the aforementioned four signals), when an operation (such as service reload) times out, and when the configured watchdog timeout is triggered. If set to :systemd:option:`on-abnormal`, the service will be restarted when the process is terminated by a signal (including on core dump, excluding the aforementioned four signals), when an operation times out, or when the watchdog timeout is triggered. If set to :systemd:option:`on-abort`, the service will be restarted only if the service process exits due to an uncaught signal not specified as a clean exit status. If set to :systemd:option:`on-watchdog`, the service will be restarted only if the watchdog timeout for the service expires. If set to :systemd:option:`always`, the service will be restarted regardless of whether it exited cleanly or not, got terminated abnormally by a signal, or hit a timeout. Note that :systemd:var:`Type=oneshot` services will never be restarted on a clean exit status, i.e. :systemd:option:`always` and :systemd:option:`on-success` are rejected for them.
+
+   .. list-table:: Exit causes and the effect of the :systemd:var:`Restart=` settings
+      :header-rows: 1
+
+      * - Restart settings/Exit causes
+        - :systemd:option:`no`
+        - :systemd:option:`always`
+        - :systemd:option:`on-success`
+        - :systemd:option:`on-failure`
+        - :systemd:option:`on-abnormal`
+        - :systemd:option:`on-abort`
+        - :systemd:option:`on-watchdog`
+      * - Clean exit code or signal
+        -
+        - X
+        - X
+        -
+        -
+        -
+        -
+      * - Unclean exit code
+        -
+        - X
+        -
+        - X
+        -
+        -
+        -
+      * - Unclean signal
+        -
+        - X
+        -
+        - X
+        - X
+        - X
+        -
+      * - Timeout
+        -
+        - X
+        -
+        - X
+        - X
+        -
+        -
+      * - Watchdog
+        -
+        - X
+        -
+        - X
+        - X
+        -
+        - X
+      * - Termination due to OOM
+        -
+        - X
+        -
+        - X
+        - X
+        -
+        -
+
+   As exceptions to the setting above, the service will not be restarted if the exit code or signal is specified in :systemd:var:`RestartPreventExitStatus=` (see below) or the service is stopped with :code:`systemctl stop` or an equivalent operation. Also, the services will always be restarted if the exit code or signal is specified in :systemd:var:`RestartForceExitStatus=` (see below).
+
+   Note that service restart is subject to unit start rate limiting configured with :systemd:var:`StartLimitIntervalSec=` and :systemd:var:`StartLimitBurst=`, see :ref:`systemd.unit(5)` for details.
+
+   Setting this to :systemd:option:`on-failure` is the recommended choice for long-running services, in order to increase reliability by attempting automatic recovery from errors. For services that shall be able to terminate on their own choice (and avoid immediate restarting), :systemd:option:`on-abnormal` is an alternative choice.
+
+.. systemd:option:: RestartMode=
+   :group: unit-directives
+
+   Takes a string value that specifies how a service should restart: *       If set to :systemd:option:`normal` (the default), the service restarts by going through a failed/inactive state.
+
+         .. versionadded:: 254
+
+   *       If set to :systemd:option:`direct`, the service transitions to the activating state directly during auto-restart, skipping failed/inactive state. :systemd:var:`ExecStopPost=` is still invoked. :systemd:var:`OnSuccess=` and :systemd:var:`OnFailure=` are skipped.
+
+         This option is useful in cases where a dependency can fail temporarily but we do not want these temporary failures to make the dependent units fail. Dependent units are not notified of these temporary failures.
+
+         .. versionadded:: 254
+
+   *       If set to :systemd:option:`debug`, the service manager will log messages that are related to this unit at debug level while automated restarts are attempted, until either the service hits the rate limit or it succeeds, and the :systemd:var:`$DEBUG_INVOCATION=1` environment variable will be set for the unit. This is useful to be able to get additional information when a service fails to start, without needing to proactively or permanently enable debug level logging in systemd, which is very verbose. This is otherwise equivalent to :systemd:option:`normal` mode.
+
+         .. versionadded:: 257
+
+   .. versionadded:: 254
+
+.. systemd:option:: SuccessExitStatus=
+   :group: unit-directives
+
+   Takes a list of exit status definitions that, when returned by the main service process, will be considered successful termination, in addition to the normal successful exit status 0 and, except for :systemd:var:`Type=oneshot`, the signals :systemd:constant:`SIGHUP`, :systemd:constant:`SIGINT`, :systemd:constant:`SIGTERM`, and :systemd:constant:`SIGPIPE`. Exit status definitions can be numeric termination statuses, termination status names, or termination signal names, separated by spaces. See the Process Exit Codes section in :ref:`systemd.exec(5)` for a list of termination status names (for this setting only the part without the "EXIT_" or "EX_" prefix should be used). See :man-pages:`signal(7)` for a list of signal names.
+
+   Note that this setting does not change the mapping between numeric exit statuses and their names, i.e. regardless how this setting is used 0 will still be mapped to "SUCCESS" (and thus typically shown as "0/SUCCESS" in tool outputs) and 1 to "FAILURE" (and thus typically shown as "1/FAILURE"), and so on. It only controls what happens as effect of these exit statuses, and how it propagates to the state of the service as a whole.
+
+   This option may appear more than once, in which case the list of successful exit statuses is merged. If the empty string is assigned to this option, the list is reset, all prior assignments of this option will have no effect.
+
+   A service with the :systemd:var:`SuccessExitStatus=` setting
+   ------------------------------------------------------------
+
+     .. code-block:: sh
+
+        SuccessExitStatus=TEMPFAIL 250 SIGKILL
+
+   Exit status 75 (:systemd:constant:`TEMPFAIL`), 250, and the termination signal :systemd:constant:`SIGKILL` are considered clean service terminations.
+
+   Note: :code:`systemd-analyze exit-status` may be used to list exit statuses and translate between numerical status values and names.
+
+   .. versionadded:: 189
+
+.. systemd:option:: RestartPreventExitStatus=
+   :group: unit-directives
+
+   Takes a list of exit status definitions that, when returned by the main service process, will prevent automatic service restarts, regardless of the restart setting configured with :systemd:var:`Restart=`. Exit status definitions can be numeric termination statuses, termination status names, or termination signal names, separated by spaces. Defaults to the empty list, so that, by default, no exit status is excluded from the configured restart logic.
+
+   A service with the :systemd:var:`RestartPreventExitStatus=` setting
+   -------------------------------------------------------------------
+
+     .. code-block:: sh
+
+        RestartPreventExitStatus=TEMPFAIL 250 SIGKILL
+
+   Exit status 75 (:systemd:constant:`TEMPFAIL`), 250, and the termination signal :systemd:constant:`SIGKILL` will not result in automatic service restarting.
+
+   This option may appear more than once, in which case the list of restart-preventing statuses is merged. If the empty string is assigned to this option, the list is reset and all prior assignments of this option will have no effect.
+
+   Note that this setting has no effect on processes configured via :systemd:var:`ExecStartPre=`, :systemd:var:`ExecStartPost=`, :systemd:var:`ExecStop=`, :systemd:var:`ExecStopPost=` or :systemd:var:`ExecReload=`, but only on the main service process, i.e. either the one invoked by :systemd:var:`ExecStart=` or (depending on :systemd:var:`Type=`, :systemd:var:`PIDFile=`, …) the otherwise configured main process.
+
+   .. versionadded:: 189
+
+.. systemd:option:: RestartForceExitStatus=
+   :group: unit-directives
+
+   Takes a list of exit status definitions that, when returned by the main service process, will force automatic service restarts, regardless of the restart setting configured with :systemd:var:`Restart=`. The argument format is similar to :systemd:var:`RestartPreventExitStatus=`.
+
+   Note that for :systemd:var:`Type=oneshot` services, a success exit status will prevent them from auto-restarting, no matter whether the corresponding exit statuses are listed in this option or not.
+
+   .. versionadded:: 215
+
+.. systemd:option:: RootDirectoryStartOnly=
+   :group: unit-directives
+
+   Takes a boolean argument. If true, the root directory, as configured with the :systemd:var:`RootDirectory=` option (see :ref:`systemd.exec(5)` for more information), is only applied to the process started with :systemd:var:`ExecStart=`, and not to the various other :systemd:var:`ExecStartPre=`, :systemd:var:`ExecStartPost=`, :systemd:var:`ExecReload=`, :systemd:var:`ExecReloadPost=`, :systemd:var:`ExecStop=`, and :systemd:var:`ExecStopPost=` commands. If false, the setting is applied to all configured commands the same way. Defaults to false.
+
+.. systemd:option:: NonBlocking=
+   :group: unit-directives
+
+   Set the :systemd:constant:`O_NONBLOCK` flag for all file descriptors passed via socket-based activation. If true, all file descriptors >= 3 (i.e. all except stdin, stdout, stderr), excluding those passed in via the file descriptor storage logic (see :systemd:var:`FileDescriptorStoreMax=` for details), will have the :systemd:constant:`O_NONBLOCK` flag set and hence are in non-blocking mode. This option is only useful in conjunction with a socket unit, as described in :ref:`systemd.socket(5)` and has no effect on file descriptors which were previously saved in the file-descriptor store for example. Defaults to false.
+
+   Note that if the same socket unit is configured to be passed to multiple service units (via the :systemd:var:`Sockets=` setting, see below), and these services have different :systemd:var:`NonBlocking=` configurations, the precise state of :systemd:constant:`O_NONBLOCK` depends on the order in which these services are invoked, and will possibly change after service code already took possession of the socket file descriptor, simply because the :systemd:constant:`O_NONBLOCK` state of a socket is shared by all file descriptors referencing it. Hence it is essential that all services sharing the same socket use the same :systemd:var:`NonBlocking=` configuration, and do not change the flag in service code either.
+
+.. systemd:option:: NotifyAccess=
+   :group: unit-directives
+
+   Controls access to the service status notification socket, as accessible via the :ref:`sd_notify(3)` call. Takes one of :systemd:option:`none` (the default), :systemd:option:`main`, :systemd:option:`exec` or :systemd:option:`all`. If :systemd:option:`none`, no daemon status updates are accepted from the service processes, all status update messages are ignored. If :systemd:option:`main`, only service updates sent from the main process of the service are accepted. If :systemd:option:`exec`, only service updates sent from any of the main or control processes originating from one of the :systemd:var:`Exec*=` commands are accepted. If :systemd:option:`all`, all services updates from all members of the service's control group are accepted. This option should be set to open access to the notification socket when using :systemd:var:`Type=notify`/:systemd:var:`Type=notify-reload` or :systemd:var:`WatchdogSec=` (see above). If those options are used but :systemd:var:`NotifyAccess=` is not configured, it will be implicitly set to :systemd:option:`main`.
+
+   Note that :code:`sd_notify()` notifications may be attributed to units correctly only if either the sending process is still around at the time PID 1 processes the message, or if the sending process is explicitly runtime-tracked by the service manager. The latter is the case if the service manager originally forked off the process, i.e. on all processes that match :systemd:option:`main` or :systemd:option:`exec`. Conversely, if an auxiliary process of the unit sends an :code:`sd_notify()` message and immediately exits, the service manager might not be able to properly attribute the message to the unit, and thus will ignore it, even if :systemd:var:`NotifyAccess=`:systemd:option:`all` is set for it.
+
+   Hence, to eliminate all race conditions involving lookup of the client's unit and attribution of notifications to units correctly, :code:`sd_notify_barrier()` may be used. This call acts as a synchronization point and ensures all notifications sent before this call have been picked up by the service manager when it returns successfully. Use of :code:`sd_notify_barrier()` is needed for clients which are not invoked by the service manager, otherwise this synchronization mechanism is unnecessary for attribution of notifications to the unit.
+
+.. systemd:option:: Sockets=
+   :group: unit-directives
+
+   Specifies the name of the socket units this service shall inherit socket file descriptors from when the service is started. Normally, it should not be necessary to use this setting, as all socket file descriptors whose unit shares the same name as the service (subject to the different unit name suffix of course) are passed to the spawned process.
+
+   Note that the same socket file descriptors may be passed to multiple processes simultaneously. Also note that a different service may be activated on incoming socket traffic than the one which is ultimately configured to inherit the socket file descriptors. Or, in other words: the :systemd:var:`Service=` setting of :code:`.socket` units does not have to match the inverse of the :systemd:var:`Sockets=` setting of the :code:`.service` it refers to.
+
+   This option may appear more than once, in which case the list of socket units is merged. Note that once set, clearing the list of sockets again (for example, by assigning the empty string to this option) is not supported.
+
+.. systemd:option:: FileDescriptorStoreMax=
+   :group: unit-directives
+
+   Configure how many file descriptors may be stored in the service manager for the service using :ref:`sd_pid_notify_with_fds(3)`'s "FDSTORE=1" messages. This is useful for implementing services that can restart after an explicit request or a crash without losing state. Any open sockets and other file descriptors which should not be closed during the restart may be stored this way. Application state can either be serialized to a file in :systemd:var:`RuntimeDirectory=`, or stored in a :man-pages:`memfd_create(2)` memory file descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service manager. All file descriptors passed to the service manager from a specific service are passed back to the service's main process on the next service restart (see :ref:`sd_listen_fds(3)` for details about the precise protocol used and the order in which the file descriptors are passed). Any file descriptors passed to the service manager are automatically closed when :systemd:constant:`POLLHUP` or :systemd:constant:`POLLERR` is seen on them, or when the service is fully stopped and no job is queued or being executed for it (the latter can be tweaked with :systemd:var:`FileDescriptorStorePreserve=`, see below). If this option is used, :systemd:var:`NotifyAccess=` (see above) should be set to open access to the notification socket provided by systemd. If :systemd:var:`NotifyAccess=` is not set, it will be implicitly set to :systemd:option:`main`.
+
+   The :code:`fdstore` command of :ref:`systemd-analyze(1)` may be used to list the current contents of a service's file descriptor store.
+
+   Note that the service manager will only pass file descriptors contained in the file descriptor store to the service's own processes, never to other clients via IPC or similar. However, it does allow unprivileged clients to query the list of currently open file descriptors of a service. Sensitive data may hence be safely placed inside the referenced files, but should not be attached to the metadata (e.g. included in filenames) of the stored file descriptors.
+
+   If this option is set to a non-zero value the :systemd:var:`$FDSTORE` environment variable will be set for processes invoked for this service. See :ref:`systemd.exec(5)` for details.
+
+   For further information on the file descriptor store see the `File Descriptor Store <https://systemd.io/FILE_DESCRIPTOR_STORE>`_ overview.
+
+   .. versionadded:: 219
+
+.. systemd:option:: FileDescriptorStorePreserve=
+   :group: unit-directives
+
+   Takes one of :systemd:constant:`no`, :systemd:constant:`yes`, :systemd:constant:`restart` and controls when to release the service's file descriptor store (i.e. when to close the contained file descriptors, if any). If set to :systemd:constant:`no` the file descriptor store is automatically released when the service is stopped; if :systemd:constant:`restart` (the default) it is kept around as long as the unit is neither inactive nor failed, or a job is queued for the service, or the service is expected to be restarted. If :systemd:constant:`yes` the file descriptor store is kept around until the unit is removed from memory (i.e. is not referenced anymore and inactive). The latter is useful to keep entries in the file descriptor store pinned until the service manager exits.
+
+   Use :code:`systemctl clean --what=fdstore …` to release the file descriptor store explicitly.
+
+   .. versionadded:: 254
+
+.. systemd:option:: USBFunctionDescriptors=
+   :group: unit-directives
+
+   Configure the location of a file containing `USB FunctionFS <https://docs.kernel.org/usb/functionfs.html>`_ descriptors, for implementation of USB gadget functions. This is used only in conjunction with a socket unit with :systemd:var:`ListenUSBFunction=` configured. The contents of this file are written to the :code:`ep0` file after it is opened.
+
+   .. versionadded:: 227
+
+.. systemd:option:: USBFunctionStrings=
+   :group: unit-directives
+
+   Configure the location of a file containing USB FunctionFS strings. Behavior is similar to :systemd:var:`USBFunctionDescriptors=` above.
+
+   .. versionadded:: 227
+
+.. inclusion-marker-do-not-remove oom-policy|
+
+.. systemd:option:: OOMPolicy=
+   :group: unit-directives
+
+   Configure the out-of-memory (OOM) killing policy for the kernel and the userspace OOM killer :ref:`systemd-oomd.service(8)`. On Linux, when memory becomes scarce to the point that the kernel has trouble allocating memory for itself, it might decide to kill a running process in order to free up memory and reduce memory pressure. Note that :code:`systemd-oomd.service` is a more flexible solution that aims to prevent out-of-memory situations for the userspace too, not just the kernel, by attempting to terminate services earlier, before the kernel would have to act.
+
+   This setting takes one of :systemd:constant:`continue`, :systemd:constant:`stop` or :systemd:constant:`kill`. If set to :systemd:constant:`continue` and a process in the unit is killed by the OOM killer, this is logged but the unit continues running. If set to :systemd:constant:`stop` the event is logged and the unit's processes are terminated cleanly by the service manager. If set to :systemd:constant:`kill` and one of the unit's processes is killed by the OOM killer the kernel is instructed to kill all remaining processes of the unit too, by setting the :code:`memory.oom.group` attribute to :systemd:constant:`1`; also see kernel page `Control Group v2 <https://docs.kernel.org/admin-guide/cgroup-v2.html>`_. In case of both :systemd:constant:`stop` and :systemd:constant:`kill`, the service ultimately ends up in the :systemd:constant:`oom-kill` failed state after which :systemd:var:`Restart=` may apply.
+
+   Defaults to the setting :systemd:var:`DefaultOOMPolicy=` in :ref:`systemd-system.conf(5)` is set to, except for units where :systemd:var:`Delegate=` is turned on, where it defaults to :systemd:constant:`continue`.
+
+   Use the :systemd:var:`OOMScoreAdjust=` setting to configure whether processes of the unit shall be considered preferred or less preferred candidates for process termination by the Linux OOM killer logic. See :ref:`systemd.exec(5)` for details.
+
+   This setting also applies to :ref:`systemd-oomd.service(8)`. Similarly to the kernel OOM kills performed by the kernel, this setting determines the state of the unit after :code:`systemd-oomd` kills a cgroup associated with it.
+
+   .. versionadded:: 243
+
+.. inclusion-end-marker-do-not-remove oom-policy|
+
+.. systemd:option:: OpenFile=
+   :group: unit-directives
+
+   Takes an argument of the form "path[:emphasis:`:fd-name:options`]", where: *
+
+         "path" is a path to a file or an :systemd:constant:`AF_UNIX` socket in the file system; *
+
+         "fd-name" is a name that will be associated with the file descriptor; the name may contain any ASCII character, but must exclude control characters and ":", and must be at most 255 characters in length; it is optional and, if not provided, defaults to the file name; *
+
+         "options" is a comma-separated list of access options; possible values are "read-only", "append", "truncate", "graceful"; if not specified, files will be opened in :systemd:constant:`rw` mode; if "graceful" is specified, errors during file/socket opening are ignored. Specifying the same option several times is treated as an error. The file or socket is opened by the service manager and the file descriptor is passed to the service. If the path is a socket, we call :code:`connect()` on it. See :ref:`sd_listen_fds(3)` for more details on how to retrieve these file descriptors.
+
+   This setting is useful to allow services to access files/sockets that they cannot access themselves (due to running in a separate mount namespace, not having privileges, ...).
+
+   This setting can be specified multiple times, in which case all the specified paths are opened and the file descriptors passed to the service. If the empty string is assigned, the entire list of open files defined prior to this is reset.
+
+   .. versionadded:: 253
+
+.. systemd:option:: ReloadSignal=
+   :group: unit-directives
+
+   Configures the UNIX process signal to send to the service's main process when asked to reload the service's configuration. Defaults to :systemd:constant:`SIGHUP`. This option has no effect unless :systemd:var:`Type=`:systemd:option:`notify-reload` is used, see above.
+
+   .. versionadded:: 253
+
+.. inclusion-marker-do-not-remove shared-unit-options|
+
+.. inclusion-marker-do-not-remove shared-unit-options|
+
+Check :ref:`systemd.unit(5)`, :ref:`systemd.exec(5)`, and :ref:`systemd.kill(5)` for more settings.
+
+.. inclusion-end-marker-do-not-remove shared-unit-options|
+
+.. inclusion-end-marker-do-not-remove shared-unit-options|
+
+Command lines
+#############
+
+This section describes command line parsing and variable and specifier substitutions for :code:`ExecStart=`, :code:`ExecStartPre=`, :code:`ExecStartPost=`, :code:`ExecReload=`, :code:`ExecStop=`, :code:`ExecStopPost=`, and :code:`ExecCondition=` options.
+
+Multiple command lines may be specified by using the relevant setting multiple times.
+
+Each command line is unquoted using the rules described in "Quoting" section in :ref:`systemd.syntax(7)`. The first item becomes the command to execute, and the subsequent items the arguments.
+
+This syntax is inspired by shell syntax, but only the meta-characters and expansions described in the following paragraphs are understood, and the expansion of variables is different. Specifically, redirection using "<", "<<", ">", and ">>", pipes using "|", running programs in the background using "&", and *other elements of shell syntax are not supported*\..
+
+The command to execute may contain spaces, but control characters are not allowed.
+
+Each command may be prefixed with a number of special characters:
+
+.. list-table:: Special executable prefixes
+   :header-rows: 1
+
+   * - Prefix
+     - Effect
+   * - "@"
+     - If the executable path is prefixed with "@", the second specified token will be passed as :code:`argv[0]` to the executed process (instead of the actual filename), followed by the further arguments specified, unless "|" is also specified, in which case it enables login shell semantics for the shell spawned by prefixing "-" to :code:`argv[0]`.
+   * - "-"
+     - If the executable path is prefixed with "-", an exit code of the command normally considered a failure (i.e. non-zero exit status or abnormal exit due to signal) is recorded, but has no further effect and is considered equivalent to success.
+   * - ":"
+     - If the executable path is prefixed with ":", environment variable substitution (as described below this table) is not applied.
+   * - "+"
+     - If the executable path is prefixed with "+" then the process is executed with full privileges. In this mode privilege restrictions configured with :code:`User=`, :code:`Group=`, :code:`CapabilityBoundingSet=` or the various file system namespacing options (such as :code:`PrivateDevices=`, :code:`PrivateTmp=`) are not applied to the invoked command line (but still affect any other :code:`ExecStart=`, :code:`ExecStop=`, … lines). However, note that this will not bypass options that apply to the whole control group, such as :code:`DevicePolicy=`, see :ref:`systemd.resource-control(5)` for the full list.
+   * - "!"
+     - Similar to the "+" character discussed above this permits invoking command lines with elevated privileges. However, unlike "+" the "!" character exclusively alters the effect of :code:`User=`, :code:`Group=` and :code:`SupplementaryGroups=`, i.e. only the stanzas that affect user and group credentials. Note that this setting may be combined with :code:`DynamicUser=`, in which case a dynamic user/group pair is allocated before the command is invoked, but credential changing is left to the executed process itself.
+   * - "|"
+     - If "|" is specified standalone as executable path, invoke the default shell of :code:`User=`. If specified as a prefix, use the shell ("-c") to spawn the executable. When "@" is used in conjunction, :code:`argv[0]` of shell will be prefixed with "-" to enable login shell semantics.
+
+"@", "|", "-", ":", and one of "+"/"!" may be used together and they can appear in any order. However, "+" and "!" may not be specified at the same time.
+
+For each command, the first argument must be either an absolute path to an executable or a simple file name without any slashes. If the command is not a full (absolute) path, it will be resolved to a full path using a fixed search path determined at compilation time. Searched directories include :code:`/usr/local/bin/`, :code:`/usr/bin/`, and their :code:`sbin/` counterparts (only on systems using split :code:`bin/` and :code:`sbin/`). It is thus safe to use just the executable name in case of executables located in any of the "standard" directories, and an absolute path must be used in other cases. Hint: this search path may be queried using :code:`systemd-path search-binaries-default`.
+
+The command line accepts "%" specifiers as described in :ref:`systemd.unit(5)`.
+
+An argument solely consisting of ";" must be escaped, i.e. specified as "\\;".
+
+Basic environment variable substitution is supported. Use "${FOO}" as part of a word, or as a word of its own, on the command line, in which case it will be erased and replaced by the exact value of the environment variable (if any) including all whitespace it contains, always resulting in exactly a single argument. Use "$FOO" as a separate word on the command line, in which case it will be replaced by the value of the environment variable split at whitespace, resulting in zero or more arguments. For this type of expansion, quotes are respected when splitting into words, and afterwards removed.
+
+Example:
+
+.. code-block:: sh
+
+   Environment="ONE=one" 'TWO=two two'
+   ExecStart=echo $ONE $TWO ${TWO}
+
+This will execute :code:`/bin/echo` with four arguments: "one", "two", "two", and "two two".
+
+Example:
+
+.. code-block:: sh
+
+   Environment=ONE='one' "TWO='two two' too" THREE=
+   ExecStart=/bin/echo ${ONE} ${TWO} ${THREE}
+   ExecStart=/bin/echo $ONE $TWO $THREE
+
+This results in :code:`/bin/echo` being called twice, the first time with arguments "'one'", "'two two' too", "", and the second time with arguments "one", "two two", "too".
+
+Unless for commands with the special executable prefix ":", to pass a literal dollar sign, use "$$". Variables whose value is not known at expansion time are treated as empty strings. Note that the first argument (i.e. the program to execute) may not be a variable.
+
+Variables to be used in this fashion may be defined through :code:`Environment=` and :code:`EnvironmentFile=`. In addition, variables listed in the section "Environment variables in spawned processes" in :ref:`systemd.exec(5)`, which are considered "static configuration", may be used (this includes e.g. :code:`$USER`, but not :code:`$TERM`).
+
+Note that shell command lines are not directly supported, and "|" invokes the user's default shell which isn't deterministic. It's recommended to specify a shell implementation explicitly if portability is desired. Example:
+
+.. code-block:: sh
+
+   ExecStart=sh -c 'dmesg | tac'
+
+Example:
+
+.. code-block:: sh
+
+   ExecStart=echo one
+   ExecStart=echo "two two"
+
+This will execute :code:`echo` two times, each time with one argument: "one" and "two two", respectively. Because two commands are specified, :code:`Type=oneshot` must be used.
+
+Example:
+
+.. code-block:: sh
+
+   Type=oneshot
+   ExecStart=:echo $USER
+   ExecStart=-false
+   ExecStart=+:@true $TEST
+
+This will execute :code:`/usr/bin/echo` with the literal argument "$USER" (":" suppresses variable expansion), and then :code:`/usr/bin/false` (the return value will be ignored because "-" suppresses checking of the return value), and :code:`/usr/bin/true` (with elevated privileges, with "$TEST" as :code:`argv[0]`).
+
+Example:
+
+.. code-block:: sh
+
+   ExecStart=echo / >/dev/null & \; \
+   ls
+
+This will execute :code:`echo` with five arguments: "/", ">/dev/null", "&", ";", and "ls".
+
+Examples
+########
+
+Simple service
+--------------
+
+The following unit file creates a service that will execute :code:`/usr/sbin/foo-daemon`. Since no :code:`Type=` is specified, the default :code:`Type=`:code:`simple` will be assumed. systemd will assume the unit to be started immediately after the program has begun executing.
+
+.. code-block:: sh
+
+   [Unit]
+   Description=Foo
+   [Service]
+   ExecStart=/usr/sbin/foo-daemon
+   [Install]
+   WantedBy=multi-user.target
+
+Note that systemd assumes here that the process started by systemd will continue running until the service terminates. If the program daemonizes itself (i.e. forks), please use :code:`Type=`:code:`forking` instead.
+
+Since no :code:`ExecStop=` was specified, systemd will send SIGTERM to all processes started from this service, and after a timeout also SIGKILL. This behavior can be modified, see :ref:`systemd.kill(5)` for details.
+
+Note that this unit type does not include any type of notification when a service has completed initialization. For this, you should use other unit types, such as :code:`Type=`:code:`notify`/:code:`Type=`:code:`notify-reload` if the service understands systemd's notification protocol, :code:`Type=`:code:`forking` if the service can background itself or :code:`Type=`:code:`dbus` if the unit acquires a DBus name once initialization is complete. See below.
+
+Oneshot service
+---------------
+
+Sometimes, units should just execute an action without keeping active processes, such as a filesystem check or a cleanup action on boot. For this, :code:`Type=`:code:`oneshot` exists. Units of this type will wait until the process specified terminates and then fall back to being inactive. The following unit will perform a cleanup action:
+
+.. code-block:: sh
+
+   [Unit]
+   Description=Cleanup old Foo data
+   [Service]
+   Type=oneshot
+   ExecStart=/usr/sbin/foo-cleanup
+   [Install]
+   WantedBy=multi-user.target
+
+Note that systemd will consider the unit to be in the state "starting" until the program has terminated, so ordered dependencies will wait for the program to finish before starting themselves. The unit will revert to the "inactive" state after the execution is done, never reaching the "active" state. That means another request to start the unit will perform the action again.
+
+:code:`Type=`:code:`oneshot` are the only service units that may have more than one :code:`ExecStart=` specified. For units with multiple commands (:code:`Type=oneshot`), all commands will be run again.
+
+For :code:`Type=oneshot`, :code:`Restart=`:code:`always` and :code:`Restart=`:code:`on-success` are *not* allowed. allowed.
+
+Stoppable oneshot service
+-------------------------
+
+Similarly to the oneshot services, there are sometimes units that need to execute a program to set up something and then execute another to shut it down, but no process remains active while they are considered "started". Network configuration can sometimes fall into this category. Another use case is if a oneshot service shall not be executed each time when they are pulled in as a dependency, but only the first time.
+
+For this, systemd knows the setting :code:`RemainAfterExit=`:code:`yes`, which causes systemd to consider the unit to be active if the start action exited successfully. This directive can be used with all types, but is most useful with :code:`Type=`:code:`oneshot` and :code:`Type=`:code:`simple`. With :code:`Type=`:code:`oneshot`, systemd waits until the start action has completed before it considers the unit to be active, so dependencies start only after the start action has succeeded. With :code:`Type=`:code:`simple`, dependencies will start immediately after the start action has been dispatched. The following unit provides an example for a simple static firewall.
+
+.. code-block:: sh
+
+   [Unit]
+   Description=Simple firewall
+   [Service]
+   Type=oneshot
+   RemainAfterExit=yes
+   ExecStart=/usr/local/sbin/simple-firewall-start
+   ExecStop=/usr/local/sbin/simple-firewall-stop
+   [Install]
+   WantedBy=multi-user.target
+
+Since the unit is considered to be running after the start action has exited, invoking :code:`systemctl start` on that unit again will cause no action to be taken.
+
+Traditional forking services
+----------------------------
+
+Many traditional daemons/services background (i.e. fork, daemonize) themselves when starting. Set :code:`Type=`:code:`forking` in the service's unit file to support this mode of operation. systemd will consider the service to be in the process of initialization while the original program is still running. Once it exits successfully and at least a process remains (and :code:`RemainAfterExit=`:code:`no`), the service is considered started.
+
+Often, a traditional daemon only consists of one process. Therefore, if only one process is left after the original process terminates, systemd will consider that process the main process of the service. In that case, the :code:`$MAINPID` variable will be available in :code:`ExecReload=`, :code:`ExecStop=`, etc.
+
+In case more than one process remains, systemd will be unable to determine the main process, so it will not assume there is one. In that case, :code:`$MAINPID` will not expand to anything. However, if the process decides to write a traditional PID file, systemd will be able to read the main PID from there. Please set :code:`PIDFile=` accordingly. Note that the daemon should write that file before finishing with its initialization. Otherwise, systemd might try to read the file before it exists.
+
+The following example shows a simple daemon that forks and just starts one process in the background:
+
+.. code-block:: sh
+
+   [Unit]
+   Description=My Simple Daemon
+   [Service]
+   Type=forking
+   ExecStart=/usr/sbin/my-simple-daemon -d
+   [Install]
+   WantedBy=multi-user.target
+
+Please see :ref:`systemd.kill(5)` for details on how you can influence the way systemd terminates the service.
+
+DBus services
+-------------
+
+For services that acquire a name on the DBus system bus, use :code:`Type=`:code:`dbus` and set :code:`BusName=` accordingly. The service should not fork (daemonize). systemd will consider the service to be initialized once the name has been acquired on the system bus. The following example shows a typical DBus service:
+
+.. code-block:: sh
+
+   [Unit]
+   Description=Simple DBus Service
+   [Service]
+   Type=dbus
+   BusName=org.example.simple-dbus-service
+   ExecStart=/usr/sbin/simple-dbus-service
+   [Install]
+   WantedBy=multi-user.target
+
+For *bus-activatable* services, do not include a [Install] section in the systemd service file, but use the services, do not include a \[Install] section in the systemd service file, but use the :code:`SystemdService=` option in the corresponding DBus service file, for example (:code:`/usr/share/dbus-1/system-services/org.example.simple-dbus-service.service`):
+
+.. code-block:: sh
+
+   [D-BUS Service]
+   Name=org.example.simple-dbus-service
+   Exec=/usr/sbin/simple-dbus-service
+   User=root
+   SystemdService=simple-dbus-service.service
+
+Please see :ref:`systemd.kill(5)` for details on how you can influence the way systemd terminates the service.
+
+Services that notify systemd about their initialization
+-------------------------------------------------------
+
+:code:`Type=`:code:`simple` services are really easy to write, but have the major disadvantage of systemd not being able to tell when initialization of the given service is complete. For this reason, systemd supports a simple notification protocol that allows daemons to make systemd aware that they are done initializing. Use :code:`Type=`:code:`notify` or :code:`Type=`:code:`notify-reload` for this. A typical service file for such a daemon would look like this:
+
+.. code-block:: sh
+
+   [Unit]
+   Description=Simple Notifying Service
+   [Service]
+   Type=notify-reload
+   ExecStart=/usr/sbin/simple-notifying-service
+   [Install]
+   WantedBy=multi-user.target
+
+Note that the daemon has to support systemd's notification protocol, else systemd will think the service has not started yet and kill it after a timeout. For an example of how to update daemons to support this protocol transparently, take a look at :ref:`sd_notify(3)`. systemd will consider the unit to be in the 'starting' state until a readiness notification has arrived.
+
+Please see :ref:`systemd.kill(5)` for details on how you can influence the way systemd terminates the service.
+
+To avoid code duplication, it is preferable to use :ref:`sd_notify(3)` when possible, especially when other APIs provided by :man-pages:`libsystemd(3)` are also used, but note that the notification protocol is very simple and guaranteed to be stable as per the `Interface Portability and Stability Promise <https://systemd.io/PORTABILITY_AND_STABILITY/>`_, so it can be reimplemented by services with no external dependencies. For a self-contained example, see :ref:`sd_notify(3)`.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd-system.conf(5)`, :ref:`systemd.unit(5)`, :ref:`systemd.exec(5)`, :ref:`systemd.resource-control(5)`, :ref:`systemd.kill(5)`, :ref:`systemd.directives(7)`, :ref:`systemd-run(1)`
+
+

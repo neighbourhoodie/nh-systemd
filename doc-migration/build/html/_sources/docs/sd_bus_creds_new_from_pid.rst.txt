@@ -1,0 +1,122 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_creds_new_from_pid
+:manvolnum: 3
+:summary: Retrieve credentials object for the specified PID
+:aliases: sd_bus_creds_new_from_pidfd, sd_bus_creds_get_mask, sd_bus_creds_get_augmented_mask, sd_bus_creds_ref, sd_bus_creds_unref, sd_bus_creds_unrefp
+
+.. _sd_bus_creds_new_from_pid(3):
+
+============================
+sd_bus_creds_new_from_pid(3)
+============================
+
+Name
+####
+
+sd_bus_creds_new_from_pid, sd_bus_creds_new_from_pidfd, sd_bus_creds_get_mask, sd_bus_creds_get_augmented_mask, sd_bus_creds_ref, sd_bus_creds_unref, sd_bus_creds_unrefp — Retrieve credentials object for the specified PID
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_creds_new_from_pid(pid_t pid,
+	uint64_t creds_mask,
+	sd_bus_creds **ret); .. code-block::
+
+   int sd_bus_creds_new_from_pidfd(int pidfd,
+	uint64_t creds_mask,
+	sd_bus_creds **ret); .. code-block::
+
+   uint64_t sd_bus_creds_get_mask(sd_bus_creds *c); .. code-block::
+
+   uint64_t sd_bus_creds_get_augmented_mask(sd_bus_creds *c); .. code-block::
+
+   sd_bus_creds *sd_bus_creds_ref(sd_bus_creds *c); .. code-block::
+
+   sd_bus_creds *sd_bus_creds_unref(sd_bus_creds *c); .. code-block::
+
+   void sd_bus_creds_unrefp(sd_bus_creds **c);
+
+:code:`SD_BUS_CREDS_PID`, :code:`SD_BUS_CREDS_PPID`, :code:`SD_BUS_CREDS_TID`, :code:`SD_BUS_CREDS_UID`, :code:`SD_BUS_CREDS_EUID`, :code:`SD_BUS_CREDS_SUID`, :code:`SD_BUS_CREDS_FSUID`, :code:`SD_BUS_CREDS_GID`, :code:`SD_BUS_CREDS_EGID`, :code:`SD_BUS_CREDS_SGID`, :code:`SD_BUS_CREDS_FSGID`, :code:`SD_BUS_CREDS_SUPPLEMENTARY_GIDS`, :code:`SD_BUS_CREDS_COMM`, :code:`SD_BUS_CREDS_TID_COMM`, :code:`SD_BUS_CREDS_EXE`, :code:`SD_BUS_CREDS_CMDLINE`, :code:`SD_BUS_CREDS_CGROUP`, :code:`SD_BUS_CREDS_UNIT`, :code:`SD_BUS_CREDS_SLICE`, :code:`SD_BUS_CREDS_USER_UNIT`, :code:`SD_BUS_CREDS_USER_SLICE`, :code:`SD_BUS_CREDS_SESSION`, :code:`SD_BUS_CREDS_OWNER_UID`, :code:`SD_BUS_CREDS_EFFECTIVE_CAPS`, :code:`SD_BUS_CREDS_PERMITTED_CAPS`, :code:`SD_BUS_CREDS_INHERITABLE_CAPS`, :code:`SD_BUS_CREDS_BOUNDING_CAPS`, :code:`SD_BUS_CREDS_SELINUX_CONTEXT`, :code:`SD_BUS_CREDS_AUDIT_SESSION_ID`, :code:`SD_BUS_CREDS_AUDIT_LOGIN_UID`, :code:`SD_BUS_CREDS_TTY`, :code:`SD_BUS_CREDS_UNIQUE_NAME`, :code:`SD_BUS_CREDS_WELL_KNOWN_NAMES`, :code:`SD_BUS_CREDS_DESCRIPTION`, :code:`SD_BUS_CREDS_PIDFD`, :code:`SD_BUS_CREDS_AUGMENT`, :code:`_SD_BUS_CREDS_ALL`
+
+Description
+###########
+
+:code:`sd_bus_creds_new_from_pid()` creates a new credentials object and fills it with information about the process :code:`pid`. The pointer to this object will be stored in the :code:`ret` pointer. Note that credential objects may also be created and retrieved via :ref:`sd_bus_get_name_creds(3)`, :ref:`sd_bus_get_owner_creds(3)` and :ref:`sd_bus_message_get_creds(3)`.
+
+:code:`sd_bus_creds_new_from_pidfd()` is identical to :code:`sd_bus_creds_new_from_pid()`, but takes a PID file descriptor rather than a numeric PID as reference to the process. See :man-pages:`pidfd_open(2)`.
+
+The information that will be stored is determined by :code:`creds_mask`. It may contain a subset of ORed constants :code:`SD_BUS_CREDS_PID`, :code:`SD_BUS_CREDS_PPID`, :code:`SD_BUS_CREDS_TID`, :code:`SD_BUS_CREDS_UID`, :code:`SD_BUS_CREDS_EUID`, :code:`SD_BUS_CREDS_SUID`, :code:`SD_BUS_CREDS_FSUID`, :code:`SD_BUS_CREDS_GID`, :code:`SD_BUS_CREDS_EGID`, :code:`SD_BUS_CREDS_SGID`, :code:`SD_BUS_CREDS_FSGID`, :code:`SD_BUS_CREDS_SUPPLEMENTARY_GIDS`, :code:`SD_BUS_CREDS_COMM`, :code:`SD_BUS_CREDS_TID_COMM`, :code:`SD_BUS_CREDS_EXE`, :code:`SD_BUS_CREDS_CMDLINE`, :code:`SD_BUS_CREDS_CGROUP`, :code:`SD_BUS_CREDS_UNIT`, :code:`SD_BUS_CREDS_SLICE`, :code:`SD_BUS_CREDS_USER_UNIT`, :code:`SD_BUS_CREDS_USER_SLICE`, :code:`SD_BUS_CREDS_SESSION`, :code:`SD_BUS_CREDS_OWNER_UID`, :code:`SD_BUS_CREDS_EFFECTIVE_CAPS`, :code:`SD_BUS_CREDS_PERMITTED_CAPS`, :code:`SD_BUS_CREDS_INHERITABLE_CAPS`, :code:`SD_BUS_CREDS_BOUNDING_CAPS`, :code:`SD_BUS_CREDS_SELINUX_CONTEXT`, :code:`SD_BUS_CREDS_AUDIT_SESSION_ID`, :code:`SD_BUS_CREDS_AUDIT_LOGIN_UID`, :code:`SD_BUS_CREDS_TTY`, :code:`SD_BUS_CREDS_UNIQUE_NAME`, :code:`SD_BUS_CREDS_WELL_KNOWN_NAMES`, :code:`SD_BUS_CREDS_DESCRIPTION`, and :code:`SD_BUS_CREDS_PIDFD`. Use the special value :code:`_SD_BUS_CREDS_ALL` to request all supported fields. The :code:`SD_BUS_CREDS_AUGMENT` constant may not be ORed into the mask for invocations of :code:`sd_bus_creds_new_from_pid()` or :code:`sd_bus_creds_new_from_pidfd()`.
+
+Fields can be retrieved from the credentials object using :ref:`sd_bus_creds_get_pid(3)` and other functions which correspond directly to the constants listed above.
+
+A mask of fields which were actually successfully retrieved can be retrieved with :code:`sd_bus_creds_get_mask()`. If the credentials object was created with :code:`sd_bus_creds_new_from_pid()` or :code:`sd_bus_creds_new_from_pidfd()`, this will be a subset of fields requested in :code:`creds_mask`.
+
+Similar to :code:`sd_bus_creds_get_mask()`, the function :code:`sd_bus_creds_get_augmented_mask()` returns a bitmask of field constants. The mask indicates which credential fields have been retrieved in a non-atomic fashion. For credential objects created via :code:`sd_bus_creds_new_from_pid()` or :code:`sd_bus_creds_new_from_pidfd()`, this mask will be identical to the mask returned by :code:`sd_bus_creds_get_mask()`. However, for credential objects retrieved via :code:`sd_bus_get_name_creds()`, this mask will be set for the credential fields that could not be determined atomically at peer connection time, and which were later added by reading augmenting credential data from :code:`/proc/`. Similarly, for credential objects retrieved via :code:`sd_bus_get_owner_creds()`, the mask is set for the fields that could not be determined atomically at bus creation time, but have been augmented. Similarly, for credential objects retrieved via :code:`sd_bus_message_get_creds()`, the mask is set for the fields that could not be determined atomically at message sending time, but have been augmented. The mask returned by :code:`sd_bus_creds_get_augmented_mask()` is always a subset of (or identical to) the mask returned by :code:`sd_bus_creds_get_mask()` for the same object. The latter call hence returns all credential fields available in the credential object, the former then marks the subset of those that have been augmented. Note that augmented fields are unsuitable for authorization decisions, as they may be retrieved at different times, thus being subject to races. Hence, augmented fields should be used exclusively for informational purposes.
+
+:code:`sd_bus_creds_ref()` creates a new reference to the credentials object :code:`c`. This object will not be destroyed until :code:`sd_bus_creds_unref()` has been called as many times plus once more. Once the reference count has dropped to zero, :code:`c` cannot be used anymore, so further calls to :code:`sd_bus_creds_ref(c)` or :code:`sd_bus_creds_unref(c)` are illegal.
+
+:code:`sd_bus_creds_unref()` destroys a reference to :code:`c`.
+
+:code:`sd_bus_creds_unrefp()` is similar to :code:`sd_bus_creds_unref()` but takes a pointer to a pointer to an sd_bus_creds object. This call is useful in conjunction with GCC's and LLVM's `Clean-up Variable Attribute <https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html>`_. Note that this function is defined as inline function.
+
+:code:`sd_bus_creds_ref()`, :code:`sd_bus_creds_unref()` and :code:`sd_bus_creds_unrefp()` execute no operation if the passed in bus credentials object is :code:`NULL`.
+
+Return Value
+############
+
+On success, :code:`sd_bus_creds_new_from_pid()` and :code:`sd_bus_creds_new_from_pidfd()` return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+:code:`sd_bus_creds_get_mask()` returns the mask of successfully acquired fields.
+
+:code:`sd_bus_creds_get_augmented_mask()` returns the mask of fields that have been augmented from data in :code:`/proc/`, and are thus not suitable for authorization decisions.
+
+:code:`sd_bus_creds_ref()` always returns the argument.
+
+:code:`sd_bus_creds_unref()` always returns :code:`NULL`.
+
+Reference ownership
+###################
+
+The functions :code:`sd_bus_creds_new_from_pid()` and :code:`sd_bus_creds_new_from_pidfd()` create a new object and the caller owns the sole reference. When not needed anymore, this reference should be destroyed with :ref:`sd_bus_creds_unref(3)`.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ESRCH
+
+   Specified :code:`pid` could not be found.
+
+.. systemd:option:: -EINVAL
+
+   Specified parameter is invalid (:code:`NULL` in case of output parameters).
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. systemd:option:: -EOPNOTSUPP
+
+   One of the requested fields is unknown to the local system.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_creds_new_from_pid()`, :code:`sd_bus_creds_get_mask()`, :code:`sd_bus_creds_ref()`, :code:`sd_bus_creds_unref()`, and :code:`sd_bus_creds_get_augmented_mask()` were added in version 221.
+
+:code:`sd_bus_creds_unrefp()` was added in version 229.
+
+:code:`sd_bus_creds_new_from_pidfd()` was added in version 256.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_creds_get_pid(3)`, :ref:`sd_bus_get_name_creds(3)`, :ref:`sd_bus_get_owner_creds(3)`, :ref:`sd_bus_message_get_creds(3)`
+
+

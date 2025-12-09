@@ -1,0 +1,107 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_set_address
+:manvolnum: 3
+:summary: Set or query the address of the bus connection
+:aliases: sd_bus_get_address, sd_bus_set_exec
+
+.. _sd_bus_set_address(3):
+
+=====================
+sd_bus_set_address(3)
+=====================
+
+Name
+####
+
+sd_bus_set_address, sd_bus_get_address, sd_bus_set_exec — Set or query the address of the bus connection
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_set_address(sd_bus *bus,
+	const char *address); .. code-block::
+
+   int sd_bus_get_address(sd_bus *bus,
+	const char **address); .. code-block::
+
+   int sd_bus_set_exec(sd_bus *bus,
+	const char *path,
+	char *const *argv);
+
+Description
+###########
+
+:code:`sd_bus_set_address()` configures a list of addresses of bus brokers to try to connect to from a subsequent :ref:`sd_bus_start(3)` call. The argument is a ";"-separated list of addresses to try. Each item must be one of the following:
+
+*    A unix socket address specified as "unix:guid=:emphasis:`guid`,path=:emphasis:`path`" or "unix:guid=:emphasis:`guid`,abstract=:emphasis:`path`". Exactly one of the :code:`path=` and :code:`abstract=` keys must be present, while :code:`guid=` is optional.
+
+*    A TCP socket address specified as "tcp:\[guid=:emphasis:`guid`,][host=:emphasis:`host`][,port=:emphasis:`port`][,family=:emphasis:`family`]". One or both of the :code:`host=` and :code:`port=` keys must be present, while the rest is optional. :emphasis:`family` may be either :code:`ipv4` or :code:`ipv6`.
+
+*    An executable to spawn specified as "unixexec:guid=:emphasis:`guid`,path=:emphasis:`path`,argv1=:emphasis:`argument`,argv2=:emphasis:`argument`,...". The :code:`path=` key must be present, while :code:`guid=` is optional.
+
+*    A machine (container) to connect to specified as "x-machine-unix:guid=:emphasis:`guid`,machine=:emphasis:`machine`,pid=:emphasis:`pid`". Exactly one of the :code:`machine=` and :code:`pid=` keys must be present, while :code:`guid=` is optional. :code:`machine` is the name of a local container. See :man-pages:`machinectl(1)` for more information about the "machine" concept. "machine=.host" may be used to specify the host machine. A connection to the standard system bus socket inside of the specified machine will be created.
+
+In all cases, parameter :code:`guid` is an identifier of the remote peer, in the syntax accepted by :ref:`sd_id128_from_string(3)`. If specified, the identifier returned by the peer after the connection is established will be checked and the connection will be rejected in case of a mismatch.
+
+Note that the addresses passed to :code:`sd_bus_set_address()` might not be verified immediately. If they are invalid, an error may be returned e.g. from a subsequent call to :ref:`sd_bus_start(3)`.
+
+:code:`sd_bus_get_address()` returns any previously set addresses. In addition to being explicitly set by :code:`sd_bus_set_address()`, the address will also be set automatically by :ref:`sd_bus_open(3)` and similar calls, based on environment variables or built-in defaults.
+
+:code:`sd_bus_set_exec()` is a shorthand function for setting a "unixexec" address that spawns the given executable with the given arguments. If :code:`argv` is :code:`NULL`, the given executable is spawned without any extra arguments.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The input parameters :code:`bus` or :code:`address` are :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOPKG
+
+   The bus object :code:`bus` could not be resolved.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EPERM
+
+   The input parameter :code:`bus` is in a wrong state (:code:`sd_bus_set_address()` may only be called once on a newly-created bus object).
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ECHILD
+
+   The bus object :code:`bus` was created in a different process.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENODATA
+
+   The bus object :code:`bus` has no address configured.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_set_address()`, :code:`sd_bus_get_address()`, and :code:`sd_bus_set_exec()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_new(3)`, :ref:`sd_bus_start(3)`, :ref:`systemd-machined.service(8)`, :man-pages:`machinectl(1)`
+
+

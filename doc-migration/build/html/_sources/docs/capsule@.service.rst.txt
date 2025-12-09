@@ -1,0 +1,71 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: capsule@.service
+:manvolnum: 5
+:summary: System unit for the capsule service manager
+
+.. _capsule@.service(5):
+
+===================
+capsule@.service(5)
+===================
+
+Name
+####
+
+capsule@.service — System unit for the capsule service manager
+
+Synopsis
+########
+
+:code:`capsule@NAME.service`
+
+Description
+###########
+
+Service managers for capsules run in :code:`capsule@NAME.service` system units, with the capsule name as the instance identifier. Capsules are way to run additional instances of the service manager, under dynamic user IDs, i.e. UIDs that are allocated when the capsule service manager is started, and released when it is stopped.
+
+In many ways :code:`capsule@.service` is similar to the per-user :code:`user@.service` service manager, but there are a few important distinctions:
+
+*    The capsule service manager utilizes :code:`DynamicUser=` (see :ref:`systemd.exec(5)`) to allocate a new UID dynamically on invocation. The user name is automatically generated from the capsule name, by prefixing "c-". The UID is released when the service is terminated. The user service manager on the other hand operates under a statically allocated user ID that must be pre-existing, before the user service manager is invoked.
+
+*    User service managers register themselves with :man-pages:`pam(8)`, capsule service managers do not.
+
+*    User service managers typically read their configuration from a :code:`$HOME` directory below :code:`/home/`, capsule service managers from a :code:`$HOME` directory below :code:`/var/lib/capsules/`.
+
+*    User service managers are collectively contained in the :code:`user.slice` unit, capsule service managers in :code:`capsule.slice`. Also see :ref:`systemd.special(7)`.
+
+*    User service managers start the user unit :code:`default.target` initially. Capsule service managers invoke the user unit :code:`capsule@.target` instead.
+
+The capsule service manager and the capsule's bus broker can be reached via the :code:`--capsule=` switch to :man-pages:`systemctl(1)`, :ref:`systemd-run(1)` and :man-pages:`busctl(1)`.
+
+New capsules can be started via a simple :code:`systemctl start capsule@NAME.service` command, and stopped via :code:`systemctl stop capsule@NAME.service`. Starting a capsule will implicitly create a home directory :code:`/var/lib/capsules/NAME/`, if missing. A runtime directory is created as :code:`/run/capsules/NAME/`. To remove these resources use :code:`systemctl clean capsule@NAME.service`, for example with the :code:`--what=all` switch.
+
+The :code:`capsule@.service` unit invokes a :code:`systemd --user` service manager process. This means unit files are looked for according to the sames rules as for regular user service managers, for example in :code:`/var/lib/capsules/NAME/.config/systemd/user/`.
+
+Capsule names may be chosen freely by the user, however, they must be suitable as UNIX filenames (i.e. 255 characters max, and contain no "/"), and when prefixed with "c-" be suitable as a user name matching strict POSIX rules, see `User/Group Name Syntax <https://systemd.io/USER_NAMES>`_ for details.
+
+.. versionadded:: 256
+
+Examples
+########
+
+Create a new capsule, invoke two programs in it (one interactively), terminate it, and clean everything up
+----------------------------------------------------------------------------------------------------------
+
+.. code-block:: sh
+
+   # systemctl start capsule@tatze.service
+   # systemd-run --capsule=tatze --unit=sleeptest.service sleep 999
+   # systemctl --capsule=tatze status sleeptest.service
+   # systemd-run -t --capsule=tatze bash
+   # systemctl --capsule=tatze stop sleeptest.service
+   # systemctl stop capsule@tatze.service
+   # systemctl clean --all capsule@tatze.service
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`user@.service(5)`, :ref:`systemd.service(5)`, :ref:`systemd.slice(5)`, :ref:`systemd.exec(5)`, :ref:`systemd.special(7)`, :man-pages:`systemctl(1)`, :ref:`systemd-run(1)`, :man-pages:`busctl(1)`, :man-pages:`pam(8)`
+
+

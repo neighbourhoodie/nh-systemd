@@ -1,0 +1,121 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_open_container
+:manvolnum: 3
+:summary: Create and move between containers in D-Bus messages
+:aliases: sd_bus_message_close_container, sd_bus_message_enter_container, sd_bus_message_exit_container
+
+.. _sd_bus_message_open_container(3):
+
+================================
+sd_bus_message_open_container(3)
+================================
+
+Name
+####
+
+sd_bus_message_open_container, sd_bus_message_close_container, sd_bus_message_enter_container, sd_bus_message_exit_container — Create and move between containers in D-Bus messages
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_open_container(sd_bus_message *m,
+	char type,
+	const char *contents); .. code-block::
+
+   int sd_bus_message_close_container(sd_bus_message *m); .. code-block::
+
+   int sd_bus_message_enter_container(sd_bus_message *m,
+	char type,
+	const char *contents); .. code-block::
+
+   int sd_bus_message_exit_container(sd_bus_message *m);
+
+Description
+###########
+
+:code:`sd_bus_message_open_container()` appends a new container to the message :code:`m`. After opening a new container, it can be filled with content using :ref:`sd_bus_message_append(3)` and similar functions. Containers behave like a stack. To nest containers inside each other, call :code:`sd_bus_message_open_container()` multiple times without calling :code:`sd_bus_message_close_container()` in between. Each container will be nested inside the previous container. :code:`type` represents the container type and should be one of "r", "a", "v" or "e" as described in :ref:`sd_bus_message_append(3)`. Instead of literals, the corresponding constants :code:`SD_BUS_TYPE_STRUCT`, :code:`SD_BUS_TYPE_ARRAY`, :code:`SD_BUS_TYPE_VARIANT` or :code:`SD_BUS_TYPE_DICT_ENTRY` can also be used. :code:`contents` describes the type of the container's elements and should be a D-Bus type string following the rules described in :ref:`sd_bus_message_append(3)`.
+
+:code:`sd_bus_message_close_container()` closes the last container opened with :code:`sd_bus_message_open_container()`. On success, the write pointer of the message :code:`m` is positioned after the closed container in its parent container or in :code:`m` itself if there is no parent container.
+
+:code:`sd_bus_message_enter_container()` enters the next container of the message :code:`m` for reading. It behaves mostly the same as :code:`sd_bus_message_open_container()`. Entering a container allows reading its contents with :ref:`sd_bus_message_read(3)` and similar functions. :code:`type` and :code:`contents` are the same as in :code:`sd_bus_message_open_container()`.
+
+:code:`sd_bus_message_exit_container()` exits the scope of the last container entered with :code:`sd_bus_message_enter_container()`. It behaves mostly the same as :code:`sd_bus_message_close_container()`. Note that :code:`sd_bus_message_exit_container()` may only be called after iterating through all members of the container, i.e. reading or skipping over them. Use :ref:`sd_bus_message_skip(3)` to skip over fields of a container in order to be able to exit the container with :code:`sd_bus_message_exit_container()` without reading all members.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. :code:`sd_bus_message_open_container()` and :code:`sd_bus_message_close_container()` return 0. :code:`sd_bus_message_enter_container()` returns 1 if it successfully opened a new container, and 0 if that was not possible because the end of the currently open container or message was reached. :code:`sd_bus_message_exit_container()` returns 1 on success. On failure, all of these functions return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   :code:`m` or :code:`contents` are :code:`NULL` or :code:`type` is invalid.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EBADMSG
+
+   Message :code:`m` has invalid structure.
+
+   .. versionadded:: 254
+
+.. systemd:option:: -ENXIO
+
+   Message :code:`m` does not have a container of type :code:`type` at the current position, or the contents do not match :code:`contents`.
+
+   .. versionadded:: 254
+
+.. systemd:option:: -EPERM
+
+   The message :code:`m` is already sealed.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ESTALE
+
+   The message :code:`m` is in an invalid state.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EBUSY
+
+   :code:`sd_bus_message_exit_container()` was called but there are unread members left in the container.
+
+   .. versionadded:: 247
+
+.. include:: libsystemd-pkgconfig.rst
+
+Examples
+########
+
+Append an array of strings to a message
+---------------------------------------
+
+.. literalinclude:: /code-examples/c/sd-bus-container-append.c
+    :language: c
+
+Read an array of strings from a message
+---------------------------------------
+
+.. literalinclude:: /code-examples/c/sd-bus-container-read.c
+    :language: c
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_append(3)`, :ref:`sd_bus_message_read(3)`, :ref:`sd_bus_message_skip(3)`, `The D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_
+
+

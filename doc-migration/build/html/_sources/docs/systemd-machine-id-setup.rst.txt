@@ -1,0 +1,101 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-machine-id-setup
+:manvolnum: 1
+:summary: Initialize the machine ID in /etc/machine-id
+
+.. _systemd-machine-id-setup(1):
+
+===========================
+systemd-machine-id-setup(1)
+===========================
+
+Name
+####
+
+systemd-machine-id-setup — Initialize the machine ID in /etc/machine-id
+
+Synopsis
+########
+
+:code:`systemd-machine-id-setup`
+
+Description
+###########
+
+:code:`systemd-machine-id-setup` may be used by system installer tools to initialize the machine ID stored in :code:`/etc/machine-id` at install time, with a provisioned or randomly generated ID. See :man-pages:`machine-id(5)` for more information about this file.
+
+If the tool is invoked without the :code:`--commit` switch, :code:`/etc/machine-id` is initialized with a valid, new machine ID if it is missing or empty. The new machine ID will be acquired in the following fashion:
+
+1.    If a valid machine ID is stored in :code:`/run/machine-id`, the machine ID is copied and used to initialize the machine ID in :code:`/etc/machine-id`. This step is skipped if :code:`--root=` is specified or running in a chroot environment.
+
+2.    If a valid D-Bus machine ID is already configured for the system, the D-Bus machine ID is copied and used to initialize the machine ID in :code:`/etc/machine-id`.
+
+3.    If a valid machine ID is provided through :code:`system.machine_id` credential, the machine ID is copied and used to initialize the machine ID in :code:`/etc/machine-id`. This step is skipped if :code:`--root=` is specified or running in a chroot environment.
+
+4.    If run inside a KVM virtual machine and a UUID is configured (via the :code:`-uuid` option), this UUID is used to initialize the machine ID. The caller must ensure that the UUID passed is sufficiently unique and is different for every booted instance of the VM. This step is skipped if :code:`--root=` is specified or running in a chroot environment.
+
+5.    Similarly, if run inside a Linux container environment and a UUID is configured for the container, this is used to initialize the machine ID. For details, see the documentation of the `Container Interface <https://systemd.io/CONTAINER_INTERFACE>`_. This step is skipped if :code:`--root=` is specified or running in a chroot environment.
+
+6.    Otherwise, a new ID is randomly generated.
+
+The :code:`--commit` switch may be used to commit a transient machined ID to disk, making it persistent. For details, see below.
+
+Use :ref:`systemd-firstboot(1)` to initialize the machine ID on mounted (but not booted) system images.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --root=path
+
+   Takes a directory path as argument. All paths operated on will be prefixed with the given alternate :emphasis:`root` path, including the path for :code:`/etc/machine-id` itself.
+
+   .. versionadded:: 212
+
+.. systemd:option:: --image=path
+
+   Takes a path to a device node or regular file as argument. This is similar to :code:`--root=` as described above, but operates on a disk image instead of a directory tree.
+
+   .. versionadded:: 249
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove image-policy-open|
+    :end-before: .. inclusion-end-marker-do-not-remove image-policy-open|
+
+.. systemd:option:: --commit
+
+   Commit a transient machine ID to disk. This command may be used to convert a transient machine ID into a persistent one. A transient machine ID file is one that was bind mounted from a memory file system (usually "tmpfs") to :code:`/etc/machine-id` during the early phase of the boot process. This may happen because :code:`/etc/` is initially read-only and was missing a valid machine ID file at that point.
+
+   This command will execute no operation if :code:`/etc/machine-id` is not mounted from a memory file system, or if :code:`/etc/` is read-only. The command will write the current transient machine ID to disk and unmount the :code:`/etc/machine-id` mount point in a race-free manner to ensure that this file is always valid and accessible for other processes.
+
+   This command is primarily used by the :ref:`systemd-machine-id-commit.service(8)` early boot service.
+
+   .. versionadded:: 227
+
+.. systemd:option:: --print
+
+   Print the machine ID generated or committed after the operation is complete.
+
+   .. versionadded:: 231
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`machine-id(5)`, :ref:`systemd-machine-id-commit.service(8)`, :dbus:`dbus-uuidgen(1)`, :ref:`systemd-firstboot(1)`
+
+

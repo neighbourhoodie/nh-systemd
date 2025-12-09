@@ -1,0 +1,198 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-journal-remote.service
+:manvolnum: 8
+:summary: Receive journal messages over the network
+:aliases: systemd-journal-remote.socket, systemd-journal-remote
+
+.. _systemd-journal-remote.service(8):
+
+=================================
+systemd-journal-remote.service(8)
+=================================
+
+Name
+####
+
+systemd-journal-remote.service, systemd-journal-remote.socket, systemd-journal-remote — Receive journal messages over the network
+
+Synopsis
+########
+
+:code:`systemd-journal-remote.service`
+
+:code:`systemd-journal-remote.socket`
+
+:code:`/usr/lib/systemd/systemd-journal-remote [OPTIONS...] [-o/--output=<DIR>|<FILE>] [SOURCES...]`
+
+Description
+###########
+
+:code:`systemd-journal-remote` is a command to receive serialized journal events and store them to journal files. Input streams are in the `Journal Export Format <https://systemd.io/JOURNAL_EXPORT_FORMATS#journal-export-format>`_, i.e. like the output from :code:`journalctl --output=export`. For transport over the network, this serialized stream is usually carried over an HTTPS connection.
+
+:code:`systemd-journal-remote.service` is a system service that uses :code:`systemd-journal-remote` to listen for connections. :code:`systemd-journal-remote.socket` configures the network address that :code:`systemd-journal-remote.service` listens on. By default, this is port 19532. What connections are accepted and how the received data is stored can be configured through the :man-pages:`journal-remote.conf(5)` configuration file.
+
+Sources
+#######
+
+Sources can be either "active" (:code:`systemd-journal-remote` requests and pulls the data), or "passive" (:code:`systemd-journal-remote` waits for a connection and then receives events pushed by the other side).
+
+:code:`systemd-journal-remote` can read more than one event stream at a time. They will be interleaved in the output file. In case of "active" connections, each "source" is one stream, and in case of "passive" connections, each connection can result in a separate stream. Sockets can be configured in "accept" mode (i.e. only one connection), or "listen" mode (i.e. multiple connections, each resulting in a stream).
+
+When there are no more connections, and no more can be created (there are no listening sockets), then :code:`systemd-journal-remote` will exit.
+
+Active sources can be specified in the following ways:
+
+.. systemd:constant:: [SOURCES]
+
+   When :code:`-` is given as a positional argument, events will be read from standard input. Other positional arguments will be treated as filenames to open and read from.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --url=ADDRESS
+
+   With the :code:`--url=:emphasis:`ADDRESS`` option, events will be retrieved using HTTP from :emphasis:`ADDRESS`. This URL should refer to the root of a remote :ref:`systemd-journal-gatewayd(8)` instance, e.g. http://some.host:19531/ or https://some.host:19531/.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --getter='PROG [OPTIONS]'
+
+   Program to invoke to retrieve data. The journal event stream must be generated on standard output.
+
+   Examples:
+
+     .. code-block:: sh
+
+        --getter='curl "-HAccept: application/vnd.fdo.journal" https://some.host:19531/'
+
+     .. code-block:: sh
+
+        --getter='wget --header="Accept: application/vnd.fdo.journal" -O- https://some.host:19531/'
+
+   .. versionadded:: 239
+
+Passive sources can be specified in the following ways:
+
+.. systemd:option:: --listen-raw=ADDRESS
+
+   :emphasis:`ADDRESS` must be an address suitable for :code:`ListenStream=` (cf. :ref:`systemd.socket(5)`). :code:`systemd-journal-remote` will listen on this socket for connections. Each connection is expected to be a stream of journal events.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --listen-http=ADDRESS, --listen-https=ADDRESS
+
+   :emphasis:`ADDRESS` must be either a negative integer, in which case it will be interpreted as the (negated) file descriptor number, or an address suitable for :code:`ListenStream=` (c.f. :ref:`systemd.socket(5)`). In the first case, the server listens on port 19532 by default, and the matching file descriptor must be inherited through :code:`$LISTEN_FDS`/:code:`$LISTEN_PID`. In the second case, an HTTP or HTTPS server will be spawned on this port, respectively for :code:`--listen-http=` and :code:`--listen-https=`. Currently, only POST requests to :code:`/upload` with "Content-Type: application/vnd.fdo.journal" are supported.
+
+   .. versionadded:: 239
+
+.. systemd:var:: $LISTEN_FDS
+
+   :code:`systemd-journal-remote` supports the :code:`$LISTEN_FDS`/:code:`$LISTEN_PID` protocol. Open sockets inherited through socket activation behave like those opened with :code:`--listen-raw=` described above, unless they are specified as an argument in :code:`--listen-http=-:emphasis:`n`` or :code:`--listen-https=-:emphasis:`n`` above. In the latter case, an HTTP or HTTPS server will be spawned using this descriptor and connections must be made over the HTTP protocol.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --key=
+
+   Takes a path to a SSL secret key file in PEM format. Defaults to :code:`|CERTIFICATE_ROOT|/private/journal-remote.pem`. This option can be used with :code:`--listen-https=`. If the path refers to an :code:`AF_UNIX` stream socket in the file system a connection is made to it and the key read from it.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --cert=
+
+   Takes a path to a SSL certificate file in PEM format. Defaults to :code:`|CERTIFICATE_ROOT|/certs/journal-remote.pem`. This option can be used with :code:`--listen-https=`. If the path refers to an :code:`AF_UNIX` stream socket in the file system a connection is made to it and the certificate read from it.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --trust=
+
+   Takes a path to a SSL CA certificate file in PEM format, or :code:`all`. If :code:`all` is set, then certificate checking will be disabled. Defaults to :code:`|CERTIFICATE_ROOT|/ca/trusted.pem`. This option can be used with :code:`--listen-https=`. If the path refers to an :code:`AF_UNIX` stream socket in the file system a connection is made to it and the certificate read from it.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --gnutls-log=
+
+   Takes a comma separated list of gnutls logging categories. This option can be used with :code:`--listen-http=` or :code:`--listen-https=`.
+
+   .. versionadded:: 239
+
+Sinks
+#####
+
+The location of the output journal can be specified with :code:`-o` or :code:`--output=`.
+
+.. systemd:option:: -o FILE, --output=FILE
+
+   Will write to this journal file. The filename must end with :code:`.journal`. The file will be created if it does not exist. If necessary (journal file full, or corrupted), the file will be renamed following normal journald rules and a new journal file will be created in its stead.
+
+   .. versionadded:: 239
+
+.. systemd:option:: -o DIR, --output=DIR
+
+   Will create journal files underneath directory :emphasis:`DIR`. The directory must exist. If necessary (journal files over size, or corrupted), journal files will be rotated following normal journald rules. Names of files underneath :emphasis:`DIR` will be generated using the rules described below.
+
+   .. versionadded:: 239
+
+If :code:`--output=` is not used, the output directory :code:`/var/log/journal/remote/` will be used. In case the output file is not specified, journal files will be created underneath the selected directory. Files will be called :code:`remote-hostname.journal`, where the :emphasis:`hostname` part is the escaped hostname of the source endpoint of the connection, or the numerical address if the hostname cannot be determined.
+
+In the case that "active" sources are given by the positional arguments or :code:`--getter=` option, the output file name must always be given explicitly.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --split-mode
+
+   One of :code:`none` or :code:`host`. For the first, only one output journal file is used. For the latter, a separate output file is used, based on the hostname of the other endpoint of a connection.
+
+   In the case that "active" sources are given by the positional arguments or :code:`--getter=` option, the output file name must always be given explicitly and only :code:`none` is allowed.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --compress [BOOL]
+
+   If this is set to "yes" then compress the data in the journal using XZ. The default is "yes".
+
+   .. versionadded:: 239
+
+.. systemd:option:: --seal [BOOL]
+
+   If this is set to "yes" then periodically sign the data in the journal using Forward Secure Sealing. The default is "no".
+
+   .. versionadded:: 239
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Examples
+########
+
+Copy local journal events to a different journal directory:
+
+.. code-block:: sh
+
+   journalctl -o export | systemd-journal-remote -o /tmp/dir/foo.journal -
+
+Retrieve all available events from a remote :ref:`systemd-journal-gatewayd(8)` instance and store them in :code:`/var/log/journal/remote/remote-some.host.journal`:
+
+.. code-block:: sh
+
+   systemd-journal-remote --url http://some.host:19531/
+
+Retrieve current boot events and wait for new events from a remote :ref:`systemd-journal-gatewayd(8)` instance, and store them in :code:`/var/log/journal/remote/remote-some.host.journal`:
+
+.. code-block:: sh
+
+   systemd-journal-remote --url http://some.host:19531/entries?boot&follow
+
+See Also
+########
+
+:man-pages:`journal-remote.conf(5)`, :man-pages:`journalctl(1)`, :ref:`systemd-journal-gatewayd.service(8)`, :ref:`systemd-journal-upload.service(8)`, :ref:`systemd-journald.service(8)`
+
+

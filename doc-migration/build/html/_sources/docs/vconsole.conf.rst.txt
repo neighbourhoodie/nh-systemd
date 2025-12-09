@@ -1,0 +1,88 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: vconsole.conf
+:manvolnum: 5
+:summary: Configuration file for the virtual console
+
+.. _vconsole.conf(5):
+
+================
+vconsole.conf(5)
+================
+
+Name
+####
+
+vconsole.conf — Configuration file for the virtual console
+
+Synopsis
+########
+
+:code:`/etc/vconsole.conf`
+
+Description
+###########
+
+The :code:`/etc/vconsole.conf` file configures the virtual console, i.e. keyboard mapping and console font. It is applied at boot by udev using :code:`90-vconsole.rules` file. You can safely mask this file if you want to avoid this kind of initialization.
+
+The format of :code:`vconsole.conf` is a newline-separated list of environment-like shell-compatible variable assignments, ignoring comments and empty lines. It is possible to source the configuration from shell scripts, however, beyond mere variable assignments no shell features are supported, allowing applications to read the file without implementing a shell compatible execution engine. See :man-pages:`os-release(5)` for a detailed description of the format.
+
+Note that the kernel command line options :code:`vconsole.keymap=`, :code:`vconsole.keymap_toggle=`, :code:`vconsole.font=`, :code:`vconsole.font_map=`, :code:`vconsole.font_unimap=` may be used to override the console settings at boot.
+
+Depending on the operating system other configuration files might be checked for configuration of the virtual console as well, however only as fallback.
+
+:code:`/etc/vconsole.conf` is usually created and updated using :ref:`systemd-localed.service(8)`. :man-pages:`localectl(1)` may be used to instruct :code:`systemd-localed.service` to query or update configuration.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: KEYMAP=, KEYMAP_TOGGLE=
+   :group: environment-variables
+
+   Configures the key mapping table for the keyboard. :systemd:var:`KEYMAP=` defaults to "|SYSTEMD_DEFAULT_KEYMAP|" if not set. As a special case, if "@kernel" is specified, no keymap will be loaded, i.e. the kernel's default keymap will be used. The :systemd:var:`KEYMAP_TOGGLE=` can be used to configure a second toggle keymap and is by default unset.
+
+.. systemd:option:: FONT=, FONT_MAP=, FONT_UNIMAP=
+   :group: environment-variables
+
+   Configures the console font, the console map and the unicode font map.
+
+Kernel Command Line
+###################
+
+A few configuration parameters from :code:`vconsole.conf` may be overridden on the kernel command line:
+
+.. systemd:option:: vconsole.keymap=, vconsole.keymap_toggle=
+   :group: kernel-commandline-options
+
+   Overrides :systemd:var:`KEYMAP=` and :systemd:var:`KEYMAP_TOGGLE=`.
+
+   .. versionadded:: 232
+
+.. systemd:option:: vconsole.font=, vconsole.font_map=, vconsole.font_unimap=
+   :group: kernel-commandline-options
+
+   Overrides :systemd:var:`FONT=`, :systemd:var:`FONT_MAP=`, and :systemd:var:`FONT_UNIMAP=`.
+
+   .. versionadded:: 232
+
+Example
+#######
+
+German keyboard and console
+---------------------------
+
+:code:`/etc/vconsole.conf`:
+
+.. code-block:: sh
+
+   KEYMAP=de-latin1
+   FONT=eurlatgr
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-vconsole-setup.service(8)`, :mankier:`loadkeys(1)`, :die-net:`setfont(8)`, :man-pages:`locale.conf(5)`, :ref:`systemd-localed.service(8)`
+
+

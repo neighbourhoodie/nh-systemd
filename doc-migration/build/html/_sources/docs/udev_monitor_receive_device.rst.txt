@@ -1,0 +1,58 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udev_monitor_receive_device
+:manvolnum: 3
+:summary: Query and modify device monitor
+:aliases: udev_monitor_enable_receiving, udev_monitor_set_receive_buffer_size, udev_monitor_get_fd, udev_monitor_get_udev
+
+.. _udev_monitor_receive_device(3):
+
+==============================
+udev_monitor_receive_device(3)
+==============================
+
+Name
+####
+
+udev_monitor_receive_device, udev_monitor_enable_receiving, udev_monitor_set_receive_buffer_size, udev_monitor_get_fd, udev_monitor_get_udev — Query and modify device monitor
+
+Synopsis
+########
+
+:code:`#include <libudev.h>` .. code-block::
+
+   struct udev_device *udev_monitor_receive_device(struct udev_monitor *udev_monitor); .. code-block::
+
+   int udev_monitor_enable_receiving(struct udev_monitor *udev_monitor); .. code-block::
+
+   int udev_monitor_set_receive_buffer_size(struct udev_monitor *udev_monitor,
+	int size); .. code-block::
+
+   int udev_monitor_get_fd(struct udev_monitor *udev_monitor); .. code-block::
+
+   struct udev *udev_monitor_get_udev(struct udev_monitor *udev_monitor);
+
+.. COMMENT: <refsect1> <title>Description</title> <para>XXX: Add short description.</para> </refsect1>
+
+Return Value
+############
+
+On success, :code:`udev_monitor_receive_device()` returns a pointer to a newly referenced device that was received via the monitor. The caller is responsible to drop this reference when done. On failure, :code:`NULL` is returned.
+
+On success, :code:`udev_monitor_enable_receiving()` and :code:`udev_monitor_set_receive_buffer_size()` return an integer greater than, or equal to, :code:`0`. On failure, a negative error code is returned.
+
+On success, :code:`udev_monitor_get_fd()` returns the file descriptor used by this monitor. On failure, a negative error code is returned.
+
+:code:`udev_monitor_get_udev()` always returns a pointer to the udev context that this monitor is associated with.
+
+History
+#######
+
+:code:`udev_monitor_receive_device()`, :code:`udev_monitor_enable_receiving()`, :code:`udev_monitor_set_receive_buffer_size()`, :code:`udev_monitor_get_fd()`, and :code:`udev_monitor_get_udev()` were added in version 221.
+
+See Also
+########
+
+:man-pages:`udev_new(3)`, :man-pages:`udev_device_new_from_syspath(3)`, :man-pages:`udev_enumerate_new(3)`, :man-pages:`udev_monitor_new_from_netlink(3)`, :man-pages:`udev_monitor_filter_update(3)`, :man-pages:`udev_list_entry(3)`, :ref:`systemd(1)`
+
+

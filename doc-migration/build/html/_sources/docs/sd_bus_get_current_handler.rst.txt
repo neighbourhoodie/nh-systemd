@@ -1,0 +1,58 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_get_current_handler
+:manvolnum: 3
+:summary: Query information of the callback a bus object is currently running
+:aliases: sd_bus_get_current_message, sd_bus_get_current_slot, sd_bus_get_current_userdata
+
+.. _sd_bus_get_current_handler(3):
+
+=============================
+sd_bus_get_current_handler(3)
+=============================
+
+Name
+####
+
+sd_bus_get_current_handler, sd_bus_get_current_message, sd_bus_get_current_slot, sd_bus_get_current_userdata — Query information of the callback a bus object is currently running
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. include:: sd_bus_add_match.rst
+    :start-after: .. inclusion-marker-do-not-remove sd_bus_message_handler_t|
+    :end-before: .. inclusion-end-marker-do-not-remove sd_bus_message_handler_t|
+
+.. code-block::
+
+   sd_bus_message_handler_t sd_bus_get_current_handler(sd_bus *bus); .. code-block::
+
+   sd_bus_message* sd_bus_get_current_message(sd_bus *bus); .. code-block::
+
+   sd_bus_slot* sd_bus_get_current_slot(sd_bus *bus); .. code-block::
+
+   void* sd_bus_get_current_userdata(sd_bus *bus);
+
+Description
+###########
+
+Whenever sd-bus is about to invoke a user-supplied callback function, it stores the current callback, D-Bus message, slot and userdata pointer and allows these to be queried via :code:`sd_bus_get_current_handler()`, :code:`sd_bus_get_current_message()`, :code:`sd_bus_get_current_slot()` and :code:`sd_bus_get_current_userdata()`, respectively. If :code:`bus` cannot be resolved or if execution does not reside in a user-supplied callback of :code:`bus`, these functions return :code:`NULL`.
+
+Return Value
+############
+
+On success, these functions return the requested object. On failure, they return :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_get_current_handler()`, :code:`sd_bus_get_current_message()`, :code:`sd_bus_get_current_slot()`, and :code:`sd_bus_get_current_userdata()` were added in version 221.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`
+
+

@@ -1,0 +1,53 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_id128_randomize
+:manvolnum: 3
+:summary: Generate 128-bit IDs
+
+.. _sd_id128_randomize(3):
+
+=====================
+sd_id128_randomize(3)
+=====================
+
+Name
+####
+
+sd_id128_randomize — Generate 128-bit IDs
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-id128.h>` .. code-block::
+
+   int sd_id128_randomize(sd_id128_t *ret);
+
+Description
+###########
+
+:code:`sd_id128_randomize()` generates a new randomized 128-bit ID and returns it in :code:`ret`. Every invocation returns a new randomly generated ID. This uses the :man-pages:`getrandom(2)` kernel random number generator.
+
+Note that :code:`sd_id128_randomize()` always returns a UUID Variant 1 Version 4 compatible ID. It is hence guaranteed that this function will never return the ID consisting of all zero or all one bits (:code:`SD_ID128_NULL`, :code:`SD_ID128_ALLF`).
+
+For more information about the "sd_id128_t" type, see :ref:`sd-id128(3)`.
+
+:ref:`systemd-id128(1)`'s :code:`new` command may be used as a command line front-end for :code:`sd_id128_randomize()`.
+
+Return Value
+############
+
+The call returns 0 on success (in which case :code:`ret` is filled in), or a negative errno-style error code.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_id128_randomize()` was added in version 187.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-id128(3)`, :man-pages:`machine-id(5)`, :man-pages:`getrandom(2)`, :man-pages:`random(4)`, :ref:`sd_id128_get_machine(3)`
+
+

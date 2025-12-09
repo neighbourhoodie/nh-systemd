@@ -1,0 +1,106 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_new
+:manvolnum: 3
+:summary: Acquire and release an event loop object
+:aliases: sd_event_default, sd_event_ref, sd_event_unref, sd_event_unrefp, sd_event_get_tid, sd_event
+
+.. _sd_event_new(3):
+
+===============
+sd_event_new(3)
+===============
+
+Name
+####
+
+sd_event_new, sd_event_default, sd_event_ref, sd_event_unref, sd_event_unrefp, sd_event_get_tid, sd_event — Acquire and release an event loop object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` :code:`:code:`typedef` struct sd_event sd_event;` .. code-block::
+
+   int sd_event_new(sd_event **event); .. code-block::
+
+   int sd_event_default(sd_event **event); .. code-block::
+
+   sd_event *sd_event_ref(sd_event *event); .. code-block::
+
+   sd_event *sd_event_unref(sd_event *event); .. code-block::
+
+   void sd_event_unrefp(sd_event **event); .. code-block::
+
+   int sd_event_get_tid(sd_event *event,
+	pid_t *ret);
+
+Description
+###########
+
+:code:`sd_event_new()` allocates a new event loop object. The event loop object is returned in the :code:`event` parameter. After use, drop the returned reference with :code:`sd_event_unref()`. When the last reference is dropped, the object is freed.
+
+:code:`sd_event_default()` acquires a reference to the default event loop object of the calling thread, possibly allocating a new object if no default event loop object has been allocated yet for the thread. After use, drop the returned reference with :code:`sd_event_unref()`. When the last reference is dropped, the event loop is freed. If this function is called while the object returned from a previous call from the same thread is still referenced, the same object is returned again, but the reference is increased by one. It is recommended to use this call instead of :code:`sd_event_new()` in order to share event loop objects between various components that are dispatched in the same thread. All threads have exactly either zero or one default event loop objects associated, but never more.
+
+After allocating an event loop object, add event sources to it with :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_add_post(3)` or :ref:`sd_event_add_exit(3)`, and then execute the event loop using :ref:`sd_event_loop(3)`.
+
+:code:`sd_event_ref()` increases the reference count of the specified event loop object by one.
+
+:code:`sd_event_unref()` decreases the reference count of the specified event loop object by one. If the count hits zero, the object is freed. Note that it is freed regardless of whether it is the default event loop object for a thread or not. This means that allocating an event loop with :code:`sd_event_default()`, then releasing it, and then acquiring a new one with :code:`sd_event_default()` will result in two distinct objects. Note that, in order to free an event loop object, all remaining event sources of the event loop also need to be freed as each keeps a reference to it.
+
+:code:`sd_event_unrefp()` is similar to :code:`sd_event_unref()` but takes a pointer to a pointer to an sd_event object. This call is useful in conjunction with GCC's and LLVM's `Clean-up Variable Attribute <https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html>`_. Note that this function is defined as inline function. Use a declaration like the following, in order to allocate an event loop object that is freed automatically as the code block is left:
+
+.. code-block:: sh
+
+   {
+           __attribute__((cleanup(sd_event_unrefp))) sd_event *event = NULL;
+           int r;
+           …
+           r = sd_event_default(&event);
+           if (r < 0) {
+             errno = -r;
+             fprintf(stderr, "Failed to allocate event loop: %m\n");
+           }
+           …
+   }
+
+:code:`sd_event_ref()`, :code:`sd_event_unref()` and :code:`sd_event_unrefp()` execute no operation if the passed in event loop object is :code:`NULL`.
+
+:code:`sd_event_get_tid()` retrieves the thread identifier ("TID") of the thread the specified event loop object is associated with. This call is only supported for event loops allocated with :code:`sd_event_default()`, and returns the identifier for the thread the event loop is the default event loop of. See :man-pages:`gettid(2)` for more information on thread identifiers.
+
+Return Value
+############
+
+On success, :code:`sd_event_new()`, :code:`sd_event_default()` and :code:`sd_event_get_tid()` return 0 or a positive integer. On failure, they return a negative errno-style error code. :code:`sd_event_ref()` always returns a pointer to the event loop object passed in. :code:`sd_event_unref()` always returns :code:`NULL`.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENOMEM
+
+   Not enough memory to allocate the object.
+
+.. systemd:option:: -EMFILE
+
+   The maximum number of event loops has been allocated.
+
+.. systemd:option:: -ENXIO
+
+   :code:`sd_event_get_tid()` was invoked on an event loop object that was not allocated with :code:`sd_event_default()`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_new()`, :code:`sd_event_default()`, :code:`sd_event_ref()`, and :code:`sd_event_unref()` were added in version 213.
+
+:code:`sd_event_unrefp()` and :code:`sd_event_get_tid()` were added in version 229.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_run(3)`, :man-pages:`gettid(2)`
+
+

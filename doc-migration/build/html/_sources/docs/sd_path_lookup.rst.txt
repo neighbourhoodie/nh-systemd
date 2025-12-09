@@ -1,0 +1,108 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_path_lookup
+:manvolnum: 3
+:summary: Query well-known file system paths
+:aliases: sd_path_lookup_strv
+
+.. _sd_path_lookup(3):
+
+=================
+sd_path_lookup(3)
+=================
+
+Name
+####
+
+sd_path_lookup, sd_path_lookup_strv — Query well-known file system paths
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-path.h>`
+
+.. COMMENT: note: individual constants are not added as <refname>s, there's just too many
+
+:code:`:code:`enum` { :code:`SD_PATH_TEMPORARY`, :code:`SD_PATH_TEMPORARY_LARGE`, :code:`SD_PATH_SYSTEM_BINARIES`, :code:`SD_PATH_SYSTEM_INCLUDE`, :code:`SD_PATH_SYSTEM_LIBRARY_PRIVATE`, :code:`SD_PATH_SYSTEM_LIBRARY_ARCH`, :code:`SD_PATH_SYSTEM_SHARED`, :code:`SD_PATH_SYSTEM_CONFIGURATION_FACTORY`, :code:`SD_PATH_SYSTEM_STATE_FACTORY`, :code:`SD_PATH_SYSTEM_CONFIGURATION`, :code:`SD_PATH_SYSTEM_SEARCH_CONFIGURATION`, :code:`SD_PATH_SYSTEM_RUNTIME`, :code:`SD_PATH_SYSTEM_RUNTIME_LOGS`, :code:`SD_PATH_SYSTEM_STATE_PRIVATE`, :code:`SD_PATH_SYSTEM_STATE_LOGS`, :code:`SD_PATH_SYSTEM_STATE_CACHE`, :code:`SD_PATH_SYSTEM_STATE_SPOOL`, :code:`SD_PATH_USER_BINARIES`, :code:`SD_PATH_USER_LIBRARY_PRIVATE`, :code:`SD_PATH_USER_LIBRARY_ARCH`, :code:`SD_PATH_USER_SHARED`, :code:`SD_PATH_USER_CONFIGURATION`, :code:`SD_PATH_USER_RUNTIME`, :code:`SD_PATH_USER_STATE_PRIVATE`, :code:`SD_PATH_USER_STATE_CACHE`, :code:`SD_PATH_USER`, :code:`SD_PATH_USER_DOCUMENTS`, :code:`SD_PATH_USER_MUSIC`, :code:`SD_PATH_USER_PICTURES`, :code:`SD_PATH_USER_VIDEOS`, :code:`SD_PATH_USER_DOWNLOAD`, :code:`SD_PATH_USER_PUBLIC`, :code:`SD_PATH_USER_TEMPLATES`, :code:`SD_PATH_USER_DESKTOP`, :code:`SD_PATH_SEARCH_BINARIES`, :code:`SD_PATH_SEARCH_BINARIES_DEFAULT`, :code:`SD_PATH_SEARCH_LIBRARY_PRIVATE`, :code:`SD_PATH_SEARCH_LIBRARY_ARCH`, :code:`SD_PATH_SEARCH_SHARED`, :code:`SD_PATH_SEARCH_CONFIGURATION_FACTORY`, :code:`SD_PATH_SEARCH_STATE_FACTORY`, :code:`SD_PATH_SEARCH_CONFIGURATION`, :code:`SD_PATH_SYSTEMD_UTIL`, :code:`SD_PATH_SYSTEMD_SYSTEM_UNIT`, :code:`SD_PATH_SYSTEMD_SYSTEM_PRESET`, :code:`SD_PATH_SYSTEMD_USER_UNIT`, :code:`SD_PATH_SYSTEMD_USER_PRESET`, :code:`SD_PATH_SYSTEMD_SYSTEM_CONF`, :code:`SD_PATH_SYSTEMD_USER_CONF`, :code:`SD_PATH_SYSTEMD_SEARCH_SYSTEM_UNIT`, :code:`SD_PATH_SYSTEMD_SEARCH_USER_UNIT`, :code:`SD_PATH_SYSTEMD_SYSTEM_GENERATOR`, :code:`SD_PATH_SYSTEMD_USER_GENERATOR`, :code:`SD_PATH_SYSTEMD_SEARCH_SYSTEM_GENERATOR`, :code:`SD_PATH_SYSTEMD_SEARCH_USER_GENERATOR`, :code:`SD_PATH_SYSTEMD_SLEEP`, :code:`SD_PATH_SYSTEMD_SHUTDOWN`, :code:`SD_PATH_TMPFILES`, :code:`SD_PATH_SYSUSERS`, :code:`SD_PATH_SYSCTL`, :code:`SD_PATH_BINFMT`, :code:`SD_PATH_MODULES_LOAD`, :code:`SD_PATH_CATALOG`, :code:`SD_PATH_SYSTEMD_SEARCH_NETWORK`, :code:`SD_PATH_SYSTEMD_SYSTEM_ENVIRONMENT_GENERATOR`, :code:`SD_PATH_SYSTEMD_USER_ENVIRONMENT_GENERATOR`, :code:`SD_PATH_SYSTEMD_SEARCH_SYSTEM_ENVIRONMENT_GENERATOR`, :code:`SD_PATH_SYSTEMD_SEARCH_USER_ENVIRONMENT_GENERATOR`, };` .. code-block::
+
+   int sd_path_lookup(uint64_t type,
+	const char *suffix,
+	char **paths); .. code-block::
+
+   int sd_path_lookup_strv(uint64_t type,
+	const char *suffix,
+	char ***paths);
+
+Description
+###########
+
+:code:`sd_path_lookup()` and :code:`sd_bus_path_lookup_strv()` return a single path or set of file system paths specified by the argument :code:`type`. In case of :code:`sd_path_lookup()` a single :code:`NUL`-terminated string is returned. When :code:`type` specifies a set of paths, they are concatenated using ":" as a separator (as is traditionally done for e.g. :code:`$PATH` or :code:`$LD_LIBRARY_PATH`). In case of :code:`sd_path_lookup_strv()` a :code:`NULL`-terminated array of strings is returned (strv). If suffix :code:`suffix` is given, it is concatenated to each of the paths after a slash ("/"). All returned paths are absolute.
+
+For paths which refer to user directories, the relevant XDG standard is followed, with support for environment variables like :code:`$XDG_DOCUMENTS_DIR`, :code:`$XDG_DESKTOP_DIR`, ..., and explicit configuration in :code:`/etc/xdg/user-dirs.conf` or :code:`${XDG_CONFIG_HOME}/user-dirs.dirs`. See `XDG Base Directory Specification <https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html>`_ for details.
+
+:ref:`systemd-path(1)` is a wrapper around :code:`sd_path_lookup()` and allows the same set of paths to be queried.
+
+Return Value
+############
+
+On success, :code:`sd_path_lookup()` and :code:`sd_path_lookup_strv()` return a non-negative integer. On failure, a negative errno-style error number is returned by either function.
+
+The returned string or string array (strv) must be :man-pages:`free(3)`'d by the caller.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EOPNOTSUPP
+
+   Unknown identifier :code:`type`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EINVAL
+
+   Output argument is :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENXIO
+
+   Query failed because of an undefined environment variable (e.g. for :code:`SD_PATH_USER_RUNTIME` when :code:`$XDG_RUNTIME_DIR` is not defined).
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+   .. versionadded:: 246
+
+.. inclusion-end-marker-do-not-remove errors|
+
+Examples
+########
+
+Look up the location of ~/Documents
+###################################
+
+.. literalinclude:: /code-examples/c/path-documents.c
+    :language: c
+
+Note that the default answer of :code:`$HOME/Documents` may be overridden by :code:`user-dirs.conf` or :code:`$XDG_DOCUMENTS_DIR`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_path_lookup()` and :code:`sd_path_lookup_strv()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-path(3)`, :ref:`systemd-path(1)`
+
+

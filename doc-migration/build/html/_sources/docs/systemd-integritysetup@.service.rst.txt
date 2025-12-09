@@ -1,0 +1,63 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-integritysetup@.service
+:manvolnum: 8
+:summary: Disk integrity protection logic
+:aliases: systemd-integritysetup
+
+.. _systemd-integritysetup@.service(8):
+
+==================================
+systemd-integritysetup@.service(8)
+==================================
+
+Name
+####
+
+systemd-integritysetup@.service, systemd-integritysetup — Disk integrity protection logic
+
+Synopsis
+########
+
+:code:`systemd-integritysetup@.service`
+
+:code:`/usr/lib/systemd/systemd-integritysetup`
+
+Description
+###########
+
+:code:`systemd-integritysetup@.service` is a service responsible for setting up integrity protected block devices. It should be instantiated for each device that requires integrity protection.
+
+At early boot and when the system manager configuration is reloaded, entries from :man-pages:`integritytab(5)` are converted into :code:`systemd-integritysetup@.service` units by :ref:`systemd-integritysetup-generator(8)`.
+
+:code:`systemd-integritysetup@.service` calls :code:`systemd-integritysetup`.
+
+Commands
+########
+
+The following commands are understood by :code:`systemd-integritysetup`:
+
+.. systemd:option:: attach volume device [key-file|-] [option(s)|-]
+
+   Create a block device :emphasis:`volume` using :emphasis:`device`. See :man-pages:`integritytab(5)` and `Kernel dm-integrity <https://docs.kernel.org/admin-guide/device-mapper/dm-integrity.html>`_ documentation for details.
+
+   .. versionadded:: 250
+
+.. systemd:option:: detach volume
+
+   Detach (destroy) the block device :emphasis:`volume`.
+
+   .. versionadded:: 250
+
+.. systemd:option:: help
+
+   Print short information about command syntax.
+
+   .. versionadded:: 250
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`integritytab(5)`, :ref:`systemd-integritysetup-generator(8)`, :die-net:`integritysetup(8)`
+
+

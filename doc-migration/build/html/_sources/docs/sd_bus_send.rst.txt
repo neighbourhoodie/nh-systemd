@@ -1,0 +1,116 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_send
+:manvolnum: 3
+:summary: Queue a D-Bus message for transfer
+:aliases: sd_bus_send_to, sd_bus_message_send
+
+.. _sd_bus_send(3):
+
+==============
+sd_bus_send(3)
+==============
+
+Name
+####
+
+sd_bus_send, sd_bus_send_to, sd_bus_message_send — Queue a D-Bus message for transfer
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_send(sd_bus *bus,
+	sd_bus_message *m,
+	uint64_t *cookie); .. code-block::
+
+   int sd_bus_send_to(sd_bus *bus,
+	sd_bus_message *m,
+	const char *destination,
+	uint64_t *cookie); .. code-block::
+
+   int sd_bus_message_send(sd_bus_message *m);
+
+Description
+###########
+
+:code:`sd_bus_send()` queues the bus message object :code:`m` for transfer. If :code:`bus` is :code:`NULL`, the bus that :code:`m` is attached to is used. :code:`bus` only needs to be set when the message is sent to a different bus than the one it is attached to, for example when forwarding messages. If the output parameter :code:`cookie` is not :code:`NULL`, it is set to the message identifier. This value can later be used to match incoming replies to their corresponding messages. If :code:`cookie` is set to :code:`NULL` and the message is not sealed, :code:`sd_bus_send()` assumes the message :code:`m` does not expect a reply and adds the necessary headers to indicate this.
+
+Note that in most scenarios, :code:`sd_bus_send()` should not be called directly. Instead, use higher level functions such as :ref:`sd_bus_call_method(3)` and :ref:`sd_bus_reply_method_return(3)` which call :code:`sd_bus_send()` internally.
+
+:code:`sd_bus_send_to()` is a shorthand for sending a message to a specific destination. It's main use case is to simplify sending unicast signal messages (signals that only have a single receiver). It's behavior is similar to calling :ref:`sd_bus_message_set_destination(3)` followed by calling :code:`sd_bus_send()`.
+
+:code:`sd_bus_send()`/:code:`sd_bus_send_to()` will write the message directly to the underlying transport (e.g. kernel socket buffer) if possible. If the connection is not set up fully yet the message is queued locally. If the transport buffers are congested any unwritten message data is queued locally, too. If the connection has been closed or is currently being closed the call fails. :ref:`sd_bus_process(3)` should be invoked to write out any queued message data to the transport.
+
+:code:`sd_bus_message_send()` is the same as :code:`sd_bus_send()` but without the first and last argument. :code:`sd_bus_message_send(m)` is equivalent to :code:`sd_bus_send(sd_bus_message_get_bus(m), m, NULL)`.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The input parameter :code:`m` is :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EOPNOTSUPP
+
+   The bus connection does not support sending file descriptors.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ECHILD
+
+   The bus connection was allocated in a parent process and is being reused in a child process after :code:`fork()`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOBUFS
+
+   The bus connection's write queue is full.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOTCONN
+
+   The input parameter :code:`bus` is :code:`NULL` or the bus is not connected.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ECONNRESET
+
+   The bus connection was closed while waiting for the response.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+   .. versionadded:: 246
+
+.. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_send()` and :code:`sd_bus_send_to()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_call_method(3)`, :ref:`sd_bus_message_set_destination(3)`, :ref:`sd_bus_reply_method_return(3)`, :ref:`sd_bus_process(3)`
+
+

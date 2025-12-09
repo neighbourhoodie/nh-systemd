@@ -1,0 +1,332 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.mount
+:manvolnum: 5
+:summary: Mount unit configuration
+
+.. _systemd.mount(5):
+
+================
+systemd.mount(5)
+================
+
+Name
+####
+
+systemd.mount — Mount unit configuration
+
+Synopsis
+########
+
+:code:`mount.mount`
+
+Description
+###########
+
+A unit configuration file whose name ends in ".mount" encodes information about a file system mount point controlled and supervised by systemd.
+
+This man page lists the configuration options specific to this unit type. See :ref:`systemd.unit(5)` for the common options of all unit configuration files. The common configuration items are configured in the generic \[Unit] and \[Install] sections. The mount specific configuration options are configured in the \[Mount] section.
+
+Additional options are listed in :ref:`systemd.exec(5)`, which define the execution environment the :man-pages:`mount(8)` program is executed in, and in :ref:`systemd.kill(5)`, which define the way the processes are terminated, and in :ref:`systemd.resource-control(5)`, which configure resource control settings for the processes of the service.
+
+Note that the options :code:`User=` and :code:`Group=` are not useful for mount units. systemd passes two parameters to :man-pages:`mount(8)`; the values of :code:`What=` and :code:`Where=`. When invoked in this way, :man-pages:`mount(8)` does not read any options from :code:`/etc/fstab`, and must be run as UID 0.
+
+Mount units must be named after the mount point directories they control. Example: the mount point :code:`/home/lennart` must be configured in a unit file :code:`home-lennart.mount`. For details about the escaping logic used to convert a file system path to a unit name, see :ref:`systemd.unit(5)`. Note that mount units cannot be templated, nor is possible to add multiple names to a mount unit by creating symlinks to its unit file.
+
+Optionally, a mount unit may be accompanied by an automount unit, to allow on-demand or parallelized mounting. See :ref:`systemd.automount(5)`.
+
+Mount points created at runtime (independently of unit files or :code:`/etc/fstab`) will be monitored by systemd and appear like any other mount unit in systemd. See :code:`/proc/self/mountinfo` description in :man-pages:`proc(5)`.
+
+Some file systems have special semantics as API file systems for kernel-to-userspace and userspace-to-userspace interfaces. Some of them may not be changed via mount units, and cannot be disabled. For a longer discussion see `API File Systems <https://systemd.io/API_FILE_SYSTEMS>`_.
+
+The :ref:`systemd-mount(1)` command allows creating :code:`.mount` and :code:`.automount` units dynamically and transiently from the command line.
+
+Automatic Dependencies
+######################
+
+Implicit Dependencies
+#####################
+
+The following dependencies are implicitly added:
+
+*    If a mount unit is beneath another mount unit in the file system hierarchy, both a requirement dependency and an ordering dependency between both units are created automatically.
+
+*    Block device backed file systems automatically gain :code:`Requires=`, :code:`StopPropagatedFrom=`, and :code:`After=` type dependencies on the device unit encapsulating the block device (see :code:`x-systemd.device-bound=` for details).
+
+*    If traditional file system quota is enabled for a mount unit, automatic :code:`Wants=` and :code:`Before=` dependencies on :code:`systemd-quotacheck@.service` and :code:`quotaon@.service` are added.
+
+*    Additional implicit dependencies may be added as result of execution and resource control parameters as documented in :ref:`systemd.exec(5)` and :ref:`systemd.resource-control(5)`.
+
+Default Dependencies
+####################
+
+The following dependencies are added unless :code:`DefaultDependencies=no` is set:
+
+*    All mount units acquire automatic :code:`Before=` and :code:`Conflicts=` on :code:`umount.target` in order to be stopped during shutdown.
+
+*    Mount units referring to local file systems automatically gain an :code:`After=` dependency on :code:`local-fs-pre.target`, and a :code:`Before=` dependency on :code:`local-fs.target` unless one or more mount options among :code:`nofail`, :code:`x-systemd.wanted-by=`, and :code:`x-systemd.required-by=` is set. See below for detailed information.
+
+   Additionally, an :code:`After=` dependency on :code:`swap.target` is added when the file system type is "tmpfs".
+
+*    Network mount units automatically acquire :code:`After=` dependencies on :code:`remote-fs-pre.target`, :code:`network.target`, plus :code:`After=` and :code:`Wants=` dependencies on :code:`network-online.target`, and a :code:`Before=` dependency on :code:`remote-fs.target`, unless one or more mount options among :code:`nofail`, :code:`x-systemd.wanted-by=`, and :code:`x-systemd.required-by=` is set.
+
+Mount units referring to local and network file systems are distinguished by their file system type specification. In some cases this is not sufficient (for example network block device based mounts, such as iSCSI), in which case :code:`_netdev` may be added to the mount option string of the unit, which forces systemd to consider the mount unit a network mount.
+
+:code:`fstab`
+#############
+
+Mount units may either be configured via unit files, or via :code:`/etc/fstab` (see :man-pages:`fstab(5)` for details). Mounts listed in :code:`/etc/fstab` will be converted into native units dynamically at boot and when the configuration of the system manager is reloaded. In general, configuring mount points through :code:`/etc/fstab` is the preferred approach to manage mounts for humans. For tooling, writing mount units should be preferred over editing :code:`/etc/fstab`. See :ref:`systemd-fstab-generator(8)` for details about the conversion from :code:`/etc/fstab` to mount units.
+
+The NFS mount option :code:`bg` for NFS background mounts as documented in :man-pages:`nfs(5)` is detected by :code:`systemd-fstab-generator` and the options are transformed so that systemd fulfills the job-control implications of that option. Specifically :code:`systemd-fstab-generator` acts as though "x-systemd.mount-timeout=infinity,retry=10000" was prepended to the option list, and "fg,nofail" was appended. Depending on specific requirements, it may be appropriate to provide some of these options explicitly, or to make use of the "x-systemd.automount" option described below instead of using "bg".
+
+When reading :code:`/etc/fstab` a few special mount options are understood by systemd which influence how dependencies are created for mount points. systemd will create a dependency of type :code:`Wants=` or :code:`Requires=` (see option :code:`nofail` below), from either :code:`local-fs.target` or :code:`remote-fs.target`, depending whether the file system is local or remote.
+
+.. systemd:option:: x-systemd.requires=
+   :group: fstab-options
+
+   Configures a :systemd:var:`Requires=` and an :systemd:var:`After=` dependency between the created mount unit and another systemd unit, such as a device or mount unit. The argument should be a unit name, or an absolute path to a device node or mount point. This option may be specified more than once. This option is particularly useful for mount point declarations that need an additional device to be around (such as an external journal device for journal file systems) or an additional mount to be in place (such as an overlay file system that merges multiple mount points). See :systemd:var:`After=` and :systemd:var:`Requires=` in :ref:`systemd.unit(5)` for details.
+
+   Note that this option always applies to the created mount unit only regardless whether :systemd:option:`x-systemd.automount` has been specified.
+
+   .. versionadded:: 220
+
+.. systemd:option:: x-systemd.wants=
+   :group: fstab-options
+
+   Configures a :systemd:var:`Wants=` and an :systemd:var:`After=` dependency between the created mount unit and another systemd unit, similar to the :systemd:var:`x-systemd.requires=` option.
+
+   .. versionadded:: 257
+
+.. systemd:option:: x-systemd.before=, x-systemd.after=
+   :group: fstab-options
+
+   In the created mount unit, configures a :systemd:var:`Before=` or :systemd:var:`After=` dependency on another systemd unit, such as a mount unit. The argument should be a unit name or an absolute path to a mount point. This option may be specified more than once. This option is particularly useful for mount point declarations with :systemd:option:`nofail` option that are mounted asynchronously but need to be mounted before or after some unit start, for example, before :code:`local-fs.target` unit. See :systemd:var:`Before=` and :systemd:var:`After=` in :ref:`systemd.unit(5)` for details.
+
+   Note that these options always apply to the created mount unit only regardless whether :systemd:option:`x-systemd.automount` has been specified.
+
+   .. versionadded:: 233
+
+.. systemd:option:: x-systemd.wanted-by=, x-systemd.required-by=
+   :group: fstab-options
+
+   In the created mount unit, configures a :systemd:var:`WantedBy=` or :systemd:var:`RequiredBy=` dependency on another unit. This option may be specified more than once. If this is specified, the default dependencies (see above) other than :code:`umount.target` on the created mount unit, e.g. :code:`local-fs.target`, are not automatically created. Hence it is likely that some ordering dependencies need to be set up manually through :systemd:option:`x-systemd.before=` and :systemd:option:`x-systemd.after=`. See :systemd:var:`WantedBy=` and :systemd:var:`RequiredBy=` in :ref:`systemd.unit(5)` for details.
+
+   .. versionadded:: 245
+
+.. systemd:option:: x-systemd.wants-mounts-for=, x-systemd.requires-mounts-for=
+   :group: fstab-options
+
+   Configures a :systemd:var:`RequiresMountsFor=` or :systemd:var:`WantsMountsFor=` dependency between the created mount unit and other mount units. The argument must be an absolute path. This option may be specified more than once. See :systemd:var:`RequiresMountsFor=` or :systemd:var:`WantsMountsFor=` in :ref:`systemd.unit(5)` for details.
+
+   .. versionadded:: 220
+
+.. systemd:option:: x-systemd.graceful-option=
+   :group: fstab-options
+
+   Additional mount option that shall be appended if supported by the kernel. This may be used to configure mount options that are optional and only enabled on kernels that support them. Note that this is supported only for native kernel mount options (i.e. explicitly not for mount options implemented in userspace, such as those processed by :code:`/usr/bin/mount` itself, by FUSE or by mount helpers such as :code:`mount.nfs`). This option may be specified more than once.
+
+   .. versionadded:: 258
+
+.. systemd:option:: x-systemd.device-bound=
+   :group: fstab-options
+
+   Takes a boolean argument. If true or no argument, a :systemd:var:`BindsTo=` dependency on the backing device is set. If false, the mount unit is not stopped no matter whether the backing device is still present. This is useful when the file system is backed by volume managers. If not set, and the mount comes from unit fragments, i.e. generated from :code:`/etc/fstab` by :ref:`systemd-fstab-generator(8)` or loaded from a manually configured mount unit, a combination of :systemd:var:`Requires=` and :systemd:var:`StopPropagatedFrom=` dependencies is set on the backing device, otherwise only :systemd:var:`Requires=` is used.
+
+   .. versionadded:: 233
+
+.. systemd:option:: x-systemd.automount
+   :group: fstab-options
+
+   An automount unit will be created for the file system. See :ref:`systemd.automount(5)` for details.
+
+   .. versionadded:: 215
+
+.. systemd:option:: x-systemd.idle-timeout=
+   :group: fstab-options
+
+   Configures the idle timeout of the automount unit. See :systemd:var:`TimeoutIdleSec=` in :ref:`systemd.automount(5)` for details.
+
+   .. versionadded:: 220
+
+.. inclusion-marker-do-not-remove device-timeout|
+
+.. systemd:option:: x-systemd.device-timeout=
+   :group: fstab-options
+
+   Configure how long systemd should wait for a device to show up before giving up on an entry from :code:`/etc/fstab`. Specify a time in seconds or explicitly append a unit such as "s", "min", "h", "ms".
+
+   Note that this option can only be used in :code:`/etc/fstab`, and will be ignored when part of the :systemd:var:`Options=` setting in a unit file.
+
+   .. versionadded:: 215
+
+.. inclusion-end-marker-do-not-remove device-timeout|
+
+.. systemd:option:: x-systemd.mount-timeout=
+   :group: fstab-options
+
+   Configure how long systemd should wait for the mount command to finish before giving up on an entry from :code:`/etc/fstab`. Specify a time in seconds or explicitly append a unit such as "s", "min", "h", "ms".
+
+   Note that this option can only be used in :code:`/etc/fstab`, and will be ignored when part of the :systemd:var:`Options=` setting in a unit file.
+
+   See :systemd:var:`TimeoutSec=` below for details.
+
+   .. versionadded:: 233
+
+.. systemd:option:: x-systemd.makefs
+   :group: fstab-options
+
+   The file system will be initialized on the device. If the device is not "empty", i.e. it contains any signature, the operation will be skipped. It is hence expected that this option remains set even after the device has been initialized.
+
+   Note that this option can only be used in :code:`/etc/fstab`, and will be ignored when part of the :systemd:var:`Options=` setting in a unit file.
+
+   See :ref:`systemd-makefs@.service(8)`.
+
+   :man-pages:`wipefs(8)` may be used to remove any signatures from a block device to force :systemd:option:`x-systemd.makefs` to reinitialize the device.
+
+   .. versionadded:: 236
+
+.. systemd:option:: x-systemd.growfs
+   :group: fstab-options
+
+   The file system will be grown to occupy the full block device. If the file system is already at maximum size, no action will be performed. It is hence expected that this option remains set even after the file system has been grown. Only certain file system types are supported, see :ref:`systemd-makefs@.service(8)` for details.
+
+   Note that this option can only be used in :code:`/etc/fstab`, and will be ignored when part of the :systemd:var:`Options=` setting in a unit file.
+
+   .. versionadded:: 236
+
+.. systemd:option:: x-systemd.pcrfs
+   :group: fstab-options
+
+   Measures file system identity information (mount point, type, label, UUID, partition label, partition UUID) into PCR 15 after the file system has been mounted. This ensures the :ref:`systemd-pcrfs@.service(8)` or :code:`systemd-pcrfs-root.service` services are pulled in by the mount unit.
+
+   Note that this option can only be used in :code:`/etc/fstab`, and will be ignored when part of the :systemd:var:`Options=` setting in a unit file. It is also implied for the root and :code:`/usr/` partitions discovered by :ref:`systemd-gpt-auto-generator(8)`.
+
+   .. versionadded:: 253
+
+.. systemd:option:: x-systemd.validatefs
+   :group: fstab-options
+
+   Validates mount constraint metadata of the mounted file system after mounting it. This ensures the :ref:`systemd-validatefs@.service(8)` service is pulled in by the mount unit.
+
+   Note that this option can only be used in :code:`/etc/fstab`, and will be ignored when part of the :systemd:var:`Options=` setting in a unit file. It is also implied for all partitions discovered by :ref:`systemd-gpt-auto-generator(8)`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: x-systemd.rw-only
+   :group: fstab-options
+
+   If a mount operation fails to mount the file system read-write, it normally tries mounting the file system read-only instead. This option disables that behaviour, and causes the mount to fail immediately instead. This option is translated into the :systemd:var:`ReadWriteOnly=` setting in a unit file.
+
+   .. versionadded:: 246
+
+.. systemd:option:: _netdev
+   :group: fstab-options
+
+   Normally the file system type is used to determine if a mount is a "network mount", i.e. if it should only be started after the network is available. Using this option overrides this detection and specifies that the mount requires network.
+
+   Network mount units are ordered between :code:`remote-fs-pre.target` and :code:`remote-fs.target`, instead of :code:`local-fs-pre.target` and :code:`local-fs.target`. They also pull in :code:`network-online.target` and are ordered after it and :code:`network.target`.
+
+   .. versionadded:: 235
+
+.. systemd:option:: noauto, auto
+   :group: fstab-options
+
+   With :systemd:option:`noauto`, the mount unit will not be added as a dependency for :code:`local-fs.target` or :code:`remote-fs.target`. This means that it will not be mounted automatically during boot, unless it is pulled in by some other unit. The :systemd:option:`auto` option has the opposite meaning and is the default.
+
+   Note that if :systemd:option:`x-systemd.automount` (see above) is used, neither :systemd:option:`auto` nor :systemd:option:`noauto` have any effect. The matching automount unit will be added as a dependency to the appropriate target.
+
+   .. versionadded:: 215
+
+.. systemd:option:: nofail
+   :group: fstab-options
+
+   With :systemd:option:`nofail`, this mount will be only wanted, not required, by :code:`local-fs.target` or :code:`remote-fs.target`. Moreover, the mount unit is not ordered before these target units. This means that the boot will continue without waiting for the mount unit and regardless whether the mount point can be mounted successfully.
+
+   .. versionadded:: 215
+
+.. systemd:option:: x-initrd.mount
+   :group: fstab-options
+
+   An additional filesystem to be mounted in the initrd. See :code:`initrd-fs.target` description in :ref:`systemd.special(7)`. This is both an indicator to the initrd to mount this partition early and an indicator to the host to leave the partition mounted until final shutdown. Or in other words, if this flag is set it is assumed the mount shall be active during the entire regular runtime of the system, i.e. established before the initrd transitions into the host all the way until the host transitions to the final shutdown phase.
+
+   .. versionadded:: 215
+
+If a mount point is configured in both :code:`/etc/fstab` and a unit file that is stored below :code:`/usr/`, the former will take precedence. If the unit file is stored below :code:`/etc/`, it will take precedence. This means: native unit files take precedence over traditional configuration files, but this is superseded by the rule that configuration in :code:`/etc/` will always take precedence over configuration in :code:`/usr/`.
+
+Options
+#######
+
+Mount unit files may include \[Unit] and \[Install] sections, which are described in :ref:`systemd.unit(5)`.
+
+Mount unit files must include a \[Mount] section, which carries information about the file system mount points it supervises. A number of options that may be used in this section are shared with other unit types. These options are documented in :ref:`systemd.exec(5)`, :ref:`systemd.kill(5)` and :ref:`systemd.resource-control(5)`. The options specific to the \[Mount] section of mount units are the following:
+
+.. systemd:option:: What=
+   :group: unit-directives
+
+   Takes an absolute path or a fstab-style identifier of a device node, file or other resource to mount. See :man-pages:`mount(8)` for details. If this refers to a device node, a dependency on the respective device unit is automatically created. (See :ref:`systemd.device(5)` for more information.) This option is mandatory. Note that the usual specifier expansion is applied to this setting, literal percent characters should hence be written as "%%". If this mount is a bind mount and the specified path does not exist yet it is created as directory.
+
+.. systemd:option:: Where=
+   :group: unit-directives
+
+   Takes an absolute path of a file or directory for the mount point; in particular, the destination cannot be a symbolic link. If the mount point does not exist at the time of mounting, it is created as either a directory or a file. The former is the usual case; the latter is done only if this mount is a bind mount and the source (:systemd:var:`What=`) is not a directory. This string must be reflected in the unit filename. (See above.) This option is mandatory.
+
+.. systemd:option:: Type=
+   :group: unit-directives
+
+   Takes a string for the file system type. See :man-pages:`mount(8)` for details. This setting is optional.
+
+   If the type is "overlay", and "upperdir=" or "workdir=" are specified as options and the directories do not exist, they will be created.
+
+.. systemd:option:: Options=
+   :group: unit-directives
+
+   Mount options to use when mounting. This takes a comma-separated list of options. This setting is optional. Note that the usual specifier expansion is applied to this setting, literal percent characters should hence be written as "%%".
+
+.. systemd:option:: SloppyOptions=
+   :group: unit-directives
+
+   Takes a boolean argument. If true, parsing of the options specified in :systemd:var:`Options=` is relaxed, and unknown mount options are tolerated. This corresponds with :man-pages:`mount(8)`'s :code:`-s` switch. Defaults to off.
+
+   .. versionadded:: 215
+
+.. systemd:option:: LazyUnmount=
+   :group: unit-directives
+
+   Takes a boolean argument. If true, detach the filesystem from the filesystem hierarchy at time of the unmount operation, and clean up all references to the filesystem as soon as they are not busy anymore. This corresponds with :man-pages:`umount(8)`'s :code:`-l` switch. Defaults to off.
+
+   .. versionadded:: 232
+
+.. systemd:option:: ReadWriteOnly=
+   :group: unit-directives
+
+   Takes a boolean argument. If false, a mount point that shall be mounted read-write but cannot be mounted so is retried to be mounted read-only. If true the operation will fail immediately after the read-write mount attempt did not succeed. This corresponds with :man-pages:`mount(8)`'s :code:`-w` switch. Defaults to off.
+
+   .. versionadded:: 246
+
+.. systemd:option:: ForceUnmount=
+   :group: unit-directives
+
+   Takes a boolean argument. If true, force an unmount (in case of an unreachable NFS system). This corresponds with :man-pages:`umount(8)`'s :code:`-f` switch. Defaults to off.
+
+   .. versionadded:: 232
+
+.. systemd:option:: DirectoryMode=
+   :group: unit-directives
+
+   Directories of mount points (and any parent directories) are automatically created if needed. This option specifies the file system access mode used when creating these directories. Takes an access mode in octal notation. Defaults to 0755.
+
+.. systemd:option:: TimeoutSec=
+   :group: unit-directives
+
+   Configures the time to wait for the mount command to finish. If a command does not exit within the configured time, the mount will be considered failed and be shut down again. All commands still running will be terminated forcibly via :systemd:constant:`SIGTERM`, and after another delay of this time with :systemd:constant:`SIGKILL`. (See :systemd:option:`KillMode=` in :ref:`systemd.kill(5)`.) Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass 0 to disable the timeout logic. The default value is set from :systemd:var:`DefaultTimeoutStartSec=` option in :ref:`systemd-system.conf(5)`.
+
+.. include:: systemd.service.rst
+    :start-after: .. inclusion-marker-do-not-remove shared-unit-options|
+    :end-before: .. inclusion-end-marker-do-not-remove shared-unit-options|
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd-system.conf(5)`, :ref:`systemd.unit(5)`, :ref:`systemd.exec(5)`, :ref:`systemd.kill(5)`, :ref:`systemd.resource-control(5)`, :ref:`systemd.service(5)`, :ref:`systemd.device(5)`, :man-pages:`proc(5)`, :man-pages:`mount(8)`, :ref:`systemd-fstab-generator(8)`, :ref:`systemd.directives(7)`, :ref:`systemd-mount(1)`
+
+

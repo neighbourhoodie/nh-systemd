@@ -1,0 +1,65 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_can_send
+:manvolnum: 3
+:summary: Check which types can be sent over a bus object
+
+.. _sd_bus_can_send(3):
+
+==================
+sd_bus_can_send(3)
+==================
+
+Name
+####
+
+sd_bus_can_send — Check which types can be sent over a bus object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_can_send(sd_bus *bus,
+	char type);
+
+Description
+###########
+
+:code:`sd_bus_can_send()` is mostly used for checking if file descriptor passing is available on the given bus. :code:`type` can be any of the :code:`SD_BUS_TYPE` constants.
+
+Return Value
+############
+
+On failure, :code:`sd_bus_can_send()` returns a negative errno-style error code. If values of the given type can be sent over the given bus, it returns a positive integer. Otherwise, it returns zero.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENOPKG
+
+   The bus object :code:`bus` could not be resolved.
+
+.. systemd:option:: -ENOTCONN
+
+   The input parameter :code:`bus` is :code:`NULL` or the bus is not connected.
+
+.. systemd:option:: -ECHILD
+
+   The bus object :code:`bus` was created in a different process.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_can_send()` was added in version 221.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`
+
+

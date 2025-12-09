@@ -1,0 +1,69 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_set_signal_exit
+:manvolnum: 3
+:summary: Automatically leave event loop on
+
+.. _sd_event_set_signal_exit(3):
+
+===========================
+sd_event_set_signal_exit(3)
+===========================
+
+Name
+####
+
+sd_event_set_signal_exit — Automatically leave event loop on
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   int sd_event_set_signal_exit(sd_event *event,
+	int b);
+
+Description
+###########
+
+:code:`sd_event_set_signal_exit()` may be used to ensure the event loop terminates once a :code:`SIGINT` or :code:`SIGTERM` signal is received. It is a convenience wrapper around invocations of :ref:`sd_event_add_signal(3)` for both signals. The two signals are automatically added to the calling thread's signal mask (if a program is multi-threaded care should be taken to either invoke this function before the first thread is started or to manually block the two signals process-wide first).
+
+If the parameter :code:`b` is specified as true, the event loop will terminate on :code:`SIGINT` and :code:`SIGTERM`. If specified as false, it will no longer. When this functionality is turned off the calling thread's signal mask is restored to match the state before it was turned on, for the two signals. By default, the two signals are not handled by the event loop, and Linux' default signal handling for them is in effect.
+
+It is customary for UNIX programs to exit on either of these two signals, hence it is typically a good idea to enable this functionality for the main event loop of a program.
+
+Return Value
+############
+
+:code:`sd_event_set_signal_exit()` returns a positive non-zero value when the setting was successfully changed. It returns a zero when the specified setting was already in effect. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ECHILD
+
+   The event loop has been created in a different process, library or module instance.
+
+   .. versionadded:: 252
+
+.. systemd:option:: -EINVAL
+
+   The passed event loop object was invalid.
+
+   .. versionadded:: 252
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_set_signal_exit()` was added in version 252.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_new(3)`, :ref:`sd_event_add_signal(3)`
+
+

@@ -1,0 +1,66 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_journal_get_realtime_usec
+:manvolnum: 3
+:summary: Read timestamps from the current journal entry
+:aliases: sd_journal_get_monotonic_usec
+
+.. _sd_journal_get_realtime_usec(3):
+
+===============================
+sd_journal_get_realtime_usec(3)
+===============================
+
+Name
+####
+
+sd_journal_get_realtime_usec, sd_journal_get_monotonic_usec — Read timestamps from the current journal entry
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>` .. code-block::
+
+   int sd_journal_get_realtime_usec(sd_journal *j,
+	uint64_t *usec); .. code-block::
+
+   int sd_journal_get_monotonic_usec(sd_journal *j,
+	uint64_t *usec,
+	sd_id128_t *boot_id);
+
+Description
+###########
+
+:code:`sd_journal_get_realtime_usec()` gets the realtime (wallclock) timestamp of the current journal entry. It takes two arguments: the journal context object and a pointer to a 64-bit unsigned integer to store the timestamp in. The timestamp is in microseconds since the epoch, i.e. :code:`CLOCK_REALTIME`.
+
+:code:`sd_journal_get_monotonic_usec()` gets the monotonic timestamp of the current journal entry. It takes three arguments: the journal context object, a pointer to a 64-bit unsigned integer to store the timestamp in, as well as a 128-bit ID buffer to store the boot ID of the monotonic timestamp. The timestamp is in microseconds since boot-up of the specific boot, i.e. :code:`CLOCK_MONOTONIC`. Since the monotonic clock begins new with every reboot, it only defines a well-defined point in time when used together with an identifier identifying the boot. See :ref:`sd_id128_get_boot(3)` for more information. If the boot ID parameter is passed :code:`NULL`, the function will fail if the monotonic timestamp of the current entry is not of the current system boot.
+
+Note that these functions will not work before :ref:`sd_journal_next(3)` (or related call) has been called at least once, in order to position the read pointer at a valid entry.
+
+Return Value
+############
+
+:code:`sd_journal_get_realtime_usec()` and :code:`sd_journal_get_monotonic_usec()` returns 0 on success or a negative errno-style error code. If the boot ID parameter was passed :code:`NULL` and the monotonic timestamp of the current journal entry is not of the current system boot, :code:`-ESTALE` is returned by :code:`sd_journal_get_monotonic_usec()`.
+
+Notes
+#####
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove strict|
+    :end-before: .. inclusion-end-marker-do-not-remove strict|
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+History
+#######
+
+:code:`sd_journal_get_realtime_usec()` and :code:`sd_journal_get_monotonic_usec()` were added in version 187.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-journal(3)`, :ref:`sd_journal_open(3)`, :ref:`sd_journal_next(3)`, :ref:`sd_journal_get_data(3)`, :ref:`sd_journal_get_seqnum(3)`, :ref:`sd_id128_get_boot(3)`, :man-pages:`clock_gettime(2)`, :ref:`sd_journal_get_cutoff_realtime_usec(3)`
+
+

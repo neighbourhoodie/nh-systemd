@@ -1,0 +1,67 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_is_open
+:manvolnum: 3
+:summary: Check whether the bus connection is open or ready
+:aliases: sd_bus_is_ready
+
+.. _sd_bus_is_open(3):
+
+=================
+sd_bus_is_open(3)
+=================
+
+Name
+####
+
+sd_bus_is_open, sd_bus_is_ready — Check whether the bus connection is open or ready
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_is_open(sd_bus *bus); .. code-block::
+
+   int sd_bus_is_ready(sd_bus *bus);
+
+Description
+###########
+
+:code:`sd_bus_is_open()` checks whether the specified bus connection is open, i.e. in the process of being established, already established or in the process of being torn down. It returns zero when the connection has not been started yet (i.e. :ref:`sd_bus_start(3)` or some equivalent call has not been invoked yet), or is fully terminated again (for example after :ref:`sd_bus_close(3)`), it returns positive otherwise.
+
+:code:`sd_bus_is_ready()` checks whether the specified connection is fully established, i.e. completed the connection and authentication phases of the protocol and received the :code:`Hello()` method call response, and is not in the process of being torn down again. It returns zero outside of this state, and positive otherwise. Effectively, this function returns positive while regular messages can be sent or received on the connection.
+
+The :code:`bus` argument may be :code:`NULL`, zero is also returned in that case.
+
+To be notified when the connection is fully established, use :ref:`sd_bus_set_connected_signal(3)` and install a match for the :code:`Connected()` signal on the "org.freedesktop.DBus.Local" interface. To be notified when the connection is torn down again, install a match for the :code:`Disconnected()` signal on the "org.freedesktop.DBus.Local" interface.
+
+Return Value
+############
+
+Those functions return 0 if the bus is *not* in the given state, and a positive integer when it is. On failure, a negative errno-style error code is returned. in the given state, and a positive integer when it is. On failure, a negative errno-style error code is returned.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ECHILD
+
+   The bus connection has been created in a different process, library or module instance.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_is_open()` was added in version 221.
+
+:code:`sd_bus_is_ready()` was added in version 237.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_start(3)`, :ref:`sd_bus_close(3)`, :ref:`sd_bus_set_connected_signal(3)`
+
+

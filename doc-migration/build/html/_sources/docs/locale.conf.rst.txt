@@ -1,0 +1,62 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: locale.conf
+:manvolnum: 5
+:summary: Configuration file for locale settings
+
+.. _locale.conf(5):
+
+==============
+locale.conf(5)
+==============
+
+Name
+####
+
+locale.conf — Configuration file for locale settings
+
+Synopsis
+########
+
+:code:`/etc/locale.conf`
+
+Description
+###########
+
+The :code:`/etc/locale.conf` file configures system-wide locale settings. It is read at early boot by :ref:`systemd(1)`.
+
+The format of :code:`locale.conf` is a newline-separated list of environment-like shell-compatible variable assignments, ignoring comments and empty lines. It is possible to source the configuration from shell scripts, however, beyond mere variable assignments, no shell features are supported, allowing applications to read the file without implementing a shell compatible execution engine. See :man-pages:`os-release(5)` for a detailed description of the format.
+
+Note that the kernel command line options :code:`locale.LANG=`, :code:`locale.LANGUAGE=`, :code:`locale.LC_CTYPE=`, :code:`locale.LC_NUMERIC=`, :code:`locale.LC_TIME=`, :code:`locale.LC_COLLATE=`, :code:`locale.LC_MONETARY=`, :code:`locale.LC_MESSAGES=`, :code:`locale.LC_PAPER=`, :code:`locale.LC_NAME=`, :code:`locale.LC_ADDRESS=`, :code:`locale.LC_TELEPHONE=`, :code:`locale.LC_MEASUREMENT=`, :code:`locale.LC_IDENTIFICATION=` may be used to override the locale settings at boot.
+
+The locale settings configured in :code:`/etc/locale.conf` are system-wide and are inherited by every service or user, unless overridden or unset by individual programs or users.
+
+Depending on the operating system, other configuration files might be checked for locale configuration as well, however only as fallback.
+
+:code:`/etc/locale.conf` can be updated using :ref:`systemd-localed.service(8)`. :man-pages:`localectl(1)` may be used to alter the settings in this file during runtime from the command line. Use :ref:`systemd-firstboot(1)` to customize them on mounted (but not booted) system images.
+
+Options
+#######
+
+The following locale settings may be set using :code:`/etc/locale.conf`: :code:`LANG=`, :code:`LANGUAGE=`, :code:`LC_CTYPE=`, :code:`LC_NUMERIC=`, :code:`LC_TIME=`, :code:`LC_COLLATE=`, :code:`LC_MONETARY=`, :code:`LC_MESSAGES=`, :code:`LC_PAPER=`, :code:`LC_NAME=`, :code:`LC_ADDRESS=`, :code:`LC_TELEPHONE=`, :code:`LC_MEASUREMENT=`, :code:`LC_IDENTIFICATION=`. Note that :code:`LC_ALL` may not be configured in this file. For details about the meaning and semantics of these settings, refer to :man-pages:`locale(7)`.
+
+Example
+#######
+
+German locale with English messages
+-----------------------------------
+
+:code:`/etc/locale.conf`:
+
+.. code-block:: sh
+
+   # Custom settings
+   LANG=de_DE.UTF-8
+   LC_MESSAGES=en_US.UTF-8
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`locale(7)`, :man-pages:`localectl(1)`, :ref:`systemd-localed.service(8)`, :ref:`systemd-firstboot(1)`
+
+

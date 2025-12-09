@@ -1,0 +1,66 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_now
+:manvolnum: 3
+:summary: Retrieve current event loop iteration timestamp
+
+.. _sd_event_now(3):
+
+===============
+sd_event_now(3)
+===============
+
+Name
+####
+
+sd_event_now — Retrieve current event loop iteration timestamp
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   int sd_event_now(sd_event *event,
+	clockid_t clock,
+	uint64_t *ret);
+
+Description
+###########
+
+:code:`sd_event_now()` returns the time when the most recent event loop iteration began. A timestamp is taken right after returning from the event sleep, and before dispatching any event sources. The :code:`event` parameter specifies the event loop object to retrieve the timestamp from. The :code:`clock` parameter specifies the clock to retrieve the timestamp for, and is one of :code:`CLOCK_REALTIME` (or equivalently :code:`CLOCK_REALTIME_ALARM`), :code:`CLOCK_MONOTONIC`, or :code:`CLOCK_BOOTTIME` (or equivalently :code:`CLOCK_BOOTTIME_ALARM`), see :man-pages:`clock_gettime(2)` for more information on the various clocks. The retrieved timestamp is stored in the :code:`ret` parameter, in μs since the clock's epoch. If this function is invoked before the first event loop iteration, the current time is returned, as reported by :code:`clock_gettime()`. To distinguish this case from a regular invocation the return value will be positive, and zero when the returned timestamp refers to an actual event loop iteration.
+
+Return Value
+############
+
+If the first event loop iteration has not run yet :code:`sd_event_now()` writes current time to :code:`ret` and returns a positive return value. Otherwise, it will write the requested timestamp to :code:`ret` and return 0. On failure, the call returns a negative errno-style error code.
+
+Errors
+######
+
+Returned values may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An invalid parameter was passed.
+
+.. systemd:option:: -EOPNOTSUPP
+
+   Unsupported clock type.
+
+.. systemd:option:: -ECHILD
+
+   The event loop object was created in a different process, library or module instance.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_now()` was added in version 229.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_new(3)`, :ref:`sd_event_add_time(3)`, :man-pages:`clock_gettime(2)`
+
+

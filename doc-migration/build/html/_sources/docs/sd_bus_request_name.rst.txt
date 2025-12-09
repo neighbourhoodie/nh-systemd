@@ -1,0 +1,135 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_request_name
+:manvolnum: 3
+:summary: Request or release a well-known service name on a bus
+:aliases: sd_bus_request_name_async, sd_bus_release_name, sd_bus_release_name_async
+
+.. _sd_bus_request_name(3):
+
+======================
+sd_bus_request_name(3)
+======================
+
+Name
+####
+
+sd_bus_request_name, sd_bus_request_name_async, sd_bus_release_name, sd_bus_release_name_async — Request or release a well-known service name on a bus
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. include:: sd_bus_add_match.rst
+    :start-after: .. inclusion-marker-do-not-remove sd_bus_message_handler_t|
+    :end-before: .. inclusion-end-marker-do-not-remove sd_bus_message_handler_t|
+
+.. code-block::
+
+   int sd_bus_request_name(sd_bus *bus,
+	const char *name,
+	uint64_t flags); .. code-block::
+
+   int sd_bus_request_name_async(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *name,
+	uint64_t flags,
+	sd_bus_message_handler_t callback,
+	void *userdata); .. code-block::
+
+   int sd_bus_release_name(sd_bus *bus,
+	const char *name); .. code-block::
+
+   int sd_bus_release_name_async(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *name,
+	sd_bus_message_handler_t callback,
+	void *userdata);
+
+Description
+###########
+
+:code:`sd_bus_request_name()` requests a well-known service name on a bus. It takes a bus connection, a valid bus name, and a flags parameter. The flags parameter is a combination of zero or more of the following flags:
+
+.. systemd:constant:: SD_BUS_NAME_ALLOW_REPLACEMENT
+
+   After acquiring the name successfully, permit other peers to take over the name when they try to acquire it with the :code:`SD_BUS_NAME_REPLACE_EXISTING` flag set. If :code:`SD_BUS_NAME_ALLOW_REPLACEMENT` is not set on the original request, such a request by other peers will be denied.
+
+   .. versionadded:: 209
+
+.. systemd:constant:: SD_BUS_NAME_REPLACE_EXISTING
+
+   Take over the name if it was already acquired by another peer, and that other peer has permitted takeover by setting :code:`SD_BUS_NAME_ALLOW_REPLACEMENT` while acquiring it.
+
+   .. versionadded:: 209
+
+.. systemd:constant:: SD_BUS_NAME_QUEUE
+
+   Queue the acquisition of the name when the name is already taken.
+
+   .. versionadded:: 209
+
+:code:`sd_bus_request_name()` operates in a synchronous fashion: a message requesting the name is sent to the bus broker, and the call waits until the broker responds.
+
+:code:`sd_bus_request_name_async()` is an asynchronous version of :code:`sd_bus_request_name()`. Instead of waiting for the request to complete, the request message is enqueued. The specified :code:`callback` will be called when the broker's response is received. If the parameter is specified as :code:`NULL` a default implementation is used instead which will terminate the connection when the name cannot be acquired. The function returns a slot object in its :code:`slot` parameter — if it is passed as non-:code:`NULL` — which may be used as a reference to the name request operation. Use :ref:`sd_bus_slot_unref(3)` to destroy this reference. Note that destroying the reference will not unregister the name, but simply ensure the specified callback is no longer called.
+
+:code:`sd_bus_release_name()` releases an acquired well-known name. It takes a bus connection and a valid bus name as parameters. This function operates synchronously, sending a release request message to the bus broker and waiting for it to reply.
+
+:code:`sd_bus_release_name_async()` is an asynchronous version of :code:`sd_bus_release_name()`. The specified :code:`callback` function is called when the name has been released successfully. If specified as :code:`NULL` a generic implementation is used that ignores the result of the operation. As above, the :code:`slot` (if non-:code:`NULL`) is set to an object that may be used to reference the operation.
+
+These functions are supported only on bus connections, i.e. connections to a bus broker and not on direct connections.
+
+Return Value
+############
+
+On success, these calls return 0 or a positive integer. On failure, these calls return a negative errno-style error code.
+
+If :code:`SD_BUS_NAME_QUEUE` is specified, :code:`sd_bus_request_name()` will return 0 when the name is already taken by another peer and the client has been added to the queue for the name. In that case, the caller can subscribe to "NameOwnerChanged" signals to be notified when the name is successfully acquired. :code:`sd_bus_request_name()` returns > 0 when the name has immediately been acquired successfully.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EALREADY
+
+   The caller already is the owner of the specified name.
+
+.. systemd:option:: -EEXIST
+
+   The name has already been acquired by a different peer, and SD_BUS_NAME_REPLACE_EXISTING was not specified or the other peer did not specify SD_BUS_NAME_ALLOW_REPLACEMENT while acquiring the name.
+
+.. systemd:option:: -ESRCH
+
+   It was attempted to release a name that is currently not registered on the bus.
+
+.. systemd:option:: -EADDRINUSE
+
+   It was attempted to release a name that is owned by a different peer on the bus.
+
+.. systemd:option:: -EINVAL
+
+   A specified parameter is invalid. This is also generated when the requested name is a special service name reserved by the D-Bus specification, or when the operation is requested on a connection that does not refer to a bus.
+
+.. systemd:option:: -ENOTCONN
+
+   The bus connection has been disconnected.
+
+.. systemd:option:: -ECHILD
+
+   The bus connection has been created in a different process than the current one.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_request_name()` and :code:`sd_bus_release_name()` were added in version 209.
+
+:code:`sd_bus_request_name_async()` and :code:`sd_bus_release_name_async()` were added in version 237.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_new(3)`, :ref:`sd_bus_slot_unref(3)`
+
+

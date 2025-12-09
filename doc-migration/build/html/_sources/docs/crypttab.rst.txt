@@ -1,0 +1,624 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: crypttab
+:manvolnum: 5
+:summary: Configuration for encrypted block devices
+
+.. _crypttab(5):
+
+===========
+crypttab(5)
+===========
+
+Name
+####
+
+crypttab — Configuration for encrypted block devices
+
+Synopsis
+########
+
+:code:`/etc/crypttab`
+
+Description
+###########
+
+The :code:`/etc/crypttab` file describes encrypted block devices that are set up during system boot.
+
+Empty lines and lines starting with the "#" character are ignored. Each of the remaining lines describes one encrypted block device. Fields are delimited by white space.
+
+Each line is in the form
+
+.. code-block:: sh
+
+   volume-name  encrypted-device  key-file  options
+
+The first two fields are mandatory, the remaining two are optional.
+
+Setting up encrypted block devices using this file supports four encryption modes: LUKS, TrueCrypt, BitLocker and plain. See :die-net:`cryptsetup(8)` for more information about each mode. When no mode is specified in the options field and the block device contains a LUKS signature, it is opened as a LUKS device; otherwise, it is assumed to be in raw dm-crypt (plain mode) format.
+
+The four fields of :code:`/etc/crypttab` are defined as follows:
+
+1.    The first field contains the name of the resulting volume with decrypted data; its block device is set up below :code:`/dev/mapper/`.
+
+2.    The second field contains a path to the underlying block device or file, or a specification of a block device via "UUID=" followed by the UUID.
+
+3.    The third field specifies an absolute path to a file with the encryption key. Optionally, the path may be followed by ":" and an :code:`/etc/fstab` style device specification (e.g. starting with "LABEL=" or similar); in which case the path is taken relative to the specified device's file system root. If the field is not present or is "none" or "-", a key file named after the volume to unlock (i.e. the first column of the line), suffixed with :code:`.key` is automatically loaded from the :code:`/etc/cryptsetup-keys.d/` and :code:`/run/cryptsetup-keys.d/` directories, if present. Otherwise, the password has to be manually entered during system boot. For swap encryption, :code:`/dev/urandom` may be used as key file, resulting in a randomized key.
+
+   If the specified key file path refers to an :code:`AF_UNIX` stream socket in the file system, the key is acquired by connecting to the socket and reading it from the connection. This allows the implementation of a service to provide key information dynamically, at the moment when it is needed. For details see below.
+
+4.    The fourth field, if present, is a comma-delimited list of options. The supported options are listed below.
+
+Key Acquisition
+###############
+
+Six different mechanisms for acquiring the decryption key or passphrase unlocking the encrypted volume are supported. Specifically:
+
+1.    Most prominently, the user may be queried interactively during volume activation (i.e. typically at boot), asking them to type in the necessary passphrases.
+
+2.    The (unencrypted) key may be read from a file on disk, possibly on removable media. The third field of each line encodes the location, for details see above.
+
+3.    The (unencrypted) key may be requested from another service, by specifying an :code:`AF_UNIX` file system socket in place of a key file in the third field. For details see above and below.
+
+4.    The key may be acquired via a PKCS#11 compatible hardware security token or smartcard. In this case, a saved key used in unlock process is stored on disk/removable media, acquired via :code:`AF_UNIX`, or stored in the LUKS2 JSON token metadata header. For RSA, the saved key is an encrypted volume key. The encrypted volume key is then decrypted by the PKCS#11 token with an RSA private key stored on it, and used to unlock the encrypted volume. For elliptic-curve (EC) cryptography, the saved key is the public key generated in enrollment process. The public key is then used to derive a shared secret with a private key stored in the PKCS#11 token. The derived shared secret is then used to unlock the volume. Use the :code:`pkcs11-uri=` option described below to use this mechanism.
+
+5.    Similarly, the key may be acquired via a FIDO2 compatible hardware security token (which must implement the "hmac-secret" extension). In this case, a key generated randomly during enrollment is stored on disk/removable media, acquired via :code:`AF_UNIX`, or stored in the LUKS2 JSON token metadata header. The random key is hashed via a keyed hash function (HMAC) on the FIDO2 token, using a secret key stored on the token that never leaves it. The resulting hash value is then used as key to unlock the encrypted volume. Use the :code:`fido2-device=` option described below to use this mechanism.
+
+6.    Similarly, the key may be acquired via a TPM2 security chip. In this case, a (during enrollment) randomly generated key — encrypted by an asymmetric key derived from the TPM2 chip's seed key — is stored on disk/removable media, acquired via :code:`AF_UNIX`, or stored in the LUKS2 JSON token metadata header. Use the :code:`tpm2-device=` option described below to use this mechanism.
+
+For the latter five mechanisms the source for the key material used for unlocking the volume is primarily configured in the third field of each :code:`/etc/crypttab` line, but may also be configured in :code:`/etc/cryptsetup-keys.d/` and :code:`/run/cryptsetup-keys.d/` (see above) or in the LUKS2 JSON token header (in case of the latter three). Use the :ref:`systemd-cryptenroll(1)` tool to enroll PKCS#11, FIDO2 and TPM2 devices in LUKS2 volumes.
+
+Supported Options
+#################
+
+The following options may be used in the fourth field of each line:
+
+.. systemd:option:: cipher=
+   :group: fstab-options
+
+   Specifies the cipher to use. See :die-net:`cryptsetup(8)` for possible values and the default value of this option. A cipher with unpredictable IV values, such as "aes-cbc-essiv:sha256", is recommended. Embedded commas in the cipher specification need to be escaped by preceding them with a backslash, see example below.
+
+   .. versionadded:: 186
+
+.. systemd:option:: discard
+   :group: fstab-options
+
+   Allow discard requests to be passed through the encrypted block device. This improves performance on SSD storage but has security implications.
+
+   .. versionadded:: 207
+
+.. systemd:option:: hash=
+   :group: fstab-options
+
+   Specifies the hash to use for password hashing. See :die-net:`cryptsetup(8)` for possible values and the default value of this option.
+
+   .. versionadded:: 186
+
+.. systemd:option:: header=
+   :group: fstab-options
+
+   Use a detached (separated) metadata device or file where the header containing the master key(s) is stored. This option is only relevant for LUKS and TrueCrypt/VeraCrypt devices. See :die-net:`cryptsetup(8)` for possible values and the default value of this option.
+
+   Optionally, the path may be followed by ":" and an :code:`/etc/fstab` device specification (e.g. starting with "UUID=" or similar); in which case, the path is relative to the device file system root. The device gets mounted automatically for LUKS device activation duration only.
+
+   .. versionadded:: 219
+
+.. systemd:option:: keyfile-offset=
+   :group: fstab-options
+
+   Specifies the number of bytes to skip at the start of the key file. See :die-net:`cryptsetup(8)` for possible values and the default value of this option.
+
+   .. versionadded:: 187
+
+.. systemd:option:: keyfile-size=
+   :group: fstab-options
+
+   Specifies the maximum number of bytes to read from the key file. See :die-net:`cryptsetup(8)` for possible values and the default value of this option. This option is ignored in plain encryption mode, where the key file size is determined by the key size. It is also ignored when the key file is used as a salt file for a FIDO2 token, as the salt size in that case is defined by the FIDO2 specification to be exactly 32 bytes.
+
+   .. versionadded:: 188
+
+.. systemd:option:: keyfile-erase
+   :group: fstab-options
+
+   If enabled, the specified key file is erased after the volume is activated or when activation fails. This is in particular useful when the key file is only acquired transiently before activation (e.g. via a file in :code:`/run/`, generated by a service running before activation), and shall be removed after use. Defaults to off.
+
+   .. versionadded:: 246
+
+.. systemd:option:: key-slot=
+   :group: fstab-options
+
+   Specifies the key slot to compare the passphrase or key against. If the key slot does not match the given passphrase or key, but another would, the setup of the device will fail regardless. This option implies :systemd:option:`luks`. See :die-net:`cryptsetup(8)` for possible values. The default is to try all key slots in sequential order.
+
+   .. versionadded:: 209
+
+.. systemd:option:: keyfile-timeout=
+   :group: fstab-options
+
+   Specifies the timeout for the device on which the key file resides or the device used as the key file, and falls back to a password if it could not be accessed. See :ref:`systemd-cryptsetup-generator(8)` for key files on external devices.
+
+   .. versionadded:: 243
+
+.. systemd:option:: link-volume-key=
+   :group: fstab-options
+
+   Specifies the kernel keyring and key description (see :man-pages:`keyrings(7)`) where LUKS2 volume key gets linked during device activation. The kernel keyring description and key description must be separated by "::".
+
+   The kernel keyring part can be a string description or a predefined kernel keyring prefixed with "@" (e.g.: to use "@s" session or "@u" user keyring directly). The type prefix text in the kernel keyring description is not required. The specified kernel keyring must already exist at the time of device activation.
+
+   The key part is a string description optionally prefixed by a "%key_type:". If no type is specified, the "user" type key is linked by default. See :man-pages:`keyctl(1)` for more information on key descriptions (KEY IDENTIFIERS section).
+
+   Note that the linked volume key is not cleaned up automatically when the device is detached.
+
+   .. versionadded:: 256
+
+.. systemd:option:: luks
+   :group: fstab-options
+
+   Force LUKS mode. When this mode is used, the following options are ignored since they are provided by the LUKS header on the device: :systemd:option:`cipher=`, :systemd:option:`hash=`, :systemd:option:`size=`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: bitlk
+   :group: fstab-options
+
+   Decrypt BitLocker drive. Encryption parameters are deduced by cryptsetup from BitLocker header.
+
+   .. versionadded:: 246
+
+.. systemd:option:: _netdev
+   :group: fstab-options
+
+   Marks this cryptsetup device as requiring network. It will be started after the network is available, similarly to :ref:`systemd.mount(5)` units marked with :systemd:option:`_netdev`. The service unit to set up this device will be ordered between :code:`remote-fs-pre.target` and :code:`remote-cryptsetup.target`, instead of :code:`cryptsetup-pre.target` and :code:`cryptsetup.target`.
+
+   Hint: if this device is used for a mount point that is specified in :man-pages:`fstab(5)`, the :systemd:option:`_netdev` option should also be used for the mount point. Otherwise, a dependency loop might be created where the mount point will be pulled in by :code:`local-fs.target`, while the service to configure the network is usually only started *after* the local file system has been mounted. the local file system has been mounted.
+
+   .. versionadded:: 235
+
+.. systemd:option:: noauto
+   :group: fstab-options
+
+   This device will not be added to :code:`cryptsetup.target`. This means that it will not be automatically unlocked on boot, unless something else pulls it in. In particular, if the device is used for a mount point, it'll be unlocked automatically during boot, unless the mount point itself is also disabled with :systemd:option:`noauto`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: nofail
+   :group: fstab-options
+
+   This device will not be a hard dependency of :code:`cryptsetup.target`. It'll still be pulled in and started, but the system will not wait for the device to show up and be unlocked, and boot will not fail if this is unsuccessful. Note that other units that depend on the unlocked device may still fail. In particular, if the device is used for a mount point, the mount point itself also needs to have the :systemd:option:`nofail` option, or the boot will fail if the device is not unlocked successfully. If a keyfile and/or a :systemd:option:`header` are specified, the dependencies on their respective directories will also not be fatal, so that unmounting said directories will not cause the generated cryptset unit to be deactivated.
+
+   .. versionadded:: 186
+
+.. systemd:option:: offset=
+   :group: fstab-options
+
+   Start offset in the backend device, in 512-byte sectors. This option is only relevant for plain devices.
+
+   .. versionadded:: 220
+
+.. systemd:option:: plain
+   :group: fstab-options
+
+   Force plain encryption mode.
+
+   .. versionadded:: 186
+
+.. systemd:option:: read-only, readonly
+   :group: fstab-options
+
+   Set up the encrypted block device in read-only mode.
+
+   .. versionadded:: 186
+
+.. systemd:option:: same-cpu-crypt
+   :group: fstab-options
+
+   Perform encryption using the same CPU that IO was submitted on. The default is to use an unbound workqueue so that encryption work is automatically balanced between available CPUs.
+
+   This requires kernel 4.0 or newer.
+
+   .. versionadded:: 242
+
+.. systemd:option:: submit-from-crypt-cpus
+   :group: fstab-options
+
+   Disable offloading writes to a separate thread after encryption. There are some situations where offloading write requests from the encryption threads to a dedicated thread degrades performance significantly. The default is to offload write requests to a dedicated thread because it benefits the CFQ scheduler to have writes submitted using the same context.
+
+   This requires kernel 4.0 or newer.
+
+   .. versionadded:: 242
+
+.. systemd:option:: no-read-workqueue
+   :group: fstab-options
+
+   Bypass dm-crypt internal workqueue and process read requests synchronously. The default is to queue these requests and process them asynchronously.
+
+   This requires kernel 5.9 or newer.
+
+   .. versionadded:: 248
+
+.. systemd:option:: no-write-workqueue
+   :group: fstab-options
+
+   Bypass dm-crypt internal workqueue and process write requests synchronously. The default is to queue these requests and process them asynchronously.
+
+   This requires kernel 5.9 or newer.
+
+   .. versionadded:: 248
+
+.. systemd:option:: skip=
+   :group: fstab-options
+
+   How many 512-byte sectors of the encrypted data to skip at the beginning. This is different from the :systemd:option:`offset=` option with respect to the sector numbers used in initialization vector (IV) calculation. Using :systemd:option:`offset=` will shift the IV calculation by the same negative amount. Hence, if :systemd:option:`offset=:emphasis:`n`` is given, sector :emphasis:`n` will get a sector number of 0 for the IV calculation. Using :systemd:option:`skip=` causes sector :emphasis:`n` to also be the first sector of the mapped device, but with its number for IV generation being :emphasis:`n`.
+
+   This option is only relevant for plain devices.
+
+   .. versionadded:: 220
+
+.. systemd:option:: size=
+   :group: fstab-options
+
+   Specifies the key size in bits. See :die-net:`cryptsetup(8)` for possible values and the default value of this option.
+
+   .. versionadded:: 186
+
+.. systemd:option:: sector-size=
+   :group: fstab-options
+
+   Specifies the sector size in bytes. See :die-net:`cryptsetup(8)` for possible values and the default value of this option.
+
+   .. versionadded:: 240
+
+.. systemd:option:: swap
+   :group: fstab-options
+
+   The encrypted block device will be used as a swap device, and will be formatted accordingly after setting up the encrypted block device, with :man-pages:`mkswap(8)`. This option implies :systemd:option:`plain`.
+
+   .. warning::
+
+       Using the :systemd:option:`swap` option will destroy the contents of the named partition during every boot, so make sure the underlying block device is specified correctly.
+
+   .. versionadded:: 186
+
+.. systemd:option:: tcrypt
+   :group: fstab-options
+
+   Use TrueCrypt encryption mode. When this mode is used, the following options are ignored since they are provided by the TrueCrypt header on the device or do not apply: :systemd:option:`cipher=`, :systemd:option:`hash=`, :systemd:option:`keyfile-offset=`, :systemd:option:`keyfile-size=`, :systemd:option:`size=`.
+
+   When this mode is used, the passphrase is read from the key file given in the third field. Only the first line of this file is read, excluding the new line character.
+
+   Note that the TrueCrypt format uses both passphrase and key files to derive a password for the volume. Therefore, the passphrase and all key files need to be provided. Use :systemd:option:`tcrypt-keyfile=` to provide the absolute path to all key files. When using an empty passphrase in combination with one or more key files, use "/dev/null" as the password file in the third field.
+
+   .. versionadded:: 206
+
+.. systemd:option:: tcrypt-hidden
+   :group: fstab-options
+
+   Use the hidden TrueCrypt volume. This option implies :systemd:option:`tcrypt`.
+
+   This will map the hidden volume that is inside of the volume provided in the second field. Please note that there is no protection for the hidden volume if the outer volume is mounted instead. See :die-net:`cryptsetup(8)` for more information on this limitation.
+
+   .. versionadded:: 206
+
+.. systemd:option:: tcrypt-keyfile=
+   :group: fstab-options
+
+   Specifies the absolute path to a key file to use for a TrueCrypt volume. This implies :systemd:option:`tcrypt` and can be used more than once to provide several key files.
+
+   See the entry for :systemd:option:`tcrypt` on the behavior of the passphrase and key files when using TrueCrypt encryption mode.
+
+   .. versionadded:: 206
+
+.. systemd:option:: tcrypt-system
+   :group: fstab-options
+
+   Use TrueCrypt in system encryption mode. This option implies :systemd:option:`tcrypt`.
+
+   .. versionadded:: 206
+
+.. systemd:option:: tcrypt-veracrypt
+   :group: fstab-options
+
+   Check for a VeraCrypt volume. VeraCrypt is a fork of TrueCrypt that is mostly compatible, but uses different, stronger key derivation algorithms that cannot be detected without this flag. Enabling this option could substantially slow down unlocking, because VeraCrypt's key derivation takes much longer than TrueCrypt's. This option implies :systemd:option:`tcrypt`.
+
+   .. versionadded:: 232
+
+.. systemd:option:: veracrypt-pim=
+   :group: fstab-options
+
+   Specifies a custom Personal Iteration Multiplier (PIM) value, which can range from 0..2147468 for standard veracrypt volumes and 0..65535 for veracrypt system volumes. A value of 0 will imply the VeraCrypt default. This option is only effective when :systemd:option:`tcrypt-veracrypt` is set.
+
+   Note that VeraCrypt enforces a minimal allowed PIM value depending on the password strength and the hash algorithm used for key derivation, however :systemd:option:`veracrypt-pim=` is not checked against these bounds. See `Veracrypt Personal Iterations Multiplier <https://www.veracrypt.fr/en/Personal%20Iterations%20Multiplier%20%28PIM%29.html>`_ documentation for more information.
+
+   .. versionadded:: 254
+
+.. systemd:option:: timeout=
+   :group: fstab-options
+
+   Specifies the timeout for querying for a password. If no unit is specified, seconds is used. Supported units are s, ms, us, min, h, d. A timeout of 0 waits indefinitely (which is the default).
+
+   .. versionadded:: 186
+
+.. systemd:option:: tmp=
+   :group: fstab-options
+
+   The encrypted block device will be prepared for using it as :code:`/tmp/`; it will be formatted using :man-pages:`mkfs(8)`. Takes a file system type as argument, such as "ext4", "xfs" or "btrfs". If no argument is specified defaults to "ext4". This option implies :systemd:option:`plain`.
+
+   .. warning::
+
+       Using the :systemd:option:`tmp` option will destroy the contents of the named partition during every boot, so make sure the underlying block device is specified correctly.
+
+   .. versionadded:: 186
+
+.. systemd:option:: tries=
+   :group: fstab-options
+
+   Specifies the maximum number of times the user is queried for a password. The default is 3. If set to 0, the user is queried for a password indefinitely.
+
+   .. versionadded:: 186
+
+.. systemd:option:: headless=
+   :group: fstab-options
+
+   Takes a boolean argument, defaults to false. If true, never query interactively for the password/PIN. Useful for headless systems.
+
+   .. versionadded:: 249
+
+.. systemd:option:: verify
+   :group: fstab-options
+
+   If the encryption password is read from console, it has to be entered twice to prevent typos.
+
+   .. versionadded:: 186
+
+.. systemd:option:: password-echo=yes|no|masked
+   :group: fstab-options
+
+   Controls whether to echo passwords or security token PINs that are read from console. Takes a boolean or the special string "masked". The default is :systemd:option:`password-echo=masked`.
+
+   If enabled, the typed characters are echoed literally. If disabled, the typed characters are not echoed in any form, the user will not get feedback on their input. If set to "masked", an asterisk ("*") is echoed for each character typed. Regardless of which mode is chosen, if the user hits the tabulator key ("↹") at any time, or the backspace key ("⌫") before any other data has been entered, then echo is turned off.
+
+   .. versionadded:: 249
+
+.. systemd:option:: password-cache=yes|no|read-only
+   :group: fstab-options
+
+   Controls whether to use cache for passwords or security token PINs. Takes a boolean or the special string "read-only". Defaults to "yes".
+
+   If set to "read-only", the kernel keyring is checked for a password/PIN before requesting one interactively. If set to "yes", in addition to checking the keyring, any password/PIN entered interactively is cached in the keyring with a 2.5-minute timeout before being purged.
+
+   Note that this option is not permitted for PKCS#11 security tokens. The reasoning behind this is that PKCS#11 security tokens are usually configured to lock after being supplied an invalid PIN multiple times, so using the cache might inadvertently lock the token.
+
+   .. versionadded:: 257
+
+.. systemd:option:: pkcs11-uri=
+   :group: fstab-options
+
+   Takes either the special value "auto" or an `RFC7512 PKCS#11 URI <https://tools.ietf.org/html/rfc7512>`_ pointing to a private key which is used to decrypt the encrypted key specified in the third column of the line. This is useful for unlocking encrypted volumes through PKCS#11 compatible security tokens or smartcards. See below for an example how to set up this mechanism for unlocking a LUKS2 volume with a YubiKey security token.
+
+   If specified as "auto" the volume must be of type LUKS2 and must carry PKCS#11 security token metadata in its LUKS2 JSON token section. In this mode the URI and the encrypted key are automatically read from the LUKS2 JSON token header. Use :ref:`systemd-cryptenroll(1)` as a simple tool for enrolling PKCS#11 security tokens or smartcards in a way compatible with "auto". In this mode the third column of the line should remain empty (that is, specified as "-").
+
+   The specified URI can refer directly to a private key stored on a token or alternatively just to a slot or token, in which case a search for a suitable private key will be performed. In this case, if multiple suitable objects are found, the token is refused. The keyfile configured in the third column of the line is used as is (i.e. in binary form, unprocessed). The resulting decrypted key (for RSA) or derived shared secret (for ECC) is then Base64 encoded before it is used to unlock the LUKS volume.
+
+   Use :code:`systemd-cryptenroll --pkcs11-token-uri=list` to list all suitable PKCS#11 security tokens currently plugged in, along with their URIs.
+
+   Note that many newer security tokens that may be used as PKCS#11 security token typically also implement the newer and simpler FIDO2 standard. Consider using :systemd:option:`fido2-device=` (described below) to enroll it via FIDO2 instead. Note that a security token enrolled via PKCS#11 cannot be used to unlock the volume via FIDO2, unless also enrolled via FIDO2, and vice versa.
+
+   .. versionadded:: 245
+
+.. systemd:option:: fido2-device=
+   :group: fstab-options
+
+   Takes either the special value "auto" or the path to a "hidraw" device node (e.g. :code:`/dev/hidraw1`) referring to a FIDO2 security token that implements the "hmac-secret" extension (most current hardware security tokens do). See below for an example how to set up this mechanism for unlocking an encrypted volume with a FIDO2 security token.
+
+   If specified as "auto" the FIDO2 token device is automatically discovered, as it is plugged in.
+
+   FIDO2 volume unlocking requires a client ID hash (CID) to be configured via :systemd:option:`fido2-cid=` (see below) and a key to pass to the security token's HMAC functionality (configured in the line's third column) to operate. If not configured and the volume is of type LUKS2, the CID and the key are read from LUKS2 JSON token metadata instead. Use :ref:`systemd-cryptenroll(1)` as simple tool for enrolling FIDO2 security tokens for LUKS2 volumes.
+
+   Use :code:`systemd-cryptenroll --fido2-device=list` to list all suitable FIDO2 security tokens currently plugged in, along with their device nodes.
+
+   This option implements the following mechanism: the configured key is hashed via they HMAC keyed hash function the FIDO2 device implements, keyed by a secret key embedded on the device. The resulting hash value is Base64 encoded and used to unlock the LUKS2 volume. As it should not be possible to extract the secret from the hardware token, it should not be possible to retrieve the hashed key given the configured key — without possessing the hardware token.
+
+   Note that many security tokens that implement FIDO2 also implement PKCS#11, suitable for unlocking volumes via the :systemd:option:`pkcs11-uri=` option described above. Typically the newer, simpler FIDO2 standard is preferable.
+
+   .. versionadded:: 248
+
+.. systemd:option:: fido2-cid=
+   :group: fstab-options
+
+   Takes a Base64 encoded FIDO2 client ID to use for the FIDO2 unlock operation. If specified, but :systemd:option:`fido2-device=` is not, :systemd:option:`fido2-device=auto` is implied. If :systemd:option:`fido2-device=` is used but :systemd:option:`fido2-cid=` is not, the volume must be of LUKS2 type, and the CID is read from the LUKS2 JSON token header. Use :ref:`systemd-cryptenroll(1)` for enrolling a FIDO2 token in the LUKS2 header compatible with this automatic mode.
+
+   .. versionadded:: 248
+
+.. systemd:option:: fido2-rp=
+   :group: fstab-options
+
+   Takes a string, configuring the FIDO2 Relying Party (rp) for the FIDO2 unlock operation. If not specified, "io.systemd.cryptsetup" is used, except if the LUKS2 JSON token header contains a different value. It should normally not be necessary to override this.
+
+   .. versionadded:: 248
+
+.. systemd:option:: fido2-pin=
+   :group: fstab-options
+
+   Controls whether to require the user to enter a PIN when unlocking the volume (the FIDO2 "clientPin" feature). This option only applies when in manual mode, i.e. when :systemd:option:`fido2-cid=` option is set. Defaults to neither true or false, but rather to :systemd:constant:`v248` behavior, that is: try with no PIN first, but if token reports that PIN is required, try again asking for PIN.
+
+   .. versionadded:: 257
+
+.. systemd:option:: fido2-up=
+   :group: fstab-options
+
+   Controls whether to require the user to verify presence (tap the token, the FIDO2 "up" feature) when unlocking the volume. This option only applies when in manual mode, i.e. when :systemd:option:`fido2-cid=` option is set. Defaults to neither true or false, but rather to :systemd:constant:`v248` behavior, that is: try with no UP first, but if token reports that UP is required, try again with UP enabled.
+
+   .. versionadded:: 257
+
+.. systemd:option:: fido2-uv=
+   :group: fstab-options
+
+   Controls whether to require user verification (the FIDO2 "uv" feature) when unlocking the volume. This option only applies when in manual mode, i.e. when :systemd:option:`fido2-cid=` option is set. Defaults to neither true or false, but rather to :systemd:constant:`v248` behavior, that is: omit configuring UV whatsoever.
+
+   .. versionadded:: 257
+
+.. systemd:option:: tpm2-device=
+   :group: fstab-options
+
+   Takes either the special value "auto" or the path to a device node (e.g. :code:`/dev/tpmrm0`) referring to a TPM2 security chip. See below for an example how to set up this mechanism for unlocking an encrypted volume with a TPM2 chip.
+
+   Use :systemd:option:`tpm2-pcrs=` (see below) to configure the set of TPM2 PCRs to bind the volume unlocking to. Use :ref:`systemd-cryptenroll(1)` as simple tool for enrolling TPM2 security chips in LUKS2 volumes.
+
+   If specified as "auto" the TPM2 device is automatically discovered. Use :code:`systemd-cryptenroll --tpm2-device=list` to list all suitable TPM2 devices currently available, along with their device nodes.
+
+   This option implements the following mechanism: when enrolling a TPM2 device via :code:`systemd-cryptenroll` on a LUKS2 volume, a randomized key unlocking the volume is generated on the host and loaded into the TPM2 chip where it is encrypted with an asymmetric "primary" key pair derived from the TPM2's internal "seed" key. Neither the seed key nor the primary key are permitted to ever leave the TPM2 chip — however, the now encrypted randomized key may. It is saved in the LUKS2 volume JSON token header. When unlocking the encrypted volume, the primary key pair is generated on the TPM2 chip again (which works as long as the chip's seed key is correctly maintained by the TPM2 chip), which is then used to decrypt (on the TPM2 chip) the encrypted key from the LUKS2 volume JSON token header saved there during enrollment. The resulting decrypted key is then used to unlock the volume. When the randomized key is encrypted the current values of the selected PCRs (see below) are included in the operation, so that different PCR state results in different encrypted keys and the decrypted key can only be recovered if the same PCR state is reproduced.
+
+   .. versionadded:: 248
+
+.. systemd:option:: tpm2-pcrs=
+   :group: fstab-options
+
+   Takes a "+" separated list of numeric TPM2 PCR (i.e. "Platform Configuration Register") indexes to bind the TPM2 volume unlocking to. This option is only useful when TPM2 enrollment metadata is not available in the LUKS2 JSON token header already, the way :code:`systemd-cryptenroll` writes it there. If not used (and no metadata in the LUKS2 JSON token header defines it), defaults to a list of a single entry: PCR 7. Assign an empty string to encode a policy that binds the key to no PCRs, making the key accessible to local programs regardless of the current PCR state.
+
+   .. versionadded:: 248
+
+.. systemd:option:: tpm2-pin=
+   :group: fstab-options
+
+   Takes a boolean argument, defaults to "false". Controls whether TPM2 volume unlocking is bound to a PIN in addition to PCRs. Similarly, this option is only useful when TPM2 enrollment metadata is not available.
+
+   .. versionadded:: 251
+
+.. systemd:option:: tpm2-signature=
+   :group: fstab-options
+
+   Takes an absolute path to a TPM2 PCR JSON signature file, as produced by the :ref:`systemd-measure(1)` tool. This permits locking LUKS2 volumes to any PCR values for which a valid signature matching a public key specified at key enrollment time can be provided. See :ref:`systemd-cryptenroll(1)` for details on enrolling TPM2 PCR public keys. If this option is not specified but it is attempted to unlock a LUKS2 volume with a signed TPM2 PCR enrollment, a suitable signature file :code:`tpm2-pcr-signature.json` is searched for in :code:`/etc/systemd/`, :code:`/run/systemd/`, :code:`/usr/lib/systemd/` (in this order).
+
+   .. versionadded:: 252
+
+.. systemd:option:: tpm2-pcrlock=
+   :group: fstab-options
+
+   Takes an absolute path to a TPM2 pcrlock policy file, as produced by the :ref:`systemd-pcrlock(8)` tool. This permits locking LUKS2 volumes to a local policy of allowed PCR values with variants. See :ref:`systemd-cryptenroll(1)` for details on enrolling TPM2 pcrlock policies. If this option is not specified but it is attempted to unlock a LUKS2 volume with a TPM2 pcrlock enrollment, a suitable signature file :code:`pcrlock.json` is searched for in :code:`/run/systemd/` and :code:`/var/lib/systemd/` (in this order).
+
+   .. versionadded:: 255
+
+.. systemd:option:: tpm2-measure-pcr=
+   :group: fstab-options
+
+   Controls whether to measure the volume key of the encrypted volume to a TPM2 PCR. If set to "no" (which is the default) no PCR extension is done. If set to "yes" the volume key is measured into PCR 15. If set to a decimal integer in the range 0…23 the volume key is measured into the specified PCR. The volume key is measured along with the activated volume name and its UUID. This functionality is particularly useful for the encrypted volume backing the root file system, as it then allows later TPM objects to be securely bound to the root file system and hence the specific installation.
+
+   .. versionadded:: 253
+
+.. systemd:option:: tpm2-measure-bank=
+   :group: fstab-options
+
+   Selects one or more TPM2 PCR banks to measure the volume key into, as configured with :systemd:option:`tpm2-measure-pcr=` above. Multiple banks may be specified, separated by a colon character. If not specified, automatically determines available and used banks. Expects a message digest name (e.g. "sha1", "sha256", …) as argument, to identify the bank.
+
+   .. versionadded:: 253
+
+.. systemd:option:: tpm2-measure-keyslot-nvpcr=
+   :group: fstab-options
+
+   Controls whether to measure information about the used LUKS unlock keyslot to a TPM2 non-volatile index (nvindex in PCR mode). If set to to an empty string (which is the default) no TPM2 nvindex extension is done, otherwise keyslot information is measured to an nvindex of the specified name, which is allocated if needed. It is recommended to set this to "cryptsetup" to enable this logic. The slot index and the used unlock mechanism (i.e. "tpm2", "fido2", "pkcs11") is measured along with the activated volume name and its UUID.
+
+   .. versionadded:: 259
+
+.. systemd:option:: token-timeout=
+   :group: fstab-options
+
+   Specifies how long to wait at most for configured security devices (i.e. FIDO2, PKCS#11, TPM2) to show up. Takes a time value in seconds (but other time units may be specified too, see :ref:`systemd.time(7)` for supported formats). Defaults to 30s. Once the specified timeout elapsed authentication via password is attempted. Note that this timeout applies to waiting for the security device to show up — it does not apply to the PIN prompt for the device (should one be needed) or similar. Pass 0 to turn off the timeout and wait forever.
+
+   .. versionadded:: 250
+
+.. systemd:option:: try-empty-password=
+   :group: fstab-options
+
+   Takes a boolean argument. If enabled, right before asking the user for a password it is first attempted to unlock the volume with an empty password. This is useful for systems that are initialized with an encrypted volume with only an empty password set, which shall be replaced with a suitable password during first boot, but after activation.
+
+   .. versionadded:: 246
+
+.. systemd:option:: x-systemd.device-timeout=
+   :group: fstab-options
+
+   Specifies how long systemd should wait for a block device to show up before giving up on the entry. The argument is a time in seconds or explicitly specified units of "s", "min", "h", "ms".
+
+   .. versionadded:: 216
+
+.. systemd:option:: x-initrd.attach
+   :group: fstab-options
+
+   Setup this encrypted block device in the initrd, similarly to :ref:`systemd.mount(5)` units marked with :systemd:option:`x-initrd.mount`.
+
+   Although it is not necessary to mark the mount entry for the root file system with :systemd:option:`x-initrd.mount`, :systemd:option:`x-initrd.attach` is still recommended with the encrypted block device containing the root file system as otherwise systemd will attempt to detach the device during the regular system shutdown while it is still in use. With this option the device will still be detached but later after the root file system is unmounted.
+
+   All other encrypted block devices that contain file systems mounted in the initrd should use this option.
+
+   .. versionadded:: 245
+
+At early boot and when the system manager configuration is reloaded, this file is translated into native systemd units by :ref:`systemd-cryptsetup-generator(8)`.
+
+:code:`AF_UNIX` Key Files
+#########################
+
+If the key file path (as specified in the third column of :code:`/etc/crypttab` entries, see above) refers to an :code:`AF_UNIX` stream socket in the file system, the key is acquired by connecting to the socket and reading the key from the connection. The connection is made from an :code:`AF_UNIX` socket name in the abstract namespace, see :man-pages:`unix(7)` for details. The source socket name is chosen according to the following format:
+
+.. code-block:: sh
+
+   NUL  RANDOM  /cryptsetup/ VOLUME
+
+In other words: a :code:`NUL` byte (as required for abstract namespace sockets), followed by a random string (consisting of alphanumeric characters only), followed by the literal string "/cryptsetup/", followed by the name of the volume to acquire they key for. For example, for the volume "myvol":
+
+.. code-block:: sh
+
+   \0d7067f78d9827418/cryptsetup/myvol
+
+Services listening on the :code:`AF_UNIX` stream socket may query the source socket name with :man-pages:`getpeername(2)`, and use this to determine which key to send, allowing a single listening socket to serve keys for multiple volumes. If the PKCS#11 logic is used (see above), the socket source name is picked in similar fashion, except that the literal string "/cryptsetup-pkcs11/" is used. And similarly for FIDO2 ("/cryptsetup-fido2-salt/") and TPM2 ("/cryptsetup-tpm2/"). A different path component is used so that services providing key material know that the secret key was not requested directly, but instead an encrypted key that will be decrypted via the PKCS#11/FIDO2/TPM2 logic to acquire the final secret key.
+
+Examples
+########
+
+/etc/crypttab example
+---------------------
+
+Set up four encrypted block devices. One using LUKS for normal storage, another one for usage as a swap device and two TrueCrypt volumes. For the fourth device, the option string is interpreted as two options "cipher=xchacha12,aes-adiantum-plain64", "keyfile-timeout=10s".
+
+.. code-block:: sh
+
+   luks       UUID=2505567a-9e27-4efe-a4d5-15ad146c258b
+   swap       /dev/sda7       /dev/urandom       swap
+   truecrypt  /dev/sda2       /etc/container_password  tcrypt
+   hidden     /mnt/tc_hidden  /dev/null    tcrypt-hidden,tcrypt-keyfile=/etc/keyfile
+   external   /dev/sda3       keyfile:LABEL=keydev keyfile-timeout=10s,cipher=xchacha12\,aes-adiantum-plain64
+
+Yubikey-based PKCS#11 Volume Unlocking Example
+----------------------------------------------
+
+The PKCS#11 logic allows hooking up any compatible security token that is capable of storing RSA or EC cryptographic keys for unlocking an encrypted volume. Here's an example how to set up a Yubikey security token for this purpose on a LUKS2 volume, using :debian:`ykmap(1)` from the yubikey-manager project to initialize the token and :ref:`systemd-cryptenroll(1)` to add it in the LUKS2 volume:
+
+.. literalinclude:: /code-examples/sh/yubikey-crypttab.sh
+    :language: shell
+
+A few notes on the above:
+
+*    We use RSA2048, which is the longest key size current Yubikeys support
+
+*    We use Yubikey key slot 9d, since that's apparently the keyslot to use for decryption purposes, see `Yubico PIV certificate slots <https://developers.yubico.com/PIV/Introduction/Certificate_slots.html>`_.
+
+FIDO2 Volume Unlocking Example
+------------------------------
+
+The FIDO2 logic allows using any compatible FIDO2 security token that implements the "hmac-secret" extension for unlocking an encrypted volume. Here's an example how to set up a FIDO2 security token for this purpose for a LUKS2 volume, using :ref:`systemd-cryptenroll(1)`:
+
+.. literalinclude:: /code-examples/sh/fido2-crypttab.sh
+    :language: shell
+
+TPM2 Volume Unlocking Example
+-----------------------------
+
+The TPM2 logic allows using any TPM2 chip supported by the Linux kernel for unlocking an encrypted volume. Here's an example how to set up a TPM2 chip for this purpose for a LUKS2 volume, using :ref:`systemd-cryptenroll(1)`:
+
+.. literalinclude:: /code-examples/sh/tpm2-crypttab.sh
+    :language: shell
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-cryptsetup@.service(8)`, :ref:`systemd-cryptsetup-generator(8)`, :ref:`systemd-cryptenroll(1)`, :man-pages:`fstab(5)`, :die-net:`cryptsetup(8)`, :man-pages:`mkswap(8)`, :man-pages:`mke2fs(8)`
+
+

@@ -1,0 +1,77 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-stdio-bridge
+:manvolnum: 1
+:summary: D-Bus proxy
+
+.. _systemd-stdio-bridge(1):
+
+=======================
+systemd-stdio-bridge(1)
+=======================
+
+Name
+####
+
+systemd-stdio-bridge — D-Bus proxy
+
+Synopsis
+########
+
+:code:`systemd-stdio-bridge [OPTIONS...]`
+
+Description
+###########
+
+:code:`systemd-stdio-bridge` implements a proxy between STDIN/STDOUT and a D-Bus bus. It expects to receive an open connection via STDIN/STDOUT when started, and will create a new connection to the specified bus. It will then forward messages between the two connections. This program is suitable for socket activation: the first connection may be a pipe or a socket and must be passed as either standard input, or as an open file descriptor according to the protocol described in :ref:`sd_listen_fds(3)`. The second connection will be made by default to the local system bus, but this can be influenced by the :code:`--user`, :code:`--system`, :code:`--machine=`, and :code:`--bus-path=` options described below.
+
+:ref:`sd-bus(3)` uses :code:`systemd-stdio-bridge` to forward D-Bus connections over :man-pages:`ssh(1)`, or to connect to the bus of a different user, see :ref:`sd_bus_set_address(3)`.
+
+Options
+#######
+
+The following options are understood:
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove user|
+    :end-before: .. inclusion-end-marker-do-not-remove user|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove system|
+    :end-before: .. inclusion-end-marker-do-not-remove system|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove machine|
+    :end-before: .. inclusion-end-marker-do-not-remove machine|
+
+.. systemd:option:: -p PATH, --bus-path=PATH
+
+   Path to the bus address. Default: "unix:path=/run/dbus/system_bus_socket"
+
+   .. versionadded:: 251
+
+.. systemd:option:: -q, --quiet
+
+   Suppresses error logging on failure.
+
+   .. versionadded:: 259
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:dbus:`dbus-daemon(1)`, :dbus:`dbus-broker(1)`, `D-Bus <https://www.freedesktop.org/wiki/Software/dbus>`_, :ref:`systemd(1)`
+
+

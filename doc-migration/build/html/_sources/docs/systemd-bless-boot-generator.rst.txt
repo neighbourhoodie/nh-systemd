@@ -1,0 +1,35 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-bless-boot-generator
+:manvolnum: 8
+:summary: Pull
+
+.. _systemd-bless-boot-generator(8):
+
+===============================
+systemd-bless-boot-generator(8)
+===============================
+
+Name
+####
+
+systemd-bless-boot-generator — Pull
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-bless-boot-generator`
+
+Description
+###########
+
+:code:`systemd-bless-boot-generator` is a generator that pulls :code:`systemd-bless-boot.service` into the initial boot transaction when boot counting, as implemented by :ref:`systemd-boot(7)`, is enabled.
+
+:code:`systemd-bless-boot-generator` implements :ref:`systemd.generator(7)`.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-bless-boot.service(8)`, :ref:`systemd-boot(7)`
+
+

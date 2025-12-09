@@ -1,0 +1,38 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-volatile-root.service
+:manvolnum: 8
+:summary: Make the root file system volatile
+:aliases: systemd-volatile-root
+
+.. _systemd-volatile-root.service(8):
+
+================================
+systemd-volatile-root.service(8)
+================================
+
+Name
+####
+
+systemd-volatile-root.service, systemd-volatile-root — Make the root file system volatile
+
+Synopsis
+########
+
+:code:`systemd-volatile-root.service`
+
+:code:`/usr/lib/systemd/systemd-volatile-root`
+
+Description
+###########
+
+:code:`systemd-volatile-root.service` is a service that replaces the root directory with a volatile memory file system ("tmpfs"), mounting the original (non-volatile) :code:`/usr/` inside it read-only. This way, vendor data from :code:`/usr/` is available as usual, but all configuration data in :code:`/etc/`, all state data in :code:`/var/` and all other resources stored directly under the root directory are reset on boot and lost at shutdown, enabling fully stateless systems.
+
+This service is only enabled if full volatile mode is selected, for example by specifying "systemd.volatile=yes" on the kernel command line. This service runs only in the initrd, before the system transitions to the host's root directory. Note that this service is not used if "systemd.volatile=state" is used, as in that mode the root directory is non-volatile.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-fstab-generator(8)`, :man-pages:`kernel-command-line(7)`
+
+

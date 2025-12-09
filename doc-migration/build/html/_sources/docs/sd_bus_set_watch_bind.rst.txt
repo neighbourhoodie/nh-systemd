@@ -1,0 +1,77 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_set_watch_bind
+:manvolnum: 3
+:summary: Control socket binding watching on bus connections
+:aliases: sd_bus_get_watch_bind
+
+.. _sd_bus_set_watch_bind(3):
+
+========================
+sd_bus_set_watch_bind(3)
+========================
+
+Name
+####
+
+sd_bus_set_watch_bind, sd_bus_get_watch_bind — Control socket binding watching on bus connections
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_set_watch_bind(sd_bus *bus,
+	int b); .. code-block::
+
+   int sd_bus_get_watch_bind(sd_bus *bus);
+
+Description
+###########
+
+:code:`sd_bus_set_watch_bind()` may be used to enable or disable client-side watching of server socket binding for a bus connection object. If the :code:`b` is true, the feature is enabled, otherwise disabled (which is the default). When enabled, and the selected bus address refers to an :code:`AF_UNIX` socket in the file system which does not exist while the connection attempt is made an :man-pages:`inotify(7)` watch is installed on it, waiting for the socket to appear. As soon as the socket appears the connection is made. This functionality is useful in particular in early-boot programs that need to run before the system bus is available, but want to connect to it the instant it may be connected to.
+
+:code:`sd_bus_get_watch_bind()` may be used to query the current setting of this feature. It returns zero when the feature is disabled, and positive if enabled.
+
+Note that no timeout is applied while we wait for the socket to appear. This means that any synchronous remote operation (such as :ref:`sd_bus_call(3)`, :ref:`sd_bus_add_match(3)` or :ref:`sd_bus_request_name(3)`), that is used on a connection with this feature enabled that has not been established yet, might block forever if the socket is never created. However, asynchronous remote operations (such as :ref:`sd_bus_send(3)`, :ref:`sd_bus_call_async(3)`, :ref:`sd_bus_add_match_async(3)`) do not block in this case, and safely enqueue the requested operations to be dispatched the instant the connection is set up.
+
+Use :ref:`sd_bus_is_ready(3)` to determine whether the connection is fully established, i.e. whether the peer socket has been bound, connected to and authenticated. Use :ref:`sd_bus_set_connected_signal(3)` to be notified when the connection is fully established.
+
+Return Value
+############
+
+On success, these functions return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ECHILD
+
+   The bus connection has been created in a different process, library or module instance.
+
+.. include:: libsystemd-pkgconfig.rst
+
+Example
+#######
+
+Create a simple system service that publishes a property on the system bus and can reconnect when D-Bus disconnects and reconnects
+----------------------------------------------------------------------------------------------------------------------------------
+
+.. literalinclude:: /code-examples/c/sd_bus_service_reconnect.c
+    :language: c
+
+This is particularly useful for services that are configured to survive a soft-reboot, see :ref:`systemd-soft-reboot.service(8)` for more details.
+
+History
+#######
+
+:code:`sd_bus_set_watch_bind()` and :code:`sd_bus_get_watch_bind()` were added in version 237.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :man-pages:`inotify(7)`, :ref:`sd_bus_call(3)`, :ref:`sd_bus_add_match(3)`, :ref:`sd_bus_request_name(3)`, :ref:`sd_bus_is_ready(3)`, :ref:`sd_bus_set_connected_signal(3)`
+
+

@@ -1,0 +1,87 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_journal_stream_fd
+:manvolnum: 3
+:summary: Create log stream file descriptor to the journal
+:aliases: sd_journal_stream_fd_with_namespace
+
+.. _sd_journal_stream_fd(3):
+
+=======================
+sd_journal_stream_fd(3)
+=======================
+
+Name
+####
+
+sd_journal_stream_fd, sd_journal_stream_fd_with_namespace — Create log stream file descriptor to the journal
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>` .. code-block::
+
+   int sd_journal_stream_fd(const char *identifier,
+	int priority,
+	int level_prefix); .. code-block::
+
+   int sd_journal_stream_fd_with_namespace(const char *name_space,
+	const char *identifier,
+	int priority,
+	int level_prefix);
+
+Description
+###########
+
+:code:`sd_journal_stream_fd()` may be used to create a log stream file descriptor. Log messages written to this file descriptor as simple newline-separated text strings are written to the journal. This file descriptor can be used internally by applications or be made standard output or standard error of other processes executed.
+
+:code:`sd_journal_stream_fd()` takes a short program identifier string as first argument, which will be written to the journal as SYSLOG_IDENTIFIER= field for each log entry (see :ref:`systemd.journal-fields(7)` for more information). The second argument shall be the default priority level for all messages. The priority level is one of :code:`LOG_EMERG`, :code:`LOG_ALERT`, :code:`LOG_CRIT`, :code:`LOG_ERR`, :code:`LOG_WARNING`, :code:`LOG_NOTICE`, :code:`LOG_INFO`, :code:`LOG_DEBUG`, as defined in :code:`syslog.h`, see :man-pages:`syslog(3)` for details. The third argument is a boolean: if true kernel-style log level prefixes (such as :code:`SD_WARNING`) are interpreted, see :ref:`sd-daemon(3)` for more information.
+
+:code:`sd_journal_stream_fd_with_namespace()` is similar to :code:`sd_journal_stream_fd()`, but takes an additional :code:`name_space` parameter that specifies which journal namespace to operate on. If specified as :code:`NULL` the call is identical to :code:`sd_journal_stream_fd()`. For details about journal namespaces, see :ref:`systemd-journald.service(8)`.
+
+It is recommended that applications log UTF-8 messages only with this API, but this is not enforced.
+
+Each invocation of these functions allocates a new log stream file descriptor, that is not shared with prior or later invocations. The file descriptor is write-only (its reading direction is shut down), and :code:`O_NONBLOCK` is turned off initially.
+
+Return Value
+############
+
+The call returns a valid write-only file descriptor on success or a negative errno-style error code.
+
+Signal safety
+#############
+
+:code:`sd_journal_stream_fd()` and :code:`sd_journal_stream_fd_with_namespace()` are "async signal safe" in the meaning of :man-pages:`signal-safety(7)`.
+
+Notes
+#####
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove safe|
+    :end-before: .. inclusion-end-marker-do-not-remove safe|
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+Examples
+########
+
+Creating a log stream suitable for :man-pages:`fprintf(3)`:
+
+.. literalinclude:: /code-examples/c/journal-stream-fd.c
+    :language: c
+
+History
+#######
+
+:code:`sd_journal_stream_fd()` was added in version 187.
+
+:code:`sd_journal_stream_fd_with_namespace()` was added in version 256.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-journal(3)`, :ref:`sd-daemon(3)`, :ref:`sd_journal_print(3)`, :man-pages:`syslog(3)`, :man-pages:`fprintf(3)`, :ref:`systemd.journal-fields(7)`
+
+

@@ -1,0 +1,34 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-environment-d-generator
+:manvolnum: 8
+:summary: Load variables specified by
+:aliases: 30-systemd-environment-d-generator
+
+.. _systemd-environment-d-generator(8):
+
+==================================
+systemd-environment-d-generator(8)
+==================================
+
+Name
+####
+
+systemd-environment-d-generator, 30-systemd-environment-d-generator — Load variables specified by
+
+Synopsis
+########
+
+:code:`|USER_ENV_GENERATOR_DIR|/30-systemd-environment-d-generator`
+
+Description
+###########
+
+:code:`systemd-environment-d-generator` is a :ref:`systemd.environment-generator(7)` that reads environment configuration specified by :man-pages:`environment.d(5)` configuration files and passes it to the :ref:`systemd(1)` user manager instance.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd.environment-generator(7)`, :ref:`systemd.generator(7)`
+
+

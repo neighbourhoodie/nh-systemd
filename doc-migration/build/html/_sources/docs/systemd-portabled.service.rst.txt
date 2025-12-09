@@ -1,0 +1,42 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-portabled.service
+:manvolnum: 8
+:summary: Portable service manager
+:aliases: systemd-portabled
+
+.. _systemd-portabled.service(8):
+
+============================
+systemd-portabled.service(8)
+============================
+
+Name
+####
+
+systemd-portabled.service, systemd-portabled — Portable service manager
+
+Synopsis
+########
+
+:code:`systemd-portabled.service`
+
+:code:`/usr/lib/systemd/systemd-portabled`
+
+Description
+###########
+
+:code:`systemd-portabled` is a system service that may be used to attach, detach and inspect portable service images.
+
+Most of :code:`systemd-portabled`'s functionality is accessible through the :man-pages:`portablectl(1)` command.
+
+See the `Portable Services <https://systemd.io/PORTABLE_SERVICES>`_ page for details about the concepts this service implements.
+
+See :man-pages:`org.freedesktop.portable1(5)` and :man-pages:`org.freedesktop.LogControl1(5)` for a description of the D-Bus API.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`portablectl(1)`, :man-pages:`org.freedesktop.portable1(5)`
+
+

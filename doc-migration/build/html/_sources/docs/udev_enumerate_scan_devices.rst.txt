@@ -1,0 +1,56 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udev_enumerate_scan_devices
+:manvolnum: 3
+:summary: Query or modify a udev enumerate object
+:aliases: udev_enumerate_scan_subsystems, udev_enumerate_get_list_entry, udev_enumerate_add_syspath, udev_enumerate_get_udev
+
+.. _udev_enumerate_scan_devices(3):
+
+==============================
+udev_enumerate_scan_devices(3)
+==============================
+
+Name
+####
+
+udev_enumerate_scan_devices, udev_enumerate_scan_subsystems, udev_enumerate_get_list_entry, udev_enumerate_add_syspath, udev_enumerate_get_udev — Query or modify a udev enumerate object
+
+Synopsis
+########
+
+:code:`#include <libudev.h>` .. code-block::
+
+   int udev_enumerate_scan_devices(struct udev_enumerate *udev_enumerate); .. code-block::
+
+   int udev_enumerate_scan_subsystems(struct udev_enumerate *udev_enumerate); .. code-block::
+
+   struct udev_list_entry *udev_enumerate_get_list_entry(struct udev_enumerate *udev_enumerate); .. code-block::
+
+   int udev_enumerate_add_syspath(struct udev_enumerate *udev_enumerate,
+	const char *syspath); .. code-block::
+
+   struct udev *udev_enumerate_get_udev(struct udev_enumerate *udev_enumerate);
+
+.. COMMENT: <refsect1> <title>Description</title> <para>XXX: Add short description.</para> </refsect1>
+
+Return Value
+############
+
+On success, :code:`udev_enumerate_scan_devices()`, :code:`udev_enumerate_scan_subsystems()` and :code:`udev_enumerate_add_syspath()` return an integer greater than, or equal to, :code:`0`.
+
+On success, :code:`udev_enumerate_get_list_entry()` returns a pointer to the first entry in the list of found devices. If the list is empty, or on failure, :code:`NULL` is returned.
+
+:code:`udev_enumerate_get_udev()` always returns a pointer to the udev context that this enumerated object is associated with.
+
+History
+#######
+
+:code:`udev_enumerate_scan_devices()`, :code:`udev_enumerate_scan_subsystems()`, :code:`udev_enumerate_get_list_entry()`, :code:`udev_enumerate_add_syspath()`, and :code:`udev_enumerate_get_udev()` were added in version 221.
+
+See Also
+########
+
+:man-pages:`udev_new(3)`, :man-pages:`udev_device_new_from_syspath(3)`, :man-pages:`udev_enumerate_new(3)`, :man-pages:`udev_enumerate_add_match_subsystem(3)`, :man-pages:`udev_monitor_new_from_netlink(3)`, :man-pages:`udev_list_entry(3)`, :ref:`systemd(1)`
+
+

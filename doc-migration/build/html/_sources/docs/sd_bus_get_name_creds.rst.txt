@@ -1,0 +1,82 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_get_name_creds
+:manvolnum: 3
+:summary: Query bus client credentials
+:aliases: sd_bus_get_owner_creds
+
+.. _sd_bus_get_name_creds(3):
+
+========================
+sd_bus_get_name_creds(3)
+========================
+
+Name
+####
+
+sd_bus_get_name_creds, sd_bus_get_owner_creds — Query bus client credentials
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_get_name_creds(sd_bus *bus,
+	const char *name,
+	uint64_t mask,
+	sd_bus_creds **creds); .. code-block::
+
+   int sd_bus_get_owner_creds(sd_bus *bus,
+	uint64_t mask,
+	sd_bus_creds **creds);
+
+Description
+###########
+
+:code:`sd_bus_get_name_creds()` queries the credentials of the bus client identified by :code:`name`. The :code:`mask` parameter is a combo of :code:`SD_BUS_CREDS_*` flags that indicate which credential info the caller is interested in. See :ref:`sd_bus_creds_new_from_pid(3)` for a list of possible flags. On success, :code:`creds` contains a new sd_bus_creds instance with the requested information. Ownership of this instance belongs to the caller and it should be freed once no longer needed by calling :ref:`sd_bus_creds_unref(3)`.
+
+:code:`sd_bus_get_owner_creds()` queries the credentials of the creator of the given bus. The :code:`mask` and :code:`creds` parameters behave the same as in :code:`sd_bus_get_name_creds()`.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An argument is invalid.
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+.. systemd:option:: -EPERM
+
+   The bus has already been started.
+
+.. systemd:option:: -ECHILD
+
+   The bus was created in a different process, library or module instance.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_get_name_creds()` and :code:`sd_bus_get_owner_creds()` were added in version 221.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_creds_unref(3)`
+
+

@@ -1,0 +1,280 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: loginctl
+:manvolnum: 1
+:summary: Control the systemd login manager
+
+.. _loginctl(1):
+
+===========
+loginctl(1)
+===========
+
+Name
+####
+
+loginctl — Control the systemd login manager
+
+Synopsis
+########
+
+:code:`loginctl [OPTIONS...] {COMMAND} [NAME...]`
+
+Description
+###########
+
+:code:`loginctl` may be used to introspect and control the state of the :ref:`systemd(1)` login manager :ref:`systemd-logind.service(8)`.
+
+Commands
+########
+
+The following commands are understood:
+
+Session Commands
+################
+
+.. systemd:option:: list-sessions
+
+   List current sessions. The JSON format output can be toggled using :code:`--json=` or :code:`-j` option.
+
+.. systemd:option:: session-status [ID…]
+
+   Show terse runtime status information about one or more sessions, followed by the most recent log data from the journal. Takes one or more session identifiers as parameters. If no session identifiers are passed, the status of the caller's session is shown. This function is intended to generate human-readable output. If you are looking for computer-parsable output, use :code:`show-session` instead.
+
+   .. versionadded:: 233
+
+.. systemd:option:: show-session [ID…]
+
+   Show properties of one or more sessions or the manager itself. If no argument is specified, properties of the manager will be shown. If a session ID is specified, properties of the session are shown. Specially, if the given ID is "self", the session to which the :code:`loginctl` process belongs is used. If "auto", the current session is used as with "self" if exists, and falls back to the current user's graphical session. By default, empty properties are suppressed. Use :code:`--all` to show those too. To select specific properties to show, use :code:`--property=`. This command is intended to be used whenever computer-parsable output is required. Use :code:`session-status` if you are looking for formatted human-readable output.
+
+   .. versionadded:: 233
+
+.. systemd:option:: activate [ID]
+
+   Activate a session. This brings a session into the foreground if another session is currently in the foreground on the respective seat. Takes a session identifier as argument. If no argument is specified, the session of the caller is put into foreground.
+
+   .. versionadded:: 219
+
+.. systemd:option:: lock-session [ID…], unlock-session [ID…]
+
+   Activates/deactivates the screen lock on one or more sessions, if the session supports it. Takes one or more session identifiers as arguments. If no argument is specified, the session of the caller is locked/unlocked.
+
+   .. versionadded:: 233
+
+.. systemd:option:: lock-sessions, unlock-sessions
+
+   Activates/deactivates the screen lock on all current sessions supporting it.
+
+   .. versionadded:: 188
+
+.. systemd:option:: terminate-session ID…
+
+   Terminates a session. This kills all processes of the session and deallocates all resources attached to the session. If the argument is specified as empty string the session invoking the command is terminated.
+
+   .. versionadded:: 233
+
+.. systemd:option:: kill-session ID…
+
+   Send a signal to one or more processes of the session. Use :code:`--kill-whom=` to select which process to kill. Use :code:`--signal=` to select the signal to send. If the argument is specified as empty string the signal is sent to the session invoking the command.
+
+   .. versionadded:: 233
+
+User Commands
+#############
+
+.. systemd:option:: list-users
+
+   List currently logged in users. The JSON format output can be toggled using :code:`--json=` or :code:`-j` option.
+
+.. systemd:option:: user-status [USER…]
+
+   Show terse runtime status information about one or more logged in users, followed by the most recent log data from the journal. Takes one or more user names or numeric user IDs as parameters. If no parameters are passed, the status is shown for the user of the session of the caller. This function is intended to generate human-readable output. If you are looking for computer-parsable output, use :code:`show-user` instead.
+
+   .. versionadded:: 233
+
+.. systemd:option:: show-user [USER…]
+
+   Show properties of one or more users or the manager itself. If no argument is specified, properties of the manager will be shown. If a user is specified, properties of the user are shown. By default, empty properties are suppressed. Use :code:`--all` to show those too. To select specific properties to show, use :code:`--property=`. This command is intended to be used whenever computer-parsable output is required. Use :code:`user-status` if you are looking for formatted human-readable output.
+
+   .. versionadded:: 233
+
+.. systemd:option:: enable-linger [USER…], disable-linger [USER…]
+
+   Enable/disable user lingering for one or more users. If enabled for a specific user, a user manager is spawned for the user at boot and kept around after logouts. This allows users who are not logged in to run long-running services. Takes one or more user names or numeric UIDs as argument. If no argument is specified, enables/disables lingering for the user of the session of the caller.
+
+   See also :code:`KillUserProcesses=` setting in :man-pages:`logind.conf(5)`.
+
+   .. versionadded:: 233
+
+.. systemd:option:: terminate-user USER…
+
+   Terminates all sessions of a user. This kills all processes of all sessions of the user and deallocates all runtime resources attached to the user. If the argument is specified as empty string the sessions of the user invoking the command are terminated.
+
+   .. versionadded:: 233
+
+.. systemd:option:: kill-user USER…
+
+   Send a signal to all processes of a user. Use :code:`--signal=` to select the signal to send. If the argument is specified as empty string the signal is sent to the sessions of the user invoking the command.
+
+   .. versionadded:: 233
+
+Seat Commands
+#############
+
+.. systemd:option:: list-seats
+
+   List currently available seats on the local system. The JSON format output can be toggled using :code:`--json=` or :code:`-j` option.
+
+.. systemd:option:: seat-status [NAME…]
+
+   Show terse runtime status information about one or more seats. Takes one or more seat names as parameters. If no seat names are passed the status of the caller's session's seat is shown. This function is intended to generate human-readable output. If you are looking for computer-parsable output, use :code:`show-seat` instead.
+
+   .. versionadded:: 233
+
+.. systemd:option:: show-seat [NAME…]
+
+   Show properties of one or more seats or the manager itself. If no argument is specified, properties of the manager will be shown. If a seat is specified, properties of the seat are shown. By default, empty properties are suppressed. Use :code:`--all` to show those too. To select specific properties to show, use :code:`--property=`. This command is intended to be used whenever computer-parsable output is required. Use :code:`seat-status` if you are looking for formatted human-readable output.
+
+   .. versionadded:: 233
+
+.. systemd:option:: attach NAME DEVICE…
+
+   Persistently attach one or more devices to a seat. The devices should be specified via device paths in the :code:`/sys/` file system. To create a new seat, attach at least one graphics card to a previously unused seat name. Seat names may consist only of a–z, A–Z, 0–9, "-" and "_" and must be prefixed with "seat". To drop assignment of a device to a specific seat, just reassign it to a different seat, or use :code:`flush-devices`.
+
+   .. versionadded:: 233
+
+.. systemd:option:: flush-devices
+
+   Removes all device assignments previously created with :code:`attach`. After this call, only automatically generated seats will remain, and all seat hardware is assigned to them.
+
+.. systemd:option:: terminate-seat NAME…
+
+   Terminates all sessions on a seat. This kills all processes of all sessions on the seat and deallocates all runtime resources attached to them.
+
+   .. versionadded:: 233
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: -p, --property=
+
+   When showing session/user/seat properties, limit display to certain properties as specified as argument. If not specified, all set properties are shown. The argument should be a property name, such as "Sessions". If specified more than once, all properties with the specified names are shown.
+
+.. systemd:option:: --value
+
+   When showing session/user/seat properties, only print the value, and skip the property name and "=".
+
+   .. versionadded:: 230
+
+.. systemd:option:: -a, --all
+
+   When showing session/user/seat properties, show all properties regardless of whether they are set or not.
+
+.. systemd:option:: -l, --full
+
+   Do not ellipsize process tree entries.
+
+   .. versionadded:: 198
+
+.. systemd:option:: --kill-whom=
+
+   When used with :code:`kill-session`, choose which processes to kill. Takes one of "leader" or "all", to select whether to kill only the leader process of the session or all processes of the session. If omitted, defaults to :code:`all`.
+
+   .. versionadded:: 252
+
+.. systemd:option:: -s, --signal=
+
+   When used with :code:`kill-session` or :code:`kill-user`, choose which signal to send to selected processes. Must be one of the well known signal specifiers, such as :code:`SIGTERM`, :code:`SIGINT` or :code:`SIGSTOP`. If omitted, defaults to :code:`SIGTERM`.
+
+   The special value "help" will list the known values and the program will exit immediately, and the special value "list" will list known values along with the numerical signal numbers and the program will exit immediately.
+
+.. systemd:option:: -n, --lines=
+
+   When used with :code:`user-status` and :code:`session-status`, controls the number of journal lines to show, counting from the most recent ones. Takes a positive integer argument. Defaults to 10.
+
+   .. versionadded:: 219
+
+.. systemd:option:: -o, --output=
+
+   When used with :code:`user-status` and :code:`session-status`, controls the formatting of the journal entries that are shown. For the available choices, see :man-pages:`journalctl(1)`. Defaults to "short".
+
+   .. versionadded:: 219
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove machine|
+    :end-before: .. inclusion-end-marker-do-not-remove machine|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove j|
+    :end-before: .. inclusion-end-marker-do-not-remove j|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+Examples
+########
+
+Querying user status
+--------------------
+
+.. code-block:: sh
+
+   $ loginctl user-status
+   fatima (1005)
+              Since: Sat 2016-04-09 14:23:31 EDT; 54min ago
+              State: active
+           Sessions: 5 *3
+               Unit: user-1005.slice
+                     ├─user@1005.service
+                       …
+                     ├─session-3.scope
+                       …
+                     └─session-5.scope
+                       ├─3473 login -- fatima
+                       └─3515 -zsh
+   Apr 09 14:40:30 laptop login[2325]: pam_unix(login:session):
+                          session opened for user fatima by LOGIN(uid=0)
+   Apr 09 14:40:30 laptop login[2325]: LOGIN ON tty3 BY fatima
+
+There are two sessions, 3 and 5. Session 3 is a graphical session, marked with a star. The tree of processing including the two corresponding scope units and the user manager unit are shown.
+
+.. include:: common-variables.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd-logind.service(8)`, :man-pages:`logind.conf(5)`
+
+

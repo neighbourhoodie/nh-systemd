@@ -1,0 +1,80 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udev_device_has_tag
+:manvolnum: 3
+:summary: Retrieve or set device attributes
+:aliases: udev_device_has_current_tag, udev_device_get_devlinks_list_entry, udev_device_get_properties_list_entry, udev_device_get_tags_list_entry, udev_device_get_current_tags_list_entry, udev_device_get_sysattr_list_entry, udev_device_get_property_value, udev_device_get_sysattr_value, udev_device_set_sysattr_value
+
+.. _udev_device_has_tag(3):
+
+======================
+udev_device_has_tag(3)
+======================
+
+Name
+####
+
+udev_device_has_tag, udev_device_has_current_tag, udev_device_get_devlinks_list_entry, udev_device_get_properties_list_entry, udev_device_get_tags_list_entry, udev_device_get_current_tags_list_entry, udev_device_get_sysattr_list_entry, udev_device_get_property_value, udev_device_get_sysattr_value, udev_device_set_sysattr_value — Retrieve or set device attributes
+
+Synopsis
+########
+
+:code:`#include <libudev.h>` .. code-block::
+
+   int udev_device_has_tag(struct udev_device *udev_device,
+	const char *tag); .. code-block::
+
+   int udev_device_has_current_tag(struct udev_device *udev_device,
+	const char *tag); .. code-block::
+
+   struct udev_list_entry *udev_device_get_devlinks_list_entry(struct udev_device *udev_device); .. code-block::
+
+   struct udev_list_entry *udev_device_get_properties_list_entry(struct udev_device *udev_device); .. code-block::
+
+   struct udev_list_entry *udev_device_get_tags_list_entry(struct udev_device *udev_device); .. code-block::
+
+   struct udev_list_entry *udev_device_get_current_tags_list_entry(struct udev_device *udev_device); .. code-block::
+
+   struct udev_list_entry *udev_device_get_sysattr_list_entry(struct udev_device *udev_device); .. code-block::
+
+   const char *udev_device_get_property_value(struct udev_device *udev_device,
+	const char *key); .. code-block::
+
+   const char *udev_device_get_sysattr_value(struct udev_device *udev_device,
+	const char *sysattr); .. code-block::
+
+   int udev_device_set_sysattr_value(struct udev_device *udev_device,
+	const char *sysattr,
+	const char *value);
+
+Description
+###########
+
+:code:`udev_device_has_tag()` returns a value larger than zero if the specified device object has the indicated tag assigned to it, and zero otherwise. See :man-pages:`udev(7)` for details on the tags concept. :code:`udev_device_has_current_tag()` executes a similar check, however only determines whether the indicated tag was set as result of the most recent event seen for the device. Tags are "sticky", i.e. once set for a device they remain on the device until the device is unplugged, even if the rules run for later events of the same device do not set them anymore. Any tag for which :code:`udev_device_has_current_tag()` returns true will hence also return true when passed to :code:`udev_device_has_tag()`, but the opposite might not be true, in case a tag is no longer configured by the rules applied to the most recent device even.
+
+:code:`udev_device_get_tags_list_entry()` returns a udev_list_entry object, encapsulating a list of tags set for the specified device. Similar, :code:`udev_device_get_current_tags_list_entry()` returns a list of tags set for the specified device as effect of the most recent device event seen (see above for details on the difference).
+
+Return Value
+############
+
+On success, :code:`udev_device_has_tag()` and :code:`udev_device_has_current_tag()` return positive or :code:`0`, depending on whether the device has the given tag or not. On failure, a negative error code is returned.
+
+On success, :code:`udev_device_get_devlinks_list_entry()`, :code:`udev_device_get_properties_list_entry()`, :code:`udev_device_get_tags_list_entry()`, :code:`udev_device_get_current_tags_list_entry()` and :code:`udev_device_get_sysattr_list_entry()` return a pointer to the first entry of the retrieved list. If that list is empty, or if an error occurred, :code:`NULL` is returned.
+
+On success, :code:`udev_device_get_property_value()` and :code:`udev_device_get_sysattr_value()` return a pointer to a constant string of the requested value. On error, :code:`NULL` is returned. Attributes that may contain :code:`NUL` bytes should not be retrieved with :code:`udev_device_get_sysattr_value()`; instead, read them directly from the files within the device's syspath.
+
+On success, :code:`udev_device_set_sysattr_value()` returns an integer greater than, or equal to, :code:`0`. On failure, a negative error code is returned. Values that contain :code:`NUL` bytes should not be set with this function; instead, write them directly to the files within the device's syspath.
+
+History
+#######
+
+:code:`udev_device_get_devlinks_list_entry()`, :code:`udev_device_get_properties_list_entry()`, :code:`udev_device_get_tags_list_entry()`, :code:`udev_device_get_sysattr_list_entry()`, :code:`udev_device_get_property_value()`, :code:`udev_device_has_tag()`, :code:`udev_device_get_sysattr_value()`, and :code:`udev_device_set_sysattr_value()` were added in version 221.
+
+:code:`udev_device_has_current_tag()` and :code:`udev_device_get_current_tags_list_entry()` were added in version 247.
+
+See Also
+########
+
+:man-pages:`udev(7)`, :man-pages:`udev_new(3)`, :man-pages:`udev_device_new_from_syspath(3)`, :man-pages:`udev_device_get_syspath(3)`, :man-pages:`udev_enumerate_new(3)`, :man-pages:`udev_monitor_new_from_netlink(3)`, :man-pages:`udev_list_entry(3)`, :ref:`systemd(1)`
+
+

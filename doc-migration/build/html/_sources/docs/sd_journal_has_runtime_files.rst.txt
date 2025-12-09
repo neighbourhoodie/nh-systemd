@@ -1,0 +1,61 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_journal_has_runtime_files
+:manvolnum: 3
+:summary: Query availability of runtime or persistent journal files
+:aliases: sd_journal_has_persistent_files
+
+.. _sd_journal_has_runtime_files(3):
+
+===============================
+sd_journal_has_runtime_files(3)
+===============================
+
+Name
+####
+
+sd_journal_has_runtime_files, sd_journal_has_persistent_files — Query availability of runtime or persistent journal files
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>` .. code-block::
+
+   int sd_journal_has_runtime_files(sd_journal *j); .. code-block::
+
+   int sd_journal_has_persistent_files(sd_journal *j);
+
+Description
+###########
+
+:code:`sd_journal_has_runtime_files()` returns a positive value if runtime journal files (present in /run/systemd/journal/) have been found. Otherwise, returns 0.
+
+:code:`sd_journal_has_persistent_files()` returns a positive value if persistent journal files (present in /var/log/journal/) have been found. Otherwise, returns 0.
+
+Return value
+############
+
+Both :code:`sd_journal_has_runtime_files()` and :code:`sd_journal_has_persistent_files()` return -EINVAL if their argument is :code:`NULL`.
+
+Notes
+#####
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove strict|
+    :end-before: .. inclusion-end-marker-do-not-remove strict|
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+History
+#######
+
+:code:`sd_journal_has_runtime_files()` and :code:`sd_journal_has_persistent_files()` were added in version 229.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-journal(3)`
+
+

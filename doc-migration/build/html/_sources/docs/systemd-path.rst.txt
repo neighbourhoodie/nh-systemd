@@ -1,0 +1,65 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-path
+:manvolnum: 1
+:summary: List and query system and user paths
+
+.. _systemd-path(1):
+
+===============
+systemd-path(1)
+===============
+
+Name
+####
+
+systemd-path — List and query system and user paths
+
+Synopsis
+########
+
+:code:`systemd-path [OPTIONS...] [NAME...]`
+
+Description
+###########
+
+:code:`systemd-path` may be used to query system and user paths. The tool makes many of the paths described in :man-pages:`file-hierarchy(7)` available for querying.
+
+When invoked without arguments, a list of known paths and their current values is shown. When at least one argument is passed, the path with this name is queried and its value shown. The variables whose name begins with "search-" do not refer to individual paths, but instead to a list of colon-separated search paths, in their order of precedence.
+
+Note that paths which depend on environment variables are computed with :code:`systemd-path`'s invoked environment, and not the system or user manager's environment. As such, the output of :code:`systemd-path` may not reflect the behavior of manager processes.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --suffix=
+
+   Printed paths are suffixed by the specified string.
+
+   .. versionadded:: 215
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`file-hierarchy(7)`
+
+

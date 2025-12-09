@@ -1,0 +1,40 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-localed.service
+:manvolnum: 8
+:summary: Locale bus mechanism
+:aliases: systemd-localed
+
+.. _systemd-localed.service(8):
+
+==========================
+systemd-localed.service(8)
+==========================
+
+Name
+####
+
+systemd-localed.service, systemd-localed — Locale bus mechanism
+
+Synopsis
+########
+
+:code:`systemd-localed.service`
+
+:code:`/usr/lib/systemd/systemd-localed`
+
+Description
+###########
+
+:code:`systemd-localed.service` is a system service that may be used as mechanism to change the system locale settings, as well as the console key mapping and default X11 key mapping. :code:`systemd-localed` is automatically activated on request and terminates itself when it is unused.
+
+The tool :man-pages:`localectl(1)` is a command line client to this service.
+
+See :man-pages:`org.freedesktop.locale1(5)` and :man-pages:`org.freedesktop.LogControl1(5)` for a description of the D-Bus API.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`locale.conf(5)`, :man-pages:`vconsole.conf(5)`, :man-pages:`localectl(1)`, :mankier:`loadkeys(1)`, :man-pages:`org.freedesktop.locale1(5)`
+
+

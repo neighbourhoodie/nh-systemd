@@ -1,0 +1,61 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_verify_type
+:manvolnum: 3
+:summary: Check if the message has specified type at the current location
+
+.. _sd_bus_message_verify_type(3):
+
+=============================
+sd_bus_message_verify_type(3)
+=============================
+
+Name
+####
+
+sd_bus_message_verify_type — Check if the message has specified type at the current location
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_verify_type(sd_bus_message *m,
+	char type,
+	const char* contents);
+
+Description
+###########
+
+:code:`sd_bus_message_verify_type()` checks if the complete type at the current location in the message :code:`m` matches the specified :code:`type` and :code:`contents`. If non-zero, parameter :code:`type` must be one of the types specified in :ref:`sd_bus_message_append(3)`. If non-null, parameter :code:`contents` must be a valid sequence of complete types. If both :code:`type` and :code:`contents` are specified :code:`type` must be a container type.
+
+If :code:`type` is specified, the type in the message must match. If :code:`contents` is specified, the type in the message must be a container type with this signature.
+
+Return Value
+############
+
+On success, this call returns true if the type matches and zero if not (the message :code:`m` contains different data or the end of the message has been reached). On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   :code:`m` or both :code:`type` and :code:`contents` are :code:`NULL`.
+
+   Arguments do not satisfy other constraints listed above.
+
+.. systemd:option:: -EPERM
+
+   Message :code:`m` is not sealed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_append(3)`
+
+

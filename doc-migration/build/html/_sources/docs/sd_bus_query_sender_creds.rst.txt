@@ -1,0 +1,84 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_query_sender_creds
+:manvolnum: 3
+:summary: Query bus message sender credentials/privileges
+:aliases: sd_bus_query_sender_privilege
+
+.. _sd_bus_query_sender_creds(3):
+
+============================
+sd_bus_query_sender_creds(3)
+============================
+
+Name
+####
+
+sd_bus_query_sender_creds, sd_bus_query_sender_privilege — Query bus message sender credentials/privileges
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_query_sender_creds(sd_bus_message *m,
+	uint64_t mask,
+	sd_bus_creds **creds); .. code-block::
+
+   sd_bus_error* sd_bus_query_sender_privilege(sd_bus_message *m,
+	int capability);
+
+Description
+###########
+
+:code:`sd_bus_query_sender_creds()` returns the credentials of the message :code:`m`. The :code:`mask` parameter is a combo of :code:`SD_BUS_CREDS_*` flags that indicate which credential info the caller is interested in. See :ref:`sd_bus_creds_new_from_pid(3)` for a list of possible flags. First, this message checks if the requested credentials are attached to the message itself. If not, but the message contains the pid of the sender and the caller specified the :code:`SD_BUS_CREDS_AUGMENT` flag, this function tries to figure out the missing credentials via other means (starting from the pid). If the PID is not available but the message has a sender, this function calls :ref:`sd_bus_get_name_creds(3)` to get the requested credentials. If the message has no sender (when a direct connection is used), this function calls :ref:`sd_bus_get_owner_creds(3)` to get the requested credentials. On success, the requested credentials are stored in :code:`creds`. Ownership of the credentials object in :code:`creds` is transferred to the caller and should be freed by calling :ref:`sd_bus_creds_unref(3)`.
+
+:code:`sd_bus_query_sender_privilege()` checks if the message :code:`m` has the requested privileges. If :code:`capability` is a non-negative integer, this function checks if the message has the capability with the same value. See :man-pages:`capabilities(7)` for a list of capabilities. If :code:`capability` is a negative integer, this function returns whether the sender of the message runs as the same user as the receiver of the message, or if the sender of the message runs as root and the receiver of the message does not run as root. On success and if the message has the requested privileges, this function returns a positive integer. If the message does not have the requested privileges, this function returns zero.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The message :code:`m` or an output parameter is :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOTCONN
+
+   The bus of :code:`m` is not connected.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ECHILD
+
+   The bus of :code:`m` was created in a different process, library or module instance.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EPERM
+
+   The message :code:`m` is not sealed.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_query_sender_creds()` and :code:`sd_bus_query_sender_privilege()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_creds_new_from_pid(3)`, :ref:`sd_bus_get_name_creds(3)`, :ref:`sd_bus_get_owner_creds(3)`, :ref:`sd_bus_creds_unref(3)`, :man-pages:`capabilities(7)`
+
+

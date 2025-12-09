@@ -1,0 +1,236 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-journal-gatewayd.service
+:manvolnum: 8
+:summary: HTTP server for journal events
+:aliases: systemd-journal-gatewayd.socket, systemd-journal-gatewayd
+
+.. _systemd-journal-gatewayd.service(8):
+
+===================================
+systemd-journal-gatewayd.service(8)
+===================================
+
+Name
+####
+
+systemd-journal-gatewayd.service, systemd-journal-gatewayd.socket, systemd-journal-gatewayd — HTTP server for journal events
+
+Synopsis
+########
+
+:code:`systemd-journal-gatewayd.service`
+
+:code:`systemd-journal-gatewayd.socket`
+
+:code:`/usr/lib/systemd/systemd-journal-gatewayd [OPTIONS...]`
+
+Description
+###########
+
+:code:`systemd-journal-gatewayd` serves journal events over the network. Clients must connect using HTTP. The server listens on port 19531 by default. If :code:`--cert=` is specified, the server expects HTTPS connections.
+
+The program is started by :ref:`systemd(1)` and expects to receive a single socket. Use :code:`systemctl start systemd-journal-gatewayd.socket` to start the service, and :code:`systemctl enable systemd-journal-gatewayd.socket` to have it started on boot.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --cert=
+
+   Specify the path to a file or :code:`AF_UNIX` stream socket to read the server certificate from. The certificate must be in PEM format. This option switches :code:`systemd-journal-gatewayd` into HTTPS mode and must be used together with :code:`--key=`.
+
+   .. versionadded:: 198
+
+.. systemd:option:: --key=
+
+   Specify the path to a file or :code:`AF_UNIX` stream socket to read the secret server key corresponding to the certificate specified with :code:`--cert=` from. The key must be in PEM format.
+
+   .. versionadded:: 198
+
+.. systemd:option:: --trust=
+
+   Specify the path to a file or :code:`AF_UNIX` stream socket to read a CA certificate from. The certificate must be in PEM format.
+
+   .. versionadded:: 236
+
+.. systemd:option:: --system, --user
+
+   Limit served entries to entries from system services and the kernel, or to entries from services of current user. This has the same meaning as :code:`--system` and :code:`--user` options for :man-pages:`journalctl(1)`. If neither is specified, all accessible entries are served.
+
+   .. versionadded:: 249
+
+.. systemd:option:: -m, --merge
+
+   Serve entries interleaved from all available journals, including other machines. This has the same meaning as :code:`--merge` option for :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 249
+
+.. systemd:option:: -D DIR, --directory=DIR
+
+   Takes a directory path as argument. If specified, :code:`systemd-journal-gatewayd` will serve the specified journal directory :emphasis:`DIR` instead of the default runtime and system journal paths.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --file=GLOB
+
+   Takes a file glob as an argument. Serve entries from the specified journal files matching :emphasis:`GLOB` instead of the default runtime and system journal paths. May be specified multiple times, in which case files will be suitably interleaved. This has the same meaning as :code:`--file=` option for :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 249
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Supported URLs
+##############
+
+The following URLs are recognized:
+
+.. systemd:option:: /boots
+
+   Returns json-seq (RFC 7464) response containing JSON objects, each one containing boot number, its ID and the timestamps of the first and last message. Boots are returned starting with the latest boot first and use the same schema as :code:`journalctl --list-boots --output json`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: /browse
+
+   Interactive browsing.
+
+   .. versionadded:: 197
+
+.. systemd:option:: /entries[?option1&option2=value…]
+
+   Retrieval of events in various formats.
+
+   The :code:`Accept:` part of the HTTP header determines the format. Supported values are described below.
+
+   The :code:`Range:` part of the HTTP header determines the range of events returned. Supported values are described below.
+
+   GET parameters can be used to modify what events are returned. Supported parameters are described below.
+
+   .. versionadded:: 197
+
+.. systemd:option:: /machine
+
+   Return a JSON structure describing the machine.
+
+   Example:
+
+     .. code-block:: sh
+
+        { "machine_id" : "8cf7ed9d451ea194b77a9f118f3dc446",
+          "boot_id" : "3d3c9efaf556496a9b04259ee35df7f7",
+          "hostname" : "fedora",
+          "os_pretty_name" : "Fedora 19 (Rawhide)",
+          "virtualization" : "kvm",
+          …}
+
+   .. versionadded:: 197
+
+.. systemd:option:: /fields/FIELD_NAME
+
+   Return a list of values of this field present in the logs.
+
+   .. versionadded:: 197
+
+Accept header
+#############
+
+:code:`Accept: :emphasis:`format``
+
+Recognized formats:
+
+.. systemd:option:: text/plain
+
+   The default. Plaintext syslog-like output, one line per journal entry (like :code:`journalctl --output short`).
+
+   .. versionadded:: 197
+
+.. systemd:option:: application/json
+
+   Entries are formatted as JSON data structures, one per line (like :code:`journalctl --output json`). See `Journal JSON Format <https://systemd.io/JOURNAL_EXPORT_FORMATS#journal-json-format>`_ for more information.
+
+   .. versionadded:: 197
+
+.. systemd:option:: text/event-stream
+
+   Entries are formatted as JSON data structures, wrapped in a format suitable for `Server-Sent Events <https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events>`_ (like :code:`journalctl --output json-sse`).
+
+   .. versionadded:: 229
+
+.. systemd:option:: application/vnd.fdo.journal
+
+   Entries are serialized into a binary (but mostly text-based) stream suitable for backups and network transfer (like :code:`journalctl --output export`). See `Journal Export Format <https://systemd.io/JOURNAL_EXPORT_FORMATS#journal-export-format>`_ for more information.
+
+   .. versionadded:: 197
+
+Range header
+############
+
+:code:`Range: entries=[:emphasis:`cursor`][\[::emphasis:`num_skip`]:[:emphasis:`num_entries`]]`
+
+:code:`Range: realtime=[:emphasis:`since`]:[:emphasis:`until`][\[::emphasis:`num_skip`]::emphasis:`num_entries`]`
+
+where :emphasis:`cursor` is a cursor string, defaults to the first entry, :emphasis:`since` and :emphasis:`until` are timestamps (seconds since 1970-01-01 00:00:00 UTC), :emphasis:`num_skip` is an integer, :emphasis:`num_entries` is an unsigned integer.
+
+Range defaults to all available events.
+
+If :emphasis:`num_skip` is negative and no :emphasis:`cursor` is given, the last entry will be the reference point.
+
+URL GET parameters
+##################
+
+Following parameters can be used as part of the URL:
+
+.. systemd:option:: follow
+
+   wait for new events (like :code:`journalctl --follow`, the number of events returned is not limited, unless :emphasis:`num_entries` is specified in the :emphasis:`Range` header).
+
+   .. versionadded:: 197
+
+.. systemd:option:: discrete
+
+   Test that the specified cursor refers to an entry in the journal. Returns just this entry.
+
+   .. versionadded:: 197
+
+.. systemd:option:: boot
+
+   Limit events to the current boot of the system (like :code:`journalctl -b`).
+
+   .. versionadded:: 197
+
+.. systemd:option:: KEY=match
+
+   Match journal fields. See :ref:`systemd.journal-fields(7)`.
+
+   .. versionadded:: 197
+
+Examples
+########
+
+Retrieve events from this boot from local journal in `Journal Export Format <https://systemd.io/JOURNAL_EXPORT_FORMATS#journal-export-format>`_:
+
+.. code-block:: sh
+
+   curl --silent -H'Accept: application/vnd.fdo.journal' \
+          'http://localhost:19531/entries?boot'
+
+Listen for core dumps:
+
+.. code-block:: sh
+
+   curl 'http://localhost:19531/entries?follow&MESSAGE_ID=fc2e22bc6ee647b6b90729ab34a250b1'
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`journalctl(1)`, :ref:`systemd.journal-fields(7)`, :ref:`systemd-journald.service(8)`, :ref:`systemd-journal-remote.service(8)`, :ref:`systemd-journal-upload.service(8)`
+
+

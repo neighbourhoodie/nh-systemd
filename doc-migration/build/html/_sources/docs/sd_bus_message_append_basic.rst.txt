@@ -1,0 +1,155 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_append_basic
+:manvolnum: 3
+:summary: Attach a single field to a message
+
+.. _sd_bus_message_append_basic(3):
+
+==============================
+sd_bus_message_append_basic(3)
+==============================
+
+Name
+####
+
+sd_bus_message_append_basic — Attach a single field to a message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_append_basic(sd_bus_message *m,
+	char type,
+	const void *p);
+
+Description
+###########
+
+:code:`sd_bus_message_append_basic()` appends a single field to the message :code:`m`. The parameter :code:`type` determines how the pointer :code:`p` is interpreted. :code:`type` must be one of the basic types as defined by the `Basic Types <https://dbus.freedesktop.org/doc/dbus-specification.html#basic-types>`_ section of the D-Bus specification, and listed in the table below.
+
+.. inclusion-marker-do-not-remove format-specifiers|
+
+.. list-table:: Item type specifiers
+   :header-rows: 1
+
+   * - Specifier
+     - Constant
+     - Description
+     - Size
+     - Expected C Type
+   * - "y"
+     - :code:`SD_BUS_TYPE_BYTE`
+     - unsigned integer
+     - 1 byte
+     - uint8_t
+   * - "b"
+     - :code:`SD_BUS_TYPE_BOOLEAN`
+     - boolean
+     - 4 bytes
+     - int
+   * - "n"
+     - :code:`SD_BUS_TYPE_INT16`
+     - signed integer
+     - 2 bytes
+     - int16_t
+   * - "q"
+     - :code:`SD_BUS_TYPE_UINT16`
+     - unsigned integer
+     - 2 bytes
+     - uint16_t
+   * - "i"
+     - :code:`SD_BUS_TYPE_INT32`
+     - signed integer
+     - 4 bytes
+     - int32_t
+   * - "u"
+     - :code:`SD_BUS_TYPE_UINT32`
+     - unsigned integer
+     - 4 bytes
+     - uint32_t
+   * - "x"
+     - :code:`SD_BUS_TYPE_INT64`
+     - signed integer
+     - 8 bytes
+     - int64_t
+   * - "t"
+     - :code:`SD_BUS_TYPE_UINT64`
+     - unsigned integer
+     - 8 bytes
+     - uint64_t
+   * - "d"
+     - :code:`SD_BUS_TYPE_DOUBLE`
+     - floating-point
+     - 8 bytes
+     - double
+   * - "s"
+     - :code:`SD_BUS_TYPE_STRING`
+     - Unicode string
+     - variable
+     - char[]
+   * - "o"
+     - :code:`SD_BUS_TYPE_OBJECT_PATH`
+     - object path
+     - variable
+     - char[]
+   * - "g"
+     - :code:`SD_BUS_TYPE_SIGNATURE`
+     - signature
+     - variable
+     - char[]
+   * - "h"
+     - :code:`SD_BUS_TYPE_UNIX_FD`
+     - UNIX file descriptor
+     - 4 bytes
+     - int
+
+.. inclusion-end-marker-do-not-remove format-specifiers|
+
+The value of the parameter is copied into a memory area held by the message object, stays in the possession of the caller and may hence be freely changed after this call without affecting the bus message it has been added to. If :code:`type` is "h" (UNIX file descriptor), the descriptor is duplicated by this call and the passed descriptor stays in possession of the caller.
+
+For types "s", "o", and "g", the parameter :code:`p` is interpreted as a pointer to a :code:`NUL`-terminated character sequence. As a special case, a :code:`NULL` pointer is interpreted as an empty string. The string should be valid Unicode string encoded as UTF-8. In case of the two latter types, the additional requirements for a D-Bus object path or type signature should be satisfied. Those requirements should be verified by the recipient of the message.
+
+Return Value
+############
+
+On success, this call returns 0 or a positive integer. On failure, it returns a negative errno-style error code.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   Specified parameter is invalid.
+
+.. systemd:option:: -EPERM
+
+   Message has been sealed.
+
+.. systemd:option:: -ESTALE
+
+   Message is in invalid state.
+
+.. systemd:option:: -ENXIO
+
+   Message cannot be appended to.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_read_basic(3)`, :ref:`sd_bus_message_append(3)`, `The D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_
+
+

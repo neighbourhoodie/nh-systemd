@@ -1,0 +1,703 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udevadm
+:manvolnum: 8
+:summary: udev management tool
+
+.. _udevadm(8):
+
+==========
+udevadm(8)
+==========
+
+Name
+####
+
+udevadm — udev management tool
+
+Synopsis
+########
+
+:code:`udevadm [\--debug] [\--version] [\--help]`
+
+:code:`udevadm info [<options>...] [<devpath>...|<syspath>...|<id>...|<unit>...]`
+
+:code:`udevadm trigger [<options>...] [<devpath>...|<syspath>...|<id>...|<unit>...]`
+
+:code:`udevadm settle [<options>...]`
+
+:code:`udevadm control options...`
+
+:code:`udevadm monitor [<options>...]`
+
+:code:`udevadm test [<options>...] devpath|syspath|id|unit`
+
+:code:`udevadm test-builtin [<options>...] command devpath|syspath|id|unit`
+
+:code:`udevadm verify [<options>...] [<files>...]`
+
+:code:`udevadm cat [<options>...] [<files>...]`
+
+:code:`udevadm wait [<options>...] devpath...|syspath...`
+
+:code:`udevadm lock [<options>...] command...`
+
+Description
+###########
+
+:code:`udevadm` expects a command and command specific options. It controls the runtime behavior of :code:`systemd-udevd`, requests kernel events, manages the event queue, and provides simple debugging mechanisms.
+
+Options
+#######
+
+.. systemd:option:: -d, --debug
+
+   Print debug messages to standard error. This option is implied in :code:`udevadm test` and :code:`udevadm test-builtin` commands.
+
+.. systemd:option:: -V, --version
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version-text|
+    :end-before: .. inclusion-end-marker-do-not-remove version-text|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+udevadm info [:emphasis:`options`\…] [:emphasis:`devpath`\|:emphasis:`syspath`\|:emphasis:`id`\|:emphasis:`unit`\…]
+###################################################################################################################
+
+Query the udev database for device information.
+
+Positional arguments should be used to specify one or more devices. Each one may be a device name (in which case it must start with :code:`/dev/`), a sys path (in which case it must start with :code:`/sys/`), a device ID (such as "n1", "c5:1", or "b259:1", see :ref:`sd_device_get_device_id(3)`). or a systemd device unit name (in which case it must end with ".device", see :ref:`systemd.device(5)`).
+
+.. systemd:option:: -q, --query=TYPE
+
+   Query the database for the specified type of device data. Valid :emphasis:`TYPE`\s are: :code:`name`, :code:`symlink`, :code:`path`, :code:`property`, :code:`all`.
+
+.. systemd:option:: --property=NAME
+
+   When showing device properties using the :code:`--query=property` option, limit display to properties specified in the argument. The argument should be a comma-separated list of property names. If not specified, all known properties are shown.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --value
+
+   When showing device properties using the :code:`--query=property` option, print only their values, and skip the property name and "=".
+
+   Cannot be used together with :code:`-x/--export` or :code:`-P/--export-prefix`.
+
+   .. versionadded:: 250
+
+.. systemd:option:: -p, --path=DEVPATH
+
+   The :code:`/sys/` path of the device to query, e.g. :code:`[/sys/]/class/block/sda`. This option is an alternative to the positional argument with a :code:`/sys/` prefix. :code:`udevadm info --path=/class/block/sda` is equivalent to :code:`udevadm info /sys/class/block/sda`.
+
+.. systemd:option:: -n, --name=FILE
+
+   The name of the device node or a symlink to query, e.g. :code:`[/dev/]/sda`. This option is an alternative to the positional argument with a :code:`/dev/` prefix. :code:`udevadm info --name=sda` is equivalent to :code:`udevadm info /dev/sda`.
+
+.. systemd:option:: -r, --root
+
+   Print absolute paths in :code:`name` or :code:`symlink` query.
+
+.. systemd:option:: -a, --attribute-walk
+
+   Print all sysfs properties of the specified device that can be used in udev rules to match the specified device. It prints all devices along the chain, up to the root of sysfs that can be used in udev rules.
+
+   This switch supports JSON output mode (see :code:`--json=` below). Note that because this switch generates multiple JSON objects, JSON-SEQ mode is automatically enabled (RFC7464). (Note: tools such as `jq <https://jqlang.github.io/jq/manual/>`_ natively support JSON-SEQ via the :code:`--seq` switch.)
+
+.. systemd:option:: -t, --tree
+
+   Display a sysfs tree. This recursively iterates through the sysfs hierarchy and displays it in a tree structure. If a path is specified only the subtree below and its parent directories are shown. This will show both device and subsystem items.
+
+   .. versionadded:: 251
+
+.. systemd:option:: -x, --export
+
+   Print output as key/value pairs. Values are enclosed in single quotes. This takes effects only when :code:`--query=property` or :code:`--device-id-of-file=:emphasis:`FILE`` is specified.
+
+.. systemd:option:: -P, --export-prefix=NAME
+
+   Add a prefix to the key name of exported values. This implies :code:`--export`.
+
+.. systemd:option:: -d, --device-id-of-file=FILE
+
+   Print major/minor numbers of the underlying device, where the file lives on. If this is specified, all positional arguments are ignored.
+
+.. systemd:option:: -e, --export-db
+
+   Export the content of the udev database.
+
+.. systemd:option:: -c, --cleanup-db
+
+   Cleanup the udev database.
+
+.. systemd:option:: -w[SECONDS], --wait-for-initialization[=SECONDS]
+
+   Wait for device to be initialized. If argument :emphasis:`SECONDS` is not specified, the default is to wait forever.
+
+   .. versionadded:: 243
+
+.. systemd:option:: --subsystem-match[=SUBSYSTEM], --subsystem-nomatch[=SUBSYSTEM]
+
+   When used with :code:`--export-db`, only show devices of or not of the given subsystem respectively.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --attr-match[=FILE[=VALUE]], --attr-nomatch[=FILE[=VALUE]]
+
+   When used with :code:`--export-db`, only show devices matching or not matching the given attribute respectively.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --property-match[=KEY=VALUE]
+
+   When used with :code:`--export-db`, only show devices matching the given property and value.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --tag-match[=TAG]
+
+   When used with :code:`--export-db`, only show devices with the given tag.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --sysname-match[=NAME]
+
+   When used with :code:`--export-db`, only show devices with the given "/sys" path.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --name-match[=NAME]
+
+   When used with :code:`--export-db`, only show devices with the given name in "/dev".
+
+   .. versionadded:: 255
+
+.. systemd:option:: --parent-match[=NAME]
+
+   When used with :code:`--export-db`, only show devices with the given parent device.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --initialized-match, --initialized-nomatch
+
+   When used with :code:`--export-db`, only show devices that are initialized or not initialized respectively.
+
+   .. versionadded:: 255
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+The generated output shows the current device database entry in a terse format. Each line shown is prefixed with one of the following characters:
+
+.. list-table:: :code:`udevadm info` output prefixes
+   :header-rows: 1
+
+   * - Prefix
+     - Meaning
+   * - "P:"
+     - Device path in :code:`/sys/`
+   * - "M:"
+     - Device name in :code:`/sys/` (i.e. the last component of "P:")
+   * - "R:"
+     - Device number in :code:`/sys/` (i.e. the numeric suffix of the last component of "P:")
+   * - "J:"
+     - Device ID
+   * - "U:"
+     - Kernel subsystem
+   * - "B:"
+     - Driver subsystem
+   * - "T:"
+     - Kernel device type within subsystem
+   * - "D:"
+     - Kernel device node major/minor
+   * - "I:"
+     - Network interface index
+   * - "N:"
+     - Kernel device node name
+   * - "L:"
+     - Device node symlink priority
+   * - "S:"
+     - Device node symlink
+   * - "Q:"
+     - Block device sequence number (DISKSEQ)
+   * - "V:"
+     - Attached driver
+   * - "E:"
+     - Device property
+
+udevadm trigger [:emphasis:`options`\…] [:emphasis:`devpath`\|:emphasis:`syspath`\|:emphasis:`id`\|:emphasis:`unit`\…]
+######################################################################################################################
+
+Request device events from the kernel. Primarily used to replay events at system coldplug time.
+
+Takes device specifications as positional arguments. See the description of :code:`udevadm info` above.
+
+.. systemd:option:: -v, --verbose
+
+   Print the list of devices which will be triggered.
+
+.. systemd:option:: -n, --dry-run
+
+   Do not actually trigger the event.
+
+.. systemd:option:: -q, --quiet
+
+   Suppress error logging in triggering events.
+
+   .. versionadded:: 248
+
+.. systemd:option:: -t, --type=TYPE
+
+   Trigger a specific type of devices. Valid types are "all", "devices", and "subsystems". The default value is "devices".
+
+.. systemd:option:: -c, --action=ACTION
+
+   Type of event to be triggered. Possible actions are "add", "remove", "change", "move", "online", "offline", "bind", and "unbind". Also, the special value "help" can be used to list the possible actions. The default value is "change".
+
+.. systemd:option:: --prioritized-subsystem=SUBSYSTEM[,SUBSYSTEM…]
+
+   Takes a comma separated list of subsystems. When triggering events for devices, the devices from the specified subsystems and their parents are triggered first. For example, if :code:`--prioritized-subsystem=block,net`, then firstly all block devices and their parents are triggered, in the next all network devices and their parents are triggered, and lastly the other devices are triggered. This option can be specified multiple times, and in that case the lists of the subsystems will be merged. That is, :code:`--prioritized-subsystem=block --prioritized-subsystem=net` is equivalent to :code:`--prioritized-subsystem=block,net`.
+
+   .. versionadded:: 251
+
+.. systemd:option:: -s, --subsystem-match=SUBSYSTEM
+
+   Trigger events for devices which belong to a matching subsystem. This option supports shell style pattern matching. When this option is specified more than once, then each matching result is ORed, that is, all the devices in each subsystem are triggered.
+
+.. systemd:option:: -S, --subsystem-nomatch=SUBSYSTEM
+
+   Do not trigger events for devices which belong to a matching subsystem. This option supports shell style pattern matching. When this option is specified more than once, then each matching result is ANDed, that is, devices which do not match all specified subsystems are triggered.
+
+.. systemd:option:: -a, --attr-match=ATTRIBUTE=VALUE
+
+   Trigger events for devices with a matching sysfs attribute. If a value is specified along with the attribute name, the content of the attribute is matched against the given value using shell style pattern matching. If no value is specified, the existence of the sysfs attribute is checked. When this option is specified multiple times, then each matching result is ANDed, that is, only devices which have all specified attributes are triggered.
+
+.. systemd:option:: -A, --attr-nomatch=ATTRIBUTE=VALUE
+
+   Do not trigger events for devices with a matching sysfs attribute. If a value is specified along with the attribute name, the content of the attribute is matched against the given value using shell style pattern matching. If no value is specified, the existence of the sysfs attribute is checked. When this option is specified multiple times, then each matching result is ANDed, that is, only devices which have none of the specified attributes are triggered.
+
+.. systemd:option:: -p, --property-match=PROPERTY=VALUE
+
+   Trigger events for devices with a matching property value. This option supports shell style pattern matching. When this option is specified more than once, then each matching result is ORed, that is, devices which have one of the specified properties are triggered.
+
+.. systemd:option:: -g, --tag-match=TAG
+
+   Trigger events for devices with a matching tag. When this option is specified multiple times, then each matching result is ANDed, that is, devices which have all specified tags are triggered.
+
+.. systemd:option:: -y, --sysname-match=NAME
+
+   Trigger events for devices for which the last component (i.e. the filename) of the :code:`/sys/` path matches the specified :emphasis:`PATH`. This option supports shell style pattern matching. When this option is specified more than once, then each matching result is ORed, that is, all devices which have any of the specified :emphasis:`NAME` are triggered.
+
+.. systemd:option:: --name-match=NAME
+
+   Trigger events for devices with a matching device path. When this option is specified more than once, then each matching result is ORed, that is, all specified devices are triggered.
+
+   .. versionadded:: 218
+
+.. systemd:option:: -b, --parent-match=SYSPATH
+
+   Trigger events for all children of a given device. When this option is specified more than once, then each matching result is ORed, that is, all children of each specified device are triggered.
+
+.. systemd:option:: --initialized-match, --initialized-nomatch
+
+   When :code:`--initialized-match` is specified, trigger events for devices that are already initialized by :code:`systemd-udevd`, and skip devices that are not initialized yet.
+
+   When :code:`--initialized-nomatch` is specified, trigger events for devices that are not initialized by :code:`systemd-udevd` yet, and skip devices that are already initialized.
+
+   Typically, it is essential that applications which intend to use such a match, make sure a suitable udev rule is installed that sets at least one property on devices that shall be matched. See also Initialized Devices section below for more details.
+
+   .. warning::
+
+       :code:`--initialized-nomatch` can potentially save a significant amount of time compared to re-triggering all devices in the system and e.g. can be used to optimize boot time. However, this is not safe to be used in a boot sequence in general. Especially, when udev rules for a device depend on its parent devices (e.g. "ATTRS" or "IMPORT{parent}" keys, see :man-pages:`udev(7)` for more details), the final state of the device becomes easily unstable with this option.
+
+   .. versionadded:: 251
+
+.. systemd:option:: --include-parents
+
+   Trigger parent devices of found devices even if the parents will not match the filter condition. This is useful if we are interested to limit the coldplug activities to some devices or subsystems.
+
+   .. versionadded:: 258
+
+.. systemd:option:: -w, --settle
+
+   Apart from triggering events, also waits for those events to finish. Note that this is different from calling :code:`udevadm settle`. :code:`udevadm settle` waits for all events to finish. This option only waits for events triggered by the same command to finish.
+
+   .. versionadded:: 238
+
+.. systemd:option:: --uuid
+
+   Trigger the synthetic device events, and associate a randomized UUID with each. These UUIDs are printed to standard output, one line for each event. These UUIDs are included in the uevent environment block (in the "SYNTH_UUID=" property) and may be used to track delivery of the generated events.
+
+   .. versionadded:: 249
+
+.. systemd:option:: --wait-daemon[=SECONDS]
+
+   Before triggering uevents, wait for systemd-udevd daemon to be initialized. Optionally takes timeout value. Default timeout is 5 seconds. This is equivalent to invoking :code:`udevadm control --ping` before :code:`udevadm trigger`.
+
+   .. versionadded:: 241
+
+In addition, optional positional arguments can be used to specify device names or sys paths. They must start with :code:`/dev/` or :code:`/sys/` respectively.
+
+udevadm settle [:emphasis:`options`\…]
+######################################
+
+Watches the udev event queue, and exits if all current events are handled.
+
+.. systemd:option:: -t, --timeout=SECONDS
+
+   Maximum number of seconds to wait for the event queue to become empty. The default value is 120 seconds. A value of 0 will check if the queue is empty and always return immediately. A non-zero value will return an exit code of 0 if queue became empty before timeout was reached, non-zero otherwise.
+
+.. systemd:option:: -E, --exit-if-exists=FILE
+
+   Stop waiting if file exists.
+
+See :ref:`systemd-udev-settle.service(8)` for more information.
+
+udevadm control :emphasis:`options`\…
+#####################################
+
+Modify the internal state of the running udev daemon.
+
+.. systemd:option:: -e, --exit
+
+   Signal and wait for systemd-udevd to exit. No option except for :code:`--timeout` can be specified after this option. Note that :code:`systemd-udevd.service` contains :code:`Restart=always` and so as a result, this option restarts systemd-udevd. If you want to stop :code:`systemd-udevd.service`, please use the following:
+
+     .. code-block:: sh
+
+        systemctl stop systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd-varlink.socket systemd-udevd.service
+
+.. systemd:option:: -l, --log-level=value
+
+   Set the internal log level of :code:`systemd-udevd`. Valid values are the numerical syslog priorities or their textual representations: :code:`emerg`, :code:`alert`, :code:`crit`, :code:`err`, :code:`warning`, :code:`notice`, :code:`info`, and :code:`debug`.
+
+.. systemd:option:: -s, --stop-exec-queue
+
+   Signal systemd-udevd to stop executing new events. Incoming events will be queued.
+
+.. systemd:option:: -S, --start-exec-queue
+
+   Signal systemd-udevd to enable the execution of events.
+
+.. systemd:option:: -R, --reload
+
+   Signal systemd-udevd to reload the rules files and other databases like the kernel module index. Reloading rules and databases does not apply any changes to already existing devices; the new configuration will only be applied to new events.
+
+.. systemd:option:: -p, --property=KEY=value
+
+   Set a global property for all events.
+
+.. systemd:option:: -m, --children-max=value
+
+   Set the maximum number of events, systemd-udevd will handle at the same time. When 0 is specified, then the maximum is determined based on the system resources.
+
+.. systemd:option:: --ping
+
+   Send a ping message to systemd-udevd and wait for the reply. This may be useful to check that systemd-udevd daemon is running.
+
+   .. versionadded:: 241
+
+.. systemd:option:: --trace=BOOL
+
+   Enable/disable trace logging in :code:`systemd-udevd`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --revert
+
+   Revert settings previously set with :code:`udevadm control` command. When specified, settings set with :code:`-l/--log-level=`, :code:`--trace`, :code:`-m/--children-max=`, and :code:`-p/--property=` will be cleared.
+
+   .. versionadded:: 258
+
+.. systemd:option:: -t, --timeout=seconds
+
+   The maximum number of seconds to wait for a reply from systemd-udevd.
+
+.. systemd:option:: --load-credentials
+
+   When specified, the following credentials are used when passed in:
+
+   .. systemd:option:: udev.conf.*
+
+         These credentials should contain valid :man-pages:`udev.conf(5)` configuration data. From each matching credential a separate file is created. Example: a passed credential :code:`udev.conf.50-foobar` will be copied into a configuration file :code:`/run/udev/udev.conf.d/50-foobar.conf`.
+
+         .. versionadded:: 256
+
+   .. systemd:option:: udev.rules.*
+
+         These credentials should contain valid :man-pages:`udev(7)` rules. From each matching credential a separate file is created. Example: a passed credential :code:`udev.rules.50-foobar` will be copied into a configuration file :code:`/run/udev/rules.d/50-foobar.rules`.
+
+         .. versionadded:: 256
+
+   Note, this *does not* imply imply :code:`--reload` option. So, if :code:`systemd-udevd` is already running, please consider to also specify :code:`-reload` to make the copied udev rules files used by :code:`systemd-udevd`.
+
+   .. versionadded:: 256
+
+udevadm monitor [:emphasis:`options`\…]
+#######################################
+
+Listens to the kernel uevents and events sent out by a udev rule and prints the devpath of the event to the console. It can be used to analyze the event timing, by comparing the timestamps of the kernel uevent and the udev event.
+
+.. systemd:option:: -k, --kernel
+
+   Print the kernel uevents.
+
+.. systemd:option:: -u, --udev
+
+   Print the udev event after the rule processing.
+
+.. systemd:option:: -p, --property
+
+   Also print the properties of the event.
+
+.. systemd:option:: -s, --subsystem-match=string[/string]
+
+   Filter kernel uevents and udev events by subsystem[/devtype]. Only events with a matching subsystem value will pass. When this option is specified more than once, then each matching result is ORed, that is, all devices in the specified subsystems are monitored.
+
+.. systemd:option:: -t, --tag-match=string
+
+   Filter udev events by tag. Only udev events with a given tag attached will pass. When this option is specified more than once, then each matching result is ORed, that is, devices which have one of the specified tags are monitored.
+
+udevadm test [:emphasis:`options`\…] :emphasis:`devpath`\|:emphasis:`syspath`\|:emphasis:`id`\|:emphasis:`unit`
+###############################################################################################################
+
+Simulate a udev event run for the given device, and print debug output. The option :code:`--json=` may be useful for parsing the final result. See also Example section.
+
+.. systemd:option:: -a, --action=ACTION
+
+   Type of event to be simulated. Possible actions are "add", "remove", "change", "move", "online", "offline", "bind", and "unbind". Also, the special value "help" can be used to list the possible actions. The default value is "add".
+
+.. systemd:option:: -N, --resolve-names=early|late|never
+
+   Specify when :code:`udevadm` should resolve names of users and groups specified in udev rules. When set to :code:`early` (the default), names will be resolved when the rules are parsed. When set to :code:`late`, names will be resolved during the event being processed. When set to :code:`never`, names will never be resolved and relevant udev rules will be ignored.
+
+   .. versionadded:: 209
+
+.. systemd:option:: -D DIR, --extra-rules-dir=DIR
+
+   Also load udev rules files from the specified directory. This option can be specified multiple times. It may be useful for debugging udev rules by copying some udev rules files to a temporary directory, editing them, and specifying the directory with this option. Files found in the specified directories have a higher priority than rules files in the default :code:`udev/rules.d` directories used by :code:`systemd-udevd`. See :man-pages:`udev(7)` for more details about the search paths.
+
+   .. versionadded:: 258
+
+.. systemd:option:: -v, --verbose
+
+   Shows verbose logs in processing udev rules.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+udevadm test-builtin [:emphasis:`options`\…] :emphasis:`command` :emphasis:`devpath`\|:emphasis:`file`\|:emphasis:`unit`
+########################################################################################################################
+
+Run a built-in command :emphasis:`COMMAND` for device :emphasis:`DEVPATH`, and print debug output.
+
+.. systemd:option:: -a, --action=ACTION
+
+   Type of event to be simulated. Possible actions are "add", "remove", "change", "move", "online", "offline", "bind", and "unbind". Also, the special value "help" can be used to list the possible actions. The default value is "add".
+
+   .. versionadded:: 250
+
+udevadm verify [:emphasis:`options`\…] [:emphasis:`files`\…]
+############################################################
+
+Verify syntactic, semantic, and stylistic correctness of udev rules files.
+
+Positional arguments can be used to specify one or more files to check. Each argument must be an absolute path to a udev rules file or a directory that contains rules files, or a file name of udev rules file (e.g. :code:`99-systemd.rules`). If a file name is specified, the file will be searched in the :code:`udev/rules.d` directories that are processed by :code:`systemd-udevd`, and searched in the current working directory if not found. If no files are specified, the udev rules are read from the files located in the same :code:`udev/rules.d` directories that are processed by :code:`systemd-udevd`. See :man-pages:`udev(7)` for more details about the search paths.
+
+The exit status is :code:`0` if all specified udev rules files are syntactically, semantically, and stylistically correct, and a non-zero error code otherwise.
+
+.. systemd:option:: -N, --resolve-names=early|late|never
+
+   Specify when :code:`udevadm` should resolve names of users and groups specified in udev rules. When set to :code:`early` (the default), names will be resolved when the rules are parsed. When set to :code:`late`, names will not be verified, as :code:`systemd-udevd` resolves names during each event being processed. When set to :code:`never`, names will never be resolved and relevant rules will be ignored.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --root=PATH
+
+   When looking for udev rules files located in the :code:`udev/rules.d` directories, operate on files underneath the specified root path :emphasis:`PATH`. When a file name is specified, and it is not found in the :code:`udev/rules.d` directories, the file will be searched in the specified root path :emphasis:`PATH`, rather than the current working directory.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --no-summary
+
+   Do not show summary.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --no-style
+
+   Ignore style issues. When specified, even if style issues are found in udev rules files, the exit status is :code:`0` if no syntactic or semantic errors are found.
+
+   .. versionadded:: 254
+
+udevadm cat [:emphasis:`options`\…] [:emphasis:`file`\…]
+########################################################
+
+Show udev rules files or udev.conf.
+
+Positional arguments can be used to specify one or more files to show. Each argument must be an absolute path to a udev rules file or a directory that contains rules files, or a file name of udev rules file (e.g. :code:`99-systemd.rules`). If a file name is specified, the file will be searched in the :code:`udev/rules.d` directories that are processed by :code:`systemd-udevd`, and searched in the current working directory if not found. If no files are specified, the udev rules are read from the files located in the same :code:`udev/rules.d` directories that are processed by :code:`systemd-udevd`. See :man-pages:`udev(7)` for more details about the search paths.
+
+.. systemd:option:: --root=PATH
+
+   When looking for udev rules files located in the :code:`udev/rules.d` directories, operate on files underneath the specified root path :emphasis:`PATH`. When a file name is specified, and it is not found in the :code:`udev/rules.d` directories, the file will be searched in the specified root path :emphasis:`PATH`, rather than the current working directory.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --tldr
+
+   Only print the "interesting" parts of the configuration files, skipping comments and empty lines and section headers followed only by comments and empty lines.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --config
+
+   Shows :man-pages:`udev.conf(5)` files, rather than udev rules files. When specified, no udev rules file cannot be specified.
+
+   .. versionadded:: 258
+
+udevadm wait [:emphasis:`options`\…] :emphasis:`devpath|syspath`\…
+##################################################################
+
+Wait for devices or device symlinks being created and initialized by :code:`systemd-udevd`. Each device path must start with "/dev/" or "/sys/", e.g. "/dev/sda", "/dev/disk/by-path/pci-0000:3c:00.0-nvme-1-part1", "/sys/devices/pci0000:00/0000:00:1f.6/net/eth0", or "/sys/class/net/eth0". This can take multiple devices. This may be useful for waiting for devices being processed by :code:`systemd-udevd` after e.g. partitioning or formatting the devices.
+
+.. systemd:option:: -t, --timeout=SECONDS
+
+   Maximum number of seconds to wait for the specified devices or device symlinks being created, initialized, or removed. The default value is "infinity".
+
+   .. versionadded:: 251
+
+.. systemd:option:: --initialized=BOOL
+
+   Check if :code:`systemd-udevd` initialized devices. Defaults to true. When false, the command only checks if the specified devices exist. Set false to this setting if there is no udev rules for the specified devices, as the devices will never be considered as initialized in that case. See Initialized Devices section below for more details.
+
+   .. versionadded:: 251
+
+.. systemd:option:: --removed
+
+   When specified, the command wait for devices being removed instead of created or initialized. If this is specified, :code:`--initialized=` will be ignored.
+
+   .. versionadded:: 251
+
+.. systemd:option:: --settle
+
+   When specified, also watches the udev event queue, and wait for all queued events being processed by :code:`systemd-udevd`.
+
+   .. versionadded:: 251
+
+udevadm lock [:emphasis:`options`\…] :emphasis:`command`\…
+##########################################################
+
+:code:`udevadm lock` takes an (advisory) exclusive lock on a block device (or all specified devices), as per `Locking Block Device Access <https://systemd.io/BLOCK_DEVICE_LOCKING>`_ and invokes a program with the locks taken. When the invoked program exits the locks are automatically released and its return value is propagated as exit code of :code:`udevadm lock`.
+
+This tool is in particular useful to ensure that :ref:`systemd-udevd.service(8)` does not probe a block device while changes are made to it, for example partitions created or file systems formatted. Note that many tools that interface with block devices natively support taking relevant locks, see for example :man-pages:`sfdisk(8)`'s :code:`--lock` switch.
+
+The command expects at least one block device specified via :code:`--device=` or :code:`--backing=`, and a command line to execute as arguments.
+
+.. systemd:option:: --device=DEVICE, -d DEVICE
+
+   Takes a path to a device node of the device to lock. This switch may be used multiple times (and in combination with :code:`--backing=`) in order to lock multiple devices. If a partition block device node is specified the containing "whole" block device is automatically determined and used for the lock, as per the specification. If multiple devices are specified, they are deduplicated, sorted by the major/minor of their device nodes and then locked in order.
+
+   This switch must be used at least once, to specify at least one device to lock. (Alternatively, use :code:`--backing=`, see below.)
+
+   .. versionadded:: 251
+
+.. systemd:option:: --backing=PATH, -b PATH
+
+   If a path to a device node is specified, identical to :code:`--device=`. However, this switch alternatively accepts a path to a regular file or directory, in which case the block device of the file system the file/directory resides on is automatically determined and used as if it was specified with :code:`--device=`.
+
+   .. versionadded:: 251
+
+.. systemd:option:: --timeout=SECS, -t SECS
+
+   Specifies how long to wait at most until all locks can be taken. Takes a value in seconds, or in the usual supported time units, see :ref:`systemd.time(7)`. If specified as zero the lock is attempted and if not successful the invocation will immediately fail. If passed as "infinity" (the default) the invocation will wait indefinitely until the lock can be acquired. If the lock cannot be taken in the specified time the specified command will not be executed and the invocation will fail.
+
+   .. versionadded:: 251
+
+.. systemd:option:: --print, -p
+
+   Instead of locking the specified devices and executing a command, just print the device paths that would be locked, and execute no command. This command is useful to determine the "whole" block device in case a partition block device is specified. The devices will be sorted by their device node major number as primary ordering key and the minor number as secondary ordering key (i.e. they are shown in the order they'd be locked). Note that the number of lines printed here can be less than the number of :code:`--device=` and :code:`--backing=` switches specified in case these resolve to the same "whole" devices.
+
+   .. versionadded:: 251
+
+Initialized Devices
+###################
+
+Initialized devices are those for which at least one udev rule already completed execution – for any action but "remove" — that set a property or other device setting (and thus has an entry in the udev device database). Devices are no longer considered initialized if a "remove" action is seen for them (which removes their entry in the udev device database). Note that devices that have no udev rules are never considered initialized, but might still be announced via the sd-device API (or similar).
+
+Example
+#######
+
+Format a File System
+--------------------
+
+Take a lock on the backing block device while creating a file system, to ensure that :code:`systemd-udevd` does not probe or announce the new superblock before it is comprehensively written:
+
+.. code-block:: sh
+
+   # udevadm lock --device=/dev/sda1 mkfs.ext4 /dev/sda1
+
+Format a RAID File System
+-------------------------
+
+Similar, but take locks on multiple devices at once:
+
+.. code-block:: sh
+
+   # udevadm lock --device=/dev/sda1 --device=/dev/sdb1 mkfs.btrfs /dev/sda1 /dev/sdb1
+
+Copy in a File System
+---------------------
+
+Take a lock on the backing block device while copying in a prepared file system image, to ensure that :code:`systemd-udevd` does not probe or announce the new superblock before it is fully written:
+
+.. code-block:: sh
+
+   # udevadm lock -d /dev/sda1 dd if=fs.raw of=/dev/sda1
+
+Predict Network Interface Renaming
+----------------------------------
+
+To predict a network interface name, :code:`udevadm test` can be used:
+
+.. code-block:: sh
+
+   $ udevadm test /sys/class/net/wlan0 --json=pretty 2>/dev/null | jq .networkInterface.name
+   "wlp59s0"
+
+Predict Symbolic links of a Device Node
+---------------------------------------
+
+To predict symbolic links to a device node, :code:`udevadm test` can be used:
+
+.. code-block:: sh
+
+   $ udevadm test /dev/nvme0n1p1 --json=pretty 2>/dev/null | jq .node.symlinks
+   [
+     "/dev/disk/by-diskseq/1-part1",
+     "/dev/disk/by-id/nvme-WDC_PC_SN720_SDAQNTW-512G-1001_192290802247-part1",
+     "/dev/disk/by-id/nvme-WDC_PC_SN720_SDAQNTW-512G-1001_192290802247_1-part1",
+     "/dev/disk/by-id/nvme-eui.1922908022470001001b448b44ccb9d6-part1",
+     "/dev/disk/by-path/pci-0000:3c:00.0-nvme-1-part/by-partnum/1",
+     "/dev/disk/by-path/pci-0000:3c:00.0-nvme-1-part1"
+   ]
+   $ udevadm test /dev/input/event3 --json=pretty 2>/dev/null | jq .node.symlinks
+   [
+     "/dev/input/by-path/platform-i8042-serio-0-event-kbd"
+   ]
+
+See Also
+########
+
+:man-pages:`udev(7)`, :ref:`systemd-udevd.service(8)`, :man-pages:`udev.conf(5)`
+
+

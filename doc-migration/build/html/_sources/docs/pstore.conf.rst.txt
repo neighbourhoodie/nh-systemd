@@ -1,0 +1,74 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: pstore.conf
+:manvolnum: 5
+:summary: PStore configuration file
+:aliases: pstore.conf.d
+
+.. _pstore.conf(5):
+
+==============
+pstore.conf(5)
+==============
+
+Name
+####
+
+pstore.conf, pstore.conf.d — PStore configuration file
+
+Synopsis
+########
+
+| :code:`/etc/systemd/pstore.conf`
+| :code:`/run/systemd/pstore.conf`
+| :code:`/usr/local/lib/systemd/pstore.conf`
+| :code:`/usr/lib/systemd/pstore.conf`
+| :code:`/etc/systemd/pstore.conf.d/\*.conf`
+| :code:`/run/systemd/pstore.conf.d/\*.conf`
+| :code:`/usr/local/lib/systemd/pstore.conf.d/\*.conf`
+| :code:`/usr/lib/systemd/pstore.conf.d/\*.conf`
+
+Description
+###########
+
+This file configures the behavior of :ref:`systemd-pstore(8)`, a tool for archiving the contents of the persistent storage filesystem, `pstore <https://docs.kernel.org/admin-guide/abi-testing.html#abi-sys-fs-pstore>`_.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+All options are configured in the \[PStore] section:
+
+.. systemd:option:: Storage=
+   :group: config-directives
+
+   Controls where to archive (i.e. copy) files from the pstore filesystem. One of "none", "external", and "journal". When "none", the tool exits without processing files in the pstore filesystem. When "external" (the default), files are archived into :code:`/var/lib/systemd/pstore/`, and logged into the journal. When "journal", pstore file contents are logged only in the journal.
+
+   .. versionadded:: 243
+
+.. systemd:option:: Unlink=
+   :group: config-directives
+
+   Controls whether or not files are removed from pstore after processing. Takes a boolean value. When true, a pstore file is removed from the pstore once it has been archived (either to disk or into the journal). When false, processing of pstore files occurs normally, but the files remain in the pstore. The default is true in order to maintain the pstore in a nearly empty state, so that the pstore has storage available for the next kernel error event.
+
+   .. versionadded:: 243
+
+Use
+
+.. code-block:: sh
+
+   systemd-analyze cat-config systemd/pstore.conf
+
+to display the full config.
+
+See Also
+########
+
+:ref:`systemd-pstore.service(8)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

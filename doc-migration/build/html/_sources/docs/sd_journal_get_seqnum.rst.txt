@@ -1,0 +1,68 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_journal_get_seqnum
+:manvolnum: 3
+:summary: Read sequence number from the current journal entry
+
+.. _sd_journal_get_seqnum(3):
+
+========================
+sd_journal_get_seqnum(3)
+========================
+
+Name
+####
+
+sd_journal_get_seqnum — Read sequence number from the current journal entry
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>` .. code-block::
+
+   int sd_journal_get_seqnum(sd_journal *j,
+	uint64_t *ret_seqnum,
+	sd_id128_t *ret_seqnum_id);
+
+Description
+###########
+
+:code:`sd_journal_get_seqnum()` returns the sequence number of the current journal entry. It takes three arguments: the journal context object, a pointer to a 64-bit unsigned integer to store the sequence number in, and a buffer to return the 128-bit sequence number ID in.
+
+When writing journal entries to disk each :code:`systemd-journald` instance will number them sequentially, starting from 1 for the first entry written after subsystem initialization. Each such series of sequence numbers is associated with a 128-bit sequence number ID which is initialized randomly, once at :code:`systemd-journal` initialization. Thus, while multiple instances of :code:`systemd-journald` will assign the same sequence numbers to their written journal entries, they will have a distinct sequence number IDs. The sequence number is assigned at the moment of writing the entry to disk. If log entries are rewritten (for example because the volatile logs from :code:`/run/log/` are flushed to :code:`/var/log/` via :code:`systemd-journald-flush.service`) they will get new sequence numbers assigned.
+
+Sequence numbers may be used to order entries (entries associated with the same sequence number ID and lower sequence numbers should be ordered chronologically before those with higher sequence numbers), and to detect lost entries. Note that journal service instances typically write to multiple journal files in parallel (for example because :code:`SplitMode=` is used), in which case each journal file will only contain a subset of the sequence numbers. To recover the full stream of journal entries the files must be combined ("interleaved"), a process that primarily relies on the sequence numbers. When journal files are rotated (due to size or time limits), the series of sequence numbers is continued in the replacement files. All journal files generated from the same journal instance will carry the same sequence number ID.
+
+As the sequence numbers are assigned at the moment of writing the journal entries to disk they do not exist if storage is disabled via :code:`SplitMode=`.
+
+The :code:`ret_seqnum` and :code:`ret_seqnum_id` parameters may be specified as :code:`NULL` in which case the relevant data is not returned (but the call will otherwise succeed).
+
+Note that these functions will not work before :ref:`sd_journal_next(3)` (or related call) has been called at least once, in order to position the read pointer at a valid entry.
+
+Return Value
+############
+
+:code:`sd_journal_get_seqnum()` returns 0 on success or a negative errno-style error code..
+
+Notes
+#####
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove strict|
+    :end-before: .. inclusion-end-marker-do-not-remove strict|
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+History
+#######
+
+:code:`sd_journal_get_seqnum()` was added in version 254.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-journal(3)`, :ref:`sd_journal_open(3)`, :ref:`sd_journal_next(3)`, :ref:`sd_journal_get_data(3)`, :ref:`sd_journal_get_monotonic_usec(3)`
+
+

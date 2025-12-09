@@ -1,0 +1,62 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_slot_get_bus
+:manvolnum: 3
+:summary: Query information attached to a bus slot object
+:aliases: sd_bus_slot_get_current_handler, sd_bus_slot_get_current_message, sd_bus_slot_get_current_userdata
+
+.. _sd_bus_slot_get_bus(3):
+
+======================
+sd_bus_slot_get_bus(3)
+======================
+
+Name
+####
+
+sd_bus_slot_get_bus, sd_bus_slot_get_current_handler, sd_bus_slot_get_current_message, sd_bus_slot_get_current_userdata — Query information attached to a bus slot object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. include:: sd_bus_add_match.rst
+    :start-after: .. inclusion-marker-do-not-remove sd_bus_message_handler_t|
+    :end-before: .. inclusion-end-marker-do-not-remove sd_bus_message_handler_t|
+
+.. code-block::
+
+   sd_bus *sd_bus_slot_get_bus(sd_bus_slot *slot); .. code-block::
+
+   sd_bus_message_handler_t sd_bus_slot_get_current_handler(sd_bus_slot *slot); .. code-block::
+
+   sd_bus_message *sd_bus_slot_get_current_message(sd_bus_slot *slot); .. code-block::
+
+   void *sd_bus_slot_get_current_userdata(sd_bus_slot *slot);
+
+Description
+###########
+
+:code:`sd_bus_slot_get_bus()` returns the bus object that message :code:`slot` is attached to.
+
+:code:`sd_bus_slot_get_current_handler()`, :code:`sd_bus_slot_get_current_message()` and :code:`sd_bus_slot_get_current_userdata()` return the current handler, message and userdata respectively of the bus :code:`slot` is attached to if we're currently executing the callback associated with :code:`slot`.
+
+Return Value
+############
+
+:code:`sd_bus_slot_get_bus()` always returns the bus object.
+
+On success, :code:`sd_bus_slot_get_current_handler()`, :code:`sd_bus_slot_get_current_message()` and :code:`sd_bus_slot_get_current_userdata()` return the requested object. On failure, they return :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_slot_get_bus()`, :code:`sd_bus_slot_get_current_handler()`, :code:`sd_bus_slot_get_current_message()`, and :code:`sd_bus_slot_get_current_userdata()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`
+
+

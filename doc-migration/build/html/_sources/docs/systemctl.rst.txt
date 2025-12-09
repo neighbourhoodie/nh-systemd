@@ -1,0 +1,1511 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemctl
+:manvolnum: 1
+:summary: Control the systemd system and service manager
+
+.. _systemctl(1):
+
+============
+systemctl(1)
+============
+
+Name
+####
+
+systemctl — Control the systemd system and service manager
+
+Synopsis
+########
+
+:code:`systemctl [OPTIONS...] COMMAND [UNIT...]`
+
+Description
+###########
+
+:code:`systemctl` may be used to introspect and control the state of the "systemd" system and service manager. Please refer to :ref:`systemd(1)` for an introduction into the basic concepts and functionality this tool manages.
+
+Commands
+########
+
+The following commands are understood:
+
+Unit Commands (Introspection and Modification)
+##############################################
+
+.. systemd:option:: list-units [PATTERN…]
+
+   List units that :code:`systemd` currently has in memory. This includes units that are either referenced directly or through a dependency, units that are pinned by applications programmatically, or units that were active in the past and have failed. By default, only units which are active, have pending jobs, or have failed are shown; this can be changed with option :code:`--all`. If one or more :emphasis:`PATTERN`\s are specified, only units matching one of them are shown. The units that are shown are additionally filtered by :code:`--type=` and :code:`--state=` if those options are specified.
+
+   Note that this command does not show unit templates, but only instances of unit templates. Units templates that are not instantiated are not runnable, and will thus never show up in the output of this command. Specifically this means that :code:`foo@.service` will never be shown in this list — unless instantiated, e.g. as :code:`foo@bar.service`. Use :code:`list-unit-files` (see below) for listing installed unit template files.
+
+   Produces output similar to
+
+     .. code-block:: sh
+
+          UNIT                         LOAD   ACTIVE SUB     DESCRIPTION
+          sys-module-fuse.device       loaded active plugged /sys/module/fuse
+          -.mount                      loaded active mounted Root Mount
+          boot-efi.mount               loaded active mounted /boot/efi
+          systemd-journald.service     loaded active running Journal Service
+          systemd-logind.service       loaded active running Login Service
+        ● user@1000.service            loaded failed failed  User Manager for UID 1000
+          …
+          systemd-tmpfiles-clean.timer loaded active waiting Daily Cleanup of Temporary Directories
+        LOAD   = Reflects whether the unit definition was properly loaded.
+        ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+        SUB    = The low-level unit activation state, values depend on unit type.
+        123 loaded units listed. Pass --all to see loaded but inactive units, too.
+        To show all installed unit files use 'systemctl list-unit-files'.
+
+   The header and the last unit of a given type are underlined if the terminal supports that. A colored dot is shown next to services which were masked, not found, or otherwise failed.
+
+   The LOAD column shows the load state, one of :code:`loaded`, :code:`not-found`, :code:`bad-setting`, :code:`error`, :code:`masked`. The ACTIVE columns shows the general unit state, one of the following:
+
+   .. include:: unit-states.rst
+       :start-after: .. inclusion-marker-do-not-remove table|
+       :end-before: .. inclusion-end-marker-do-not-remove table|
+
+   The SUB column shows the unit-type-specific detailed state of the unit, possible values vary by unit type. The list of possible LOAD, ACTIVE, and SUB states is not constant and new systemd releases may both add and remove values.
+
+     .. code-block:: sh
+
+        systemctl --state=help
+
+   command may be used to display the current set of possible values.
+
+   This is the default command.
+
+.. systemd:option:: list-automounts [PATTERN…]
+
+   List automount units currently in memory, ordered by mount path. If one or more :emphasis:`PATTERN`\s are specified, only automount units matching one of them are shown. Produces output similar to
+
+     .. code-block:: sh
+
+        WHAT        WHERE                    MOUNTED IDLE TIMEOUT UNIT
+        /dev/sdb1   /mnt/test                no      120s         mnt-test.automount
+        binfmt_misc /proc/sys/fs/binfmt_misc yes     0            proc-sys-fs-binfmt_misc.automount
+        2 automounts listed.
+
+   Also see :code:`--show-types`, :code:`--all`, and :code:`--state=`.
+
+   .. versionadded:: 252
+
+.. systemd:option:: list-paths [PATTERN…]
+
+   List path units currently in memory, ordered by path. If one or more :emphasis:`PATTERN`\s are specified, only path units matching one of them are shown. Produces output similar to
+
+     .. code-block:: sh
+
+        PATH                           CONDITION         UNIT                               ACTIVATES
+        /run/systemd/ask-password      DirectoryNotEmpty systemd-ask-password-plymouth.path systemd-ask-password-plymouth.service
+        /run/systemd/ask-password      DirectoryNotEmpty systemd-ask-password-wall.path     systemd-ask-password-wall.service
+        /var/cache/cups/org.cups.cupsd PathExists        cups.path                          cups.service
+        3 paths listed.
+
+   Also see :code:`--show-types`, :code:`--all`, and :code:`--state=`.
+
+   .. versionadded:: 254
+
+.. systemd:option:: list-sockets [PATTERN…]
+
+   List socket units currently in memory, ordered by listening address. If one or more :emphasis:`PATTERN`\s are specified, only socket units matching one of them are shown. Produces output similar to
+
+     .. code-block:: sh
+
+        LISTEN           UNIT                        ACTIVATES
+        kobject-uevent 1 systemd-udevd-kernel.socket systemd-udevd.service
+        /dev/rfkill      systemd-rfkill.socket       systemd-rfkill.service
+        …
+        5 sockets listed.
+
+   Note: because the addresses might contains spaces, this output is not suitable for programmatic consumption.
+
+   Also see :code:`--show-types`, :code:`--all`, and :code:`--state=`.
+
+   .. versionadded:: 202
+
+.. systemd:option:: list-timers [PATTERN…]
+
+   List timer units currently in memory, ordered by the time they elapse next. If one or more :emphasis:`PATTERN`\s are specified, only units matching one of them are shown. Produces output similar to
+
+     .. code-block:: sh
+
+        NEXT                         LEFT          LAST                         PASSED     UNIT                         ACTIVATES
+        -                            -             Thu 2017-02-23 13:40:29 EST  3 days ago ureadahead-stop.timer        ureadahead-stop.service
+        Sun 2017-02-26 18:55:42 EST  1min 14s left Thu 2017-02-23 13:54:44 EST  3 days ago systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+        Sun 2017-02-26 20:37:16 EST  1h 42min left Sun 2017-02-26 11:56:36 EST  6h ago     apt-daily.timer              apt-daily.service
+        Sun 2017-02-26 20:57:49 EST  2h 3min left  Sun 2017-02-26 11:56:36 EST  6h ago     snapd.refresh.timer          snapd.refresh.service
+
+   *NEXT* shows the next time the timer will run. shows the next time the timer will run.
+
+   *LEFT* shows how long till the next time the timer runs. shows how long till the next time the timer runs.
+
+   *LAST* shows the last time the timer ran. shows the last time the timer ran.
+
+   *PASSED* shows how long has passed since the timer last ran. shows how long has passed since the timer last ran.
+
+   *UNIT* shows the name of the timer shows the name of the timer
+
+   *ACTIVATES* shows the name the service the timer activates when it runs. shows the name the service the timer activates when it runs.
+
+   Also see :code:`--all` and :code:`--state=`.
+
+   .. versionadded:: 209
+
+.. systemd:option:: is-active PATTERN…
+
+   Check whether any of the specified units are active (i.e. running). Returns an exit code :code:`0` if at least one is active, or non-zero otherwise. Unless :code:`--quiet` is specified, this will also print the current unit state to standard output.
+
+.. systemd:option:: is-failed [PATTERN…]
+
+   Check whether any of the specified units is in the "failed" state. If no unit is specified, check whether there are any failed units or ordering cycles, which corresponds to the "degraded" state returned by :code:`is-system-running`. Returns an exit code :code:`0` if at least one has failed, non-zero otherwise. Unless :code:`--quiet` is specified, this will also print the current unit or system state to standard output.
+
+   .. versionadded:: 197
+
+.. systemd:option:: status [PATTERN…|PID…]]
+
+   Show runtime status information about the whole system or about one or more units followed by most recent log data from the journal. If no positional arguments are specified, and no unit filter is given with :code:`--type=`, :code:`--state=`, or :code:`--failed`, shows the status of the whole system. If combined with :code:`--all`, follows that with the status of all units. If positional arguments are specified, each positional argument is treated as either a unit name to show, or a glob pattern to show units whose names match that pattern, or a PID to show the unit containing that PID. When :code:`--type=`, :code:`--state=`, or :code:`--failed` are used, units are additionally filtered by the TYPE and ACTIVE state.
+
+   This function is intended to generate human-readable output. If you are looking for computer-parsable output, use :code:`show` instead. By default, this function only shows 10 lines of output and ellipsizes lines to fit in the terminal window. This can be changed with :code:`--lines` and :code:`--full`, see above. In addition, :code:`journalctl --unit=NAME` or :code:`journalctl --user-unit=NAME` use a similar filter for messages and might be more convenient.
+
+   Note that this operation only displays *runtime* status, i.e. information about the current invocation of the unit (if it is running) or the most recent invocation (if it is not running anymore, and has not been released from memory). Information about earlier invocations, invocations from previous system boots, or prior invocations that have already been released from memory may be retrieved via status, i.e. information about the current invocation of the unit (if it is running) or the most recent invocation (if it is not running anymore, and has not been released from memory). Information about earlier invocations, invocations from previous system boots, or prior invocations that have already been released from memory may be retrieved via :code:`journalctl --unit=`.
+
+   systemd implicitly loads units as necessary, so just running the :code:`status` will attempt to load a file. The command is thus not useful for determining if something was already loaded or not. The units may possibly also be quickly unloaded after the operation is completed if there's no reason to keep it in memory thereafter.
+
+   Example output from systemctl status
+   ------------------------------------
+
+     .. code-block:: sh
+
+        $ systemctl status bluetooth
+        ● bluetooth.service - Bluetooth service
+           Loaded: loaded (/usr/lib/systemd/system/bluetooth.service; enabled; preset: enabled)
+           Active: active (running) since Wed 2017-01-04 13:54:04 EST; 1 weeks 0 days ago
+             Docs: man:bluetoothd(8)
+         Main PID: 930 (bluetoothd)
+           Status: "Running"
+            Tasks: 1
+           Memory: 648.0K
+              CPU: 435ms
+           CGroup: /system.slice/bluetooth.service
+                   └─930 /usr/lib/bluetooth/bluetoothd
+        Jan 12 10:46:45 example.com bluetoothd[8900]: Not enough free handles to register service
+        Jan 12 10:46:45 example.com bluetoothd[8900]: Current Time Service could not be registered
+        Jan 12 10:46:45 example.com bluetoothd[8900]: gatt-time-server: Input/output error (5)
+
+   The dot ("●") uses color on supported terminals to summarize the unit state at a glance. Along with its color, its shape varies according to its state: "inactive" or "maintenance" is a white circle ("○"), "active" is a green dot ("●"), "deactivating" is a white dot, "failed" or "error" is a red cross ("×"), and "reloading" or "refreshing" is a green clockwise circle arrow ("↻").
+
+   The "Loaded:" line in the output will show "loaded" if the unit has been loaded into memory. Other possible values for "Loaded:" include: "error" if there was a problem loading it, "not-found" if no unit file was found for this unit, "bad-setting" if an essential unit file setting could not be parsed and "masked" if the unit file has been masked. Along with showing the path to the unit file, this line will also show the enablement state. Enabled units are included in the dependency network between units, and thus are started at boot or via some other form of activation. See the full table of possible enablement states — including the definition of "masked" — in the documentation for the :code:`is-enabled` command.
+
+   The "Active:" line shows active state. The value is usually "active" or "inactive". Active could mean started, bound, plugged in, etc depending on the unit type. The unit could also be in process of changing states, reporting a state of "activating" or "deactivating". A special "failed" state is entered when the service failed in some way, such as a crash, exiting with an error code or timing out. If the failed state is entered the cause will be logged for later reference.
+
+.. systemd:option:: show [PATTERN…|JOB…]
+
+   Show properties of one or more units, jobs, or the manager itself. If no argument is specified, properties of the manager will be shown. If a unit name is specified, properties of the unit are shown, and if a job ID is specified, properties of the job are shown. By default, empty properties are suppressed. Use :code:`--all` to show those too. To select specific properties to show, use :code:`--property=`. This command is intended to be used whenever computer-parsable output is required. Use :code:`status` if you are looking for formatted human-readable output.
+
+   Many properties shown by :code:`systemctl show` map directly to configuration settings of the system and service manager and its unit files. Note that the properties shown by the command are generally more low-level, normalized versions of the original configuration settings and expose runtime state in addition to configuration. For example, properties shown for service units include the service's current main process identifier as "MainPID" (which is runtime state), and time settings are always exposed as properties ending in the "…USec" suffix even if a matching configuration options end in "…Sec", because microseconds is the normalized time unit used internally by the system and service manager.
+
+   For details about many of these properties, see the documentation of the D-Bus interface backing these properties, see :man-pages:`org.freedesktop.systemd1(5)`.
+
+.. systemd:option:: cat PATTERN…
+
+   Show backing files of one or more units. Prints the "fragment" and "drop-ins" (source files) of units. Each file is preceded by a comment which includes the file name. Note that this shows the contents of the backing files on disk, which might not match the system manager's understanding of these units if any unit files were updated on disk and the :code:`daemon-reload` command was not issued since.
+
+   .. versionadded:: 209
+
+.. systemd:option:: help PATTERN…|PID…
+
+   Show manual pages for one or more units, if available. If a PID is given, the manual pages for the unit the process belongs to are shown.
+
+   .. versionadded:: 185
+
+.. systemd:option:: list-dependencies [UNIT…]
+
+   Shows units required and wanted by the specified units. This recursively lists units following the :code:`Requires=`, :code:`Requisite=`, :code:`Wants=`, :code:`ConsistsOf=`, :code:`BindsTo=`, and :code:`Upholds=` dependencies. If no units are specified, :code:`default.target` is implied.
+
+   The units that are shown are additionally filtered by :code:`--type=` and :code:`--state=` if those options are specified. Note that we will not be able to use a tree structure in this case, so :code:`--plain` is implied.
+
+   By default, only target units are recursively expanded. When :code:`--all` is passed, all other units are recursively expanded as well.
+
+   Options :code:`--reverse`, :code:`--after`, :code:`--before` may be used to change what types of dependencies are shown.
+
+   Note that this command only lists units currently loaded into memory by the service manager. In particular, this command is not suitable to get a comprehensive list at all reverse dependencies on a specific unit, as it will not list the dependencies declared by units currently not loaded.
+
+   .. versionadded:: 198
+
+.. COMMENT: Commands that modify unit state start here
+
+.. systemd:option:: start PATTERN…
+
+   Start (activate) one or more units specified on the command line.
+
+   Note that unit glob patterns expand to names of units currently in memory. Units which are not active and are not in a failed state usually are not in memory, and will not be matched by any pattern. In addition, in case of instantiated units, systemd is often unaware of the instance name until the instance has been started. Therefore, using glob patterns with :code:`start` has limited usefulness. Also, secondary alias names of units are not considered.
+
+   Option :code:`--all` may be used to also operate on inactive units which are referenced by other loaded units. Note that this is not the same as operating on "all" possible units, because as the previous paragraph describes, such a list is ill-defined. Nevertheless, :code:`systemctl start --all GLOB` may be useful if all the units that should match the pattern are pulled in by some target which is known to be loaded.
+
+.. systemd:option:: stop PATTERN…
+
+   Stop (deactivate) one or more units specified on the command line.
+
+   This command will fail if the unit does not exist or if stopping of the unit is prohibited (see :code:`RefuseManualStop=` in :ref:`systemd.unit(5)`). It will *not* fail if any of the commands configured to stop the unit ( fail if any of the commands configured to stop the unit (:code:`ExecStop=`, etc.) fail, because the manager will still forcibly terminate the unit.
+
+   If a unit that gets stopped can still be triggered by other units, a warning containing the names of the triggering units is shown. :code:`--no-warn` can be used to suppress the warning.
+
+.. systemd:option:: reload PATTERN…
+
+   Asks all units listed on the command line to reload their configuration. Note that this will reload the service-specific configuration, not the unit configuration file of systemd. If you want systemd to reload the configuration file of a unit, use the :code:`daemon-reload` command. In other words: for the example case of Apache, this will reload Apache's :code:`httpd.conf` in the web server, not the :code:`apache.service` systemd unit file.
+
+   This command should not be confused with the :code:`daemon-reload` command.
+
+.. systemd:option:: restart PATTERN…
+
+   Stop and then start one or more units specified on the command line. If the units are not running yet, they will be started.
+
+   Note that restarting a unit with this command does not necessarily flush out all of the unit's resources before it is started again. For example, the per-service file descriptor storage facility (see :code:`FileDescriptorStoreMax=` in :ref:`systemd.service(5)`) will remain intact as long as the unit has a job pending, and is only cleared when the unit is fully stopped and no jobs are pending anymore. If it is intended that the file descriptor store is flushed out, too, during a restart operation an explicit :code:`systemctl stop` command followed by :code:`systemctl start` should be issued.
+
+.. systemd:option:: try-restart PATTERN…
+
+   Stop and then start one or more units specified on the command line if the units are running. This does nothing if units are not running.
+
+   .. COMMENT: Note that we do not document condrestart here, as that is just compatibility support, and we generally do not document that.
+
+.. systemd:option:: reload-or-restart PATTERN…
+
+   Reload one or more units if they support it. If not, stop and then start them instead. If the units are not running yet, they will be started.
+
+   This has a slightly differing functionality when used in combination with :code:`--marked`, see below.
+
+.. systemd:option:: try-reload-or-restart PATTERN…
+
+   Reload one or more units if they support it. If not, stop and then start them instead. This does nothing if the units are not running.
+
+   .. COMMENT: Note that we do not document force-reload here, as that is just compatibility support, and we generally do not document that.
+
+   .. versionadded:: 229
+
+.. systemd:option:: isolate UNIT
+
+   Start the unit specified on the command line and its dependencies and stop all others, unless they have :code:`IgnoreOnIsolate=yes` (see :ref:`systemd.unit(5)`). If a unit name with no extension is given, an extension of ".target" will be assumed.
+
+   This command is dangerous, since it will immediately stop processes that are not enabled in the new target, possibly including the graphical environment or terminal you are currently using.
+
+   Note that this operation is allowed only on units where :code:`AllowIsolate=` is enabled. See :ref:`systemd.unit(5)` for details.
+
+.. systemd:option:: kill PATTERN…
+
+   Send a UNIX process signal to one or more processes of the unit. Use :code:`--kill-whom=` to select which process to send the signal to. Use :code:`--signal=` to select the signal to send. Combine with :code:`--kill-value=` to enqueue a POSIX Realtime Signal with an associated value.
+
+.. systemd:option:: clean PATTERN…
+
+   Remove the configuration, state, cache, logs, runtime or file descriptor store data of the specified units. Use :code:`--what=` to select which kind of resource to remove. For service units this may be used to remove the directories configured with :code:`ConfigurationDirectory=`, :code:`StateDirectory=`, :code:`CacheDirectory=`, :code:`LogsDirectory=` and :code:`RuntimeDirectory=`, see :ref:`systemd.exec(5)` for details. It may also be used to clear the file descriptor store as enabled via :code:`FileDescriptorStoreMax=`, see :ref:`systemd.service(5)` for details. For timer units this may be used to clear out the persistent timestamp data if :code:`Persistent=` is used and :code:`--what=state` is selected, see :ref:`systemd.timer(5)`. This command only applies to units that use either of these settings. If :code:`--what=` is not specified, the cache and runtime data as well as the file descriptor store are removed (as these three types of resources are generally redundant and reproducible on the next invocation of the unit). Multiple values can be separated by commas. Note that the specified units must be stopped to invoke this operation.
+
+   .. list-table:: Possible values for :code:`--what=`
+      :header-rows: 1
+
+      * - Value
+        - Unit Setting
+      * - "runtime"
+        - :code:`RuntimeDirectory=`
+      * - "state"
+        - :code:`StateDirectory=`
+      * - "cache"
+        - :code:`CacheDirectory=`
+      * - "logs"
+        - :code:`LogsDirectory=`
+      * - "configuration"
+        - :code:`ConfigurationDirectory=`
+      * - "fdstore"
+        - :code:`FileDescriptorStorePreserve=`
+      * - "all"
+        - All of the above
+      * - "help"
+        - Show the supported values and exit
+
+   .. versionadded:: 243
+
+.. systemd:option:: freeze PATTERN…
+
+   Freeze one or more units specified on the command line using cgroup freezer
+
+   Freezing the unit will cause all processes contained within the cgroup corresponding to the unit to be suspended. Being suspended means that unit's processes will not be scheduled to run on CPU until thawed. Note that this command is supported only on systems that use unified cgroup hierarchy. Unit is automatically thawed just before we execute a job against the unit, e.g. before the unit is stopped.
+
+   .. versionadded:: 246
+
+.. systemd:option:: thaw PATTERN…
+
+   Thaw (unfreeze) one or more units specified on the command line.
+
+   This is the inverse operation to the :code:`freeze` command and resumes the execution of processes in the unit's cgroup.
+
+   .. versionadded:: 246
+
+.. systemd:option:: set-property UNIT PROPERTY=VALUE…
+
+   Set the specified unit properties at runtime where this is supported. This allows changing configuration parameter properties such as resource control settings at runtime. Not all properties may be changed at runtime, but many resource control settings (primarily those in :ref:`systemd.resource-control(5)`) may. The changes are applied immediately, and stored on disk for future boots, unless :code:`--runtime` is passed, in which case the settings only apply until the next reboot. The syntax of the property assignment follows closely the syntax of assignments in unit files.
+
+   Example: :code:`systemctl set-property foobar.service CPUWeight=200`
+
+   If the specified unit appears to be inactive, the changes will be only stored on disk as described previously hence they will be effective when the unit will be started.
+
+   Note that this command allows changing multiple properties at the same time, which is preferable over setting them individually.
+
+   Example: :code:`systemctl set-property foobar.service CPUWeight=200 MemoryMax=2G IPAccounting=yes`
+
+   Like with unit file configuration settings, assigning an empty setting usually resets a property to its defaults.
+
+   Example: :code:`systemctl set-property avahi-daemon.service IPAddressDeny=`
+
+   .. versionadded:: 206
+
+.. systemd:option:: bind UNIT PATH [PATH]
+
+   Bind-mounts a file or directory from the host into the specified unit's mount namespace. The first path argument is the source file or directory on the host, the second path argument is the destination file or directory in the unit's mount namespace. When the latter is omitted, the destination path in the unit's mount namespace is the same as the source path on the host. When combined with the :code:`--read-only` switch, a read-only bind mount is created. When combined with the :code:`--mkdir` switch, the destination path is first created before the mount is applied.
+
+   Note that this option is currently only supported for units that run within a mount namespace (e.g.: with :code:`RootImage=`, :code:`PrivateMounts=`, etc.). This command supports bind-mounting directories, regular files, device nodes, :code:`AF_UNIX` socket nodes, as well as FIFOs. The bind mount is ephemeral, and it is undone as soon as the current unit process exists. Note that the namespace mentioned here, where the bind mount will be added to, is the one where the main service process runs. Other processes (those exececuted by :code:`ExecReload=`, :code:`ExecStartPre=`, etc.) run in distinct namespaces.
+
+   If supported by the kernel, any prior mount on the selected target will be replaced by the new mount. If not supported, any prior mount will be over-mounted, but remain pinned and inaccessible.
+
+   .. versionadded:: 248
+
+.. systemd:option:: mount-image UNIT IMAGE [PATH [PARTITION_NAME:MOUNT_OPTIONS]]
+
+   Mounts an image from the host into the specified unit's mount namespace. The first path argument is the source image on the host, the second path argument is the destination directory in the unit's mount namespace (i.e. inside :code:`RootImage=`/:code:`RootDirectory=`). The following argument, if any, is interpreted as a colon-separated tuple of partition name and comma-separated list of mount options for that partition. The format is the same as the service :code:`MountImages=` setting. When combined with the :code:`--read-only` switch, a ready-only mount is created. When combined with the :code:`--mkdir` switch, the destination path is first created before the mount is applied.
+
+   Note that this option is currently only supported for units that run within a mount namespace (i.e. with :code:`RootImage=`, :code:`PrivateMounts=`, etc.). Note that the namespace mentioned here where the image mount will be added to, is the one where the main service process runs. Note that the namespace mentioned here, where the bind mount will be added to, is the one where the main service process runs. Other processes (those exececuted by :code:`ExecReload=`, :code:`ExecStartPre=`, etc.) run in distinct namespaces.
+
+   If supported by the kernel, any prior mount on the selected target will be replaced by the new mount. If not supported, any prior mount will be over-mounted, but remain pinned and inaccessible.
+
+   Example:
+
+     .. code-block:: sh
+
+        systemctl mount-image foo.service /tmp/img.raw /var/lib/image root:ro,nosuid
+
+     .. code-block:: sh
+
+        systemctl mount-image --mkdir bar.service /tmp/img.raw /var/lib/baz/img
+
+   .. versionadded:: 248
+
+.. systemd:option:: service-log-level SERVICE [LEVEL]
+
+   If the :emphasis:`LEVEL` argument is not given, print the current log level as reported by service :emphasis:`SERVICE`.
+
+   If the optional argument :emphasis:`LEVEL` is provided, then change the current log level of the service to :emphasis:`LEVEL`. The log level should be a typical syslog log level, i.e. a value in the range 0…7 or one of the strings :code:`emerg`, :code:`alert`, :code:`crit`, :code:`err`, :code:`warning`, :code:`notice`, :code:`info`, :code:`debug`; see :man-pages:`syslog(3)` for details.
+
+   The service must have the appropriate :code:`BusName=:emphasis:`destination`` property and also implement the generic :man-pages:`org.freedesktop.LogControl1(5)` interface. (:code:`systemctl` will use the generic D-Bus protocol to access the :code:`org.freedesktop.LogControl1.LogLevel` interface for the D-Bus name :emphasis:`destination`.)
+
+   .. versionadded:: 247
+
+.. systemd:option:: service-log-target SERVICE [TARGET]
+
+   If the :emphasis:`TARGET` argument is not given, print the current log target as reported by service :emphasis:`SERVICE`.
+
+   If the optional argument :emphasis:`TARGET` is provided, then change the current log target of the service to :emphasis:`TARGET`. The log target should be one of the strings :code:`console` (for log output to the service's standard error stream), :code:`kmsg` (for log output to the kernel log buffer), :code:`journal` (for log output to :ref:`systemd-journald.service(8)` using the native journal protocol), :code:`syslog` (for log output to the classic syslog socket :code:`/dev/log`), :code:`null` (for no log output whatsoever) or :code:`auto` (for an automatically determined choice, typically equivalent to :code:`console` if the service is invoked interactively, and :code:`journal` or :code:`syslog` otherwise).
+
+   For most services, only a small subset of log targets make sense. In particular, most "normal" services should only implement :code:`console`, :code:`journal`, and :code:`null`. Anything else is only appropriate for low-level services that are active in very early boot before proper logging is established.
+
+   The service must have the appropriate :code:`BusName=:emphasis:`destination`` property and also implement the generic :man-pages:`org.freedesktop.LogControl1(5)` interface. (:code:`systemctl` will use the generic D-Bus protocol to access the :code:`org.freedesktop.LogControl1.LogLevel` interface for the D-Bus name :emphasis:`destination`.)
+
+   .. versionadded:: 247
+
+.. systemd:option:: reset-failed [PATTERN…]
+
+   Reset the "failed" state of the specified units, or if no unit name is passed, reset the state of all units. When a unit fails in some way (i.e. process exiting with non-zero error code, terminating abnormally or timing out), it will automatically enter the "failed" state and its exit code and status is recorded for introspection by the administrator until the service is stopped/re-started or reset with this command.
+
+   In addition to resetting the "failed" state of a unit it also resets various other per-unit properties: the start rate limit counter of all unit types is reset to zero, as is the restart counter of service units. Thus, if a unit's start limit (as configured with :code:`StartLimitIntervalSec=`/:code:`StartLimitBurst=`) is hit and the unit refuses to be started again, use this command to make it startable again.
+
+.. systemd:option:: whoami [PID…]
+
+   Returns the units the processes referenced by the given PIDs belong to (one per line). If no PID is specified returns the unit the :code:`systemctl` command is invoked in.
+
+   .. versionadded:: 254
+
+Unit File Commands
+##################
+
+.. systemd:option:: list-unit-files [PATTERN…]
+
+   List unit files installed on the system, in combination with their enablement state (as reported by :code:`is-enabled`). If one or more :emphasis:`PATTERN`\s are specified, only unit files whose name matches one of them are shown (patterns matching unit file system paths are not supported).
+
+   Unlike :code:`list-units` this command will list template units in addition to explicitly instantiated units.
+
+   .. versionadded:: 233
+
+.. systemd:option:: enable UNIT…, enable PATH…
+
+   Enable one or more units or unit instances. This will create a set of symlinks, as encoded in the \[Install] sections of the indicated unit files. After the symlinks have been created, the system manager configuration is reloaded (in a way equivalent to :code:`daemon-reload`), in order to ensure the changes are taken into account immediately. Note that this does *not* have the effect of also starting any of the units being enabled. If this is desired, combine this command with the have the effect of also starting any of the units being enabled. If this is desired, combine this command with the :code:`--now` switch, or invoke :code:`start` with appropriate arguments later. Note that in case of unit instance enablement (i.e. enablement of units of the form :code:`foo@bar.service`), symlinks named the same as instances are created in the unit configuration directory, however they point to the single template unit file they are instantiated from.
+
+   This command expects either valid unit names (in which case various unit file directories are automatically searched for unit files with appropriate names), or absolute paths to unit files (in which case these files are read directly). If a specified unit file is located outside of the usual unit file directories, an additional symlink is created, linking it into the unit configuration path, thus ensuring it is found when requested by commands such as :code:`start`. The file system where the linked unit files are located must be accessible when systemd is started (e.g. anything underneath :code:`/home/` or :code:`/var/` is not allowed, unless those directories are located on the root file system).
+
+   This command will print the file system operations executed. This output may be suppressed by passing :code:`--quiet`.
+
+   Note that this operation creates only the symlinks suggested in the \[Install] section of the unit files. While this command is the recommended way to manipulate the unit configuration directory, the administrator is free to make additional changes manually by placing or removing symlinks below this directory. This is particularly useful to create configurations that deviate from the suggested default installation. In this case, the administrator must make sure to invoke :code:`daemon-reload` manually as necessary, in order to ensure the changes are taken into account.
+
+   When using this operation on units without install information, a warning about it is shown. :code:`--no-warn` can be used to suppress the warning.
+
+   Enabling units should not be confused with starting (activating) units, as done by the :code:`start` command. Enabling and starting units is orthogonal: units may be enabled without being started and started without being enabled. Enabling simply hooks the unit into various suggested places (for example, so that the unit is automatically started on boot or when a particular kind of hardware is plugged in). Starting actually spawns the daemon process (in case of service units), or binds the socket (in case of socket units), and so on.
+
+   Depending on whether :code:`--system`, :code:`--user`, :code:`--runtime`, or :code:`--global` is specified, this enables the unit for the system, for the calling user only, for only this boot of the system, or for all future logins of all users. Note that in the last case, no systemd daemon configuration is reloaded.
+
+   Using :code:`enable` on masked units is not supported and results in an error.
+
+.. systemd:option:: disable UNIT…
+
+   Disables one or more units. This removes all symlinks to the unit files backing the specified units from the unit configuration directory, and hence undoes any changes made by :code:`enable` or :code:`link`. Note that this removes *all* symlinks to matching unit files, including manually created symlinks, and not just those actually created by symlinks to matching unit files, including manually created symlinks, and not just those actually created by :code:`enable` or :code:`link`. Note that while :code:`disable` undoes the effect of :code:`enable`, the two commands are otherwise not symmetric, as :code:`disable` may remove more symlinks than a prior :code:`enable` invocation of the same unit created.
+
+   This command expects valid unit names only, it does not accept paths to unit files.
+
+   In addition to the units specified as arguments, all units are disabled that are listed in the :code:`Also=` setting contained in the \[Install] section of any of the unit files being operated on.
+
+   This command implicitly reloads the system manager configuration after completing the operation. Note that this command does not implicitly stop the units that are being disabled. If this is desired, either combine this command with the :code:`--now` switch, or invoke the :code:`stop` command with appropriate arguments later.
+
+   This command will print information about the file system operations (symlink removals) executed. This output may be suppressed by passing :code:`--quiet`.
+
+   If a unit gets disabled but its triggering units are still active, a warning containing the names of the triggering units is shown. :code:`--no-warn` can be used to suppress the warning.
+
+   When this command is used with :code:`--user`, the units being operated on might still be enabled in global scope, and thus get started automatically even after a successful disablement in user scope. In this case, a warning about it is shown, which can be suppressed using :code:`--no-warn`.
+
+   This command honors :code:`--system`, :code:`--user`, :code:`--runtime`, :code:`--global` and :code:`--no-warn` in a similar way as :code:`enable`.
+
+   .. versionadded:: 238
+
+.. systemd:option:: reenable UNIT…
+
+   Reenable one or more units, as specified on the command line. This is a combination of :code:`disable` and :code:`enable` and is useful to reset the symlinks a unit file is enabled with to the defaults configured in its \[Install] section. This command expects a unit name only, it does not accept paths to unit files.
+
+   This command implicitly reloads the system manager configuration after completing the operation. Note that this command does not implicitly restart the units that are being disabled. If this is desired, either combine this command with the :code:`--now` switch, or invoke the :code:`try-restart` command with appropriate arguments later.
+
+   .. versionadded:: 238
+
+.. systemd:option:: preset UNIT…
+
+   Reset the enable/disable status of one or more unit files, as specified on the command line, to the defaults configured in the preset policy files. This has the same effect as :code:`disable` or :code:`enable`, depending how the unit is listed in the preset files.
+
+   Use :code:`--preset-mode=` to control whether units shall be enabled and disabled, or only enabled, or only disabled.
+
+   If the unit carries no install information, it will be silently ignored by this command. :emphasis:`UNIT` must be the real unit name, any alias names are ignored silently.
+
+   For more information on the preset policy format, see :ref:`systemd.preset(5)`.
+
+   .. versionadded:: 238
+
+.. systemd:option:: preset-all
+
+   Resets all installed unit files to the defaults configured in the preset policy file (see above).
+
+   Use :code:`--preset-mode=` to control whether units shall be enabled and disabled, or only enabled, or only disabled.
+
+   .. versionadded:: 215
+
+.. systemd:option:: is-enabled UNIT…
+
+   Checks whether any of the specified unit files are enabled (as with :code:`enable`). Returns an exit code of 0 if at least one is enabled, non-zero otherwise. Prints the current enable status (see table). To suppress this output, use :code:`--quiet`. To show installation targets, use :code:`--full`.
+
+   .. list-table:: :code:`is-enabled` output
+      :header-rows: 1
+
+      * - Name
+        - Description
+        - Exit Code
+      * - "enabled"
+        - Enabled via :code:`.wants/`, :code:`.requires/` or :code:`Alias=` symlinks (permanently in :code:`/etc/systemd/system/`, or transiently in :code:`/run/systemd/system/`).
+        - 0
+      * - "enabled-runtime"
+        -
+        -
+      * - "linked"
+        - Made available through one or more symlinks to the unit file (permanently in :code:`/etc/systemd/system/` or transiently in :code:`/run/systemd/system/`), even though the unit file might reside outside of the unit file search path.
+        - > 0
+      * - "linked-runtime"
+        -
+        -
+      * - "alias"
+        - The name is an alias (symlink to another unit file).
+        - 0
+      * - "masked"
+        - Completely disabled, so that any start operation on it fails (permanently in :code:`/etc/systemd/system/` or transiently in :code:`/run/systemd/systemd/`).
+        - > 0
+      * - "masked-runtime"
+        -
+        -
+      * - "static"
+        - The unit file is not enabled, and has no provisions for enabling in the \[Install] unit file section.
+        - 0
+      * - "indirect"
+        - The unit file itself is not enabled, but it has a non-empty :code:`Also=` setting in the \[Install] unit file section, listing other unit files that might be enabled, or it has an alias under a different name through a symlink that is not specified in :code:`Also=`. For template unit files, an instance different than the one specified in :code:`DefaultInstance=` is enabled.
+        - 0
+      * - "disabled"
+        - The unit file is not enabled, but contains an \[Install] section with installation instructions.
+        - > 0
+      * - "generated"
+        - The unit file was generated dynamically via a generator tool. See :ref:`systemd.generator(7)`. Generated unit files may not be enabled, they are enabled implicitly by their generator.
+        - 0
+      * - "transient"
+        - The unit file has been created dynamically with the runtime API. Transient units may not be enabled.
+        - 0
+      * - "bad"
+        - The unit file is invalid or another error occurred. Note that :code:`is-enabled` will not actually return this state, but print an error message instead. However, the unit file listing printed by :code:`list-unit-files` might show it.
+        - > 0
+      * - "not-found"
+        - The unit file does not exist.
+        - 4
+
+   .. versionadded:: 238
+
+.. systemd:option:: mask UNIT…
+
+   Mask one or more units, as specified on the command line. This will link these unit files to :code:`/dev/null`, making it impossible to start them. This is a stronger version of :code:`disable`, since it prohibits all kinds of activation of the unit, including enablement and manual activation. Use this option with care. This honors the :code:`--runtime` option to only mask temporarily until the next reboot of the system. The :code:`--now` option may be used to ensure that the units are also stopped. This command expects valid unit names only, it does not accept unit file paths.
+
+   Note that this will create a symlink under the unit's name in :code:`/etc/systemd/system/` (in case :code:`--runtime` is not specified) or :code:`/run/systemd/system/` (in case :code:`--runtime` is specified). If a matching unit file already exists under these directories this operation will hence fail. This means that the operation is primarily useful to mask units shipped by the vendor (as those are shipped in :code:`/usr/lib/systemd/system/` and not the aforementioned two directories), but typically does not work for units created locally (as those are typically placed precisely in the two aforementioned directories). Similar restrictions apply for :code:`--user` mode, in which case the directories are below the user's home directory however.
+
+   If a unit gets masked but its triggering units are still active, a warning containing the names of the triggering units is shown. :code:`--no-warn` can be used to suppress the warning.
+
+   .. versionadded:: 238
+
+.. systemd:option:: unmask UNIT…
+
+   Unmask one or more unit files, as specified on the command line. This will undo the effect of :code:`mask`. This command expects valid unit names only, it does not accept unit file paths.
+
+   .. versionadded:: 238
+
+.. systemd:option:: link PATH…
+
+   Link a unit file that is not in the unit file search path into the unit file search path. This command expects an absolute path to a unit file. The effect of this may be undone with :code:`disable`. The effect of this command is that a unit file is made available for commands such as :code:`start`, even though it is not installed directly in the unit search path. The file system where the linked unit files are located must be accessible when systemd is started (e.g. anything underneath :code:`/home/` or :code:`/var/` is not allowed, unless those directories are located on the root file system).
+
+   .. versionadded:: 233
+
+.. systemd:option:: revert UNIT…
+
+   Revert one or more unit files to their vendor versions. This command removes drop-in configuration files that modify the specified units, as well as any user-configured unit file that overrides a matching vendor supplied unit file. Specifically, for a unit "foo.service" the matching directories "foo.service.d/" with all their contained files are removed, both below the persistent and runtime configuration directories (i.e. below :code:`/etc/systemd/system` and :code:`/run/systemd/system`); if the unit file has a vendor-supplied version (i.e. a unit file located below :code:`/usr/`) any matching persistent or runtime unit file that overrides it is removed, too. Note that if a unit file has no vendor-supplied version (i.e. is only defined below :code:`/etc/systemd/system` or :code:`/run/systemd/system`, but not in a unit file stored below :code:`/usr/`), then it is not removed. Also, if a unit is masked, it is unmasked.
+
+   Effectively, this command may be used to undo all changes made with :code:`systemctl edit`, :code:`systemctl set-property` and :code:`systemctl mask` and puts the original unit file with its settings back in effect.
+
+   .. versionadded:: 230
+
+.. systemd:option:: add-wants TARGET UNIT…, add-requires TARGET UNIT…
+
+   Adds "Wants=" or "Requires=" dependencies, respectively, to the specified :emphasis:`TARGET` for one or more units.
+
+   This command honors :code:`--system`, :code:`--user`, :code:`--runtime` and :code:`--global` in a way similar to :code:`enable`.
+
+   .. versionadded:: 217
+
+.. systemd:option:: edit UNIT…
+
+   Edit or replace a drop-in snippet or the main unit file, to extend or override the definition of the specified unit.
+
+   Depending on whether :code:`--system` (the default), :code:`--user`, or :code:`--global` is specified, this command will operate on the system unit files, unit files for the calling user, or the unit files shared between all users.
+
+   The editor (see the "Environment" section below) is invoked on temporary files which will be written to the real location if the editor exits successfully. After the editing is finished, configuration is reloaded, equivalent to :code:`systemctl daemon-reload --system` or :code:`systemctl daemon-reload --user`. For :code:`edit --global`, the reload is not performed and the edits will take effect only for subsequent logins (or after a reload is requested in a different way).
+
+   If :code:`--full` is specified, a replacement for the main unit file will be created or edited. Otherwise, a drop-in file will be created or edited.
+
+   If :code:`--drop-in=` is specified, the given drop-in file name will be used instead of the default :code:`override.conf`.
+
+   The unit must exist, i.e. its main unit file must be present. If :code:`--force` is specified, this requirement is ignored and a new unit may be created (with :code:`--full`), or a drop-in for a nonexistent unit may be created.
+
+   If :code:`--runtime` is specified, the changes will be made temporarily in :code:`/run/` and they will be lost on the next reboot.
+
+   If :code:`--stdin` is specified, the new contents will be read from standard input. In this mode, the old contents of the file are discarded.
+
+   If the temporary file is empty upon exit, the modification of the related unit is canceled.
+
+   Note that this command cannot be used to remotely edit units and that you cannot temporarily edit units which are in :code:`/etc/`, since they take precedence over :code:`/run/`.
+
+   .. versionadded:: 218
+
+.. systemd:option:: get-default
+
+   Return the default target to boot into. This returns the target unit name :code:`default.target` is aliased (symlinked) to.
+
+   .. versionadded:: 205
+
+.. systemd:option:: set-default TARGET
+
+   Set the default target to boot into. This sets (symlinks) the :code:`default.target` alias to the given target unit.
+
+   .. versionadded:: 205
+
+Machine Commands
+################
+
+.. systemd:option:: list-machines [PATTERN…]
+
+   List the host and all running local containers with their state. If one or more :emphasis:`PATTERN`\s are specified, only containers matching one of them are shown.
+
+   .. versionadded:: 212
+
+Job Commands
+############
+
+.. systemd:option:: list-jobs [PATTERN…]
+
+   List jobs that are in progress. If one or more :emphasis:`PATTERN`\s are specified, only jobs for units matching one of them are shown.
+
+   When combined with :code:`--after` or :code:`--before` the list is augmented with information on which other job each job is waiting for, and which other jobs are waiting for it, see above.
+
+   .. versionadded:: 233
+
+.. systemd:option:: cancel [JOB…]
+
+   Cancel one or more jobs specified on the command line by their numeric job IDs. If no job ID is specified, cancel all pending jobs.
+
+   .. versionadded:: 233
+
+Environment Commands
+####################
+
+:code:`systemd` supports an environment block that is passed to processes the manager spawns. The names of the variables can contain ASCII letters, digits, and the underscore character. Variable names cannot be empty or start with a digit. In variable values, most characters are allowed, but the whole sequence must be valid UTF-8. (Note that control characters like newline (:code:`NL`), tab (:code:`TAB`), or the escape character (:code:`ESC`), *are* valid ASCII and thus valid UTF-8). The total length of the environment block is limited to valid ASCII and thus valid UTF-8). The total length of the environment block is limited to :code:`_SC_ARG_MAX` value defined by :man-pages:`sysconf(3)`.
+
+.. systemd:option:: show-environment
+
+   Dump the systemd manager environment block. This is the environment block that is passed to all processes the manager spawns. The environment block will be dumped in straightforward form suitable for sourcing into most shells. If no special characters or whitespace is present in the variable values, no escaping is performed, and the assignments have the form "VARIABLE=value". If whitespace or characters which have special meaning to the shell are present, dollar-single-quote escaping is used, and assignments have the form "VARIABLE=$'value'". This syntax is known to be supported by :die-net:`bash(1)`, :die-net:`zsh(1)`, :die-net:`ksh(1)`, and :die-net:`busybox(1)`'s :die-net:`ash(1)`, but not :die-net:`dash(1)` or :die-net:`fish(1)`.
+
+   Note that this shows the *effective* block, i.e. the combination of environment variables configured via configuration files, environment generators and via IPC (i.e. via the block, i.e. the combination of environment variables configured via configuration files, environment generators and via IPC (i.e. via the :code:`set-environment` described below). At the moment a unit process is forked off, this combined environment block will be further combined with per-unit environment variables, which are not visible in this command.
+
+.. systemd:option:: set-environment VARIABLE=VALUE…
+
+   Set one or more service manager environment variables, as specified on the command line. This command will fail if variable names and values do not conform to the rules listed above.
+
+   Note that this operates on an environment block separate from the environment block configured from service manager configuration and environment generators. Whenever a process is invoked the two blocks are combined (also incorporating any per-service environment variables), and passed to it. The :code:`show-environment` verb will show the combination of the blocks, see above.
+
+   .. versionadded:: 233
+
+.. systemd:option:: unset-environment VARIABLE…
+
+   Unset one or more systemd manager environment variables. If only a variable name is specified, it will be removed regardless of its value. If a variable and a value are specified, the variable is only removed if it has the specified value.
+
+   Note that this operates on an environment block separate from the environment block configured from service manager configuration and environment generators. Whenever a process is invoked the two blocks are combined (also incorporating any per-service environment variables), and passed to it. The :code:`show-environment` verb will show the combination of the blocks, see above. Note that this means this command cannot be used to unset environment variables defined in the service manager configuration files or via generators.
+
+   .. versionadded:: 233
+
+.. systemd:option:: import-environment VARIABLE…
+
+   Import all, one or more environment variables set on the client into the systemd manager environment block. If a list of environment variable names is passed, client-side values are then imported into the manager's environment block. If any names are not valid environment variable names or have invalid values according to the rules described above, an error is raised. If no arguments are passed, the entire environment block inherited by the :code:`systemctl` process is imported. In this mode, any inherited invalid environment variables are quietly ignored.
+
+   Importing of the full inherited environment block (calling this command without any arguments) is deprecated. A shell will set dozens of variables which only make sense locally and are only meant for processes which are descendants of the shell. Such variables in the global environment block are confusing to other processes.
+
+   .. versionadded:: 209
+
+Manager State Commands
+######################
+
+.. systemd:option:: daemon-reload
+
+   Reload the systemd manager configuration. This will rerun all generators (see :ref:`systemd.generator(7)`), reload all unit files, and recreate the entire dependency tree. While the daemon is being reloaded, all sockets systemd listens on behalf of user configuration will stay accessible.
+
+   This command should not be confused with the :code:`reload` command.
+
+.. systemd:option:: daemon-reexec
+
+   Reexecute the systemd manager. This will serialize the manager state, reexecute the process and deserialize the state again. This command is of little use except for debugging and package upgrades. Sometimes, it might be helpful as a heavy-weight :code:`daemon-reload`. While the daemon is being reexecuted, all sockets systemd listening on behalf of user configuration will stay accessible.
+
+.. inclusion-marker-do-not-remove log-level|
+
+.. systemd:option:: log-level [LEVEL]
+
+   If no argument is given, print the current log level of the manager. If an optional argument :emphasis:`LEVEL` is provided, then the command changes the current log level of the manager to :emphasis:`LEVEL` (accepts the same values as :code:`--log-level=` described in :ref:`systemd(1)`).
+
+   .. versionadded:: 244
+
+.. inclusion-end-marker-do-not-remove log-level|
+
+.. systemd:option:: log-target [TARGET]
+
+   If no argument is given, print the current log target of the manager. If an optional argument :emphasis:`TARGET` is provided, then the command changes the current log target of the manager to :emphasis:`TARGET` (accepts the same values as :code:`--log-target=`, described in :ref:`systemd(1)`).
+
+   .. versionadded:: 244
+
+.. systemd:option:: service-watchdogs [yes|no]
+
+   If no argument is given, print the current state of service runtime watchdogs of the manager. If an optional boolean argument is provided, then globally enables or disables the service runtime watchdogs (:code:`WatchdogSec=`) and emergency actions (e.g. :code:`OnFailure=` or :code:`StartLimitAction=`); see :ref:`systemd.service(5)`. The hardware watchdog is not affected by this setting.
+
+   .. versionadded:: 244
+
+System Commands
+###############
+
+.. systemd:option:: is-system-running
+
+   Checks whether the system is operational. This returns success (exit code 0) when the system is fully up and running, specifically not in startup, shutdown or maintenance mode, and with no failed services. Failure is returned otherwise (exit code non-zero). In addition, the current state is printed in a short string to standard output, see the table below. Use :code:`--quiet` to suppress this output.
+
+   Use :code:`--wait` to wait until the boot process is completed before printing the current state and returning the appropriate error status. If :code:`--wait` is in use, states :code:`initializing` or :code:`starting` will not be reported, instead the command will block until a later state (such as :code:`running` or :code:`degraded`) is reached.
+
+   .. list-table:: :code:`is-system-running` output
+      :header-rows: 1
+
+      * - Name
+        - Description
+        - Exit Code
+      * - :code:`initializing`
+        - Early bootup, before :code:`basic.target` is reached or the :code:`maintenance` state entered.
+
+        - > 0
+      * - :code:`starting`
+        - Late bootup, before the job queue becomes idle for the first time, or one of the rescue targets are reached.
+
+        - > 0
+      * - :code:`running`
+        - The system is fully operational.
+
+        - 0
+      * - :code:`degraded`
+        - The system is operational but one or more units failed.
+
+        - > 0
+      * - :code:`maintenance`
+        - The rescue or emergency target is active.
+
+        - > 0
+      * - :code:`stopping`
+        - The manager is shutting down.
+
+        - > 0
+      * - :code:`offline`
+        - The manager is not running. Specifically, this is the operational state if an incompatible program is running as system manager (PID 1).
+
+        - > 0
+      * - :code:`unknown`
+        - The operational state could not be determined, due to lack of resources or another error cause.
+
+        - > 0
+
+   .. versionadded:: 215
+
+.. systemd:option:: default
+
+   Enter default mode. This is equivalent to :code:`systemctl isolate default.target`. This operation is blocking by default, use :code:`--no-block` to request asynchronous behavior.
+
+.. systemd:option:: rescue
+
+   Enter rescue mode. This is equivalent to :code:`systemctl isolate rescue.target`. This operation is blocking by default, use :code:`--no-block` to request asynchronous behavior.
+
+.. systemd:option:: emergency
+
+   Enter emergency mode. This is equivalent to :code:`systemctl isolate emergency.target`. This operation is blocking by default, use :code:`--no-block` to request asynchronous behavior.
+
+.. systemd:option:: halt
+
+   Shut down and halt the system. This is mostly equivalent to :code:`systemctl start halt.target --job-mode=replace-irreversibly --no-block`, but also prints a wall message to all users. This command is asynchronous; it will return after the halt operation is enqueued, without waiting for it to complete. Note that this operation will simply halt the OS kernel after shutting down, leaving the hardware powered on. Use :code:`systemctl poweroff` for powering off the system (see below).
+
+   If combined with :code:`--force`, shutdown of all running services is skipped, however all processes are killed and all file systems are unmounted or mounted read-only, immediately followed by the system halt. If :code:`--force` is specified twice, the operation is immediately executed without terminating any processes or unmounting any file systems. This may result in data loss. Note that when :code:`--force` is specified twice the halt operation is executed by :code:`systemctl` itself, and the system manager is not contacted. This means the command should succeed even when the system manager has crashed.
+
+   If combined with :code:`--when=`, shutdown will be scheduled after the given timestamp. And :code:`--when=cancel` will cancel the shutdown.
+
+.. systemd:option:: poweroff
+
+   Shut down and power-off the system. This is mostly equivalent to :code:`systemctl start poweroff.target --job-mode=replace-irreversibly --no-block`, but also prints a wall message to all users. This command is asynchronous; it will return after the power-off operation is enqueued, without waiting for it to complete.
+
+   This command honors :code:`--force` and :code:`--when=` in a similar way as :code:`halt`.
+
+.. systemd:option:: reboot
+
+   Shut down and reboot the system.
+
+   This command mostly equivalent to :code:`systemctl start reboot.target --job-mode=replace-irreversibly --no-block`, but also prints a wall message to all users. This command is asynchronous; it will return after the reboot operation is enqueued, without waiting for it to complete.
+
+   If the switch :code:`--reboot-argument=` is given, it will be passed as the optional argument to the :man-pages:`reboot(2)` system call.
+
+   Options :code:`--boot-loader-entry=`, :code:`--boot-loader-menu=`, and :code:`--firmware-setup` can be used to select what to do *after* the reboot. See the descriptions of those options for details. the reboot. See the descriptions of those options for details.
+
+   This command honors :code:`--force` and :code:`--when=` in a similar way as :code:`halt`.
+
+   If a new kernel has been loaded via :code:`kexec --load`, a :code:`kexec` will be performed instead of a reboot, unless "SYSTEMCTL_SKIP_AUTO_KEXEC=1" has been set. If a new root file system has been set up on "/run/nextroot/", a :code:`soft-reboot` will be performed instead of a reboot, unless "SYSTEMCTL_SKIP_AUTO_SOFT_REBOOT=1" has been set.
+
+   .. versionadded:: 246
+
+.. systemd:option:: kexec
+
+   Shut down and reboot the system via :code:`kexec`. This command will load a kexec kernel if one was not loaded yet or fail. A kernel may be loaded earlier by a separate step, this is particularly useful if a custom initrd or additional kernel command line options are desired. The :code:`--force` can be used to continue without a kexec kernel, i.e. to perform a normal reboot. The final reboot step is equivalent to :code:`systemctl start kexec.target --job-mode=replace-irreversibly --no-block`.
+
+   To load a kernel, an enumeration is performed following the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_, and the default boot entry is loaded. For this step to succeed, the system must be using UEFI and the boot loader entries must be configured appropriately. :code:`bootctl list` may be used to list boot entries, see :man-pages:`bootctl(1)`.
+
+   This command is asynchronous; it will return after the reboot operation is enqueued, without waiting for it to complete.
+
+   This command honors :code:`--force` and :code:`--when=` similarly to :code:`halt`.
+
+   If a new kernel has been loaded via :code:`kexec --load`, a :code:`kexec` will be performed when :code:`reboot` is invoked, unless "SYSTEMCTL_SKIP_AUTO_KEXEC=1" has been set.
+
+.. systemd:option:: soft-reboot
+
+   Shut down and reboot userspace. This is equivalent to :code:`systemctl start soft-reboot.target --job-mode=replace-irreversibly --no-block`. This command is asynchronous; it will return after the reboot operation is enqueued, without waiting for it to complete.
+
+   This command honors :code:`--force` and :code:`--when=` in a similar way as :code:`halt`.
+
+   This operation only reboots userspace, leaving the kernel running. See :ref:`systemd-soft-reboot.service(8)` for details.
+
+   If a new root file system has been set up on "/run/nextroot/", a :code:`soft-reboot` will be performed when :code:`reboot` is invoked, unless "SYSTEMCTL_SKIP_AUTO_SOFT_REBOOT=1" has been set.
+
+   .. versionadded:: 254
+
+.. systemd:option:: exit [EXIT_CODE]
+
+   Ask the service manager to quit. This is only supported for user service managers (i.e. in conjunction with the :code:`--user` option) or in containers and is equivalent to :code:`poweroff` otherwise. This command is asynchronous; it will return after the exit operation is enqueued, without waiting for it to complete.
+
+   The service manager will exit with the specified exit code, if :emphasis:`EXIT_CODE` is passed.
+
+   .. versionadded:: 227
+
+.. systemd:option:: switch-root [ROOT [INIT]]
+
+   Switches to a different root directory and executes a new system manager process below it. This is intended for use in the initrd, and will transition from the initrd's system manager process (a.k.a. "init" process, PID 1) to the main system manager process which is loaded from the actual host root files system. This call takes two arguments: the directory that is to become the new root directory, and the path to the new system manager binary below it to execute as PID 1. If both are omitted or the former is an empty string it defaults to :code:`/sysroot/`. If the latter is omitted or is an empty string, a systemd binary will automatically be searched for and used as service manager. If the system manager path is omitted, equal to the empty string or identical to the path to the systemd binary, the state of the initrd's system manager process is passed to the main system manager, which allows later introspection of the state of the services involved in the initrd boot phase.
+
+   .. versionadded:: 209
+
+.. systemd:option:: sleep
+
+   Put the system to sleep, through :code:`suspend`, :code:`hibernate`, :code:`hybrid-sleep`, or :code:`suspend-then-hibernate`. The sleep operation to use is automatically selected by :ref:`systemd-logind.service(8)`. By default, :code:`suspend-then-hibernate` is used, and falls back to :code:`suspend` and then :code:`hibernate` if not supported. Refer to :code:`SleepOperation=` setting in :man-pages:`logind.conf(5)` for more details. This command is asynchronous, and will return after the sleep operation is successfully enqueued. It will not wait for the sleep/resume cycle to complete.
+
+   .. versionadded:: 256
+
+.. systemd:option:: suspend
+
+   Suspend the system. This will trigger activation of the special target unit :code:`suspend.target`. This command is asynchronous, and will return after the suspend operation is successfully enqueued. It will not wait for the suspend/resume cycle to complete.
+
+   If :code:`--force` is specified, and :code:`systemd-logind` returned error for the operation, the error will be ignored and the operation will be tried again directly through starting the target unit.
+
+.. systemd:option:: hibernate
+
+   Hibernate the system. This will trigger activation of the special target unit :code:`hibernate.target`. This command is asynchronous, and will return after the hibernation operation is successfully enqueued. It will not wait for the hibernate/thaw cycle to complete.
+
+   This command honors :code:`--force` in the same way as :code:`suspend`.
+
+.. systemd:option:: hybrid-sleep
+
+   Hibernate and suspend the system. This will trigger activation of the special target unit :code:`hybrid-sleep.target`. This command is asynchronous, and will return after the hybrid sleep operation is successfully enqueued. It will not wait for the sleep/wake-up cycle to complete.
+
+   This command honors :code:`--force` in the same way as :code:`suspend`.
+
+   .. versionadded:: 196
+
+.. systemd:option:: suspend-then-hibernate
+
+   Suspend the system and hibernate it when the battery is low, or when the delay specified in :code:`systemd-sleep.conf` elapsed. This will trigger activation of the special target unit :code:`suspend-then-hibernate.target`. This command is asynchronous, and will return after the hybrid sleep operation is successfully enqueued. It will not wait for the sleep/wake-up or hibernate/thaw cycle to complete.
+
+   This command honors :code:`--force` in the same way as :code:`suspend`.
+
+   .. versionadded:: 240
+
+Parameter Syntax
+################
+
+Unit commands listed above take either a single unit name (designated as :emphasis:`UNIT`), or multiple unit specifications (designated as :emphasis:`PATTERN`\…). In the first case, the unit name with or without a suffix must be given. If the suffix is not specified (unit name is "abbreviated"), systemctl will append a suitable suffix, ".service" by default, and a type-specific suffix in case of commands which operate only on specific unit types. For example,
+
+.. code-block:: sh
+
+   # systemctl start sshd
+
+and
+
+.. code-block:: sh
+
+   # systemctl start sshd.service
+
+are equivalent, as are
+
+.. code-block:: sh
+
+   # systemctl isolate default
+
+and
+
+.. code-block:: sh
+
+   # systemctl isolate default.target
+
+Note that (absolute) paths to device nodes are automatically converted to device unit names, and other (absolute) paths to mount unit names.
+
+.. code-block:: sh
+
+   # systemctl status /dev/sda
+   # systemctl status /home
+
+are equivalent to:
+
+.. code-block:: sh
+
+   # systemctl status dev-sda.device
+   # systemctl status home.mount
+
+In the second case, shell-style globs will be matched against the primary names of all units currently in memory; literal unit names, with or without a suffix, will be treated as in the first case. This means that literal unit names always refer to exactly one unit, but globs may match zero units and this is not considered an error.
+
+Glob patterns use :man-pages:`fnmatch(3)`, so normal shell-style globbing rules are used, and "*", "?", "[]" may be used. See :man-pages:`glob(7)` for more details. The patterns are matched against the primary names of units currently in memory, and patterns which do not match anything are silently skipped. For example:
+
+.. code-block:: sh
+
+   # systemctl stop "sshd@*.service"
+
+will stop all :code:`sshd@.service` instances. Note that alias names of units, and units that are not in memory are not considered for glob expansion.
+
+For unit file commands, the specified :emphasis:`UNIT` should be the name of the unit file (possibly abbreviated, see above), or the absolute path to the unit file:
+
+.. code-block:: sh
+
+   # systemctl enable foo.service
+
+or
+
+.. code-block:: sh
+
+   # systemctl link /path/to/foo.service
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: -t, --type=
+
+   The argument is a comma-separated list of unit types such as :code:`service` and :code:`socket`. When units are listed with :code:`list-units`, :code:`list-dependencies`, :code:`show`, or :code:`status`, only units of the specified types will be shown. By default, units of all types are shown.
+
+   As a special case, if one of the arguments is :code:`help`, a list of allowed values will be printed and the program will exit.
+
+.. systemd:option:: --state=
+
+   The argument is a comma-separated list of unit LOAD, SUB, or ACTIVE states. When listing units with :code:`list-units`, :code:`list-dependencies`, :code:`show` or :code:`status`, show only those in the specified states. Use :code:`--state=failed` or :code:`--failed` to show only failed units.
+
+   As a special case, if one of the arguments is :code:`help`, a list of allowed values will be printed and the program will exit.
+
+   .. versionadded:: 206
+
+.. systemd:option:: -p, --property=
+
+   When showing unit/job/manager properties with the :code:`show` command, limit display to properties specified in the argument. The argument should be a comma-separated list of property names, such as "MainPID". Unless specified, all known properties are shown. If specified more than once, all properties with the specified names are shown. Shell completion is implemented for property names.
+
+   For the manager itself, :code:`systemctl show` will show all available properties, most of which are derived or closely match the options described in :ref:`systemd-system.conf(5)`.
+
+   Properties for units vary by unit type, so showing any unit (even a non-existent one) is a way to list properties pertaining to this type. Similarly, showing any job will list properties pertaining to all jobs. Properties for units are documented in :ref:`systemd.unit(5)`, and the pages for individual unit types :ref:`systemd.service(5)`, :ref:`systemd.socket(5)`, etc.
+
+.. systemd:option:: -P
+
+   .. include:: standard-options.rst
+       :start-after: .. inclusion-marker-do-not-remove xpointer(//varlistentry[@id='option-P']/listitem/para)|
+       :end-before: .. inclusion-end-marker-do-not-remove xpointer(//varlistentry[@id='option-P']/listitem/para)|
+
+   .. versionadded:: 246
+
+.. systemd:option:: -a, --all
+
+   When listing units with :code:`list-units`, also show inactive units and units which are following other units. When showing unit/job/manager properties, show all properties regardless whether they are set or not.
+
+   To list all units installed in the file system, use the :code:`list-unit-files` command instead.
+
+   When listing units with :code:`list-dependencies`, recursively show dependencies of all dependent units (by default only dependencies of target units are shown).
+
+   When used with :code:`status`, show journal messages in full, even if they include unprintable characters or are very long. By default, fields with unprintable characters are abbreviated as "blob data". (Note that the pager may escape unprintable characters again.)
+
+.. systemd:option:: -r, --recursive
+
+   When listing units, also show units of local containers. Units of local containers will be prefixed with the container name, separated by a single colon character (":").
+
+   .. versionadded:: 212
+
+.. systemd:option:: --reverse
+
+   Show reverse dependencies between units with :code:`list-dependencies`, i.e. follow dependencies of type :code:`WantedBy=`, :code:`RequiredBy=`, :code:`UpheldBy=`, :code:`PartOf=`, :code:`BoundBy=`, instead of :code:`Wants=` and similar.
+
+   .. versionadded:: 203
+
+.. systemd:option:: --after
+
+   With :code:`list-dependencies`, show the units that are ordered before the specified unit. In other words, recursively list units following the :code:`After=` dependency.
+
+   Note that any :code:`After=` dependency is automatically mirrored to create a :code:`Before=` dependency. Temporal dependencies may be specified explicitly, but are also created implicitly for units which are :code:`WantedBy=` targets (see :ref:`systemd.target(5)`), and as a result of other directives (for example :code:`RequiresMountsFor=`). Both explicitly and implicitly introduced dependencies are shown with :code:`list-dependencies`.
+
+   When passed to the :code:`list-jobs` command, for each printed job show which other jobs are waiting for it. May be combined with :code:`--before` to show both the jobs waiting for each job as well as all jobs each job is waiting for.
+
+   .. versionadded:: 203
+
+.. systemd:option:: --before
+
+   With :code:`list-dependencies`, show the units that are ordered after the specified unit. In other words, recursively list units following the :code:`Before=` dependency.
+
+   When passed to the :code:`list-jobs` command, for each printed job show which other jobs it is waiting for. May be combined with :code:`--after` to show both the jobs waiting for each job as well as all jobs each job is waiting for.
+
+   .. versionadded:: 212
+
+.. systemd:option:: --with-dependencies
+
+   When used with :code:`status`, :code:`cat`, :code:`list-units`, and :code:`list-unit-files`, those commands print all specified units and the dependencies of those units.
+
+   Options :code:`--reverse`, :code:`--after`, :code:`--before` may be used to change what types of dependencies are shown.
+
+   .. versionadded:: 245
+
+.. systemd:option:: -l, --full
+
+   Do not ellipsize unit names, process tree entries, journal output, or truncate unit descriptions in the output of :code:`status`, :code:`list-units`, :code:`list-jobs`, and :code:`list-timers`.
+
+   Also, show installation targets in the output of :code:`is-enabled`.
+
+.. systemd:option:: --value
+
+   When printing properties with :code:`show`, only print the value, and skip the property name and "=". Also see option :code:`-P` above.
+
+   .. versionadded:: 230
+
+.. systemd:option:: --show-types
+
+   When showing sockets, show the type of the socket.
+
+   .. versionadded:: 202
+
+.. systemd:option:: --job-mode=
+
+   When queuing a new job, this option controls how to deal with already queued jobs. It takes one of "fail", "lenient", "replace", "replace-irreversibly", "isolate", "ignore-dependencies", "ignore-requirements", "flush", "triggering", or "restart-dependencies". Defaults to "replace", except when the :code:`isolate` command is used which implies the "isolate" job mode.
+
+   If "fail" is specified and a requested operation on weak dependencies conflicts with a pending job (more specifically: causes an already pending start job to be reversed into a stop job or vice versa), cause the operation to fail.
+
+   If "lenient" is specified and a requested operation conflicts with any active/activating unit, cause the operation to fail.
+
+   If "replace" (the default) is specified, any conflicting pending job will be replaced, as necessary.
+
+   If "replace-irreversibly" is specified, operate like "replace", but also mark the new jobs as irreversible. This prevents future conflicting transactions from replacing these jobs (or even being enqueued while the irreversible jobs are still pending). Irreversible jobs can still be cancelled using the :code:`cancel` command. This job mode should be used on any transaction which pulls in :code:`shutdown.target`.
+
+   "isolate" is only valid for start operations and causes all other units to be stopped when the specified unit is started. This mode is always used when the :code:`isolate` command is used.
+
+   "flush" will cause all queued jobs to be canceled when the new job is enqueued.
+
+   If "ignore-dependencies" is specified, then all unit dependencies are ignored for this new job and the operation is executed immediately. If passed, no required units of the unit passed will be pulled in, and no ordering dependencies will be honored. This is mostly a debugging and rescue tool for the administrator and should not be used by applications.
+
+   "ignore-requirements" is similar to "ignore-dependencies", but only causes the requirement dependencies to be ignored, the ordering dependencies will still be honored.
+
+   "triggering" may only be used with :code:`systemctl stop`. In this mode, the specified unit and any active units that trigger it are stopped. See the discussion of :code:`Triggers=` in :ref:`systemd.unit(5)` for more information about triggering units.
+
+   "restart-dependencies" may only be used with :code:`systemctl start`. In this mode, dependencies of the specified unit will receive restart propagation, as if a restart job had been enqueued for the unit.
+
+   .. versionadded:: 209
+
+.. systemd:option:: -T, --show-transaction
+
+   When enqueuing a unit job (for example as effect of a :code:`systemctl start` invocation or similar), show brief information about all jobs enqueued, covering both the requested job and any added because of unit dependencies. Note that the output will only include jobs immediately part of the transaction requested. It is possible that service start-up program code run as effect of the enqueued jobs might request further jobs to be pulled in. This means that completion of the listed jobs might ultimately entail more jobs than the listed ones.
+
+   .. versionadded:: 242
+
+.. systemd:option:: --fail
+
+   Shorthand for :code:`--job-mode=`fail.
+
+   When used with the :code:`kill` command, if no units were killed, the operation results in an error.
+
+   .. versionadded:: 227
+
+.. systemd:option:: --check-inhibitors=
+
+   When system shutdown or sleep state is requested, this option controls checking of inhibitor locks. It takes one of "auto", "yes", and "no". Defaults to "auto", which means logind will perform the check and respect active inhibitor locks, but :code:`systemctl` will only do a client-side check for interactive invocations (i.e. from a TTY), so that a more friendly and informative error can be returned to users. "no" disables the checks both in :code:`systemctl` and :ref:`systemd-logind(8)`.
+
+   Applications can establish inhibitor locks to prevent certain important operations (such as CD burning) from being interrupted by system shutdown or sleep. Any user may take these locks and privileged users may override these locks. If any locks are taken, shutdown and sleep state requests will normally fail (unless explicitly overridden with "no").
+
+   Option :code:`--force` provides another way to override inhibitors.
+
+   .. versionadded:: 248
+
+.. systemd:option:: -i
+
+   Shortcut for :code:`--check-inhibitors=no`.
+
+   .. versionadded:: 198
+
+.. systemd:option:: --dry-run
+
+   Just print what would be done. Currently supported by verbs :code:`halt`, :code:`poweroff`, :code:`reboot`, :code:`kexec`, :code:`suspend`, :code:`hibernate`, :code:`hybrid-sleep`, :code:`suspend-then-hibernate`, :code:`default`, :code:`rescue`, :code:`emergency`, and :code:`exit`.
+
+   .. versionadded:: 236
+
+.. systemd:option:: -q, --quiet
+
+   Suppress printing of the results of various commands and also the hints about truncated log lines. This does not suppress output of commands for which the printed output is the only result (like :code:`show`). Errors are always printed.
+
+.. systemd:option:: -v, --verbose
+
+   Display unit log output while executing unit operations.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --no-warn
+
+   Do not generate the warnings shown by default in the following cases: *       when :code:`systemctl` is invoked without procfs mounted on :code:`/proc/`,
+
+   *       when using :code:`enable` or :code:`disable` on units without install information (i.e. do not have or have an empty \[Install] section),
+
+   *       when using :code:`disable` combined with :code:`--user` on units that are enabled in global scope,
+
+   *       when a :code:`stop`-ped, :code:`disable`-d, or :code:`mask`-ed unit still has active triggering units,
+
+   *       when a unit file is changed and requires :code:`daemon-reload`.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --no-block
+
+   Do not synchronously wait for the requested operation to finish. If this is not specified, the job will be verified, enqueued and :code:`systemctl` will wait until the unit's start-up is completed. By passing this argument, it is only verified and enqueued. This option may not be combined with :code:`--wait`.
+
+.. systemd:option:: --wait
+
+   When used with :code:`start` or :code:`restart`, synchronously wait for started units to terminate again. This option may not be combined with :code:`--no-block`. Note that this will wait forever if any given unit never terminates (by itself or by getting stopped explicitly); particularly services which use "RemainAfterExit=yes".
+
+   When used with :code:`is-system-running`, wait until the boot process is completed before returning.
+
+   When used with :code:`kill`, wait until the signalled units terminate. Note that this will wait forever if any given unit never terminates.
+
+   .. versionadded:: 232
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove user|
+    :end-before: .. inclusion-end-marker-do-not-remove user|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove system|
+    :end-before: .. inclusion-end-marker-do-not-remove system|
+
+.. systemd:option:: --failed
+
+   List units in failed state. This is equivalent to :code:`--state=failed`.
+
+   .. versionadded:: 233
+
+.. systemd:option:: --no-wall
+
+   Do not send wall message before halt, power-off and reboot.
+
+.. systemd:option:: --global
+
+   When used with :code:`enable` and :code:`disable`, operate on the global user configuration directory, thus enabling or disabling a unit file globally for all future logins of all users.
+
+.. systemd:option:: --no-reload
+
+   When used with :code:`enable`, :code:`disable`, :code:`preset`, :code:`mask`, or :code:`unmask`, do not implicitly reload daemon configuration after executing the changes.
+
+.. systemd:option:: --kill-whom=
+
+   When used with :code:`kill`, choose which processes to send a UNIX process signal to. Must be one of :code:`main`, :code:`control`, :code:`cgroup` or :code:`all` to select whether to kill only the main process, the control process, all processes in the unit's control group or all processes of the unit. The main process of the unit is the one that defines the life-time of it. A control process of a unit is one that is invoked by the manager to induce state changes of it. For example, all processes started due to the :code:`ExecStartPre=`, :code:`ExecStop=` or :code:`ExecReload=` settings of service units are control processes. Note that there is only one control process per unit at a time, as only one state change is executed at a time. For services of type :code:`Type=forking`, the initial process started by the manager for :code:`ExecStart=` is a control process, while the process ultimately forked off by that one is then considered the main process of the unit (if it can be determined). This is different for service units of other types, where the process forked off by the manager for :code:`ExecStart=` is always the main process itself. A service unit consists of zero or one main process, zero or one control process plus any number of additional processes part of the unit's control group. Not all unit types manage processes of these types however. For example, for mount units, control processes are defined (which are the invocations of :code:`|MOUNT_PATH|` and :code:`|UMOUNT_PATH|`), but no main process is defined. If omitted, defaults to :code:`all`, except if :code:`--kill-subgroup=` is used in which case defaults to :code:`cgroup`.
+
+   .. versionadded:: 252
+
+.. systemd:option:: --kill-value=INT
+
+   If used with the :code:`kill` command, enqueues a signal along with the specified integer value parameter to the specified process(es). This operation is only available for POSIX Realtime Signals (i.e. :code:`--signal=SIGRTMIN+…` or :code:`--signal=SIGRTMAX-…`), and ensures the signals are generated via the :man-pages:`sigqueue(3)` system call, rather than :man-pages:`kill(3)`. The specified value must be a 32-bit signed integer, and may be specified either in decimal, in hexadecimal (if prefixed with "0x"), octal (if prefixed with "0o") or binary (if prefixed with "0b")
+
+   If this option is used the signal will only be enqueued on the control or main process of the unit, never on other processes belonging to the unit, i.e. :code:`--kill-whom=all` will only affect main and control processes but no other processes.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --kill-subgroup=PATH
+
+   Takes a control group sub-path to send signals to, for use with the :code:`kill` command. By default the chosen signal is delivered to all processes of the unit's cgroups (as well as the main/control processes (if outside) – subject to :code:`--kill-whom=`). But with this option a subgroup can be selelected instead. This functionality is only available if "cgroup" or "cgroup-fail" are used with :code:`--kill-whom=`, and in fact the former is the default if :code:`--kill-subgroup=` is used.
+
+   The specified path may, but doesn't have to be prefixed with a slash, and its absence or presence has no effect, the path is either way taken relative to the unit's main control group path.
+
+   This functionality is only available on units where control group delegation is enabled (see :code:`Delegate=` in
+   | :ref:`systemd.resource-control(5)`).
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove signal|
+    :end-before: .. inclusion-end-marker-do-not-remove signal|
+
+.. systemd:option:: --what=
+
+   Select what type of per-unit resources to remove when the :code:`clean` command is invoked, see above. Takes one of :code:`configuration`, :code:`state`, :code:`cache`, :code:`logs`, :code:`runtime`, :code:`fdstore` to select the type of resource. This option may be specified more than once, in which case all specified resource types are removed. Also accepts the special value :code:`all` as a shortcut for specifying all six resource types. If this option is not specified defaults to the combination of :code:`cache`, :code:`runtime` and :code:`fdstore`, i.e. the three kinds of resources that are generally considered to be redundant and can be reconstructed on next invocation. Note that the explicit removal of the :code:`fdstore` resource type is only useful if the :code:`FileDescriptorStorePreserve=` option is enabled, since the file descriptor store is otherwise cleaned automatically when the unit is stopped.
+
+   .. versionadded:: 243
+
+.. systemd:option:: -f, --force
+
+   When used with :code:`enable`, overwrite any existing conflicting symlinks.
+
+   When used with :code:`edit`, create all of the specified units which do not already exist.
+
+   When used with :code:`suspend`, :code:`hibernate`, :code:`hybrid-sleep`, or :code:`suspend-then-hibernate`, the error returned by :code:`systemd-logind` will be ignored, and the operation will be performed directly through starting the corresponding units.
+
+   When used with :code:`halt`, :code:`poweroff`, :code:`reboot`, or :code:`kexec`, execute the selected operation without shutting down all units. However, all processes will be killed forcibly and all file systems are unmounted or remounted read-only. This is hence a drastic but relatively safe option to request an immediate reboot. If :code:`--force` is specified twice for these operations (with the exception of :code:`kexec`), they will be executed immediately, without terminating any processes or unmounting any file systems.
+
+   .. warning::
+
+       Specifying :code:`--force` twice with any of these operations might result in data loss. Note that when :code:`--force` is specified twice the selected operation is executed by :code:`systemctl` itself, and the system manager is not contacted. This means the command should succeed even when the system manager has crashed.
+
+.. systemd:option:: --message=
+
+   When used with :code:`halt`, :code:`poweroff` or :code:`reboot`, set a short message explaining the reason for the operation. The message will be logged together with the default shutdown message.
+
+   .. versionadded:: 225
+
+.. systemd:option:: --now
+
+   When used with :code:`enable`, :code:`disable`, :code:`mask`, or :code:`reenable`, also start/stop/try-restart the units after the specified unit file operations succeed.
+
+   .. versionadded:: 220
+
+.. systemd:option:: --root=
+
+   When used with :code:`enable`/:code:`disable`/:code:`is-enabled` (and related commands), use the specified root path when looking for unit files. If this option is present, :code:`systemctl` will operate on the file system directly, instead of communicating with the :code:`systemd` daemon to carry out changes.
+
+.. systemd:option:: --image=image
+
+   Takes a path to a disk image file or block device node. If specified, all operations are applied to file system in the indicated disk image. This option is similar to :code:`--root=`, but operates on file systems stored in disk images or block devices. The disk image should either contain just a file system or a set of file systems within a GPT partition table, following the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_. For further information on supported disk images, see :ref:`systemd-nspawn(1)`'s switch of the same name.
+
+   .. versionadded:: 252
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove image-policy-open|
+    :end-before: .. inclusion-end-marker-do-not-remove image-policy-open|
+
+.. systemd:option:: --runtime
+
+   When used with :code:`enable`, :code:`disable`, :code:`edit`, (and related commands), make changes only temporarily, so that they are lost on the next reboot. This will have the effect that changes are not made in subdirectories of :code:`/etc/` but in :code:`/run/`, with identical immediate effects, however, since the latter is lost on reboot, the changes are lost too.
+
+   Similarly, when used with :code:`set-property`, make changes only temporarily, so that they are lost on the next reboot.
+
+.. systemd:option:: --preset-mode=
+
+   Takes one of "full" (the default), "enable-only", "disable-only". When used with the :code:`preset` or :code:`preset-all` commands, controls whether units shall be disabled and enabled according to the preset rules, or only enabled, or only disabled.
+
+   .. versionadded:: 215
+
+.. systemd:option:: -n, --lines=
+
+   When used with :code:`status`, controls the number of journal lines to show, counting from the most recent ones. Takes a positive integer argument, or 0 to disable journal output. Defaults to 10.
+
+.. systemd:option:: -o, --output=
+
+   When used with :code:`status`, controls the formatting of the journal entries that are shown. For the available choices, see :man-pages:`journalctl(1)`. Defaults to "short".
+
+.. systemd:option:: --firmware-setup
+
+   When used with the :code:`reboot`, :code:`poweroff`, or :code:`halt` command, indicate to the system's firmware to reboot into the firmware setup interface for the next boot. Note that this functionality is not available on all systems.
+
+   .. versionadded:: 220
+
+.. systemd:option:: --boot-loader-menu=timeout
+
+   When used with the :code:`reboot`, :code:`poweroff`, or :code:`halt` command, indicate to the system's boot loader to show the boot loader menu on the following boot. Takes a time value as parameter — indicating the menu timeout. Pass zero in order to disable the menu timeout. Note that not all boot loaders support this functionality.
+
+   .. versionadded:: 242
+
+.. systemd:option:: --boot-loader-entry=ID
+
+   When used with the :code:`reboot`, :code:`poweroff`, or :code:`halt` command, indicate to the system's boot loader to boot into a specific boot loader entry on the following boot. Takes a boot loader entry identifier as argument, or "help" in order to list available entries. Note that not all boot loaders support this functionality.
+
+   .. versionadded:: 242
+
+.. systemd:option:: --reboot-argument=
+
+   This switch is used with :code:`reboot`. The value is architecture and firmware specific. As an example, "recovery" might be used to trigger system recovery, and "fota" might be used to trigger a “firmware over the air” update.
+
+   .. versionadded:: 246
+
+.. systemd:option:: --plain
+
+   When used with :code:`list-dependencies`, :code:`list-units` or :code:`list-machines`, the output is printed as a list instead of a tree, and the bullet circles are omitted.
+
+   .. versionadded:: 203
+
+.. systemd:option:: --timestamp=
+
+   Change the format of printed timestamps. The following values may be used:
+
+   .. systemd:option:: pretty (this is the default)
+
+         "Day YYYY-MM-DD HH:MM:SS TZ"
+
+         .. versionadded:: 248
+
+   .. systemd:option:: unix
+
+         "@seconds-since-the-epoch"
+
+         .. versionadded:: 251
+
+   .. systemd:option:: us, μs
+
+         "Day YYYY-MM-DD HH:MM:SS.UUUUUU TZ"
+
+         .. versionadded:: 248
+
+   .. systemd:option:: utc
+
+         "Day YYYY-MM-DD HH:MM:SS UTC"
+
+         .. versionadded:: 248
+
+   .. systemd:option:: us+utc, μs+utc
+
+         "Day YYYY-MM-DD HH:MM:SS.UUUUUU UTC"
+
+         .. versionadded:: 248
+
+   .. versionadded:: 247
+
+.. systemd:option:: --mkdir
+
+   When used with :code:`bind`, creates the destination file or directory before applying the bind mount. Note that even though the name of this option suggests that it is suitable only for directories, this option also creates the destination file node to mount over if the object to mount is not a directory, but a regular file, device node, socket or FIFO.
+
+   .. versionadded:: 248
+
+.. systemd:option:: --marked
+
+   Only allowed with :code:`reload-or-restart`. Enqueues restart jobs for all units that have the "needs-restart" mark, and reload jobs for units that have the "needs-reload" mark. When a unit marked for reload does not support reload, restart will be queued. Those properties can be set using :code:`set-property Markers=…`.
+
+   Unless :code:`--no-block` is used, :code:`systemctl` will wait for the queued jobs to finish.
+
+   .. versionadded:: 248
+
+.. systemd:option:: --read-only
+
+   When used with :code:`bind`, creates a read-only bind mount.
+
+   .. versionadded:: 248
+
+.. systemd:option:: --drop-in=NAME
+
+   When used with :code:`edit`, use :emphasis:`NAME` as the drop-in file name instead of :code:`override.conf`.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --when=
+
+   When used with :code:`halt`, :code:`poweroff`, :code:`reboot` or :code:`kexec`, schedule the action to be performed at the given timestamp, which should adhere to the syntax documented in :man-pages:`systemd.time(7)` section "PARSING TIMESTAMPS". Specially, if "show" is given, the currently scheduled action will be shown, which can be canceled by passing an empty string or "cancel". "auto" will schedule the action according to maintenance window or one minute in the future.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --stdin
+
+   When used with :code:`edit`, the contents of the file will be read from standard input and the editor will not be launched. In this mode, the old contents of the file are completely replaced. This is useful to "edit" unit files from scripts:
+
+     .. code-block:: sh
+
+        $ systemctl edit --drop-in=limits.conf --stdin some-service.service <<EOF
+        [Unit]
+        AllowedCPUs=7,11
+        EOF
+
+   Multiple drop-ins may be "edited" in this mode; the same contents will be written to all of them.
+
+   .. versionadded:: 256
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove machine|
+    :end-before: .. inclusion-end-marker-do-not-remove machine|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove capsule|
+    :end-before: .. inclusion-end-marker-do-not-remove capsule|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove legend|
+    :end-before: .. inclusion-end-marker-do-not-remove legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+:code:`systemctl` uses the return codes defined by LSB, as defined in `LSB 3.0.0 <http://refspecs.linuxbase.org/LSB_3.0.0/LSB-PDA/LSB-PDA/iniscrptact.html>`_.
+
+.. list-table:: LSB return codes
+   :header-rows: 1
+
+   * - Value
+     - Description in LSB
+     - Use in systemd
+   * - :code:`0`
+     - "program is running or service is OK"
+     - unit is active
+   * - :code:`1`
+     - "program is dead and :code:`/var/run` pid file exists"
+     - unit *not* failed (used by failed (used by :code:`is-failed`)
+   * - :code:`2`
+     - "program is dead and :code:`/var/lock` lock file exists"
+     - unused
+   * - :code:`3`
+     - "program is not running"
+     - unit is not active
+   * - :code:`4`
+     - "program or service status is unknown"
+     - no such unit
+
+The mapping of LSB service states to systemd unit states is imperfect, so it is better to not rely on those return values but to look for specific unit states and substates instead.
+
+Environment
+###########
+
+.. systemd:var:: $SYSTEMD_EDITOR
+   :group: environment-variables
+
+   Editor to use when editing units; overrides :systemd:var:`$EDITOR` and :systemd:var:`$VISUAL`. If neither :systemd:var:`$SYSTEMD_EDITOR` nor :systemd:var:`$EDITOR` nor :systemd:var:`$VISUAL` are present or if it is set to an empty string or if their execution failed, systemctl will try to execute well known editors in this order: :die-net:`editor(1)`, :die-net:`nano(1)`, :die-net:`vim(1)`, :die-net:`vi(1)`.
+
+   .. versionadded:: 218
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove log-level|
+    :end-before: .. inclusion-end-marker-do-not-remove log-level|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove log-color|
+    :end-before: .. inclusion-end-marker-do-not-remove log-color|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove log-time|
+    :end-before: .. inclusion-end-marker-do-not-remove log-time|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove log-location|
+    :end-before: .. inclusion-end-marker-do-not-remove log-location|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove log-target|
+    :end-before: .. inclusion-end-marker-do-not-remove log-target|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove pager|
+    :end-before: .. inclusion-end-marker-do-not-remove pager|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove less|
+    :end-before: .. inclusion-end-marker-do-not-remove less|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove lesscharset|
+    :end-before: .. inclusion-end-marker-do-not-remove lesscharset|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove lesssecure|
+    :end-before: .. inclusion-end-marker-do-not-remove lesssecure|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove colors|
+    :end-before: .. inclusion-end-marker-do-not-remove colors|
+
+.. include:: common-variables.rst
+    :start-after: .. inclusion-marker-do-not-remove urlify|
+    :end-before: .. inclusion-end-marker-do-not-remove urlify|
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`journalctl(1)`, :man-pages:`loginctl(1)`, :man-pages:`machinectl(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.resource-control(5)`, :ref:`systemd.special(7)`, :man-pages:`wall(1)`, :ref:`systemd.preset(5)`, :ref:`systemd.generator(7)`, :man-pages:`glob(7)`
+
+

@@ -1,0 +1,1379 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="systemd-resolved.service(8)" href="systemd-resolved.service.html"><link rel="prev" title="systemd-remount-fs.service(8)" href="systemd-remount-fs.service.html">
+        <link rel="prefetch" href="../_static/systemd-logo.svg" as="image">
+        <link rel="prefetch" href="../_static/systemd-logo-dark.svg" as="image">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>systemd-repart(8)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6e47b7e0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #35a764;
+  --color-brand-content: #35a764;
+  --color-brand-visited: #197b43;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">systemd</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/systemd-logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/systemd-logo-dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">B</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="binfmt.d.html">binfmt.d(5) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootctl.html">bootctl(1) — Control EFI firmware boot settings and manage boot loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootup.html">bootup(7) — System bootup process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="busctl.html">busctl(1) — Introspect the bus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capsule%40.service.html">capsule@.service(5) — System unit for the capsule service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredump.conf.html">coredump.conf(5) — Core dump storage configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredumpctl.html">coredumpctl(1) — Retrieve and process saved core dumps and metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypttab.html">crypttab(5) — Configuration for encrypted block devices</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">D</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daemon.html">daemon(7) — Writing and packaging system daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dnssec-trust-anchors.d.html">dnssec-trust-anchors.d(5) — DNSSEC trust anchor configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">E</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment.d.html">environment.d(5) — Definition of user service environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">F</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-hierarchy.html">file-hierarchy(7) — File system hierarchy overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">H</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="homectl.html">homectl(1) — Create, remove, change or inspect home directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homed.conf.html">homed.conf(5) — Home area/user account manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostname.html">hostname(5) — Local hostname configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostnamectl.html">hostnamectl(1) — Control the system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hwdb.html">hwdb(7) — Hardware Database</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">I</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="importctl.html">importctl(1) — Download, import or export disk images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integritytab.html">integritytab(5) — Configuration for integrity block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocost.conf.html">iocost.conf(5) — Configuration files for the iocost solution manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">J</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="journal-remote.conf.html">journal-remote.conf(5) — Configuration files for the service accepting remote journal uploads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal-upload.conf.html">journal-upload.conf(5) — Configuration files for the journal upload service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journalctl.html">journalctl(1) — Print log entries from the systemd journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journald.conf.html">journald.conf(5) — Journal service configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">K</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kernel-command-line.html">kernel-command-line(7) — Kernel command line parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-install.html">kernel-install(8) — Add and remove kernel and initrd images to and from the boot partition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">L</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libsystemd.html">libsystemd(3) — Functions for implementing services and interacting with systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libudev.html">libudev(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.conf.html">loader.conf(5) — Configuration file for systemd-boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locale.conf.html">locale.conf(5) — Configuration file for locale settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localectl.html">localectl(1) — Control the system locale and keyboard layout settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localtime.html">localtime(5) — Local timezone configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loginctl.html">loginctl(1) — Control the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logind.conf.html">logind.conf(5) — Login manager configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">M</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="machine-id.html">machine-id(5) — Local machine ID configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machine-info.html">machine-info(5) — Local machine information file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machinectl.html">machinectl(1) — Control the systemd machine manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules-load.d.html">modules-load.d(5) — Configure kernel modules to load at boot</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">N</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="networkctl.html">networkctl(1) — Query or modify the status of network links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networkd.conf.html">networkd.conf(5) — Global Network configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-myhostname.html">nss-myhostname(8) — Hostname resolution for the locally configured system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-mymachines.html">nss-mymachines(8) — Hostname resolution for local container instances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-resolve.html">nss-resolve(8) — Hostname resolution via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-systemd.html">nss-systemd(8) — UNIX user and group name resolution for user/group lookup via Varlink</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">O</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oomctl.html">oomctl(1) — Analyze the state stored in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oomd.conf.html">oomd.conf(5) — Global</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.home1.html">org.freedesktop.home1(5) — The D-Bus interface of systemd-homed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.hostname1.html">org.freedesktop.hostname1(5) — The D-Bus interface of systemd-hostnamed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.import1.html">org.freedesktop.import1(5) — The D-Bus interface of systemd-importd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.locale1.html">org.freedesktop.locale1(5) — The D-Bus interface of systemd-localed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.LogControl1.html">org.freedesktop.LogControl1(5) — D-Bus interface to query and set logging configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.login1.html">org.freedesktop.login1(5) — The D-Bus interface of systemd-logind</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.machine1.html">org.freedesktop.machine1(5) — The D-Bus interface of systemd-machined</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.network1.html">org.freedesktop.network1(5) — The D-Bus interface of systemd-networkd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.oom1.html">org.freedesktop.oom1(5) — The D-Bus interface of systemd-oomd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.portable1.html">org.freedesktop.portable1(5) — The D-Bus interface of systemd-portabled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.resolve1.html">org.freedesktop.resolve1(5) — The D-Bus interface of systemd-resolved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.systemd1.html">org.freedesktop.systemd1(5) — The D-Bus interface of systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.sysupdate1.html">org.freedesktop.sysupdate1(5) — The D-Bus interface of systemd-sysupdated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timedate1.html">org.freedesktop.timedate1(5) — The D-Bus interface of systemd-timedated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timesync1.html">org.freedesktop.timesync1(5) — The D-Bus interface of systemd-timesyncd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="os-release.html">os-release(5) — Operating system identification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">P</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd.html">pam_systemd(8) — Register user sessions in the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_home.html">pam_systemd_home(8) — Authenticate users and mount home directories via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_loadkey.html">pam_systemd_loadkey(8) — Read password from kernel keyring and set it as PAM authtok</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portablectl.html">portablectl(1) — Attach, detach or inspect portable service images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="poweroff.html">poweroff(8) — Power off, reboot, or halt the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pstore.conf.html">pstore.conf(5) — PStore configuration file</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">R</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="repart.d.html">repart.d(5) — Partition Definition Files for Automatic Boot-Time Repartitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolvectl.html">resolvectl(1) — Resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services; introspect and reconfigure the DNS resolver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolved.conf.html">resolved.conf(5) — Network Name Resolution configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run0.html">run0(1) — Elevate privileges</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">S</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="sd-bus.html">sd-bus(3) — A lightweight D-Bus IPC client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus-errors.html">sd-bus-errors(3) — Standard D-Bus error names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-daemon.html">sd-daemon(3) — APIs for new-style daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-device.html">sd-device(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-event.html">sd-event(3) — A generic event loop implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-hwdb.html">sd-hwdb(3) — Read-only access to the hardware description database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-id128.html">sd-id128(3) — APIs for processing 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-journal.html">sd-journal(3) — APIs for submitting and querying log entries to and from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-json.html">sd-json(3) — APIs for Dealing with JSON Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-login.html">sd-login(3) — APIs for tracking logins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-path.html">sd-path(3) — APIs to query file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-varlink.html">sd-varlink(3) — APIs for Varlink IPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_booted.html">sd_booted(3) — Test whether the system is running the systemd init system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_match.html">sd_bus_add_match(3) — Add a match rule for incoming message dispatching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_node_enumerator.html">sd_bus_add_node_enumerator(3) — Add a node enumerator for a D-Bus object path prefix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object.html">sd_bus_add_object(3) — Declare properties and methods for a D-Bus path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object_manager.html">sd_bus_add_object_manager(3) — Add a D-Bus object manager for a D-Bus object sub-tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_attach_event.html">sd_bus_attach_event(3) — Attach a bus connection object to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call.html">sd_bus_call(3) — Invoke a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call_method.html">sd_bus_call_method(3) — Initialize a bus message object and invoke the corresponding D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_can_send.html">sd_bus_can_send(3) — Check which types can be sent over a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_close.html">sd_bus_close(3) — Close and flush a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_get_pid.html">sd_bus_creds_get_pid(3) — Retrieve fields from a credentials object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_new_from_pid.html">sd_bus_creds_new_from_pid(3) — Retrieve credentials object for the specified PID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_default.html">sd_bus_default(3) — Acquire a connection to a system or user bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_emit_signal.html">sd_bus_emit_signal(3) — Convenience functions for emitting (standard) D-Bus signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_enqueue_for_read.html">sd_bus_enqueue_for_read(3) — Re-enqueue a bus message on a bus connection, for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error.html">sd_bus_error(3) — sd-bus error handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error_add_map.html">sd_bus_error_add_map(3) — Additional sd-dbus error mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_current_handler.html">sd_bus_get_current_handler(3) — Query information of the callback a bus object is currently running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_fd.html">sd_bus_get_fd(3) — Get the file descriptor, I/O events and timeout to wait for from a message bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_n_queued_read.html">sd_bus_get_n_queued_read(3) — Get the number of pending bus messages in the read and write queues of a bus connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_creds.html">sd_bus_get_name_creds(3) — Query bus client credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_machine_id.html">sd_bus_get_name_machine_id(3) — Retrieve a bus client's machine identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_interface_name_is_valid.html">sd_bus_interface_name_is_valid(3) — Check if a string is a valid bus name or object path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_is_open.html">sd_bus_is_open(3) — Check whether the bus connection is open or ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_list_names.html">sd_bus_list_names(3) — Retrieve information about registered names on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append.html">sd_bus_message_append(3) — Attach fields to a D-Bus message based on a type string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_array.html">sd_bus_message_append_array(3) — Append an array of fields to a D-Bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_basic.html">sd_bus_message_append_basic(3) — Attach a single field to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_string_memfd.html">sd_bus_message_append_string_memfd(3) — Attach a string to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_strv.html">sd_bus_message_append_strv(3) — Attach an array of strings to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_at_end.html">sd_bus_message_at_end(3) — Check if a message has been fully read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_copy.html">sd_bus_message_copy(3) — Copy the contents of one message to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_dump.html">sd_bus_message_dump(3) — Produce a string representation of a message for debugging purposes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_cookie.html">sd_bus_message_get_cookie(3) — Returns the transaction cookie of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_monotonic_usec.html">sd_bus_message_get_monotonic_usec(3) — Retrieve the sender timestamps and sequence number of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_signature.html">sd_bus_message_get_signature(3) — Query bus message signature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_type.html">sd_bus_message_get_type(3) — Query bus message addressing/credentials metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new.html">sd_bus_message_new(3) — Create a new bus message object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_call.html">sd_bus_message_new_method_call(3) — Create a method call message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_error.html">sd_bus_message_new_method_error(3) — Create an error reply for a method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_signal.html">sd_bus_message_new_signal(3) — Create a signal message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_open_container.html">sd_bus_message_open_container(3) — Create and move between containers in D-Bus messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read.html">sd_bus_message_read(3) — Read a sequence of values from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_array.html">sd_bus_message_read_array(3) — Access an array of elements in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_basic.html">sd_bus_message_read_basic(3) — Read a basic type from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_strv.html">sd_bus_message_read_strv(3) — Access an array of strings in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_rewind.html">sd_bus_message_rewind(3) — Return to beginning of message or current container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_seal.html">sd_bus_message_seal(3) — Prepare a D-Bus message for transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_sensitive.html">sd_bus_message_sensitive(3) — Mark a message object as containing sensitive data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_destination.html">sd_bus_message_set_destination(3) — Set and query bus message addressing information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_expect_reply.html">sd_bus_message_set_expect_reply(3) — Set and query bus message metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_skip.html">sd_bus_message_skip(3) — Skip elements in a bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_verify_type.html">sd_bus_message_verify_type(3) — Check if the message has specified type at the current location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_negotiate_fds.html">sd_bus_negotiate_fds(3) — Control feature negotiation on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_new.html">sd_bus_new(3) — Create a new bus object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_path_encode.html">sd_bus_path_encode(3) — Convert an external identifier into an object path and back</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_pending_method_calls.html">sd_bus_pending_method_calls(3) — Return the number of currently pending, outgoing method calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_process.html">sd_bus_process(3) — Drive the connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_query_sender_creds.html">sd_bus_query_sender_creds(3) — Query bus message sender credentials/privileges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_error.html">sd_bus_reply_method_error(3) — Reply with an error to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_return.html">sd_bus_reply_method_return(3) — Reply to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_request_name.html">sd_bus_request_name(3) — Request or release a well-known service name on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_send.html">sd_bus_send(3) — Queue a D-Bus message for transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_address.html">sd_bus_set_address(3) — Set or query the address of the bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_close_on_exit.html">sd_bus_set_close_on_exit(3) — Control whether to close the bus connection during the event loop exit phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_connected_signal.html">sd_bus_set_connected_signal(3) — Control emission of local connection establishment signal on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_description.html">sd_bus_set_description(3) — Set or query properties of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_exit_on_disconnect.html">sd_bus_set_exit_on_disconnect(3) — Control the exit behavior when the bus object disconnects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_fd.html">sd_bus_set_fd(3) — Set the file descriptors to use for bus communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_method_call_timeout.html">sd_bus_set_method_call_timeout(3) — Set or query the default D-Bus method call timeout of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_property.html">sd_bus_set_property(3) — Set or query D-Bus service properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_sender.html">sd_bus_set_sender(3) — Configure default sender for outgoing messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_server.html">sd_bus_set_server(3) — Configure connection mode for a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_watch_bind.html">sd_bus_set_watch_bind(3) — Control socket binding watching on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_get_bus.html">sd_bus_slot_get_bus(3) — Query information attached to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_ref.html">sd_bus_slot_ref(3) — Create and destroy references to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_description.html">sd_bus_slot_set_description(3) — Set or query the description of bus slot objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_destroy_callback.html">sd_bus_slot_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_floating.html">sd_bus_slot_set_floating(3) — Control whether a bus slot object is "floating"</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_userdata.html">sd_bus_slot_set_userdata(3) — Set and query the value in the "userdata" field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_start.html">sd_bus_start(3) — Initiate a bus connection to the D-bus broker daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_add_name.html">sd_bus_track_add_name(3) — Add, remove and retrieve bus peers tracked in a bus peer tracking object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_new.html">sd_bus_track_new(3) — Track bus peers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_wait.html">sd_bus_wait(3) — Wait for I/O on a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_add_match_parent.html">sd_device_enumerator_add_match_parent(3) — Add a filter to the device enumerator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_get_device_first.html">sd_device_enumerator_get_device_first(3) — Enumerates devices and get the first or next device.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_new.html">sd_device_enumerator_new(3) — Create, reference, and release a device enumerator object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_get_syspath.html">sd_device_get_syspath(3) — Returns various fields of device objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_ref.html">sd_device_ref(3) — Create or destroy references to a device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_child.html">sd_event_add_child(3) — Add a child process state change event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_defer.html">sd_event_add_defer(3) — Add static event sources to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_inotify.html">sd_event_add_inotify(3) — Add an "inotify" file system inode event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_io.html">sd_event_add_io(3) — Add an I/O event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_memory_pressure.html">sd_event_add_memory_pressure(3) — Add and configure an event source run as result of memory pressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_signal.html">sd_event_add_signal(3) — Add a UNIX process signal event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_time.html">sd_event_add_time(3) — Add a timer event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_exit.html">sd_event_exit(3) — Ask the event loop to exit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_get_fd.html">sd_event_get_fd(3) — Obtain a file descriptor to poll for event loop events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_new.html">sd_event_new(3) — Acquire and release an event loop object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_now.html">sd_event_now(3) — Retrieve current event loop iteration timestamp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_run.html">sd_event_run(3) — Run an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_exit_on_idle.html">sd_event_set_exit_on_idle(3) — Enable event loop exit-on-idle support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_signal_exit.html">sd_event_set_signal_exit(3) — Automatically leave event loop on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_watchdog.html">sd_event_set_watchdog(3) — Enable event loop watchdog support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_event.html">sd_event_source_get_event(3) — Retrieve the event loop of an event source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_pending.html">sd_event_source_get_pending(3) — Determine pending state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_description.html">sd_event_source_set_description(3) — Set or retrieve descriptive names of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_destroy_callback.html">sd_event_source_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_enabled.html">sd_event_source_set_enabled(3) — Enable or disable event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_exit_on_failure.html">sd_event_source_set_exit_on_failure(3) — Set or retrieve the exit-on-failure feature of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_floating.html">sd_event_source_set_floating(3) — Set or retrieve 'floating' state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_prepare.html">sd_event_source_set_prepare(3) — Set a preparation callback for event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_priority.html">sd_event_source_set_priority(3) — Set or retrieve the priority of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_ratelimit.html">sd_event_source_set_ratelimit(3) — Configure rate limiting on event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_userdata.html">sd_event_source_set_userdata(3) — Set or retrieve user data pointer of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_unref.html">sd_event_source_unref(3) — Increase or decrease event source reference counters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_wait.html">sd_event_wait(3) — Low-level event loop operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_get_seats.html">sd_get_seats(3) — Determine available seats, sessions, logged in users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_get.html">sd_hwdb_get(3) — Seek to a location in hwdb or access entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_new.html">sd_hwdb_new(3) — Create a new hwdb object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_get_machine.html">sd_id128_get_machine(3) — Retrieve 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_randomize.html">sd_id128_randomize(3) — Generate 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_to_string.html">sd_id128_to_string(3) — Format or parse 128-bit IDs as strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_is_fifo.html">sd_is_fifo(3) — Check the type of a file descriptor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_add_match.html">sd_journal_add_match(3) — Add or remove entry matches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_enumerate_fields.html">sd_journal_enumerate_fields(3) — Read used field names from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_catalog.html">sd_journal_get_catalog(3) — Retrieve message catalog entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cursor.html">sd_journal_get_cursor(3) — Get cursor string for or test cursor string against the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cutoff_realtime_usec.html">sd_journal_get_cutoff_realtime_usec(3) — Read cut-off timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_data.html">sd_journal_get_data(3) — Read data fields from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_fd.html">sd_journal_get_fd(3) — Journal change notification interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_realtime_usec.html">sd_journal_get_realtime_usec(3) — Read timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_seqnum.html">sd_journal_get_seqnum(3) — Read sequence number from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_usage.html">sd_journal_get_usage(3) — Journal disk usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_has_runtime_files.html">sd_journal_has_runtime_files(3) — Query availability of runtime or persistent journal files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_next.html">sd_journal_next(3) — Advance or set back the read pointer in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_open.html">sd_journal_open(3) — Open the system journal for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_print.html">sd_journal_print(3) — Submit log entries to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_query_unique.html">sd_journal_query_unique(3) — Read unique data fields from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_seek_head.html">sd_journal_seek_head(3) — Seek to a position in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_stream_fd.html">sd_journal_stream_fd(3) — Create log stream file descriptor to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_json_dispatch_string.html">sd_json_dispatch_string(3) — Decode JSON variant values and write them to the specified memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_listen_fds.html">sd_listen_fds(3) — Check for file descriptors passed by the system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_login_monitor_new.html">sd_login_monitor_new(3) — Monitor login sessions, seats, users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_machine_get_class.html">sd_machine_get_class(3) — Determine the class and network interface indices of a locally running virtual machine or container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_notify.html">sd_notify(3) — Notify service manager about start-up completion and other service status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_path_lookup.html">sd_path_lookup(3) — Query well-known file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pid_get_owner_uid.html">sd_pid_get_owner_uid(3) — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pidfd_get_inode_id.html">sd_pidfd_get_inode_id(3) — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_seat_get_active.html">sd_seat_get_active(3) — Determine state of a specific seat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_session_is_active.html">sd_session_is_active(3) — Determine state of a specific session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_uid_get_state.html">sd_uid_get_state(3) — Determine login state of a specific Unix user ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_is_connected.html">sd_varlink_is_connected(3) — Query if a Varlink connection object is currently connected or idle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_push_fd.html">sd_varlink_push_fd(3) — Submit a file descriptor to send along with the next outgoing Varlink message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_send.html">sd_varlink_send(3) — Enqueues a Varlink method call, not expecting a reply</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_server_new.html">sd_varlink_server_new(3) — Allocate Varlink server object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_description.html">sd_varlink_set_description(3) — Set or query description of a Varlink connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_relative_timeout.html">sd_varlink_set_relative_timeout(3) — Set method call time-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_watchdog_enabled.html">sd_watchdog_enabled(3) — Check whether the service manager expects watchdog keep-alive notifications from a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shutdown.html">shutdown(8) — Halt, power off or reboot the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smbios-type-11.html">smbios-type-11(7) — SMBIOS Type 11 strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysctl.d.html">sysctl.d(5) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysext.conf.html">sysext.conf(5) — Configuration files for systemd-sysext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemctl.html">systemctl(1) — Control the systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.html">systemd(1) — systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ac-power.html">systemd-ac-power(1) — Report whether we are connected to an external power source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-analyze.html">systemd-analyze(1) — Analyze and debug system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password.html">systemd-ask-password(1) — Query the user for a system password</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password-console.service.html">systemd-ask-password-console.service(8) — Query the user for system passwords on the console and via wall</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-backlight%40.service.html">systemd-backlight@.service(8) — Load and save the display backlight brightness at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-battery-check.service.html">systemd-battery-check.service(8) — Check battery level whether there's enough charge, and power off if not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-binfmt.service.html">systemd-binfmt.service(8) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot-generator.html">systemd-bless-boot-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot.service.html">systemd-bless-boot.service(8) — Mark current boot process as successful</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot.html">systemd-boot(7) — A simple UEFI boot manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-check-no-failures.service.html">systemd-boot-check-no-failures.service(8) — verify that the system booted up cleanly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-clear-sysfail.service.html">systemd-boot-clear-sysfail.service(8) — Clear LoaderEntrySysFail entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-random-seed.service.html">systemd-boot-random-seed.service(8) — Refresh boot loader random seed at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bsod.service.html">systemd-bsod.service(8) — Displays boot-time emergency log message in full screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cat.html">systemd-cat(1) — Connect a pipeline or program's output with the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgls.html">systemd-cgls(1) — Recursively show control group contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgtop.html">systemd-cgtop(1) — Show top control groups by their resource usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-coredump.html">systemd-coredump(8) — Acquire, save and process core dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-creds.html">systemd-creds(1) — Lists, shows, encrypts and decrypts service credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptenroll.html">systemd-cryptenroll(1) — Enroll PKCS#11, FIDO2, TPM2 token/devices to LUKS2 encrypted volumes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup.html">systemd-cryptsetup(8) — Full disk decryption logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup-generator.html">systemd-cryptsetup-generator(8) — Unit generator for</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-debug-generator.html">systemd-debug-generator(8) — Generator for enabling a runtime debug shell and masking specific units at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-delta.html">systemd-delta(1) — Find overridden configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-detect-virt.html">systemd-detect-virt(1) — Detect execution in a virtualized environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-dissect.html">systemd-dissect(1) — Dissect Discoverable Disk Images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-environment-d-generator.html">systemd-environment-d-generator(8) — Load variables specified by</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-escape.html">systemd-escape(1) — Escape strings for usage in systemd unit names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset.html">systemd-factory-reset(8) — Request or complete a factory reset operation, or query current factory reset mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset-generator.html">systemd-factory-reset-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-firstboot.html">systemd-firstboot(1) — Initialize basic system settings on or before the first boot-up of a system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fsck%40.service.html">systemd-fsck@.service(8) — File system checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fstab-generator.html">systemd-fstab-generator(8) — Unit generator for /etc/fstab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-getty-generator.html">systemd-getty-generator(8) — Generator for enabling getty instances on the console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-gpt-auto-generator.html">systemd-gpt-auto-generator(8) — Generator for automatically discovering and mounting root,</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume-generator.html">systemd-hibernate-resume-generator(8) — Unit generator for resume= kernel parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume.service.html">systemd-hibernate-resume.service(8) — Resume from hibernation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-homed.service.html">systemd-homed.service(8) — Home Area/User Account Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hostnamed.service.html">systemd-hostnamed.service(8) — Daemon to control system hostname from programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hwdb.html">systemd-hwdb(8) — hardware database management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-id128.html">systemd-id128(1) — Generate and print sd-128 identifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-import-generator.html">systemd-import-generator(8) — Generator for automatically downloading disk images at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-importd.service.html">systemd-importd.service(8) — VM and container image import and export service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-inhibit.html">systemd-inhibit(1) — Execute a program with an inhibition lock taken</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup-generator.html">systemd-integritysetup-generator(8) — Unit generator for integrity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup%40.service.html">systemd-integritysetup@.service(8) — Disk integrity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-gatewayd.service.html">systemd-journal-gatewayd.service(8) — HTTP server for journal events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-remote.service.html">systemd-journal-remote.service(8) — Receive journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-upload.service.html">systemd-journal-upload.service(8) — Send journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journald.service.html">systemd-journald.service(8) — Journal service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-keyutil.html">systemd-keyutil(1) — Perform various operations on private keys and X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-localed.service.html">systemd-localed.service(8) — Locale bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-logind.service.html">systemd-logind.service(8) — Login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-loop%40.service.html">systemd-loop@.service(8) — Attach a loopback block device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-commit.service.html">systemd-machine-id-commit.service(8) — Commit a transient machine ID to disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-setup.html">systemd-machine-id-setup(1) — Initialize the machine ID in /etc/machine-id</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machined.service.html">systemd-machined.service(8) — Virtual machine and container registration manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-makefs%40.service.html">systemd-makefs@.service(8) — Creating and growing file systems on demand</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-measure.html">systemd-measure(1) — Pre-calculate and sign expected TPM2 PCR 11 values for booted unified kernel images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-modules-load.service.html">systemd-modules-load.service(8) — Load kernel modules at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mount.html">systemd-mount(1) — Establish and destroy transient mount or auto-mount points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mountfsd.service.html">systemd-mountfsd.service(8) — Disk Image File System Mount Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mute-console.html">systemd-mute-console(1) — Temporarily mute kernel log output and service manager status output to the system console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-network-generator.service.html">systemd-network-generator.service(8) — Generate network configuration from the kernel command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd-wait-online.service.html">systemd-networkd-wait-online.service(8) — Wait for network to come online</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd.service.html">systemd-networkd.service(8) — Network manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-notify.html">systemd-notify(1) — Notify service manager about start-up completion and other daemon status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nspawn.html">systemd-nspawn(1) — Spawn a command or OS in a lightweight container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nsresourced.service.html">systemd-nsresourced.service(8) — User Namespace Resource Delegation Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-oomd.service.html">systemd-oomd.service(8) — A userspace out-of-memory (OOM) killer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-path.html">systemd-path(1) — List and query system and user paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrlock.html">systemd-pcrlock(8) — Analyze and predict TPM2 PCR states and generate an access policy from the prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrphase.service.html">systemd-pcrphase.service(8) — Measure boot phases, machine ID, product UUID and file system identity into TPM PCRs and NvPCRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-portabled.service.html">systemd-portabled.service(8) — Portable service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-poweroff.service.html">systemd-poweroff.service(8) — System shutdown logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pstore.service.html">systemd-pstore.service(8) — A service to archive contents of pstore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pty-forward.html">systemd-pty-forward(1) — Run a command with a custom terminal background color or title</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-quotacheck%40.service.html">systemd-quotacheck@.service(8) — File system quota checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-random-seed.service.html">systemd-random-seed.service(8) — Load and save the OS system random seed at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rc-local-generator.html">systemd-rc-local-generator(8) — Compatibility generator and service to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-remount-fs.service.html">systemd-remount-fs.service(8) — Remount root and kernel file systems</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">systemd-repart(8) — Automatically grow and add partitions, and generate disk images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-resolved.service.html">systemd-resolved.service(8) — Network Name Resolution manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rfkill.service.html">systemd-rfkill.service(8) — Load and save the RF kill switch state at boot and change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run.html">systemd-run(1) — Run programs in transient scope units, service units, or path-, socket-, or timer-triggered service units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run-generator.html">systemd-run-generator(8) — Generator for invoking commands specified on the kernel command line as system service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sbsign.html">systemd-sbsign(1) — Sign PE binaries for EFI Secure Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sleep.conf.html">systemd-sleep.conf(5) — Suspend and hibernation configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-activate.html">systemd-socket-activate(1) — Test socket activation of daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-proxyd.html">systemd-socket-proxyd(8) — Bidirectionally proxy local sockets to another (possibly remote) socket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-soft-reboot.service.html">systemd-soft-reboot.service(8) — Userspace reboot operation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-generator.html">systemd-ssh-generator(8) — Generator for binding a socket-activated SSH server to local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-issue.html">systemd-ssh-issue(1) — Generator for SSH login prompt drop-ins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-proxy.html">systemd-ssh-proxy(1) — SSH client plugin for connecting to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stdio-bridge.html">systemd-stdio-bridge(1) — D-Bus proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-storagetm.service.html">systemd-storagetm.service(8) — Exposes all local block devices as NVMe-TCP mass storage devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stub.html">systemd-stub(7) — A simple UEFI kernel boot stub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-suspend.service.html">systemd-suspend.service(8) — System sleep state logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysctl.service.html">systemd-sysctl.service(8) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysext.html">systemd-sysext(8) — Activates System Extension Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system-update-generator.html">systemd-system-update-generator(8) — Generator for redirecting boot to offline update mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system.conf.html">systemd-system.conf(5) — System and session service manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdate.html">systemd-sysupdate(8) — Automatically Update OS or Other Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdated.service.html">systemd-sysupdated.service(8) — System Update Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysusers.html">systemd-sysusers(8) — Allocate system users and groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysv-generator.html">systemd-sysv-generator(8) — Unit generator for SysV init scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-time-wait-sync.service.html">systemd-time-wait-sync.service(8) — Wait until kernel time is synchronized</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timedated.service.html">systemd-timedated.service(8) — Time and date bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timesyncd.service.html">systemd-timesyncd.service(8) — Network Time Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tmpfiles.html">systemd-tmpfiles(8) — Create, delete, and clean up files and directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-clear.service.html">systemd-tpm2-clear.service(8) — Request that the TPM security chip is cleared on next boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-generator.html">systemd-tpm2-generator(8) — Generator for inserting TPM2 synchronization point in the boot process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-setup.service.html">systemd-tpm2-setup.service(8) — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tty-ask-password-agent.html">systemd-tty-ask-password-agent(1) — List or process pending systemd password requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udev-settle.service.html">systemd-udev-settle.service(8) — Wait for all pending udev events to be handled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udevd.service.html">systemd-udevd.service(8) — Device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-done.service.html">systemd-update-done.service(8) — Mark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-utmp.service.html">systemd-update-utmp.service(8) — Write audit and utmp updates at bootup and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-user-sessions.service.html">systemd-user-sessions.service(8) — Permit user logins after boot, prohibit user logins at shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-userdbd.service.html">systemd-userdbd.service(8) — JSON User/Group Record Query Multiplexer/NSS Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-validatefs%40.service.html">systemd-validatefs@.service(8) — Validate File System Mount Constraint Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vconsole-setup.service.html">systemd-vconsole-setup.service(8) — Configure the virtual consoles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup-generator.html">systemd-veritysetup-generator(8) — Unit generator for verity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup%40.service.html">systemd-veritysetup@.service(8) — Disk verity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vmspawn.html">systemd-vmspawn(1) — Spawn an OS in a virtual machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-volatile-root.service.html">systemd-volatile-root.service(8) — Make the root file system volatile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vpick.html">systemd-vpick(1) — Resolve paths to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-xdg-autostart-generator.html">systemd-xdg-autostart-generator(8) — User unit generator for XDG autostart files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.automount.html">systemd.automount(5) — Automount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.device.html">systemd.device(5) — Device unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dns-delegate.html">systemd.dns-delegate(5) — DNS Server Delegation Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dnssd.html">systemd.dnssd(5) — DNS-SD configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.environment-generator.html">systemd.environment-generator(7) — systemd environment file generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.exec.html">systemd.exec(5) — Execution environment configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.generator.html">systemd.generator(7) — systemd unit generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-filter.html">systemd.image-filter(7) — Disk Image Dissection Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-policy.html">systemd.image-policy(7) — Disk Image Dissection Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.journal-fields.html">systemd.journal-fields(7) — Special journal fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.kill.html">systemd.kill(5) — Process killing procedure configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.link.html">systemd.link(5) — Network device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.mount.html">systemd.mount(5) — Mount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.net-naming-scheme.html">systemd.net-naming-scheme(7) — Network device naming schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.netdev.html">systemd.netdev(5) — Virtual Network Device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.network.html">systemd.network(5) — Network configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.nspawn.html">systemd.nspawn(5) — Container settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.offline-updates.html">systemd.offline-updates(7) — Implementation of offline updates in systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.path.html">systemd.path(5) — Path unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.pcrlock.html">systemd.pcrlock(5) — PCR measurement prediction files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.preset.html">systemd.preset(5) — Service enablement presets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.resource-control.html">systemd.resource-control(5) — Resource control unit settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.scope.html">systemd.scope(5) — Scope unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.service.html">systemd.service(5) — Service unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.slice.html">systemd.slice(5) — Slice unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.socket.html">systemd.socket(5) — Socket unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.special.html">systemd.special(7) — Special systemd units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.swap.html">systemd.swap(5) — Swap unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.syntax.html">systemd.syntax(7) — General syntax of systemd configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.system-credentials.html">systemd.system-credentials(7) — System Credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.target.html">systemd.target(5) — Target unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.time.html">systemd.time(7) — Time and date specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.timer.html">systemd.timer(5) — Timer unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.unit.html">systemd.unit(5) — Unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.v.html">systemd.v(7) — Directory with Versioned Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.d.html">sysupdate.d(5) — Transfer Definition Files for Automatic Updates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.features.html">sysupdate.features(5) — Definition Files for Optional Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysusers.d.html">sysusers.d(5) — Declarative allocation of system users and groups</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">T</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timedatectl.html">timedatectl(1) — Control the system time and date</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesyncd.conf.html">timesyncd.conf(5) — Network Time Synchronization configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tmpfiles.d.html">tmpfiles.d(5) — Configuration for creation, deletion, and cleaning of files and directories</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">U</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="udev.html">udev(7) — Dynamic device management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev.conf.html">udev.conf(5) — Configuration for device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_get_syspath.html">udev_device_get_syspath(3) — Query device properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_has_tag.html">udev_device_has_tag(3) — Retrieve or set device attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_new_from_syspath.html">udev_device_new_from_syspath(3) — Create, acquire and release a udev device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_add_match_subsystem.html">udev_enumerate_add_match_subsystem(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_new.html">udev_enumerate_new(3) — Create, acquire and release a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_scan_devices.html">udev_enumerate_scan_devices(3) — Query or modify a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_list_entry.html">udev_list_entry(3) — Iterate and access udev lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_filter_update.html">udev_monitor_filter_update(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_new_from_netlink.html">udev_monitor_new_from_netlink(3) — Create, acquire and release a udev monitor object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_receive_device.html">udev_monitor_receive_device(3) — Query and modify device monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_new.html">udev_new(3) — Create, acquire and release a udev context object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udevadm.html">udevadm(8) — udev management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ukify.html">ukify(1) — Combine components into a signed Unified Kernel Image for UEFI systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updatectl.html">updatectl(1) — Control the system update service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user%40.service.html">user@.service(5) — System units to start the user manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="userdbctl.html">userdbctl(1) — Inspect users, groups and group memberships</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">V</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="varlinkctl.html">varlinkctl(1) — Introspect with and invoke Varlink services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vconsole.conf.html">vconsole.conf(5) — Configuration file for the virtual console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="veritytab.html">veritytab(5) — Configuration for verity block devices</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/blob/man_pages_in_sphinx/doc-migration/source/docs/systemd-repart.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/edit/man_pages_in_sphinx/doc-migration/source/docs/systemd-repart.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="systemd-repart-8">
+<span id="id1"></span><h1>systemd-repart(8)<a class="headerlink" href="#systemd-repart-8" title="Link to this heading">¶</a></h1>
+<section id="name">
+<h2>Name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
+<p>systemd-repart, systemd-repart.service — Automatically grow and add partitions, and generate disk images (DDIs)</p>
+</section>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-repart</span> <span class="pre">[OPTIONS...]</span> <span class="pre">[BLOCKDEVICE]</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-repart.service</span></code></p>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> creates partition tables, and adds or grows partitions, based on the configuration files described in <a class="reference external" href="https://man7.org/linux/man-pages/man5/repart.d.5.html">repart.d(5)</a>. It operates on the block device or file image specified on the command line.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> is used when <em>building</em> OS images, and also when OS images, and also when <em>deploying</em> images to automatically adjust them, during boot, to the system they are running on. This way the image can be minimal in size and may be augmented automatically at boot, taking possession of the disk space available. images to automatically adjust them, during boot, to the system they are running on. This way the image can be minimal in size and may be augmented automatically at boot, taking possession of the disk space available.</p>
+<p>If invoked with no arguments, <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> operates on the block device backing the root file system partition of the running OS, thus adding and growing partitions of the booted OS itself. When called in the initrd, it operates on the block device backing <code class="code docutils literal notranslate"><span class="pre">/sysroot/</span></code> instead, i.e. on the block device the system will soon transition into. If <code class="code docutils literal notranslate"><span class="pre">--image=</span></code> is used, it will operate on the specified device or image file. The <code class="code docutils literal notranslate"><span class="pre">systemd-repart.service</span></code> service is generally run at boot in the initrd, in order to augment the partition table of the OS before its partitions are mounted.</p>
+<p>If the block device is specified as “-” (or as an empty string), <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> will not operate on any block device or image file, and instead determine and output the minimum disk/image size for the specified partition configuration, taking all configured size constraints into account.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> operations are mostly incremental: it grows existing partitions or adds new ones, but does not shrink, delete, or move existing partitions. The service is intended to be run on every boot, but when it detects that the partition table already matches the installed <code class="code docutils literal notranslate"><span class="pre">repart.d/*.conf</span></code> configuration files, it executes no operation.</p>
+<p>The following use cases are among those covered:</p>
+<ul class="simple">
+<li><p>The root partition may be grown to cover the whole available disk space.</p></li>
+<li><p>A <code class="code docutils literal notranslate"><span class="pre">/home/</span></code>, swap, or <code class="code docutils literal notranslate"><span class="pre">/srv/</span></code> partition can be added.</p></li>
+<li><p>A second (or third, …) root partition may be added, to cover A/B style setups where a second version of the root file system is alternatingly used for implementing update schemes. The deployed image would carry only a single partition (“A”) but on first boot a second partition (“B”) for this purpose is automatically created.</p></li>
+</ul>
+<p>The algorithm executed by <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> is roughly as follows:</p>
+<ol class="arabic simple">
+<li><p>The <code class="code docutils literal notranslate"><span class="pre">repart.d/*.conf</span></code> configuration files are loaded and parsed, and ordered by filename (without the directory prefix). For each configuration file, drop-in files are loaded from directories with same name as the configuration file with the suffix “.d” added.</p></li>
+<li><p>The partition table on the block device is loaded and parsed, if present.</p></li>
+<li><p>The existing partitions in the partition table are matched with the <code class="code docutils literal notranslate"><span class="pre">repart.d/*.conf</span></code> files by GPT partition type UUID. The first existing partition of a specific type is assigned the first configuration file declaring the same type. The second existing partition of a specific type is then assigned the second configuration file declaring the same type, and so on. After this iterative assigning is complete, any existing partitions that have no matching configuration file are considered “foreign” and left as they are. And any configuration files for which no partition was matched are treated as requests to create a partition.</p></li>
+<li><p>Partitions that shall be created are now allocated on the disk, taking the size constraints and weights declared in the configuration files into account. Free space is used within the limits set by size and padding requests. In addition, existing partitions that should be grown are grown. New partitions are always appended to the end of the partition table, taking the first partition table slot whose index is greater than the indexes of all existing partitions. Partitions are never reordered and thus partition numbers remain stable. When partitions are created, they are placed in the smallest area of free space that is large enough to satisfy the size and padding limits. This means that partitions might have different order on disk than in the partition table. Note that this allocation happens in memory only, the partition table on disk is not updated yet.</p></li>
+<li><p>All existing partitions for which configuration files exist and which currently have no GPT partition label set will be assigned a label, either explicitly configured in the configuration or — if that’s missing — derived automatically from the partition type. The same is done for all partitions that are newly created. These assignments are done in memory only, too, the disk is not updated yet.</p></li>
+<li><p>Similarly, all existing partitions for which configuration files exist and which currently have an all-zero identifying UUID will be assigned a new UUID. This UUID is cryptographically hashed from a common seed value together with the partition type UUID (and a counter in case multiple partitions of the same type are defined), see below. The same is done for all partitions that are created anew. These assignments are done in memory only, too, the disk is not updated yet.</p></li>
+<li><p>Similarly, if the disk’s volume UUID is all zeroes it is also initialized, also cryptographically hashed from the same common seed value. This is done in memory only too.</p></li>
+<li><p>The disk space assigned to new partitions (i.e. what was previously free space) is now erased. Specifically, all file system signatures are removed, and if the device supports it, the <code class="code docutils literal notranslate"><span class="pre">BLKDISCARD</span></code> I/O control command is issued to inform the hardware that the space is now empty. In addition any “padding” between partitions and at the end of the device is similarly erased.</p></li>
+<li><p>The new partition table is finally written to disk. The kernel is asked to reread the partition table.</p></li>
+</ol>
+<p>As an exception to the normal incremental operation, when called in a special “factory reset” mode, <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> may be used to erase existing partitions to reset an installation back to vendor defaults. This mode of operation is used when either the <code class="code docutils literal notranslate"><span class="pre">--factory-reset=yes</span></code> switch is passed on the tool’s command line, or the <code class="code docutils literal notranslate"><span class="pre">systemd.factory_reset=yes</span></code> option is specified on the kernel command line, or the <code class="code docutils literal notranslate"><span class="pre">FactoryResetRequest</span></code> EFI variable (vendor UUID <code class="code docutils literal notranslate"><span class="pre">8cf2644b-4b0b-428f-9387-6d876050dc67</span></code>) is set to “yes”. It alters the algorithm above slightly: between the 3rd and the 4th step above any partition marked explicitly via the <code class="code docutils literal notranslate"><span class="pre">FactoryReset=</span></code> boolean is deleted, and the algorithm restarted, thus immediately re-creating these partitions anew empty.</p>
+<p>Note that <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> by default only changes partition tables, it does not create or resize any file systems within these partitions, unless the <code class="code docutils literal notranslate"><span class="pre">Format=</span></code> configuration option is specified. Also note that there are also separate mechanisms available for this purpose, for example <a class="reference internal" href="systemd-makefs%40.service.html#systemd-makefs-service-8"><span class="std std-ref">systemd-growfs(8)</span></a> and <code class="code docutils literal notranslate"><span class="pre">systemd-makefs</span></code>.</p>
+<p>The UUIDs identifying the new partitions created (or assigned to existing partitions that have no UUID yet), as well as the disk as a whole are hashed cryptographically from a common seed value. This seed value is usually the <a class="reference external" href="https://man7.org/linux/man-pages/man5/machine-id.5.html">machine-id(5)</a> of the system, so that the machine ID reproducibly determines the UUIDs assigned to all partitions. If the machine ID cannot be read (or the user passes <code class="code docutils literal notranslate"><span class="pre">--seed=random</span></code>, see below) the seed is generated randomly instead, so that the partition UUIDs are also effectively random. The seed value may also be set explicitly, formatted as UUID via the <code class="code docutils literal notranslate"><span class="pre">--seed=</span></code> option. By hashing these UUIDs from a common seed images prepared with this tool become reproducible and the result of the algorithm above deterministic.</p>
+<p>The positional argument should specify the block device or a regular file to operate on. If <code class="code docutils literal notranslate"><span class="pre">--empty=create</span></code> is specified, the specified path is created as regular file, which is useful for generating disk images from scratch.</p>
+</section>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Link to this heading">¶</a></h2>
+<p>The following options are understood:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-dry-run">
+<span class="sig-name descname"><span class="pre">--dry-run=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-dry-run" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean. If this switch is not specified, <code class="code docutils literal notranslate"><span class="pre">--dry-run=yes</span></code> is the implied default. Controls whether <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> executes the requested re-partition operations or whether it should only show what it would do. Unless <code class="code docutils literal notranslate"><span class="pre">--dry-run=no</span></code> is specified <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> will not actually touch the device’s partition table.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-empty">
+<span class="sig-name descname"><span class="pre">--empty=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-empty" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one of “refuse”, “allow”, “require”, “force” or “create”. Controls how to operate on block devices that are entirely empty, i.e. carry no partition table/disk label yet. If this switch is not specified, the implied default is “refuse”.</p>
+<p>If “refuse” <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> requires that the block device it shall operate on already carries a partition table and refuses operation if none is found. If “allow” the command will extend an existing partition table or create a new one if none exists. If “require” the command will create a new partition table if none exists so far, and refuse operation if one already exists. If “force” it will create a fresh partition table unconditionally, erasing the disk fully in effect. If “force” no existing partitions will be taken into account or survive the operation. Hence: use with care, this is a great way to lose all your data. If “create” a new loopback file is create under the path passed via the device node parameter, of the size indicated with <code class="code docutils literal notranslate"><span class="pre">--size=</span></code>, see below.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-discard">
+<span class="sig-name descname"><span class="pre">--discard=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-discard" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean. If this switch is not specified ,:code:<cite>–discard=yes</cite> is the implied default. Controls whether to issue the <code class="code docutils literal notranslate"><span class="pre">BLKDISCARD</span></code> I/O control command on the space taken up by any added partitions or on the space in between them. Usually, it is a good idea to issue this request since it tells the underlying hardware that the covered blocks shall be considered empty, improving performance. If operating on a regular file instead of a block device node, a sparse file is generated.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-size">
+<span class="sig-name descname"><span class="pre">--size=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-size" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a size in bytes, using the usual K, M, G, T suffixes, or the special value “auto”. If used the specified device node path must refer to a regular file, which is then grown to the specified size if smaller, before any change is made to the partition table. If specified as “auto” the minimal size for the disk image is automatically determined (i.e. the minimal sizes of all partitions are summed up, taking space for additional metadata into account). This switch is not supported if the specified node is a block device. This switch has no effect if the file is already as large as the specified size or larger. The specified size is implicitly rounded up to multiples of 4096. When used with <code class="code docutils literal notranslate"><span class="pre">--empty=create</span></code> this specifies the initial size of the loopback file to create.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">--size=auto</span></code> option takes the sizes of pre-existing partitions into account. However, it does not accommodate for partition tables that are not tightly packed: the configured partitions might still not fit into the backing device if empty space exists between pre-existing partitions (or before the first partition) that cannot be fully filled by partitions to grow or create.</p>
+<p>Also note that the automatic size determination does not take files or directories specified with <code class="code docutils literal notranslate"><span class="pre">CopyFiles=</span></code> into account: operation might fail if the specified files or directories require more disk space then the configured per-partition minimal size limit.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-factory-reset">
+<span class="sig-name descname"><span class="pre">--factory-reset=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-factory-reset" title="Link to this definition">¶</a></dt>
+<dd><p>Takes boolean. If this switch is not specified, <code class="code docutils literal notranslate"><span class="pre">--factory-reset=no</span></code> is the implied default. Controls whether to operate in “factory reset” mode, see above. If set to true this will remove all existing partitions marked with <code class="code docutils literal notranslate"><span class="pre">FactoryReset=</span></code> set to yes early while executing the re-partitioning algorithm. Use with care, this is a great way to lose all your data. Note that partition files need to explicitly turn <code class="code docutils literal notranslate"><span class="pre">FactoryReset=</span></code> on, as the option defaults to off. If no partitions are marked for factory reset this switch has no effect. Note that there are two other methods to request factory reset operation: via the kernel command line and via an EFI variable, see above.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-can-factory-reset">
+<span class="sig-name descname"><span class="pre">--can-factory-reset</span></span><a class="headerlink" href="#systemd-option-systemd-repart-can-factory-reset" title="Link to this definition">¶</a></dt>
+<dd><p>If this switch is specified the disk is not re-partitioned. Instead it is determined if any existing partitions are marked with <code class="code docutils literal notranslate"><span class="pre">FactoryReset=</span></code>. If there are the tool will exit with exit status zero, otherwise non-zero. This switch may be used to quickly determine whether the running system supports a factory reset mechanism built on <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-root">
+<span class="sig-name descname"><span class="pre">--root=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-root" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a path to a directory to use as root file system when searching for <code class="code docutils literal notranslate"><span class="pre">repart.d/*.conf</span></code> files, for the machine ID file to use as seed and for the <code class="code docutils literal notranslate"><span class="pre">CopyFiles=</span></code> and <code class="code docutils literal notranslate"><span class="pre">CopyBlocks=</span></code> source files and directories. By default when invoked on the regular system this defaults to the host’s root file system <code class="code docutils literal notranslate"><span class="pre">/</span></code>. If invoked from the initrd this defaults to <code class="code docutils literal notranslate"><span class="pre">/sysroot/</span></code>, so that the tool operates on the configuration and machine ID stored in the root file system later transitioned into itself.</p>
+<p>See <code class="code docutils literal notranslate"><span class="pre">--copy-source=</span></code> for a more restricted option that only affects <code class="code docutils literal notranslate"><span class="pre">CopyFiles=</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-image">
+<span class="sig-name descname"><span class="pre">--image=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-image" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a path to a disk image file or device to mount and use in a similar fashion to <code class="code docutils literal notranslate"><span class="pre">--root=</span></code>, see above.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 249.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-image-policy-policy">
+<span class="sig-name descname"><span class="pre">--image-policy=policy</span></span><a class="headerlink" href="#systemd-option-systemd-repart-image-policy-policy" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an image policy string as argument, as per <a class="reference internal" href="systemd.image-policy.html#systemd-image-policy-7"><span class="std std-ref">systemd.image-policy(7)</span></a>. The policy is enforced when operating on the disk image specified via <code class="code docutils literal notranslate"><span class="pre">--image=</span></code>, see above. If not specified, defaults to the “*” policy, i.e. all recognized file systems in the image are used.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-seed">
+<span class="sig-name descname"><span class="pre">--seed=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-seed" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a UUID as argument or the special value <code class="code docutils literal notranslate"><span class="pre">random</span></code>. If a UUID is specified the UUIDs to assign to partitions and the partition table itself are derived via cryptographic hashing from it. If not specified, it is attempted to read the machine ID from the host (or more precisely, the root directory configured via <code class="code docutils literal notranslate"><span class="pre">--root=</span></code>) and use it as seed instead, falling back to a randomized seed otherwise. Use <code class="code docutils literal notranslate"><span class="pre">--seed=random</span></code> to force a randomized seed. Explicitly specifying the seed may be used to generated strictly reproducible partition tables.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-pretty">
+<span class="sig-name descname"><span class="pre">--pretty=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-pretty" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. If this switch is not specified, it defaults to on when called from an interactive terminal and off otherwise. Controls whether to show a user friendly table and graphic illustrating the changes applied.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-definitions">
+<span class="sig-name descname"><span class="pre">--definitions=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-definitions" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a file system path. If specified the <code class="code docutils literal notranslate"><span class="pre">*.conf</span></code> files are read from the specified directory instead of searching in <code class="code docutils literal notranslate"><span class="pre">/usr/lib/repart.d/*.conf</span></code>, <code class="code docutils literal notranslate"><span class="pre">/etc/repart.d/*.conf</span></code>, <code class="code docutils literal notranslate"><span class="pre">/run/repart.d/*.conf</span></code>.</p>
+<p>This parameter can be specified multiple times.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-key-file">
+<span class="sig-name descname"><span class="pre">--key-file=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-key-file" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a file system path. Configures the encryption key to use when setting up LUKS2 volumes configured with the <code class="code docutils literal notranslate"><span class="pre">Encrypt=key-file</span></code> setting in partition files. Should refer to a regular file containing the key, or an <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> stream socket in the file system. In the latter case, a connection is made to it and the key read from it. If this switch is not specified, and no <code class="code docutils literal notranslate"><span class="pre">KeyFile=</span></code> is specified in the partition file, the empty key (i.e. zero length key) is used. This behaviour is useful for setting up encrypted partitions during early first boot that receive their user-supplied password only in a later setup step.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 247.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-private-key">
+<span class="sig-name descname"><span class="pre">--private-key=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-private-key" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a file system path or an engine or provider specific designation. Configures the signing key to use when creating verity signature partitions with the <code class="code docutils literal notranslate"><span class="pre">Verity=signature</span></code> setting in partition files.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 252.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-private-key-source">
+<span class="sig-name descname"><span class="pre">--private-key-source=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-private-key-source" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one of “file”, “engine” or “provider”. In the latter two cases, it is followed by the name of a provider or engine, separated by colon, that will be passed to OpenSSL’s “engine” or “provider” logic. Configures how to load the private key to use when creating verity signature partitions with the <code class="code docutils literal notranslate"><span class="pre">Verity=signature</span></code> setting in partition files.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-certificate">
+<span class="sig-name descname"><span class="pre">--certificate=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-certificate" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a file system path or a provider specific designation. Configures the PEM encoded X.509 certificate to use when creating verity signature partitions with the <code class="code docutils literal notranslate"><span class="pre">Verity=signature</span></code> setting in partition files.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 252.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-certificate-source">
+<span class="sig-name descname"><span class="pre">--certificate-source=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-certificate-source" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one of “file”, or “provider”. In the latter case, it is followed by the name of a provider, separated by colon, that will be passed to OpenSSL’s “provider” logic. Configures how to load the X.509 certificate to use when creating verity signature partitions with the <code class="code docutils literal notranslate"><span class="pre">Verity=signature</span></code> setting in partition files.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-join-signature">
+<span class="sig-name descname"><span class="pre">--join-signature=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-join-signature" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a colon-separated tuple with a hex-encoded top-level Verity hash of a <code class="code docutils literal notranslate"><span class="pre">Verity=hash</span></code> partition as first element, and a PKCS7 signature of the roothash as a path to a DER-encoded signature file, or as an ASCII base64 string encoding of a DER-encoded signature prefixed by “base64:”. To be used on a pre-existing image that was created with a parameter such as <code class="code docutils literal notranslate"><span class="pre">--defer-partitions=root-verity-sig</span></code>, in order to allow implementing offline signing of the verity signature partition.</p>
+<p>This is an alternative to online signing using parameters such as <code class="code docutils literal notranslate"><span class="pre">--private-key=</span></code>, for build systems where the private key for production signing is not available in the same context where content is created.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-tpm2-device">
+<span class="sig-name descname"><span class="pre">--tpm2-device=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-tpm2-device" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-tpm2-pcrs">
+<span class="sig-name descname"><span class="pre">--tpm2-pcrs=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-tpm2-pcrs" title="Link to this definition">¶</a></dt>
+<dd><p>Configures the TPM2 device and list of PCRs to use for LUKS2 volumes configured with the <code class="code docutils literal notranslate"><span class="pre">Encrypt=tpm2</span></code> option. These options take the same parameters as the identically named options to <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> and have the same effect on partitions where TPM2 enrollment is requested.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-tpm2-device-key-path">
+<span class="sig-name descname"><span class="pre">--tpm2-device-key=PATH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-tpm2-device-key-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-tpm2-seal-key-handle-handle">
+<span class="sig-name descname"><span class="pre">--tpm2-seal-key-handle=HANDLE</span></span><a class="headerlink" href="#systemd-option-systemd-repart-tpm2-seal-key-handle-handle" title="Link to this definition">¶</a></dt>
+<dd><p>Configures a TPM2 SRK key to bind encryption to. See <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> for details on this option.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-tpm2-public-key-path">
+<span class="sig-name descname"><span class="pre">--tpm2-public-key=PATH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-tpm2-public-key-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-tpm2-public-key-pcrs-pcr-pcr">
+<span class="sig-name descname"><span class="pre">--tpm2-public-key-pcrs=PCR[+PCR...]</span></span><a class="headerlink" href="#systemd-option-systemd-repart-tpm2-public-key-pcrs-pcr-pcr" title="Link to this definition">¶</a></dt>
+<dd><p>Configures a TPM2 signed PCR policy to bind encryption to. See <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> for details on these two options.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 252.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-tpm2-pcrlock-path">
+<span class="sig-name descname"><span class="pre">--tpm2-pcrlock=PATH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-tpm2-pcrlock-path" title="Link to this definition">¶</a></dt>
+<dd><p>Configures a TPM2 pcrlock policy to bind encryption to. See <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> for details on this option.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-split-bool">
+<span class="sig-name descname"><span class="pre">--split=BOOL</span></span><a class="headerlink" href="#systemd-option-systemd-repart-split-bool" title="Link to this definition">¶</a></dt>
+<dd><p>Enables generation of split artifacts from partitions configured with <code class="code docutils literal notranslate"><span class="pre">SplitName=</span></code>. If enabled, for each partition with <code class="code docutils literal notranslate"><span class="pre">SplitName=</span></code> set, a separate output file containing just the contents of that partition is generated. The output filename consists of the loopback filename suffixed with the name configured with <code class="code docutils literal notranslate"><span class="pre">SplitName=</span></code>. If the loopback filename ends with “.raw”, the suffix is inserted before the “.raw” extension instead.</p>
+<p>Note that <code class="code docutils literal notranslate"><span class="pre">--split</span></code> is independent from <code class="code docutils literal notranslate"><span class="pre">--dry-run</span></code>. Even if <code class="code docutils literal notranslate"><span class="pre">--dry-run</span></code> is enabled, split artifacts will still be generated from an existing image if <code class="code docutils literal notranslate"><span class="pre">--split</span></code> is enabled.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 252.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-include-partitions-partitions">
+<span class="sig-name descname"><span class="pre">--include-partitions=PARTITIONS</span></span><a class="headerlink" href="#systemd-option-systemd-repart-include-partitions-partitions" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-exclude-partitions-partitions">
+<span class="sig-name descname"><span class="pre">--exclude-partitions=PARTITIONS</span></span><a class="headerlink" href="#systemd-option-systemd-repart-exclude-partitions-partitions" title="Link to this definition">¶</a></dt>
+<dd><p>These options specify which partition types <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> should operate on. If <code class="code docutils literal notranslate"><span class="pre">--include-partitions=</span></code> is used, all partitions that are not specified are excluded. If <code class="code docutils literal notranslate"><span class="pre">--exclude-partitions=</span></code> is used, all partitions that are specified are excluded. Both options take a comma separated list of GPT partition type UUIDs or identifiers (see <code class="code docutils literal notranslate"><span class="pre">Type=</span></code> in <a class="reference external" href="https://man7.org/linux/man-pages/man5/repart.d.5.html">repart.d(5)</a>).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-defer-partitions-partitions">
+<span class="sig-name descname"><span class="pre">--defer-partitions=PARTITIONS</span></span><a class="headerlink" href="#systemd-option-systemd-repart-defer-partitions-partitions" title="Link to this definition">¶</a></dt>
+<dd><p>This option specifies for which partition types <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> should defer. All partitions that are deferred using this option are still taken into account when calculating the sizes and offsets of other partitions, but are not actually written to the disk image. The net effect of this option is that if you run <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> again without this option, the missing partitions will be added as if they had not been deferred the first time <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> was executed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-defer-partitions-empty-yes">
+<span class="sig-name descname"><span class="pre">--defer-partitions-empty=yes</span></span><a class="headerlink" href="#systemd-option-systemd-repart-defer-partitions-empty-yes" title="Link to this definition">¶</a></dt>
+<dd><p>This is very similar to <code class="code docutils literal notranslate"><span class="pre">--defer-partitions=</span></code> but automatically selects all partitions for deferral that have <code class="code docutils literal notranslate"><span class="pre">Format=empty</span></code> set. It may be used in conjunction with <code class="code docutils literal notranslate"><span class="pre">--defer-partitions=</span></code> or <code class="code docutils literal notranslate"><span class="pre">--defer-partitions-factory-reset=yes</span></code>, in which case all matching partitions are deferred.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 259.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-defer-partitions-factory-reset-yes">
+<span class="sig-name descname"><span class="pre">--defer-partitions-factory-reset=yes</span></span><a class="headerlink" href="#systemd-option-systemd-repart-defer-partitions-factory-reset-yes" title="Link to this definition">¶</a></dt>
+<dd><p>This is very similar to <code class="code docutils literal notranslate"><span class="pre">--defer-partitions=</span></code> but automatically selects all partitions for deferral that have <code class="code docutils literal notranslate"><span class="pre">FactoryReset=yes</span></code> set. It may be used in conjunction with <code class="code docutils literal notranslate"><span class="pre">--defer-partitions=</span></code> or <code class="code docutils literal notranslate"><span class="pre">--defer-partitions-empty=yes</span></code>, in which case all matching partitions are deferred.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 259.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-sector-size-bytes">
+<span class="sig-name descname"><span class="pre">--sector-size=BYTES</span></span><a class="headerlink" href="#systemd-option-systemd-repart-sector-size-bytes" title="Link to this definition">¶</a></dt>
+<dd><p>This option allows configuring the sector size of the image produced by <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code>. It takes a value that is a power of “2” between “512” and “4096”. This option is useful when building images for disks that use a different sector size as the disk on which the image is produced.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-architecture-arch">
+<span class="sig-name descname"><span class="pre">--architecture=ARCH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-architecture-arch" title="Link to this definition">¶</a></dt>
+<dd><p>This option allows overriding the architecture used for architecture specific partition types. For example, if set to “arm64” a partition type of “root-x86-64” referenced in <code class="code docutils literal notranslate"><span class="pre">repart.d/</span></code> drop-ins will be patched dynamically to refer to “root-arm64” instead. Takes one of “alpha”, “arc”, “arm”, “arm64”, “ia64”, “loongarch64”, “mips-le”, “mips64-le”, “parisc”, “ppc”, “ppc64”, “ppc64-le”, “riscv32”, “riscv64”, “s390”, “s390x”, “tilegx”, “x86” or “x86-64”.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-offline-bool">
+<span class="sig-name descname"><span class="pre">--offline=BOOL</span></span><a class="headerlink" href="#systemd-option-systemd-repart-offline-bool" title="Link to this definition">¶</a></dt>
+<dd><p>Instructs <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> to build the image offline. Takes a boolean or “auto”. Defaults to “auto”. If enabled, the image is built without using loop devices. This is useful to build images unprivileged or when loop devices are not available. If disabled, the image is always built using loop devices. If “auto”, <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> will build the image online if possible and fall back to building the image offline if loop devices are not available or cannot be accessed due to missing permissions.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-copy-from-path">
+<span class="sig-name descname"><span class="pre">--copy-from=PATH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-copy-from-path" title="Link to this definition">¶</a></dt>
+<dd><p>Instructs <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> to synthesize partition definitions from the partition table in the given image or device. This option can be specified multiple times to synthesize definitions from each of the given images or devices. The generated definitions will copy the partitions into the destination partition table. The copied partitions will have the same size, metadata and contents but might have a different partition number and might be located at a different offset in the destination partition table. These definitions can be combined with partition definitions read from regular partition definition files. The synthesized definitions take precedence over the definitions read from partition definition files.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-copy-source-path">
+<span class="sig-name descname"><span class="pre">--copy-source=PATH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-copy-source-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-s-path">
+<span class="sig-name descname"><span class="pre">-s</span> <span class="pre">PATH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-s-path" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a source directory all <code class="code docutils literal notranslate"><span class="pre">CopyFiles=</span></code> source paths shall be considered relative to. This is similar to <code class="code docutils literal notranslate"><span class="pre">--root=</span></code>, but exclusively applies to the <code class="code docutils literal notranslate"><span class="pre">CopyFiles=</span></code> setting. If <code class="code docutils literal notranslate"><span class="pre">--root=</span></code> and <code class="code docutils literal notranslate"><span class="pre">--copy-source=</span></code> are used in combination the former applies as usual, except for <code class="code docutils literal notranslate"><span class="pre">CopyFiles=</span></code> where the latter takes precedence.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-make-ddi-type">
+<span class="sig-name descname"><span class="pre">--make-ddi=TYPE</span></span><a class="headerlink" href="#systemd-option-systemd-repart-make-ddi-type" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one of “sysext”, “confext” or “portable”. Generates a Discoverable Disk Image (DDI) for a system extension (sysext, see <a class="reference internal" href="systemd-sysext.html#systemd-sysext-8"><span class="std std-ref">systemd-sysext(8)</span></a> for details), configuration extension (confext) or <a class="reference external" href="https://systemd.io/PORTABLE_SERVICES">Portable Services</a>. The generated image will consist of a signed Verity “erofs” file system as root partition. In this mode of operation the partition definitions in <code class="code docutils literal notranslate"><span class="pre">/usr/lib/repart.d/*.conf</span></code> and related directories are not read, and <code class="code docutils literal notranslate"><span class="pre">--definitions=</span></code> is not supported, as appropriate definitions for the selected DDI class will be chosen automatically.</p>
+<p>Must be used in conjunction with <code class="code docutils literal notranslate"><span class="pre">--copy-source=</span></code> to specify the file hierarchy to populate the DDI with. The specified directory should contain an <code class="code docutils literal notranslate"><span class="pre">etc/</span></code> subdirectory if “confext” is selected. If “sysext” is selected it should contain either a <code class="code docutils literal notranslate"><span class="pre">usr/</span></code> or <code class="code docutils literal notranslate"><span class="pre">opt/</span></code> directory, or both. If “portable” is used a full OS file hierarchy can be provided.</p>
+<p>This option implies <code class="code docutils literal notranslate"><span class="pre">--empty=create</span></code>, <code class="code docutils literal notranslate"><span class="pre">--size=auto</span></code> and <code class="code docutils literal notranslate"><span class="pre">--seed=random</span></code> (the latter two can be overridden).</p>
+<p>The private key and certificate for signing the DDI must be specified via the <code class="code docutils literal notranslate"><span class="pre">--private-key=</span></code> and <code class="code docutils literal notranslate"><span class="pre">--certificate=</span></code> switches.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-s">
+<span class="sig-name descname"><span class="pre">-S</span></span><a class="headerlink" href="#systemd-option-systemd-repart-s" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-c">
+<span class="sig-name descname"><span class="pre">-C</span></span><a class="headerlink" href="#systemd-option-systemd-repart-c" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-p">
+<span class="sig-name descname"><span class="pre">-P</span></span><a class="headerlink" href="#systemd-option-systemd-repart-p" title="Link to this definition">¶</a></dt>
+<dd><p>Shortcuts for <code class="code docutils literal notranslate"><span class="pre">--make-ddi=sysext</span></code>, <code class="code docutils literal notranslate"><span class="pre">--make-ddi=confext</span></code>, <code class="code docutils literal notranslate"><span class="pre">--make-ddi=portable</span></code>, respectively.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-append-fstab">
+<span class="sig-name descname"><span class="pre">--append-fstab=</span></span><a class="headerlink" href="#systemd-option-systemd-repart-append-fstab" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one of “no”, “auto” or “replace”. Controls how the generated <a class="reference external" href="https://man7.org/linux/man-pages/man5/fstab.5.html">fstab(5)</a> file by <code class="code docutils literal notranslate"><span class="pre">--generate-fstab=</span></code> will behave in case that there is a previously existing file.</p>
+<p>If “no” <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> will complain and abort in case that there is a file. This is the default behaviour. If “replace” the file will be silently replaced with the new generated one.</p>
+<p>If “auto” <code class="code docutils literal notranslate"><span class="pre">systemd-repart</span></code> will search in the pre-existing file the section that belong to the automatically generated content and will replace it with the newer generated content, and keep the user provided section if there is one. The generated section is identified looking for the automatic content surrounded by “# Start section ↓ of automatically generated fstab by systemd-repart” and “# End section ↑ of automatically generated fstab by systemd-repart”. The content that is before and after those comments are considered user provided, and kept in the new file.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-generate-fstab-path">
+<span class="sig-name descname"><span class="pre">--generate-fstab=PATH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-generate-fstab-path" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a path where to write <a class="reference external" href="https://man7.org/linux/man-pages/man5/fstab.5.html">fstab(5)</a> entries for the mountpoints configured with <code class="code docutils literal notranslate"><span class="pre">MountPoint=</span></code> in the root directory specified with <code class="code docutils literal notranslate"><span class="pre">--copy-source=</span></code> or <code class="code docutils literal notranslate"><span class="pre">--root=</span></code> or in the host’s root directory if neither is specified. Disabled by default.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-generate-crypttab-path">
+<span class="sig-name descname"><span class="pre">--generate-crypttab=PATH</span></span><a class="headerlink" href="#systemd-option-systemd-repart-generate-crypttab-path" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a path where to write crypttab entries for the encrypted volumes configured with <code class="code docutils literal notranslate"><span class="pre">EncryptedVolume=</span></code> in the root directory specified with <code class="code docutils literal notranslate"><span class="pre">--copy-source=</span></code> or <code class="code docutils literal notranslate"><span class="pre">--root=</span></code> or in the host’s root directory if neither is specified. Disabled by default.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-list-devices">
+<span class="sig-name descname"><span class="pre">--list-devices</span></span><a class="headerlink" href="#systemd-option-systemd-repart-list-devices" title="Link to this definition">¶</a></dt>
+<dd><p>Show a list of candidate block devices this command may operate on. Specifically, this enumerates block devices currently present that support partition tables, and shows their device node paths along with any of their symlinks.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-h">
+<span class="sig-name descname"><span class="pre">-h</span></span><a class="headerlink" href="#systemd-option-systemd-repart-h" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-help">
+<span class="sig-name descname"><span class="pre">--help</span></span><a class="headerlink" href="#systemd-option-systemd-repart-help" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-version">
+<span class="sig-name descname"><span class="pre">--version</span></span><a class="headerlink" href="#systemd-option-systemd-repart-version" title="Link to this definition">¶</a></dt>
+<dd><p>Print a short version string and exit.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-no-pager">
+<span class="sig-name descname"><span class="pre">--no-pager</span></span><a class="headerlink" href="#systemd-option-systemd-repart-no-pager" title="Link to this definition">¶</a></dt>
+<dd><p>Do not pipe output into a pager.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-no-legend">
+<span class="sig-name descname"><span class="pre">--no-legend</span></span><a class="headerlink" href="#systemd-option-systemd-repart-no-legend" title="Link to this definition">¶</a></dt>
+<dd><p>Do not print the legend, i.e. column headers and the footer with hints.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-repart-json-mode">
+<span class="sig-name descname"><span class="pre">--json=MODE</span></span><a class="headerlink" href="#systemd-option-systemd-repart-json-mode" title="Link to this definition">¶</a></dt>
+<dd><p>Shows output formatted as JSON. Expects one of “short” (for the shortest possible output without any redundant whitespace or line breaks), “pretty” (for a pretty version of the same, with indentation and line breaks) or “off” (to turn off JSON output, the default).</p>
+</dd></dl>
+
+</section>
+<section id="exit-status">
+<h2>Exit status<a class="headerlink" href="#exit-status" title="Link to this heading">¶</a></h2>
+<p>On success, 0 is returned, and a non-zero failure code otherwise.</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
+<section id="generate-a-configuration-extension-image">
+<h3>Generate a configuration extension image<a class="headerlink" href="#generate-a-configuration-extension-image" title="Link to this heading">¶</a></h3>
+<p>The following creates a configuration extension DDI (confext) for an <code class="code docutils literal notranslate"><span class="pre">/etc/motd</span></code> update:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>tree/etc/extension-release.d
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hello World&quot;</span><span class="w"> </span>&gt;tree/etc/motd
+cat<span class="w"> </span>&gt;tree/etc/extension-release.d/extension-release.my-motd<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">ID=fedora</span>
+<span class="s">VERSION_ID=38</span>
+<span class="s">IMAGE_ID=my-motd</span>
+<span class="s">IMAGE_VERSION=7</span>
+<span class="s">EOF</span>
+systemd-repart<span class="w"> </span>-C<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--private-key<span class="o">=</span>verity-private-key.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--certificate<span class="o">=</span>verity-certificate.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-s<span class="w"> </span>tree/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>/var/lib/confexts/my-motd.confext.raw
+systemd-confext<span class="w"> </span>refresh
+</pre></div>
+</div>
+<p>The DDI generated that way may be applied to the system with <span class="xref std std-ref">systemd-confext(1)</span>.</p>
+</section>
+<section id="generate-a-system-extension-image-and-sign-it-via-pkcs11">
+<h3>Generate a system extension image and sign it via PKCS11<a class="headerlink" href="#generate-a-system-extension-image-and-sign-it-via-pkcs11" title="Link to this heading">¶</a></h3>
+<p>The following creates a system extension DDI (sysext) for an <code class="code docutils literal notranslate"><span class="pre">/usr/foo</span></code> update and signs it with a hardware token via PKCS11:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>tree/usr/lib/extension-release.d
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hello World&quot;</span><span class="w"> </span>&gt;tree/usr/foo
+cat<span class="w"> </span>&gt;tree/usr/lib/extension-release.d/extension-release.my-foo<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">ID=fedora</span>
+<span class="s">VERSION_ID=38</span>
+<span class="s">IMAGE_ID=my-foo</span>
+<span class="s">IMAGE_VERSION=7</span>
+<span class="s">EOF</span>
+systemd-repart<span class="w"> </span>--make-ddi<span class="o">=</span>sysext<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--private-key-source<span class="o">=</span>engine:pkcs11<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--private-key<span class="o">=</span><span class="s2">&quot;pkcs11:model=PKCS%2315%20emulated;manufacturer=piv_II;serial=0123456789abcdef;token=Some%20Cert&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--certificate<span class="o">=</span>verity-certificate.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-s<span class="w"> </span>tree/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>/var/lib/extensions/my-foo.sysext.raw
+systemd-sysext<span class="w"> </span>refresh
+</pre></div>
+</div>
+<p>The DDI generated that way may be applied to the system with <a class="reference internal" href="systemd-sysext.html#systemd-sysext-8"><span class="std std-ref">systemd-sysext(8)</span></a>.</p>
+</section>
+<section id="generate-a-dm-verity-signature-offline-and-append-it-to-a-pre-built-image">
+<h3>Generate a dm-verity signature offline and append it to a pre-built image<a class="headerlink" href="#generate-a-dm-verity-signature-offline-and-append-it-to-a-pre-built-image" title="Link to this heading">¶</a></h3>
+<p>The following creates an image with dm-verity metadata, signs it separately to simulate an offline signing system, and then appends the signature to the image:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>repart.d/<span class="w"> </span>/tmp/tree/usr/lib/
+cat<span class="w"> </span>&gt;/tmp/tree/usr/lib/os-release<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">ID=debian</span>
+<span class="s">VERSION_ID=13</span>
+<span class="s">EOF</span>
+cat<span class="w"> </span>&gt;repart.d/10-root.conf<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">[Partition]</span>
+<span class="s">Type=root</span>
+<span class="s">Format=erofs</span>
+<span class="s">SizeMinBytes=100M</span>
+<span class="s">SizeMaxBytes=100M</span>
+<span class="s">Verity=data</span>
+<span class="s">VerityMatchKey=root</span>
+<span class="s">EOF</span>
+cat<span class="w"> </span>&gt;repart.d/11-root-verity.conf<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">[Partition]</span>
+<span class="s">Type=root-verity</span>
+<span class="s">Label=%o_%w_verity</span>
+<span class="s">Verity=hash</span>
+<span class="s">VerityMatchKey=root</span>
+<span class="s">SizeMinBytes=400M</span>
+<span class="s">SizeMaxBytes=400M</span>
+<span class="s">EOF</span>
+cat<span class="w"> </span>&gt;repart.d/12-root-verity-sig.conf<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">[Partition]</span>
+<span class="s">Type=root-verity-sig</span>
+<span class="s">Label=%o_%w_verity_sig</span>
+<span class="s">Verity=signature</span>
+<span class="s">VerityMatchKey=root</span>
+<span class="s">EOF</span>
+systemd-repart<span class="w"> </span>--definitions<span class="w"> </span>repart.d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--defer-partitions<span class="o">=</span>root-verity-sig<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--copy-source<span class="o">=</span>/tmp/tree/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--empty<span class="o">=</span>create<span class="w"> </span>--size<span class="o">=</span>600M<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--json<span class="o">=</span>short<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>/tmp/img.raw<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>--raw-output0<span class="w"> </span>.<span class="o">[</span>-1<span class="o">]</span>.roothash<span class="w"> </span>&gt;<span class="w"> </span>/tmp/img.roothash
+openssl<span class="w"> </span>smime<span class="w"> </span>-sign<span class="w"> </span>-in<span class="w"> </span>/tmp/img.roothash<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-inkey<span class="w"> </span>verity-private-key.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-signer<span class="w"> </span>verity-certificate.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-noattr<span class="w"> </span>-binary<span class="w"> </span>-outform<span class="w"> </span>der<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-out<span class="w"> </span>/tmp/img.roothash.p7s
+systemd-repart<span class="w"> </span>--definitions<span class="w"> </span>repart.d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dry-run<span class="o">=</span>no<span class="w"> </span>--root<span class="o">=</span>/tmp/tree/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--join-signature<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>cat<span class="w"> </span>/tmp/img.roothash<span class="k">)</span><span class="s2">:/tmp/img.roothash.p7s&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--certificate<span class="o">=</span>verity-certificate.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>/tmp/img.raw
+</pre></div>
+</div>
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="systemd.html#systemd-1"><span class="std std-ref">systemd(1)</span></a>, <a class="reference external" href="https://man7.org/linux/man-pages/man5/repart.d.5.html">repart.d(5)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man5/machine-id.5.html">machine-id(5)</a>, <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a>, <a class="reference external" href="https://man7.org/linux/man-pages/man1/portablectl.1.html">portablectl(1)</a>, <a class="reference internal" href="systemd-sysext.html#systemd-sysext-8"><span class="std std-ref">systemd-sysext(8)</span></a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="systemd-resolved.service.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">systemd-resolved.service(8)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="systemd-remount-fs.service.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">systemd-remount-fs.service(8)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, systemd
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">systemd-repart(8)</a><ul>
+<li><a class="reference internal" href="#name">Name</a></li>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#exit-status">Exit status</a></li>
+<li><a class="reference internal" href="#example">Example</a><ul>
+<li><a class="reference internal" href="#generate-a-configuration-extension-image">Generate a configuration extension image</a></li>
+<li><a class="reference internal" href="#generate-a-system-extension-image-and-sign-it-via-pkcs11">Generate a system extension image and sign it via PKCS11</a></li>
+<li><a class="reference internal" href="#generate-a-dm-verity-signature-offline-and-append-it-to-a-pre-built-image">Generate a dm-verity signature offline and append it to a pre-built image</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/js/custom.js?v=abe08e2c"></script>
+    </body>
+</html>

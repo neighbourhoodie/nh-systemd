@@ -1,0 +1,67 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_source_set_destroy_callback
+:manvolnum: 3
+:summary: Define the callback function for resource cleanup
+:aliases: sd_event_source_get_destroy_callback, sd_event_destroy_t
+
+.. _sd_event_source_set_destroy_callback(3):
+
+=======================================
+sd_event_source_set_destroy_callback(3)
+=======================================
+
+Name
+####
+
+sd_event_source_set_destroy_callback, sd_event_source_get_destroy_callback, sd_event_destroy_t — Define the callback function for resource cleanup
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   typedef int (*sd_event_destroy_t)(void *userdata); .. code-block::
+
+   int sd_event_source_set_destroy_callback(sd_event_source *source,
+	sd_event_destroy_t callback); .. code-block::
+
+   int sd_event_source_get_destroy_callback(sd_event_source *source,
+	sd_event_destroy_t *callback);
+
+Description
+###########
+
+:code:`sd_event_source_set_destroy_callback()` sets :code:`callback` as the callback function to be called right before the event source object :code:`source` is deallocated. The :code:`userdata` pointer from the event source object will be passed as the :code:`userdata` parameter. This pointer can be set by an argument to the constructor functions, see :ref:`sd_event_add_io(3)`, or directly, see :ref:`sd_event_source_set_userdata(3)`. This callback function is called even if :code:`userdata` is :code:`NULL`. Note that this callback is invoked at a time where the event source object itself is already invalidated, and executing operations or taking new references to the event source object is not permissible.
+
+:code:`sd_event_source_get_destroy_callback()` returns the current callback for :code:`source` in the :code:`callback` parameter.
+
+Return Value
+############
+
+On success, :code:`sd_event_source_set_destroy_callback()` returns 0 or a positive integer. On failure, it returns a negative errno-style error code.
+
+:code:`sd_event_source_get_destroy_callback()` returns positive if the destroy callback function is set, 0 if not. On failure, returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`source` parameter is :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_destroy_t()`, :code:`sd_event_source_set_destroy_callback()`, and :code:`sd_event_source_get_destroy_callback()` were added in version 239.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_source_set_userdata(3)`
+
+

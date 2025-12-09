@@ -1,0 +1,111 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: journal-remote.conf
+:manvolnum: 5
+:summary: Configuration files for the service accepting remote journal uploads
+:aliases: journal-remote.conf.d
+
+.. _journal-remote.conf(5):
+
+======================
+journal-remote.conf(5)
+======================
+
+Name
+####
+
+journal-remote.conf, journal-remote.conf.d — Configuration files for the service accepting remote journal uploads
+
+Synopsis
+########
+
+| :code:`/etc/systemd/journal-remote.conf`
+| :code:`/run/systemd/journal-remote.conf`
+| :code:`/usr/local/lib/systemd/journal-remote.conf`
+| :code:`/usr/lib/systemd/journal-remote.conf`
+| :code:`/etc/systemd/journal-remote.conf.d/\*.conf`
+| :code:`/run/systemd/journal-remote.conf.d/\*.conf`
+| :code:`/usr/local/lib/systemd/journal-remote.conf.d/\*.conf`
+| :code:`/usr/lib/systemd/journal-remote.conf.d/\*.conf`
+
+Description
+###########
+
+These files configure various parameters of :ref:`systemd-journal-remote.service(8)`. See :ref:`systemd.syntax(7)` for a general description of the syntax.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+All options are configured in the \[Remote] section:
+
+.. systemd:option:: Seal=
+   :group: config-directives
+
+   Periodically sign the data in the journal using Forward Secure Sealing.
+
+   .. versionadded:: 229
+
+.. systemd:option:: SplitMode=
+   :group: config-directives
+
+   One of "host" or "none".
+
+   .. versionadded:: 220
+
+.. systemd:option:: ServerKeyFile=
+   :group: config-directives
+
+   SSL key in PEM format.
+
+   .. versionadded:: 220
+
+.. systemd:option:: ServerCertificateFile=
+   :group: config-directives
+
+   SSL certificate in PEM format.
+
+   .. versionadded:: 220
+
+.. systemd:option:: TrustedCertificateFile=
+   :group: config-directives
+
+   SSL CA certificate.
+
+   .. versionadded:: 220
+
+.. systemd:option:: MaxUse=, KeepFree=, MaxFileSize=, MaxFiles=
+   :group: config-directives
+
+   These are analogous to :systemd:var:`SystemMaxUse=`, :systemd:var:`SystemKeepFree=`, :systemd:var:`SystemMaxFileSize=` and :systemd:var:`SystemMaxFiles=` in :man-pages:`journald.conf(5)`.
+
+   :systemd:var:`MaxUse=` controls how much disk space the :code:`systemd-journal-remote` may use up at most. :systemd:var:`KeepFree=` controls how much disk space :code:`systemd-journal-remote` shall leave free for other uses. :code:`systemd-journal-remote` will respect both limits and use the smaller of the two values.
+
+   :systemd:var:`MaxFiles=` controls how many individual journal files to keep at most. Note that only archived files are deleted to reduce the number of files until this limit is reached; active files will stay around. This means that, in effect, there might still be more journal files around in total than this limit after a vacuuming operation is complete.
+
+   .. versionadded:: 253
+
+.. systemd:option:: Compression=
+   :group: config-directives
+
+   Configurs acceptable compression algorithms to be announced through "Accept-Encoding" HTTP header. The header suggests :code:`systemd-journal-upload` to compress data to be sent. Takes a space separated list of compression algorithms, or "no". Supported algorithms are "zstd", "xz", or "lz4". When a list of algorithms is specified, "Accept-Encoding" header will be constructed with priorities based on the order of the algorithms in the list. When "no", "Accept-Encoding" header will not be sent. This option can be specified multiple times. If an empty string is assigned, then all the previous assignments are cleared. Defaults to unset and all supported compression algorithms will be listed in the header.
+
+   Example:
+
+     .. code-block:: sh
+
+        Compression=zstd lz4
+
+   .. versionadded:: 258
+
+See Also
+########
+
+:man-pages:`journald.conf(5)`, :ref:`systemd(1)`, :ref:`systemd-journal-remote.service(8)`, :ref:`systemd-journald.service(8)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

@@ -1,0 +1,1391 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="udev(7)" href="udev.html"><link rel="prev" title="timesyncd.conf(5)" href="timesyncd.conf.html">
+        <link rel="prefetch" href="../_static/systemd-logo.svg" as="image">
+        <link rel="prefetch" href="../_static/systemd-logo-dark.svg" as="image">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>tmpfiles.d(5)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6e47b7e0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #35a764;
+  --color-brand-content: #35a764;
+  --color-brand-visited: #197b43;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">systemd</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/systemd-logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/systemd-logo-dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">B</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="binfmt.d.html">binfmt.d(5) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootctl.html">bootctl(1) — Control EFI firmware boot settings and manage boot loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootup.html">bootup(7) — System bootup process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="busctl.html">busctl(1) — Introspect the bus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capsule%40.service.html">capsule@.service(5) — System unit for the capsule service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredump.conf.html">coredump.conf(5) — Core dump storage configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredumpctl.html">coredumpctl(1) — Retrieve and process saved core dumps and metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypttab.html">crypttab(5) — Configuration for encrypted block devices</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">D</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daemon.html">daemon(7) — Writing and packaging system daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dnssec-trust-anchors.d.html">dnssec-trust-anchors.d(5) — DNSSEC trust anchor configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">E</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment.d.html">environment.d(5) — Definition of user service environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">F</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-hierarchy.html">file-hierarchy(7) — File system hierarchy overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">H</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="homectl.html">homectl(1) — Create, remove, change or inspect home directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homed.conf.html">homed.conf(5) — Home area/user account manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostname.html">hostname(5) — Local hostname configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostnamectl.html">hostnamectl(1) — Control the system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hwdb.html">hwdb(7) — Hardware Database</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">I</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="importctl.html">importctl(1) — Download, import or export disk images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integritytab.html">integritytab(5) — Configuration for integrity block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocost.conf.html">iocost.conf(5) — Configuration files for the iocost solution manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">J</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="journal-remote.conf.html">journal-remote.conf(5) — Configuration files for the service accepting remote journal uploads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal-upload.conf.html">journal-upload.conf(5) — Configuration files for the journal upload service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journalctl.html">journalctl(1) — Print log entries from the systemd journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journald.conf.html">journald.conf(5) — Journal service configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">K</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kernel-command-line.html">kernel-command-line(7) — Kernel command line parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-install.html">kernel-install(8) — Add and remove kernel and initrd images to and from the boot partition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">L</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libsystemd.html">libsystemd(3) — Functions for implementing services and interacting with systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libudev.html">libudev(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.conf.html">loader.conf(5) — Configuration file for systemd-boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locale.conf.html">locale.conf(5) — Configuration file for locale settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localectl.html">localectl(1) — Control the system locale and keyboard layout settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localtime.html">localtime(5) — Local timezone configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loginctl.html">loginctl(1) — Control the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logind.conf.html">logind.conf(5) — Login manager configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">M</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="machine-id.html">machine-id(5) — Local machine ID configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machine-info.html">machine-info(5) — Local machine information file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machinectl.html">machinectl(1) — Control the systemd machine manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules-load.d.html">modules-load.d(5) — Configure kernel modules to load at boot</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">N</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="networkctl.html">networkctl(1) — Query or modify the status of network links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networkd.conf.html">networkd.conf(5) — Global Network configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-myhostname.html">nss-myhostname(8) — Hostname resolution for the locally configured system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-mymachines.html">nss-mymachines(8) — Hostname resolution for local container instances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-resolve.html">nss-resolve(8) — Hostname resolution via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-systemd.html">nss-systemd(8) — UNIX user and group name resolution for user/group lookup via Varlink</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">O</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oomctl.html">oomctl(1) — Analyze the state stored in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oomd.conf.html">oomd.conf(5) — Global</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.home1.html">org.freedesktop.home1(5) — The D-Bus interface of systemd-homed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.hostname1.html">org.freedesktop.hostname1(5) — The D-Bus interface of systemd-hostnamed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.import1.html">org.freedesktop.import1(5) — The D-Bus interface of systemd-importd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.locale1.html">org.freedesktop.locale1(5) — The D-Bus interface of systemd-localed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.LogControl1.html">org.freedesktop.LogControl1(5) — D-Bus interface to query and set logging configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.login1.html">org.freedesktop.login1(5) — The D-Bus interface of systemd-logind</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.machine1.html">org.freedesktop.machine1(5) — The D-Bus interface of systemd-machined</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.network1.html">org.freedesktop.network1(5) — The D-Bus interface of systemd-networkd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.oom1.html">org.freedesktop.oom1(5) — The D-Bus interface of systemd-oomd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.portable1.html">org.freedesktop.portable1(5) — The D-Bus interface of systemd-portabled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.resolve1.html">org.freedesktop.resolve1(5) — The D-Bus interface of systemd-resolved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.systemd1.html">org.freedesktop.systemd1(5) — The D-Bus interface of systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.sysupdate1.html">org.freedesktop.sysupdate1(5) — The D-Bus interface of systemd-sysupdated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timedate1.html">org.freedesktop.timedate1(5) — The D-Bus interface of systemd-timedated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timesync1.html">org.freedesktop.timesync1(5) — The D-Bus interface of systemd-timesyncd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="os-release.html">os-release(5) — Operating system identification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">P</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd.html">pam_systemd(8) — Register user sessions in the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_home.html">pam_systemd_home(8) — Authenticate users and mount home directories via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_loadkey.html">pam_systemd_loadkey(8) — Read password from kernel keyring and set it as PAM authtok</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portablectl.html">portablectl(1) — Attach, detach or inspect portable service images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="poweroff.html">poweroff(8) — Power off, reboot, or halt the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pstore.conf.html">pstore.conf(5) — PStore configuration file</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">R</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="repart.d.html">repart.d(5) — Partition Definition Files for Automatic Boot-Time Repartitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolvectl.html">resolvectl(1) — Resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services; introspect and reconfigure the DNS resolver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolved.conf.html">resolved.conf(5) — Network Name Resolution configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run0.html">run0(1) — Elevate privileges</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">S</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus.html">sd-bus(3) — A lightweight D-Bus IPC client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus-errors.html">sd-bus-errors(3) — Standard D-Bus error names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-daemon.html">sd-daemon(3) — APIs for new-style daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-device.html">sd-device(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-event.html">sd-event(3) — A generic event loop implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-hwdb.html">sd-hwdb(3) — Read-only access to the hardware description database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-id128.html">sd-id128(3) — APIs for processing 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-journal.html">sd-journal(3) — APIs for submitting and querying log entries to and from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-json.html">sd-json(3) — APIs for Dealing with JSON Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-login.html">sd-login(3) — APIs for tracking logins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-path.html">sd-path(3) — APIs to query file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-varlink.html">sd-varlink(3) — APIs for Varlink IPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_booted.html">sd_booted(3) — Test whether the system is running the systemd init system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_match.html">sd_bus_add_match(3) — Add a match rule for incoming message dispatching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_node_enumerator.html">sd_bus_add_node_enumerator(3) — Add a node enumerator for a D-Bus object path prefix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object.html">sd_bus_add_object(3) — Declare properties and methods for a D-Bus path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object_manager.html">sd_bus_add_object_manager(3) — Add a D-Bus object manager for a D-Bus object sub-tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_attach_event.html">sd_bus_attach_event(3) — Attach a bus connection object to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call.html">sd_bus_call(3) — Invoke a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call_method.html">sd_bus_call_method(3) — Initialize a bus message object and invoke the corresponding D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_can_send.html">sd_bus_can_send(3) — Check which types can be sent over a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_close.html">sd_bus_close(3) — Close and flush a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_get_pid.html">sd_bus_creds_get_pid(3) — Retrieve fields from a credentials object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_new_from_pid.html">sd_bus_creds_new_from_pid(3) — Retrieve credentials object for the specified PID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_default.html">sd_bus_default(3) — Acquire a connection to a system or user bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_emit_signal.html">sd_bus_emit_signal(3) — Convenience functions for emitting (standard) D-Bus signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_enqueue_for_read.html">sd_bus_enqueue_for_read(3) — Re-enqueue a bus message on a bus connection, for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error.html">sd_bus_error(3) — sd-bus error handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error_add_map.html">sd_bus_error_add_map(3) — Additional sd-dbus error mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_current_handler.html">sd_bus_get_current_handler(3) — Query information of the callback a bus object is currently running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_fd.html">sd_bus_get_fd(3) — Get the file descriptor, I/O events and timeout to wait for from a message bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_n_queued_read.html">sd_bus_get_n_queued_read(3) — Get the number of pending bus messages in the read and write queues of a bus connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_creds.html">sd_bus_get_name_creds(3) — Query bus client credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_machine_id.html">sd_bus_get_name_machine_id(3) — Retrieve a bus client's machine identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_interface_name_is_valid.html">sd_bus_interface_name_is_valid(3) — Check if a string is a valid bus name or object path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_is_open.html">sd_bus_is_open(3) — Check whether the bus connection is open or ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_list_names.html">sd_bus_list_names(3) — Retrieve information about registered names on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append.html">sd_bus_message_append(3) — Attach fields to a D-Bus message based on a type string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_array.html">sd_bus_message_append_array(3) — Append an array of fields to a D-Bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_basic.html">sd_bus_message_append_basic(3) — Attach a single field to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_string_memfd.html">sd_bus_message_append_string_memfd(3) — Attach a string to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_strv.html">sd_bus_message_append_strv(3) — Attach an array of strings to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_at_end.html">sd_bus_message_at_end(3) — Check if a message has been fully read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_copy.html">sd_bus_message_copy(3) — Copy the contents of one message to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_dump.html">sd_bus_message_dump(3) — Produce a string representation of a message for debugging purposes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_cookie.html">sd_bus_message_get_cookie(3) — Returns the transaction cookie of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_monotonic_usec.html">sd_bus_message_get_monotonic_usec(3) — Retrieve the sender timestamps and sequence number of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_signature.html">sd_bus_message_get_signature(3) — Query bus message signature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_type.html">sd_bus_message_get_type(3) — Query bus message addressing/credentials metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new.html">sd_bus_message_new(3) — Create a new bus message object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_call.html">sd_bus_message_new_method_call(3) — Create a method call message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_error.html">sd_bus_message_new_method_error(3) — Create an error reply for a method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_signal.html">sd_bus_message_new_signal(3) — Create a signal message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_open_container.html">sd_bus_message_open_container(3) — Create and move between containers in D-Bus messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read.html">sd_bus_message_read(3) — Read a sequence of values from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_array.html">sd_bus_message_read_array(3) — Access an array of elements in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_basic.html">sd_bus_message_read_basic(3) — Read a basic type from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_strv.html">sd_bus_message_read_strv(3) — Access an array of strings in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_rewind.html">sd_bus_message_rewind(3) — Return to beginning of message or current container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_seal.html">sd_bus_message_seal(3) — Prepare a D-Bus message for transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_sensitive.html">sd_bus_message_sensitive(3) — Mark a message object as containing sensitive data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_destination.html">sd_bus_message_set_destination(3) — Set and query bus message addressing information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_expect_reply.html">sd_bus_message_set_expect_reply(3) — Set and query bus message metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_skip.html">sd_bus_message_skip(3) — Skip elements in a bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_verify_type.html">sd_bus_message_verify_type(3) — Check if the message has specified type at the current location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_negotiate_fds.html">sd_bus_negotiate_fds(3) — Control feature negotiation on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_new.html">sd_bus_new(3) — Create a new bus object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_path_encode.html">sd_bus_path_encode(3) — Convert an external identifier into an object path and back</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_pending_method_calls.html">sd_bus_pending_method_calls(3) — Return the number of currently pending, outgoing method calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_process.html">sd_bus_process(3) — Drive the connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_query_sender_creds.html">sd_bus_query_sender_creds(3) — Query bus message sender credentials/privileges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_error.html">sd_bus_reply_method_error(3) — Reply with an error to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_return.html">sd_bus_reply_method_return(3) — Reply to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_request_name.html">sd_bus_request_name(3) — Request or release a well-known service name on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_send.html">sd_bus_send(3) — Queue a D-Bus message for transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_address.html">sd_bus_set_address(3) — Set or query the address of the bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_close_on_exit.html">sd_bus_set_close_on_exit(3) — Control whether to close the bus connection during the event loop exit phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_connected_signal.html">sd_bus_set_connected_signal(3) — Control emission of local connection establishment signal on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_description.html">sd_bus_set_description(3) — Set or query properties of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_exit_on_disconnect.html">sd_bus_set_exit_on_disconnect(3) — Control the exit behavior when the bus object disconnects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_fd.html">sd_bus_set_fd(3) — Set the file descriptors to use for bus communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_method_call_timeout.html">sd_bus_set_method_call_timeout(3) — Set or query the default D-Bus method call timeout of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_property.html">sd_bus_set_property(3) — Set or query D-Bus service properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_sender.html">sd_bus_set_sender(3) — Configure default sender for outgoing messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_server.html">sd_bus_set_server(3) — Configure connection mode for a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_watch_bind.html">sd_bus_set_watch_bind(3) — Control socket binding watching on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_get_bus.html">sd_bus_slot_get_bus(3) — Query information attached to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_ref.html">sd_bus_slot_ref(3) — Create and destroy references to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_description.html">sd_bus_slot_set_description(3) — Set or query the description of bus slot objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_destroy_callback.html">sd_bus_slot_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_floating.html">sd_bus_slot_set_floating(3) — Control whether a bus slot object is "floating"</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_userdata.html">sd_bus_slot_set_userdata(3) — Set and query the value in the "userdata" field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_start.html">sd_bus_start(3) — Initiate a bus connection to the D-bus broker daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_add_name.html">sd_bus_track_add_name(3) — Add, remove and retrieve bus peers tracked in a bus peer tracking object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_new.html">sd_bus_track_new(3) — Track bus peers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_wait.html">sd_bus_wait(3) — Wait for I/O on a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_add_match_parent.html">sd_device_enumerator_add_match_parent(3) — Add a filter to the device enumerator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_get_device_first.html">sd_device_enumerator_get_device_first(3) — Enumerates devices and get the first or next device.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_new.html">sd_device_enumerator_new(3) — Create, reference, and release a device enumerator object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_get_syspath.html">sd_device_get_syspath(3) — Returns various fields of device objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_ref.html">sd_device_ref(3) — Create or destroy references to a device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_child.html">sd_event_add_child(3) — Add a child process state change event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_defer.html">sd_event_add_defer(3) — Add static event sources to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_inotify.html">sd_event_add_inotify(3) — Add an "inotify" file system inode event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_io.html">sd_event_add_io(3) — Add an I/O event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_memory_pressure.html">sd_event_add_memory_pressure(3) — Add and configure an event source run as result of memory pressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_signal.html">sd_event_add_signal(3) — Add a UNIX process signal event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_time.html">sd_event_add_time(3) — Add a timer event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_exit.html">sd_event_exit(3) — Ask the event loop to exit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_get_fd.html">sd_event_get_fd(3) — Obtain a file descriptor to poll for event loop events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_new.html">sd_event_new(3) — Acquire and release an event loop object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_now.html">sd_event_now(3) — Retrieve current event loop iteration timestamp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_run.html">sd_event_run(3) — Run an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_exit_on_idle.html">sd_event_set_exit_on_idle(3) — Enable event loop exit-on-idle support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_signal_exit.html">sd_event_set_signal_exit(3) — Automatically leave event loop on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_watchdog.html">sd_event_set_watchdog(3) — Enable event loop watchdog support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_event.html">sd_event_source_get_event(3) — Retrieve the event loop of an event source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_pending.html">sd_event_source_get_pending(3) — Determine pending state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_description.html">sd_event_source_set_description(3) — Set or retrieve descriptive names of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_destroy_callback.html">sd_event_source_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_enabled.html">sd_event_source_set_enabled(3) — Enable or disable event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_exit_on_failure.html">sd_event_source_set_exit_on_failure(3) — Set or retrieve the exit-on-failure feature of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_floating.html">sd_event_source_set_floating(3) — Set or retrieve 'floating' state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_prepare.html">sd_event_source_set_prepare(3) — Set a preparation callback for event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_priority.html">sd_event_source_set_priority(3) — Set or retrieve the priority of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_ratelimit.html">sd_event_source_set_ratelimit(3) — Configure rate limiting on event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_userdata.html">sd_event_source_set_userdata(3) — Set or retrieve user data pointer of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_unref.html">sd_event_source_unref(3) — Increase or decrease event source reference counters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_wait.html">sd_event_wait(3) — Low-level event loop operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_get_seats.html">sd_get_seats(3) — Determine available seats, sessions, logged in users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_get.html">sd_hwdb_get(3) — Seek to a location in hwdb or access entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_new.html">sd_hwdb_new(3) — Create a new hwdb object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_get_machine.html">sd_id128_get_machine(3) — Retrieve 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_randomize.html">sd_id128_randomize(3) — Generate 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_to_string.html">sd_id128_to_string(3) — Format or parse 128-bit IDs as strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_is_fifo.html">sd_is_fifo(3) — Check the type of a file descriptor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_add_match.html">sd_journal_add_match(3) — Add or remove entry matches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_enumerate_fields.html">sd_journal_enumerate_fields(3) — Read used field names from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_catalog.html">sd_journal_get_catalog(3) — Retrieve message catalog entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cursor.html">sd_journal_get_cursor(3) — Get cursor string for or test cursor string against the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cutoff_realtime_usec.html">sd_journal_get_cutoff_realtime_usec(3) — Read cut-off timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_data.html">sd_journal_get_data(3) — Read data fields from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_fd.html">sd_journal_get_fd(3) — Journal change notification interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_realtime_usec.html">sd_journal_get_realtime_usec(3) — Read timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_seqnum.html">sd_journal_get_seqnum(3) — Read sequence number from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_usage.html">sd_journal_get_usage(3) — Journal disk usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_has_runtime_files.html">sd_journal_has_runtime_files(3) — Query availability of runtime or persistent journal files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_next.html">sd_journal_next(3) — Advance or set back the read pointer in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_open.html">sd_journal_open(3) — Open the system journal for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_print.html">sd_journal_print(3) — Submit log entries to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_query_unique.html">sd_journal_query_unique(3) — Read unique data fields from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_seek_head.html">sd_journal_seek_head(3) — Seek to a position in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_stream_fd.html">sd_journal_stream_fd(3) — Create log stream file descriptor to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_json_dispatch_string.html">sd_json_dispatch_string(3) — Decode JSON variant values and write them to the specified memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_listen_fds.html">sd_listen_fds(3) — Check for file descriptors passed by the system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_login_monitor_new.html">sd_login_monitor_new(3) — Monitor login sessions, seats, users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_machine_get_class.html">sd_machine_get_class(3) — Determine the class and network interface indices of a locally running virtual machine or container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_notify.html">sd_notify(3) — Notify service manager about start-up completion and other service status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_path_lookup.html">sd_path_lookup(3) — Query well-known file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pid_get_owner_uid.html">sd_pid_get_owner_uid(3) — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pidfd_get_inode_id.html">sd_pidfd_get_inode_id(3) — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_seat_get_active.html">sd_seat_get_active(3) — Determine state of a specific seat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_session_is_active.html">sd_session_is_active(3) — Determine state of a specific session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_uid_get_state.html">sd_uid_get_state(3) — Determine login state of a specific Unix user ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_is_connected.html">sd_varlink_is_connected(3) — Query if a Varlink connection object is currently connected or idle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_push_fd.html">sd_varlink_push_fd(3) — Submit a file descriptor to send along with the next outgoing Varlink message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_send.html">sd_varlink_send(3) — Enqueues a Varlink method call, not expecting a reply</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_server_new.html">sd_varlink_server_new(3) — Allocate Varlink server object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_description.html">sd_varlink_set_description(3) — Set or query description of a Varlink connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_relative_timeout.html">sd_varlink_set_relative_timeout(3) — Set method call time-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_watchdog_enabled.html">sd_watchdog_enabled(3) — Check whether the service manager expects watchdog keep-alive notifications from a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shutdown.html">shutdown(8) — Halt, power off or reboot the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smbios-type-11.html">smbios-type-11(7) — SMBIOS Type 11 strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysctl.d.html">sysctl.d(5) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysext.conf.html">sysext.conf(5) — Configuration files for systemd-sysext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemctl.html">systemctl(1) — Control the systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.html">systemd(1) — systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ac-power.html">systemd-ac-power(1) — Report whether we are connected to an external power source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-analyze.html">systemd-analyze(1) — Analyze and debug system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password.html">systemd-ask-password(1) — Query the user for a system password</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password-console.service.html">systemd-ask-password-console.service(8) — Query the user for system passwords on the console and via wall</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-backlight%40.service.html">systemd-backlight@.service(8) — Load and save the display backlight brightness at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-battery-check.service.html">systemd-battery-check.service(8) — Check battery level whether there's enough charge, and power off if not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-binfmt.service.html">systemd-binfmt.service(8) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot-generator.html">systemd-bless-boot-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot.service.html">systemd-bless-boot.service(8) — Mark current boot process as successful</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot.html">systemd-boot(7) — A simple UEFI boot manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-check-no-failures.service.html">systemd-boot-check-no-failures.service(8) — verify that the system booted up cleanly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-clear-sysfail.service.html">systemd-boot-clear-sysfail.service(8) — Clear LoaderEntrySysFail entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-random-seed.service.html">systemd-boot-random-seed.service(8) — Refresh boot loader random seed at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bsod.service.html">systemd-bsod.service(8) — Displays boot-time emergency log message in full screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cat.html">systemd-cat(1) — Connect a pipeline or program's output with the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgls.html">systemd-cgls(1) — Recursively show control group contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgtop.html">systemd-cgtop(1) — Show top control groups by their resource usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-coredump.html">systemd-coredump(8) — Acquire, save and process core dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-creds.html">systemd-creds(1) — Lists, shows, encrypts and decrypts service credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptenroll.html">systemd-cryptenroll(1) — Enroll PKCS#11, FIDO2, TPM2 token/devices to LUKS2 encrypted volumes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup.html">systemd-cryptsetup(8) — Full disk decryption logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup-generator.html">systemd-cryptsetup-generator(8) — Unit generator for</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-debug-generator.html">systemd-debug-generator(8) — Generator for enabling a runtime debug shell and masking specific units at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-delta.html">systemd-delta(1) — Find overridden configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-detect-virt.html">systemd-detect-virt(1) — Detect execution in a virtualized environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-dissect.html">systemd-dissect(1) — Dissect Discoverable Disk Images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-environment-d-generator.html">systemd-environment-d-generator(8) — Load variables specified by</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-escape.html">systemd-escape(1) — Escape strings for usage in systemd unit names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset.html">systemd-factory-reset(8) — Request or complete a factory reset operation, or query current factory reset mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset-generator.html">systemd-factory-reset-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-firstboot.html">systemd-firstboot(1) — Initialize basic system settings on or before the first boot-up of a system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fsck%40.service.html">systemd-fsck@.service(8) — File system checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fstab-generator.html">systemd-fstab-generator(8) — Unit generator for /etc/fstab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-getty-generator.html">systemd-getty-generator(8) — Generator for enabling getty instances on the console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-gpt-auto-generator.html">systemd-gpt-auto-generator(8) — Generator for automatically discovering and mounting root,</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume-generator.html">systemd-hibernate-resume-generator(8) — Unit generator for resume= kernel parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume.service.html">systemd-hibernate-resume.service(8) — Resume from hibernation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-homed.service.html">systemd-homed.service(8) — Home Area/User Account Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hostnamed.service.html">systemd-hostnamed.service(8) — Daemon to control system hostname from programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hwdb.html">systemd-hwdb(8) — hardware database management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-id128.html">systemd-id128(1) — Generate and print sd-128 identifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-import-generator.html">systemd-import-generator(8) — Generator for automatically downloading disk images at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-importd.service.html">systemd-importd.service(8) — VM and container image import and export service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-inhibit.html">systemd-inhibit(1) — Execute a program with an inhibition lock taken</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup-generator.html">systemd-integritysetup-generator(8) — Unit generator for integrity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup%40.service.html">systemd-integritysetup@.service(8) — Disk integrity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-gatewayd.service.html">systemd-journal-gatewayd.service(8) — HTTP server for journal events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-remote.service.html">systemd-journal-remote.service(8) — Receive journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-upload.service.html">systemd-journal-upload.service(8) — Send journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journald.service.html">systemd-journald.service(8) — Journal service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-keyutil.html">systemd-keyutil(1) — Perform various operations on private keys and X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-localed.service.html">systemd-localed.service(8) — Locale bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-logind.service.html">systemd-logind.service(8) — Login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-loop%40.service.html">systemd-loop@.service(8) — Attach a loopback block device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-commit.service.html">systemd-machine-id-commit.service(8) — Commit a transient machine ID to disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-setup.html">systemd-machine-id-setup(1) — Initialize the machine ID in /etc/machine-id</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machined.service.html">systemd-machined.service(8) — Virtual machine and container registration manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-makefs%40.service.html">systemd-makefs@.service(8) — Creating and growing file systems on demand</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-measure.html">systemd-measure(1) — Pre-calculate and sign expected TPM2 PCR 11 values for booted unified kernel images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-modules-load.service.html">systemd-modules-load.service(8) — Load kernel modules at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mount.html">systemd-mount(1) — Establish and destroy transient mount or auto-mount points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mountfsd.service.html">systemd-mountfsd.service(8) — Disk Image File System Mount Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mute-console.html">systemd-mute-console(1) — Temporarily mute kernel log output and service manager status output to the system console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-network-generator.service.html">systemd-network-generator.service(8) — Generate network configuration from the kernel command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd-wait-online.service.html">systemd-networkd-wait-online.service(8) — Wait for network to come online</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd.service.html">systemd-networkd.service(8) — Network manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-notify.html">systemd-notify(1) — Notify service manager about start-up completion and other daemon status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nspawn.html">systemd-nspawn(1) — Spawn a command or OS in a lightweight container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nsresourced.service.html">systemd-nsresourced.service(8) — User Namespace Resource Delegation Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-oomd.service.html">systemd-oomd.service(8) — A userspace out-of-memory (OOM) killer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-path.html">systemd-path(1) — List and query system and user paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrlock.html">systemd-pcrlock(8) — Analyze and predict TPM2 PCR states and generate an access policy from the prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrphase.service.html">systemd-pcrphase.service(8) — Measure boot phases, machine ID, product UUID and file system identity into TPM PCRs and NvPCRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-portabled.service.html">systemd-portabled.service(8) — Portable service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-poweroff.service.html">systemd-poweroff.service(8) — System shutdown logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pstore.service.html">systemd-pstore.service(8) — A service to archive contents of pstore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pty-forward.html">systemd-pty-forward(1) — Run a command with a custom terminal background color or title</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-quotacheck%40.service.html">systemd-quotacheck@.service(8) — File system quota checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-random-seed.service.html">systemd-random-seed.service(8) — Load and save the OS system random seed at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rc-local-generator.html">systemd-rc-local-generator(8) — Compatibility generator and service to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-remount-fs.service.html">systemd-remount-fs.service(8) — Remount root and kernel file systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-repart.html">systemd-repart(8) — Automatically grow and add partitions, and generate disk images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-resolved.service.html">systemd-resolved.service(8) — Network Name Resolution manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rfkill.service.html">systemd-rfkill.service(8) — Load and save the RF kill switch state at boot and change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run.html">systemd-run(1) — Run programs in transient scope units, service units, or path-, socket-, or timer-triggered service units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run-generator.html">systemd-run-generator(8) — Generator for invoking commands specified on the kernel command line as system service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sbsign.html">systemd-sbsign(1) — Sign PE binaries for EFI Secure Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sleep.conf.html">systemd-sleep.conf(5) — Suspend and hibernation configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-activate.html">systemd-socket-activate(1) — Test socket activation of daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-proxyd.html">systemd-socket-proxyd(8) — Bidirectionally proxy local sockets to another (possibly remote) socket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-soft-reboot.service.html">systemd-soft-reboot.service(8) — Userspace reboot operation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-generator.html">systemd-ssh-generator(8) — Generator for binding a socket-activated SSH server to local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-issue.html">systemd-ssh-issue(1) — Generator for SSH login prompt drop-ins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-proxy.html">systemd-ssh-proxy(1) — SSH client plugin for connecting to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stdio-bridge.html">systemd-stdio-bridge(1) — D-Bus proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-storagetm.service.html">systemd-storagetm.service(8) — Exposes all local block devices as NVMe-TCP mass storage devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stub.html">systemd-stub(7) — A simple UEFI kernel boot stub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-suspend.service.html">systemd-suspend.service(8) — System sleep state logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysctl.service.html">systemd-sysctl.service(8) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysext.html">systemd-sysext(8) — Activates System Extension Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system-update-generator.html">systemd-system-update-generator(8) — Generator for redirecting boot to offline update mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system.conf.html">systemd-system.conf(5) — System and session service manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdate.html">systemd-sysupdate(8) — Automatically Update OS or Other Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdated.service.html">systemd-sysupdated.service(8) — System Update Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysusers.html">systemd-sysusers(8) — Allocate system users and groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysv-generator.html">systemd-sysv-generator(8) — Unit generator for SysV init scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-time-wait-sync.service.html">systemd-time-wait-sync.service(8) — Wait until kernel time is synchronized</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timedated.service.html">systemd-timedated.service(8) — Time and date bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timesyncd.service.html">systemd-timesyncd.service(8) — Network Time Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tmpfiles.html">systemd-tmpfiles(8) — Create, delete, and clean up files and directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-clear.service.html">systemd-tpm2-clear.service(8) — Request that the TPM security chip is cleared on next boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-generator.html">systemd-tpm2-generator(8) — Generator for inserting TPM2 synchronization point in the boot process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-setup.service.html">systemd-tpm2-setup.service(8) — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tty-ask-password-agent.html">systemd-tty-ask-password-agent(1) — List or process pending systemd password requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udev-settle.service.html">systemd-udev-settle.service(8) — Wait for all pending udev events to be handled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udevd.service.html">systemd-udevd.service(8) — Device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-done.service.html">systemd-update-done.service(8) — Mark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-utmp.service.html">systemd-update-utmp.service(8) — Write audit and utmp updates at bootup and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-user-sessions.service.html">systemd-user-sessions.service(8) — Permit user logins after boot, prohibit user logins at shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-userdbd.service.html">systemd-userdbd.service(8) — JSON User/Group Record Query Multiplexer/NSS Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-validatefs%40.service.html">systemd-validatefs@.service(8) — Validate File System Mount Constraint Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vconsole-setup.service.html">systemd-vconsole-setup.service(8) — Configure the virtual consoles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup-generator.html">systemd-veritysetup-generator(8) — Unit generator for verity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup%40.service.html">systemd-veritysetup@.service(8) — Disk verity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vmspawn.html">systemd-vmspawn(1) — Spawn an OS in a virtual machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-volatile-root.service.html">systemd-volatile-root.service(8) — Make the root file system volatile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vpick.html">systemd-vpick(1) — Resolve paths to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-xdg-autostart-generator.html">systemd-xdg-autostart-generator(8) — User unit generator for XDG autostart files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.automount.html">systemd.automount(5) — Automount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.device.html">systemd.device(5) — Device unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dns-delegate.html">systemd.dns-delegate(5) — DNS Server Delegation Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dnssd.html">systemd.dnssd(5) — DNS-SD configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.environment-generator.html">systemd.environment-generator(7) — systemd environment file generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.exec.html">systemd.exec(5) — Execution environment configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.generator.html">systemd.generator(7) — systemd unit generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-filter.html">systemd.image-filter(7) — Disk Image Dissection Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-policy.html">systemd.image-policy(7) — Disk Image Dissection Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.journal-fields.html">systemd.journal-fields(7) — Special journal fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.kill.html">systemd.kill(5) — Process killing procedure configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.link.html">systemd.link(5) — Network device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.mount.html">systemd.mount(5) — Mount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.net-naming-scheme.html">systemd.net-naming-scheme(7) — Network device naming schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.netdev.html">systemd.netdev(5) — Virtual Network Device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.network.html">systemd.network(5) — Network configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.nspawn.html">systemd.nspawn(5) — Container settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.offline-updates.html">systemd.offline-updates(7) — Implementation of offline updates in systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.path.html">systemd.path(5) — Path unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.pcrlock.html">systemd.pcrlock(5) — PCR measurement prediction files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.preset.html">systemd.preset(5) — Service enablement presets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.resource-control.html">systemd.resource-control(5) — Resource control unit settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.scope.html">systemd.scope(5) — Scope unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.service.html">systemd.service(5) — Service unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.slice.html">systemd.slice(5) — Slice unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.socket.html">systemd.socket(5) — Socket unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.special.html">systemd.special(7) — Special systemd units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.swap.html">systemd.swap(5) — Swap unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.syntax.html">systemd.syntax(7) — General syntax of systemd configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.system-credentials.html">systemd.system-credentials(7) — System Credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.target.html">systemd.target(5) — Target unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.time.html">systemd.time(7) — Time and date specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.timer.html">systemd.timer(5) — Timer unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.unit.html">systemd.unit(5) — Unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.v.html">systemd.v(7) — Directory with Versioned Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.d.html">sysupdate.d(5) — Transfer Definition Files for Automatic Updates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.features.html">sysupdate.features(5) — Definition Files for Optional Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysusers.d.html">sysusers.d(5) — Declarative allocation of system users and groups</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">T</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="timedatectl.html">timedatectl(1) — Control the system time and date</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesyncd.conf.html">timesyncd.conf(5) — Network Time Synchronization configuration files</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">tmpfiles.d(5) — Configuration for creation, deletion, and cleaning of files and directories</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">U</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="udev.html">udev(7) — Dynamic device management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev.conf.html">udev.conf(5) — Configuration for device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_get_syspath.html">udev_device_get_syspath(3) — Query device properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_has_tag.html">udev_device_has_tag(3) — Retrieve or set device attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_new_from_syspath.html">udev_device_new_from_syspath(3) — Create, acquire and release a udev device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_add_match_subsystem.html">udev_enumerate_add_match_subsystem(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_new.html">udev_enumerate_new(3) — Create, acquire and release a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_scan_devices.html">udev_enumerate_scan_devices(3) — Query or modify a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_list_entry.html">udev_list_entry(3) — Iterate and access udev lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_filter_update.html">udev_monitor_filter_update(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_new_from_netlink.html">udev_monitor_new_from_netlink(3) — Create, acquire and release a udev monitor object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_receive_device.html">udev_monitor_receive_device(3) — Query and modify device monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_new.html">udev_new(3) — Create, acquire and release a udev context object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udevadm.html">udevadm(8) — udev management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ukify.html">ukify(1) — Combine components into a signed Unified Kernel Image for UEFI systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updatectl.html">updatectl(1) — Control the system update service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user%40.service.html">user@.service(5) — System units to start the user manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="userdbctl.html">userdbctl(1) — Inspect users, groups and group memberships</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">V</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="varlinkctl.html">varlinkctl(1) — Introspect with and invoke Varlink services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vconsole.conf.html">vconsole.conf(5) — Configuration file for the virtual console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="veritytab.html">veritytab(5) — Configuration for verity block devices</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/blob/man_pages_in_sphinx/doc-migration/source/docs/tmpfiles.d.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/edit/man_pages_in_sphinx/doc-migration/source/docs/tmpfiles.d.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="tmpfiles-d-5">
+<span id="id1"></span><h1>tmpfiles.d(5)<a class="headerlink" href="#tmpfiles-d-5" title="Link to this heading">¶</a></h1>
+<section id="name">
+<h2>Name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
+<p>tmpfiles.d — Configuration for creation, deletion, and cleaning of files and directories</p>
+</section>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">/etc/tmpfiles.d/*.conf</span></code></div>
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">/run/tmpfiles.d/*.conf</span></code></div>
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">/usr/local/lib/tmpfiles.d/*.conf</span></code></div>
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">/usr/lib/tmpfiles.d/*.conf</span></code></div>
+</div>
+<div class="line-block">
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">~/.config/user-tmpfiles.d/*.conf</span></code></div>
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">$XDG_RUNTIME_DIR/user-tmpfiles.d/*.conf</span></code></div>
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">~/.local/share/user-tmpfiles.d/*.conf</span></code></div>
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">…</span></code></div>
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">/usr/local/share/user-tmpfiles.d/*.conf</span></code></div>
+<div class="line"><code class="code docutils literal notranslate"><span class="pre">/usr/share/user-tmpfiles.d/*.conf</span></code></div>
+</div>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1">#Type Path                                     Mode User Group Age         Argument</span>
+f<span class="w">     </span>/file/to/create<span class="w">                          </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>content
+f+<span class="w">    </span>/file/to/create-or-truncate<span class="w">              </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>content
+w<span class="w">     </span>/file/to/write-to<span class="w">                        </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>content
+w+<span class="w">    </span>/file/to/append-to<span class="w">                       </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>content
+d<span class="w">     </span>/directory/to/create-and-clean-up<span class="w">        </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>cleanup-age<span class="w"> </span>-
+D<span class="w">     </span>/directory/to/create-and-remove<span class="w">          </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>cleanup-age<span class="w"> </span>-
+e<span class="w">     </span>/directory/to/clean-up<span class="w">                   </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>cleanup-age<span class="w"> </span>-
+v<span class="w">     </span>/subvolume-or-directory/to/create<span class="w">        </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>cleanup-age<span class="w"> </span>-
+q<span class="w">     </span>/subvolume-or-directory/to/create<span class="w">        </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>cleanup-age<span class="w"> </span>-
+Q<span class="w">     </span>/subvolume-or-directory/to/create<span class="w">        </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>cleanup-age<span class="w"> </span>-
+p<span class="w">     </span>/fifo/to/create<span class="w">                          </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>-
+p+<span class="w">    </span>/fifo/to/<span class="o">[</span>re<span class="o">]</span>create<span class="w">                      </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>-
+L<span class="w">     </span>/symlink/to/create<span class="w">                       </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>symlink/target/path
+L+<span class="w">    </span>/symlink/to/<span class="o">[</span>re<span class="o">]</span>create<span class="w">                   </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>symlink/target/path
+c<span class="w">     </span>/dev/char-device-to-create<span class="w">               </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>major:minor
+c+<span class="w">    </span>/dev/char-device-to-<span class="o">[</span>re<span class="o">]</span>create<span class="w">           </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>major:minor
+b<span class="w">     </span>/dev/block-device-to-create<span class="w">              </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>major:minor
+b+<span class="w">    </span>/dev/block-device-to-<span class="o">[</span>re<span class="o">]</span>create<span class="w">          </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>major:minor
+C<span class="w">     </span>/target/to/create<span class="w">                        </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>cleanup-age<span class="w"> </span>/source/to/copy
+C+<span class="w">    </span>/target/to/create<span class="w">                        </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>cleanup-age<span class="w"> </span>/source/to/copy
+x<span class="w">     </span>/path-or-glob/to/ignore/recursively<span class="w">      </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>cleanup-age<span class="w"> </span>-
+X<span class="w">     </span>/path-or-glob/to/ignore<span class="w">                  </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>cleanup-age<span class="w"> </span>-
+r<span class="w">     </span>/path-or-glob/to/remove<span class="w">                  </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>-
+R<span class="w">     </span>/path-or-glob/to/remove/recursively<span class="w">      </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>-
+z<span class="w">     </span>/path-or-glob/to/adjust/mode<span class="w">             </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>-
+Z<span class="w">     </span>/path-or-glob/to/adjust/mode/recursively<span class="w"> </span>mode<span class="w"> </span>user<span class="w"> </span>group<span class="w"> </span>-<span class="w">           </span>-
+t<span class="w">     </span>/path-or-glob/to/set/xattrs<span class="w">              </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>xattrs
+T<span class="w">     </span>/path-or-glob/to/set/xattrs/recursively<span class="w">  </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>xattrs
+h<span class="w">     </span>/path-or-glob/to/set/attrs<span class="w">               </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>file<span class="w"> </span>attrs
+H<span class="w">     </span>/path-or-glob/to/set/attrs/recursively<span class="w">   </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>file<span class="w"> </span>attrs
+a<span class="w">     </span>/path-or-glob/to/set/acls<span class="w">                </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>POSIX<span class="w"> </span>ACLs
+a+<span class="w">    </span>/path-or-glob/to/append/acls<span class="w">             </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>POSIX<span class="w"> </span>ACLs
+A<span class="w">     </span>/path-or-glob/to/set/acls/recursively<span class="w">    </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>POSIX<span class="w"> </span>ACLs
+A+<span class="w">    </span>/path-or-glob/to/append/acls/recursively<span class="w"> </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">           </span>POSIX<span class="w"> </span>ACLs
+</pre></div>
+</div>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">tmpfiles.d</span></code> configuration files provide a generic mechanism to define the <em>creation</em> of regular files, directories, pipes, and device nodes, adjustments to their of regular files, directories, pipes, and device nodes, adjustments to their <em>access mode, ownership, attributes, quota assignments, and contents</em>, and finally their time-based , and finally their time-based <em>removal</em>. It is mostly commonly used for volatile and temporary files and directories (such as those located under . It is mostly commonly used for volatile and temporary files and directories (such as those located under <code class="code docutils literal notranslate"><span class="pre">/run/</span></code>, <code class="code docutils literal notranslate"><span class="pre">/tmp/</span></code>, <code class="code docutils literal notranslate"><span class="pre">/var/tmp/</span></code>, the API file systems such as <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code> or <code class="code docutils literal notranslate"><span class="pre">/proc/</span></code>, as well as some other directories below <code class="code docutils literal notranslate"><span class="pre">/var/</span></code>).</p>
+<p><a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a> uses this configuration to create volatile files and directories during boot and to do periodic cleanup afterwards. See <a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a> for the description of <code class="code docutils literal notranslate"><span class="pre">systemd-tmpfiles-setup.service</span></code>, <code class="code docutils literal notranslate"><span class="pre">systemd-tmpfiles-clean.service</span></code>, and associated units.</p>
+<p>System daemons frequently require private runtime directories below <code class="code docutils literal notranslate"><span class="pre">/run/</span></code> to store communication sockets and similar. For these, it is better to use <code class="code docutils literal notranslate"><span class="pre">RuntimeDirectory=</span></code> in their unit files (see <a class="reference internal" href="systemd.exec.html#systemd-exec-5"><span class="std std-ref">systemd.exec(5)</span></a> for details), if the flexibility provided by <code class="code docutils literal notranslate"><span class="pre">tmpfiles.d</span></code> is not required. The advantages are that the configuration required by the unit is centralized in one place, and that the lifetime of the directory is tied to the lifetime of the service itself. Similarly, <code class="code docutils literal notranslate"><span class="pre">StateDirectory=</span></code>, <code class="code docutils literal notranslate"><span class="pre">CacheDirectory=</span></code>, <code class="code docutils literal notranslate"><span class="pre">LogsDirectory=</span></code>, and <code class="code docutils literal notranslate"><span class="pre">ConfigurationDirectory=</span></code> should be used to create directories under <code class="code docutils literal notranslate"><span class="pre">/var/lib/</span></code>, <code class="code docutils literal notranslate"><span class="pre">/var/cache/</span></code>, <code class="code docutils literal notranslate"><span class="pre">/var/log/</span></code>, and <code class="code docutils literal notranslate"><span class="pre">/etc/</span></code>. <code class="code docutils literal notranslate"><span class="pre">tmpfiles.d</span></code> should be used for files whose lifetime is independent of any service or requires more complicated configuration.</p>
+</section>
+<section id="configuration-directories-and-precedence">
+<h2>Configuration Directories and Precedence<a class="headerlink" href="#configuration-directories-and-precedence" title="Link to this heading">¶</a></h2>
+<p>Each configuration file shall be named in the style of <code class="code docutils literal notranslate"><span class="pre">package.conf</span></code> or <code class="code docutils literal notranslate"><span class="pre">package-part.conf</span></code>. The second variant should be used when it is desirable to make it easy to override just this part of configuration.</p>
+<p>Files in <code class="code docutils literal notranslate"><span class="pre">/etc/tmpfiles.d</span></code> override files with the same name in <code class="code docutils literal notranslate"><span class="pre">/usr/lib/tmpfiles.d</span></code> and <code class="code docutils literal notranslate"><span class="pre">/run/tmpfiles.d</span></code>. Files in <code class="code docutils literal notranslate"><span class="pre">/run/tmpfiles.d</span></code> override files with the same name in <code class="code docutils literal notranslate"><span class="pre">/usr/lib/tmpfiles.d</span></code>. Packages should install their configuration files in <code class="code docutils literal notranslate"><span class="pre">/usr/lib/tmpfiles.d</span></code>. Files in <code class="code docutils literal notranslate"><span class="pre">/etc/tmpfiles.d</span></code> are reserved for the local administrator, who may use this logic to override the configuration files installed by vendor packages. All configuration files are sorted by their filename in lexicographic order, regardless of which of the directories they reside in. If multiple files specify the same path, the entry in the file with the lexicographically earliest name will be applied (note that lines suppressed due to the “!” are filtered before application, meaning that if an early line carries the exclamation mark and is suppressed because of that, a later line matching in path will be applied). All other conflicting entries will be logged as errors. When two lines are prefix path and suffix path of each other, then the prefix line is always created first, the suffix later (and if removal applies to the line, the order is reversed: the suffix is removed first, the prefix later). Lines that take globs are applied after those accepting no globs. If multiple operations shall be applied on the same file (such as ACL, xattr, file attribute adjustments), these are always done in the same fixed order. Except for those cases, the files/directories are processed in the order they are listed.</p>
+<p>If the administrator wants to disable a configuration file supplied by the vendor, the recommended way is to place a symlink to <code class="code docutils literal notranslate"><span class="pre">/dev/null</span></code> in <code class="code docutils literal notranslate"><span class="pre">/etc/tmpfiles.d/</span></code> bearing the same filename.</p>
+</section>
+<section id="configuration-file-format">
+<h2>Configuration File Format<a class="headerlink" href="#configuration-file-format" title="Link to this heading">¶</a></h2>
+<p>The configuration format is one line per path, containing type, path, mode, ownership, age, and argument fields. The lines are separated by newlines, the fields by whitespace:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1">#Type Path        Mode User Group Age Argument…</span>
+d<span class="w">     </span>/run/user<span class="w">   </span><span class="m">0755</span><span class="w"> </span>root<span class="w"> </span>root<span class="w">  </span>10d<span class="w"> </span>-
+L<span class="w">     </span>/tmp/foobar<span class="w"> </span>-<span class="w">    </span>-<span class="w">    </span>-<span class="w">     </span>-<span class="w">   </span>/dev/null
+</pre></div>
+</div>
+<p>Fields may contain C-style escapes. With the exception of the seventh field (the “argument”) all fields may be enclosed in quotes. Note that any whitespace found in the line after the beginning of the argument field will be considered part of the argument field. To begin the argument field with a whitespace character, use C-style escapes (e.g. “\x20”).</p>
+</section>
+<section id="type">
+<h2>Type<a class="headerlink" href="#type" title="Link to this heading">¶</a></h2>
+<p>The type consists of a single letter and optionally one or more modifier characters: a plus sign (“+”), exclamation mark (“!”), minus sign (“-“), equals sign (“=”), tilde character (“~”) and/or caret (“^”).</p>
+<p>The following line types are understood:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-f">
+<span class="sig-name descname"><span class="pre">f</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-f" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">f+</span></span></dt>
+<dd><p><code class="code docutils literal notranslate"><span class="pre">f</span></code> will create a file if it does not exist yet. If the argument parameter is given and the file did not exist yet, it will be written to the file. <code class="code docutils literal notranslate"><span class="pre">f+</span></code> will create or truncate the file. If the argument parameter is given, it will be written to the file. Does not follow symlinks.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-w">
+<span class="sig-name descname"><span class="pre">w</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-w" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">w+</span></span></dt>
+<dd><p>Write the argument parameter to a file, if the file exists. If suffixed with <code class="code docutils literal notranslate"><span class="pre">+</span></code>, the line will be appended to the file. If your configuration writes multiple lines to the same file, use <code class="code docutils literal notranslate"><span class="pre">w+</span></code>. Lines of this type accept shell-style globs in place of normal path names. The argument parameter will be written without a trailing newline. C-style backslash escapes are interpreted. Follows symlinks.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-d">
+<span class="sig-name descname"><span class="pre">d</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-d" title="Link to this definition">¶</a></dt>
+<dd><p>Create a directory. The mode and ownership will be adjusted if specified. Contents of this directory are subject to time-based cleanup if the age argument is specified.</p>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-d">
+<span class="sig-name descname"><span class="pre">D</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-d" title="Link to this definition">¶</a></dt>
+<dd><p>Similar to <code class="code docutils literal notranslate"><span class="pre">d</span></code>, but in addition the contents of the directory will be removed when <code class="code docutils literal notranslate"><span class="pre">--remove</span></code> is used.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-e">
+<span class="sig-name descname"><span class="pre">e</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-e" title="Link to this definition">¶</a></dt>
+<dd><p>Adjust the mode and ownership of existing directories and remove their contents based on age. Lines of this type accept shell-style globs in place of normal path names. Contents of the directories are subject to time-based cleanup if the age argument is specified. If the age argument is “0”, contents will be unconditionally deleted every time <a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a> <code class="code docutils literal notranslate"><span class="pre">--clean</span></code> is run.</p>
+<p>For this entry to be useful, at least one of the mode, user, group, or age arguments must be specified, since otherwise this entry has no effect. As an exception, an entry with no effect may be useful when combined with <code class="code docutils literal notranslate"><span class="pre">!</span></code>, see the examples.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 230.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-v">
+<span class="sig-name descname"><span class="pre">v</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-v" title="Link to this definition">¶</a></dt>
+<dd><p>Create a subvolume if the path does not exist yet, the file system supports subvolumes (btrfs), and the system itself is installed into a subvolume (specifically: the root directory <code class="code docutils literal notranslate"><span class="pre">/</span></code> is itself a subvolume). Otherwise, create a normal directory, in the same way as <code class="code docutils literal notranslate"><span class="pre">d</span></code>.</p>
+<p>A subvolume created with this line type is not assigned to any higher-level quota group. For that, use <code class="code docutils literal notranslate"><span class="pre">q</span></code> or <code class="code docutils literal notranslate"><span class="pre">Q</span></code>, which allow creating simple quota group hierarchies, see below.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 219.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-q">
+<span class="sig-name descname"><span class="pre">q</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-q" title="Link to this definition">¶</a></dt>
+<dd><p>Create a subvolume or directory the same as <code class="code docutils literal notranslate"><span class="pre">v</span></code>, but assign the subvolume to the same higher-level quota groups as the parent. This ensures that higher-level limits and accounting applied to the parent subvolume also include the specified subvolume. On non-btrfs file systems, this line type is identical to <code class="code docutils literal notranslate"><span class="pre">d</span></code>.</p>
+<p>If the subvolume already exists, no change to the quota hierarchy is made, regardless of whether the subvolume is already attached to a quota group or not. Also see <code class="code docutils literal notranslate"><span class="pre">Q</span></code> below. See <a class="reference external" href="https://btrfs.readthedocs.io/en/latest/btrfs-qgroup.html">btrfs-qgroup(8)</a> for details about the btrfs quota group concept.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 228.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-q">
+<span class="sig-name descname"><span class="pre">Q</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-q" title="Link to this definition">¶</a></dt>
+<dd><p>Create the subvolume or directory the same as <code class="code docutils literal notranslate"><span class="pre">v</span></code>, but assign the new subvolume to a new leaf quota group. Instead of copying the higher-level quota group assignments from the parent as is done with <code class="code docutils literal notranslate"><span class="pre">q</span></code>, the lowest quota group of the parent subvolume is determined that is not the leaf quota group. Then, an “intermediary” quota group is inserted that is one level below this level, and shares the same ID part as the specified subvolume. If no higher-level quota group exists for the parent subvolume, a new quota group at level 255 sharing the same ID as the specified subvolume is inserted instead. This new intermediary quota group is then assigned to the parent subvolume’s higher-level quota groups, and the specified subvolume’s leaf quota group is assigned to it.</p>
+<p>Effectively, this has a similar effect as <code class="code docutils literal notranslate"><span class="pre">q</span></code>, however introduces a new higher-level quota group for the specified subvolume that may be used to enforce limits and accounting to the specified subvolume and children subvolume created within it. Thus, by creating subvolumes only via <code class="code docutils literal notranslate"><span class="pre">q</span></code> and <code class="code docutils literal notranslate"><span class="pre">Q</span></code>, a concept of “subtree quotas” is implemented. Each subvolume for which <code class="code docutils literal notranslate"><span class="pre">Q</span></code> is set will get a “subtree” quota group created, and all child subvolumes created within it will be assigned to it. Each subvolume for which <code class="code docutils literal notranslate"><span class="pre">q</span></code> is set will not get such a “subtree” quota group, but it is ensured that they are added to the same “subtree” quota group as their immediate parents.</p>
+<p>It is recommended to use <code class="code docutils literal notranslate"><span class="pre">Q</span></code> for subvolumes that typically contain further subvolumes, and where it is desirable to have accounting and quota limits on all child subvolumes together. Examples for <code class="code docutils literal notranslate"><span class="pre">Q</span></code> are typically <code class="code docutils literal notranslate"><span class="pre">/home/</span></code> or <code class="code docutils literal notranslate"><span class="pre">/var/lib/machines/</span></code>. In contrast, <code class="code docutils literal notranslate"><span class="pre">q</span></code> should be used for subvolumes that either usually do not include further subvolumes or where no accounting and quota limits are needed that apply to all child subvolumes together. Examples for <code class="code docutils literal notranslate"><span class="pre">q</span></code> are typically <code class="code docutils literal notranslate"><span class="pre">/var/</span></code> or <code class="code docutils literal notranslate"><span class="pre">/var/tmp/</span></code>.</p>
+<p>As with <code class="code docutils literal notranslate"><span class="pre">q</span></code>, <code class="code docutils literal notranslate"><span class="pre">Q</span></code> has no effect on the quota group hierarchy if the subvolume already exists, regardless of whether the subvolume already belong to a quota group or not.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 228.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-p">
+<span class="sig-name descname"><span class="pre">p</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-p" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">p+</span></span></dt>
+<dd><p>Create a named pipe (FIFO) if it does not exist yet. If suffixed with <code class="code docutils literal notranslate"><span class="pre">+</span></code> and a file already exists where the pipe is to be created, it will be removed and be replaced by the pipe.</p>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-l">
+<span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-l" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">L+</span></span></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">L?</span></span></dt>
+<dd><p>Create a symlink if it does not exist yet. If suffixed with <code class="code docutils literal notranslate"><span class="pre">+</span></code> and a file or directory already exists where the symlink is to be created, it will be removed and be replaced by the symlink. If suffixed with <code class="code docutils literal notranslate"><span class="pre">?</span></code> and the source path does not exist, the symlink is not created. If the argument is omitted, symlinks to files with the same name residing in the directory <code class="code docutils literal notranslate"><span class="pre">/usr/share/factory/</span></code> are created. Note that permissions on symlinks are ignored.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-c">
+<span class="sig-name descname"><span class="pre">c</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-c" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">c+</span></span></dt>
+<dd><p>Create a character device node if it does not exist yet. If suffixed with <code class="code docutils literal notranslate"><span class="pre">+</span></code> and a file already exists where the device node is to be created, it will be removed and be replaced by the device node. It is recommended to suffix this entry with an exclamation mark to only create static device nodes at boot, as udev will not manage static device nodes that are created at runtime.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-b">
+<span class="sig-name descname"><span class="pre">b</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-b" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">b+</span></span></dt>
+<dd><p>Create a block device node if it does not exist yet. If suffixed with <code class="code docutils literal notranslate"><span class="pre">+</span></code> and a file already exists where the device node is to be created, it will be removed and be replaced by the device node. It is recommended to suffix this entry with an exclamation mark to only create static device nodes at boot, as udev will not manage static device nodes that are created at runtime.</p>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-c">
+<span class="sig-name descname"><span class="pre">C</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-c" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">C+</span></span></dt>
+<dd><p>Recursively copy a file or directory, if the destination files or directories do not exist yet or the destination directory is empty. Note that this command will not descend into subdirectories if the destination directory already exists and is not empty, unless the action is suffixed with <code class="code docutils literal notranslate"><span class="pre">+</span></code>. Instead, the entire copy operation is skipped. If the argument is omitted, files from the source directory <code class="code docutils literal notranslate"><span class="pre">/usr/share/factory/</span></code> with the same name are copied. Does not follow symlinks. Contents of the directories are subject to time-based cleanup if the age argument is specified.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 214.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-x" title="Link to this definition">¶</a></dt>
+<dd><p>Ignore a path during cleaning. Use this type to exclude paths from clean-up as controlled with the Age parameter. Lines of this type accept shell-style globs in place of normal path names.</p>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-x">
+<span class="sig-name descname"><span class="pre">X</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-x" title="Link to this definition">¶</a></dt>
+<dd><p>Ignore a path during cleaning. Use this type to exclude paths from clean-up as controlled with the Age parameter. Unlike <code class="code docutils literal notranslate"><span class="pre">x</span></code>, this parameter will not exclude the content if path is a directory, but only directory itself. Lines of this type accept shell-style globs in place of normal path names.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 198.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-r">
+<span class="sig-name descname"><span class="pre">r</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-r" title="Link to this definition">¶</a></dt>
+<dd><p>Remove a file or directory if it exists. This may not be used to remove non-empty directories, use <code class="code docutils literal notranslate"><span class="pre">R</span></code> for that. Lines of this type accept shell-style globs in place of normal path names. Does not follow symlinks.</p>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-r">
+<span class="sig-name descname"><span class="pre">R</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-r" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively remove a path and all its subdirectories (if it is a directory). Lines of this type accept shell-style globs in place of normal path names. Does not follow symlinks.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-z" title="Link to this definition">¶</a></dt>
+<dd><p>Adjust the access mode, user and group ownership, and restore the SELinux security context of a file or directory, if it exists. Lines of this type accept shell-style globs in place of normal path names. Does not follow symlinks.</p>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-z">
+<span class="sig-name descname"><span class="pre">Z</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-z" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively set the access mode, user and group ownership, and restore the SELinux security context of a file or directory if it exists, as well as of its subdirectories and the files contained therein (if applicable). Lines of this type accept shell-style globs in place of normal path names. Does not follow symlinks.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-t">
+<span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-t" title="Link to this definition">¶</a></dt>
+<dd><p>Set extended attributes, see <a class="reference external" href="https://man7.org/linux/man-pages/man5/attr.5.html">attr(5)</a> for details. The argument field should take one or more assignment expressions in the form <em>namespace</em>.:emphasis:<cite>attribute</cite>=:emphasis:<cite>value</cite>, for examples see below. Lines of this type accept shell-style globs in place of normal path names. This can be useful for setting SMACK labels. Does not follow symlinks.</p>
+<p>Please note that extended attributes settable with this line type are a different concept from the Linux file attributes settable with <code class="code docutils literal notranslate"><span class="pre">h</span></code>/<code class="code docutils literal notranslate"><span class="pre">H</span></code>, see below.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 218.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-t">
+<span class="sig-name descname"><span class="pre">T</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-t" title="Link to this definition">¶</a></dt>
+<dd><p>Same as <code class="code docutils literal notranslate"><span class="pre">t</span></code>, but operates recursively.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 219.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-h">
+<span class="sig-name descname"><span class="pre">h</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-h" title="Link to this definition">¶</a></dt>
+<dd><p>Set Linux file/directory attributes. Lines of this type accept shell-style globs in place of normal path names.</p>
+<p>The format of the argument field is <code class="code docutils literal notranslate"><span class="pre">[+-=][aAcCdDeijPsStTu]</span></code>. The prefix <code class="code docutils literal notranslate"><span class="pre">+</span></code> (the default one) causes the attributes to be added; <code class="code docutils literal notranslate"><span class="pre">-</span></code> causes the attributes to be removed; <code class="code docutils literal notranslate"><span class="pre">=</span></code> causes the attributes to be set exactly as the following letters. The letters “aAcCdDeijPsStTu” select the new attributes for the files, see <a class="reference external" href="https://man7.org/linux/man-pages/man1/chattr.1.html">chattr(1)</a> for further information.</p>
+<p>Passing only <code class="code docutils literal notranslate"><span class="pre">=</span></code> as argument resets all the file attributes listed above. It has to be pointed out that the <code class="code docutils literal notranslate"><span class="pre">=</span></code> prefix limits itself to the attributes corresponding to the letters listed here. All other attributes will be left untouched. Does not follow symlinks.</p>
+<p>Please note that the Linux file attributes settable with this line type are a different concept from the extended attributes settable with <code class="code docutils literal notranslate"><span class="pre">t</span></code>/<code class="code docutils literal notranslate"><span class="pre">T</span></code>, see above.</p>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-h">
+<span class="sig-name descname"><span class="pre">H</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-h" title="Link to this definition">¶</a></dt>
+<dd><p>Sames as <code class="code docutils literal notranslate"><span class="pre">h</span></code>, but operates recursively.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 220.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-tmpfiles-d-a">
+<span class="sig-name descname"><span class="pre">a</span></span><a class="headerlink" href="#systemd-option-tmpfiles-d-a" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">a+</span></span></dt>
+<dd><p>Set POSIX ACLs (access control lists), see <a class="reference external" href="https://man7.org/linux/man-pages/man5/acl.5.html">acl(5)</a>. Additionally, if ‘X’ is used, the execute bit is set only if the file is a directory or already has execute permission for some user, as mentioned in <a class="reference external" href="https://man7.org/linux/man-pages/man1/setfacl.1.html">setfacl(1)</a>. If suffixed with <code class="code docutils literal notranslate"><span class="pre">+</span></code>, the specified entries will be added to the existing set. <a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a> will automatically add the required base entries for user and group based on the access mode of the file, unless base entries already exist or are explicitly specified. The mask will be added if not specified explicitly or already present. Lines of this type accept shell-style globs in place of normal path names. This can be useful for allowing additional access to certain files. Does not follow symlinks.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 219.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-tmpfiles-d-a">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#systemd-constant-tmpfiles-d-a" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">A+</span></span></dt>
+<dd><p>Same as <code class="code docutils literal notranslate"><span class="pre">a</span></code> and <code class="code docutils literal notranslate"><span class="pre">a+</span></code>, but recursive. Does not follow symlinks.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 219.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="type-modifiers">
+<h2>Type Modifiers<a class="headerlink" href="#type-modifiers" title="Link to this heading">¶</a></h2>
+<p>If the exclamation mark (“!”) is used, this line is only safe to execute during boot, and can break a running system. Lines without the exclamation mark are presumed to be safe to execute at any time, e.g. on package upgrades. <a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a> will take lines with an exclamation mark only into consideration, if the <code class="code docutils literal notranslate"><span class="pre">--boot</span></code> option is given.</p>
+<p>For example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make sure these are created by default so that nobody else can</span>
+d<span class="w"> </span>/tmp/.X11-unix<span class="w"> </span><span class="m">1777</span><span class="w"> </span>root<span class="w"> </span>root<span class="w"> </span>10d
+<span class="c1"># Unlink the X11 lock files</span>
+r!<span class="w"> </span>/tmp/.X<span class="o">[</span><span class="m">0</span>-9<span class="o">]</span>*-lock
+</pre></div>
+</div>
+<p>The second line in contrast to the first one would break a running system, and will only be executed with <code class="code docutils literal notranslate"><span class="pre">--boot</span></code>.</p>
+<p>If the minus sign (“-”) is used, this line failing to run successfully during create (and only create) will not cause the execution of <a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a> to return an error.</p>
+<p>For example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Modify sysfs but do not fail if we are in a container with a read-only /proc</span>
+w-<span class="w"> </span>/proc/sys/vm/swappiness<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span><span class="m">10</span>
+</pre></div>
+</div>
+<p>If the equals sign (“=”) is used, the file types of existing objects in the specified path are checked, and removed if they do not match. This includes any implicitly created parent directories (which can be either directories or directory symlinks). For example, if there is a FIFO in place of one of the parent path components it will be replaced with a directory.</p>
+<p>If the tilde character (“~”) is used, the argument (i.e. 6th) column is <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc4648.html">Base64 decoded</a> before use. This modifier is only supported on line types that can write file contents, i.e. <code class="code docutils literal notranslate"><span class="pre">f</span></code>, <code class="code docutils literal notranslate"><span class="pre">f+</span></code>, <code class="code docutils literal notranslate"><span class="pre">w</span></code>, <code class="code docutils literal notranslate"><span class="pre">+</span></code>. This is useful for writing arbitrary binary data (including newlines and NUL bytes) to files. Note that if this switch is used, the argument is not subject to specifier expansion, neither before nor after Base64 decoding.</p>
+<p>If the caret character (“^”) is used, the argument (i.e. 6th) column takes a service credential name to read the argument data from. See <a class="reference external" href="https://systemd.io/CREDENTIALS">System and Service Credentials</a> for details about the credentials concept. This modifier is only supported on line types that can write file contents, i.e. <code class="code docutils literal notranslate"><span class="pre">f</span></code>, <code class="code docutils literal notranslate"><span class="pre">f+</span></code>, <code class="code docutils literal notranslate"><span class="pre">w</span></code>, <code class="code docutils literal notranslate"><span class="pre">w+</span></code>. This is useful for writing arbitrary files with contents sourced from elsewhere, including from VM or container managers further up. If the specified credential is not set for the <code class="code docutils literal notranslate"><span class="pre">systemd-tmpfiles</span></code> service, the line is silently skipped. If “^” and “~” are combined Base64 decoding is applied to the credential contents.</p>
+<p>If the dollar sign (“$”) is used, the file becomes subject to removal when <code class="code docutils literal notranslate"><span class="pre">systemd-tmpfiles</span></code> is invoked with the <code class="code docutils literal notranslate"><span class="pre">--purge</span></code> switch. Lines without this character are unaffected by that switch.</p>
+<p>Note that for all line types that result in creation of any kind of file node (i.e. <code class="code docutils literal notranslate"><span class="pre">f</span></code>, <code class="code docutils literal notranslate"><span class="pre">d</span></code>/<code class="code docutils literal notranslate"><span class="pre">D</span></code>/<code class="code docutils literal notranslate"><span class="pre">v</span></code>/<code class="code docutils literal notranslate"><span class="pre">q</span></code>/<code class="code docutils literal notranslate"><span class="pre">Q</span></code>, <code class="code docutils literal notranslate"><span class="pre">p</span></code>, <code class="code docutils literal notranslate"><span class="pre">L</span></code>, <code class="code docutils literal notranslate"><span class="pre">c</span></code>/<code class="code docutils literal notranslate"><span class="pre">b</span></code> and <code class="code docutils literal notranslate"><span class="pre">C</span></code>) leading directories are implicitly created if needed, owned by root with an access mode of 0755. In order to create them with different modes or ownership make sure to add appropriate <code class="code docutils literal notranslate"><span class="pre">d</span></code> lines.</p>
+</section>
+<section id="path">
+<h2>Path<a class="headerlink" href="#path" title="Link to this heading">¶</a></h2>
+<p>The file system path specification supports simple specifier expansion, see below. The path (after expansion) must be absolute.</p>
+</section>
+<section id="mode">
+<h2>Mode<a class="headerlink" href="#mode" title="Link to this heading">¶</a></h2>
+<p>The file access mode to use when creating this file or directory. If omitted or when set to “-”, the default is used: 0755 for directories, 0644 for all other file objects. For <code class="code docutils literal notranslate"><span class="pre">z</span></code>, <code class="code docutils literal notranslate"><span class="pre">Z</span></code> lines, if omitted or when set to “-”, the file access mode will not be modified. This parameter is ignored for <code class="code docutils literal notranslate"><span class="pre">x</span></code>, <code class="code docutils literal notranslate"><span class="pre">r</span></code>, <code class="code docutils literal notranslate"><span class="pre">R</span></code>, <code class="code docutils literal notranslate"><span class="pre">L</span></code>, <code class="code docutils literal notranslate"><span class="pre">t</span></code>, and <code class="code docutils literal notranslate"><span class="pre">a</span></code> lines.</p>
+<p>Optionally, if prefixed with “~”, the access mode is masked based on the already set access bits for existing file or directories: if the existing file has all executable bits unset, all executable bits are removed from the new access mode, too. Similarly, if all read bits are removed from the old access mode, they will be removed from the new access mode too, and if all write bits are removed, they will be removed from the new access mode too. In addition, the sticky/SUID/SGID bit is removed unless applied to a directory. This functionality is particularly useful in conjunction with <code class="code docutils literal notranslate"><span class="pre">Z</span></code>.</p>
+<p>By default, the access mode of listed inodes is set to the specified mode regardless of whether it is created anew, or already existed. Optionally, if prefixed with “:”, the configured access mode is only applied when creating new inodes, and if the inode the line refers to already exists, its access mode is left in place unmodified.</p>
+</section>
+<section id="user-group">
+<h2>User, Group<a class="headerlink" href="#user-group" title="Link to this heading">¶</a></h2>
+<p>The user and group to use for this file or directory. This may either be a numeric ID or a user/group name. If omitted or when set to “-”, the user and group of the user who invokes <a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a> is used. For <code class="code docutils literal notranslate"><span class="pre">z</span></code> and <code class="code docutils literal notranslate"><span class="pre">Z</span></code> lines, when omitted or when set to “-”, the file ownership will not be modified. These parameters are ignored for <code class="code docutils literal notranslate"><span class="pre">x</span></code>, <code class="code docutils literal notranslate"><span class="pre">r</span></code>, <code class="code docutils literal notranslate"><span class="pre">R</span></code>, <code class="code docutils literal notranslate"><span class="pre">t</span></code>, and <code class="code docutils literal notranslate"><span class="pre">a</span></code> lines.</p>
+<p>This field should generally only reference system users/groups, i.e. users/groups that are guaranteed to be resolvable during early boot. If this field references users/groups that only become resolvable during later boot (i.e. after NIS, LDAP or a similar networked directory service become available), execution of the operations declared by the line will likely fail. Also see <a class="reference external" href="https://systemd.io/UIDS-GIDS/#notes-on-resolvability-of-user-and-group-names">Notes on Resolvability of User and Group Names</a> for more information on requirements on system user/group definitions.</p>
+<p>By default, the ownership of listed inodes is set to the specified user/group regardless of whether it is created anew, or already existed. Optionally, if prefixed with “:”, the configured user/group information is only applied when creating new inodes, and if the inode the line refers to already exists, its user/group is left in place unmodified.</p>
+</section>
+<section id="age">
+<h2>Age<a class="headerlink" href="#age" title="Link to this heading">¶</a></h2>
+<p>The date field, when set, is used to decide what files to delete when cleaning. If a file or directory is older than the current time minus the age field, it is deleted. The field format is a series of integers each followed by one of the following suffixes for the respective time units: <code class="code docutils literal notranslate"><span class="pre">s</span></code>, <code class="code docutils literal notranslate"><span class="pre">m</span></code> or <code class="code docutils literal notranslate"><span class="pre">min</span></code>, <code class="code docutils literal notranslate"><span class="pre">h</span></code>, <code class="code docutils literal notranslate"><span class="pre">d</span></code>, <code class="code docutils literal notranslate"><span class="pre">w</span></code>, <code class="code docutils literal notranslate"><span class="pre">ms</span></code>, and <code class="code docutils literal notranslate"><span class="pre">us</span></code>, meaning seconds, minutes, hours, days, weeks, milliseconds, and microseconds, respectively. Full names of the time units can be used too.</p>
+<p>If multiple integers and units are specified, the time values are summed. If an integer is given without a unit, <code class="code docutils literal notranslate"><span class="pre">s</span></code> is assumed.</p>
+<p>When the age is set to zero, the files are cleaned unconditionally.</p>
+<p>The age field only applies to lines starting with <code class="code docutils literal notranslate"><span class="pre">d</span></code>, <code class="code docutils literal notranslate"><span class="pre">D</span></code>, <code class="code docutils literal notranslate"><span class="pre">e</span></code>, <code class="code docutils literal notranslate"><span class="pre">v</span></code>, <code class="code docutils literal notranslate"><span class="pre">q</span></code>, <code class="code docutils literal notranslate"><span class="pre">Q</span></code>, <code class="code docutils literal notranslate"><span class="pre">C</span></code>, <code class="code docutils literal notranslate"><span class="pre">x</span></code> and <code class="code docutils literal notranslate"><span class="pre">X</span></code>. If omitted or set to “-”, no automatic clean-up is done.</p>
+<p>If the age field starts with a tilde character “~”, clean-up is only applied to files and directories one level inside the directory specified, but not the files and directories immediately inside it.</p>
+<p>The age of a file system entry is determined from its last modification timestamp (mtime), its last access timestamp (atime), and (except for directories) its last status change timestamp (ctime). By default, any of these three (or two) values will prevent cleanup if it is more recent than the current time minus the age field. To restrict the deletion based on particular type of file timestamps, the age-by argument can be used.</p>
+<p>The age-by argument overrides the timestamp types to be used for the age check. It can be specified by prefixing the age argument with a sequence of characters to specify the timestamp types and a colon (“:”): “<em>age-by</em>…:<em>cleanup-age</em>”. The argument can consist of <code class="code docutils literal notranslate"><span class="pre">a</span></code> (<code class="code docutils literal notranslate"><span class="pre">A</span></code> for directories), <code class="code docutils literal notranslate"><span class="pre">b</span></code> (<code class="code docutils literal notranslate"><span class="pre">B</span></code> for directories), <code class="code docutils literal notranslate"><span class="pre">c</span></code> (<code class="code docutils literal notranslate"><span class="pre">C</span></code> for directories), or <code class="code docutils literal notranslate"><span class="pre">m</span></code> (<code class="code docutils literal notranslate"><span class="pre">M</span></code> for directories). Those respectively indicate access, creation, last status change, and last modification time of a file system entry. The lower-case letter signifies that the given timestamp type should be considered for files, while the upper-case letter signifies that the given timestamp type should be considered for directories. See <a class="reference external" href="https://man7.org/linux/man-pages/man2/statx.2.html">statx(2)</a> file timestamp fields for more details about timestamp types.</p>
+<p>If not specified, the age-by field defaults to <code class="code docutils literal notranslate"><span class="pre">abcmABM</span></code>, i.e. by default all file timestamps are taken into consideration, with the exception of the last status change timestamp (ctime) for directories. This is because the aging logic itself will alter the ctime whenever it deletes a file inside it. To ensure that running the aging logic does not feed back into the next iteration of itself, ctime for directories is ignored by default.</p>
+<p>For example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Files created and modified, and directories accessed more than</span>
+<span class="c1"># an hour ago in &quot;/tmp/foo/bar&quot;, are subject to time-based cleanup.</span>
+d<span class="w"> </span>/tmp/foo/bar<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>bmA:1h<span class="w"> </span>-
+</pre></div>
+</div>
+<p>Note that while the aging algorithm is run an exclusive BSD file lock (see <a class="reference external" href="https://man7.org/linux/man-pages/man2/flock.2.html">flock(2)</a>) is taken on each directory/file the algorithm decides to remove. If the aging algorithm finds a lock (shared or exclusive) is already taken on some directory/file, it (and everything below it) is skipped. Applications may use this to temporarily exclude certain directory subtrees from the aging algorithm: the applications can take a BSD file lock themselves, and as long as they keep it aging of the directory/file and everything below it is disabled.</p>
+<p>This behavior can be used to ensure guaranteed cleanup of files or directories whose lifetime should be aligned with the process that created them by having that process create them in a location monitored by <code class="code docutils literal notranslate"><span class="pre">systemd-tmpfiles</span></code> with an age of “0”, and having the process immediately lock the directory or file before using it. Because the BSD lock is process specific, the file is guaranteed to be unlocked as soon as the process exits, meaning that even if the process crashes, those files and directories will be unlocked and cleaned up by <code class="code docutils literal notranslate"><span class="pre">systemd-tmpfiles</span></code>.</p>
+</section>
+<section id="argument">
+<h2>Argument<a class="headerlink" href="#argument" title="Link to this heading">¶</a></h2>
+<p>For <code class="code docutils literal notranslate"><span class="pre">L</span></code> lines determines the destination path of the symlink. For <code class="code docutils literal notranslate"><span class="pre">c</span></code> and <code class="code docutils literal notranslate"><span class="pre">b</span></code>, determines the major/minor of the device node, with major and minor formatted as integers, separated by “:”, e.g. “1:3”. For <code class="code docutils literal notranslate"><span class="pre">f</span></code> and <code class="code docutils literal notranslate"><span class="pre">w</span></code>, the argument may be used to specify a short string that is written to the file, suffixed by a newline. For <code class="code docutils literal notranslate"><span class="pre">C</span></code>, specifies the source file or directory. For <code class="code docutils literal notranslate"><span class="pre">t</span></code> and <code class="code docutils literal notranslate"><span class="pre">T</span></code>, determines extended attributes to be set. For <code class="code docutils literal notranslate"><span class="pre">a</span></code> and <code class="code docutils literal notranslate"><span class="pre">A</span></code>, determines ACL attributes to be set. For <code class="code docutils literal notranslate"><span class="pre">h</span></code> and <code class="code docutils literal notranslate"><span class="pre">H</span></code>, determines the file attributes to set. Ignored for all other lines.</p>
+<p>This field can contain specifiers, see below.</p>
+</section>
+<section id="specifiers">
+<h2>Specifiers<a class="headerlink" href="#specifiers" title="Link to this heading">¶</a></h2>
+<p>Specifiers can be used in the “path” and “argument” fields. An unknown or unresolvable specifier is treated as invalid configuration. The following expansions are understood:</p>
+<div class="table-wrapper docutils container" id="id3">
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Specifiers available</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Specifier</p></th>
+<th class="head"><p>Meaning</p></th>
+<th class="head"><p>Details</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>“%a”</p></td>
+<td><p>Architecture</p></td>
+<td><p>A short string identifying the architecture of the local system. A string such as <code class="code docutils literal notranslate"><span class="pre">x86</span></code>, <code class="code docutils literal notranslate"><span class="pre">x86-64</span></code> or <code class="code docutils literal notranslate"><span class="pre">arm64</span></code>. See the architectures defined for <code class="code docutils literal notranslate"><span class="pre">ConditionArchitecture=</span></code> in <a class="reference internal" href="systemd.unit.html#systemd-unit-5"><span class="std std-ref">systemd.unit(5)</span></a> for a full list.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%A”</p></td>
+<td><p>Operating system image version</p></td>
+<td><p>The operating system image version identifier of the running system, as read from the <code class="code docutils literal notranslate"><span class="pre">IMAGE_VERSION=</span></code> field of <code class="code docutils literal notranslate"><span class="pre">/etc/os-release</span></code>. If not set, resolves to an empty string. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/os-release.5.html">os-release(5)</a> for more information.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%b”</p></td>
+<td><p>Boot ID</p></td>
+<td><p>The boot ID of the running system, formatted as string. See <a class="reference external" href="https://man7.org/linux/man-pages/man4/random.4.html">random(4)</a> for more information.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%B”</p></td>
+<td><p>Operating system build ID</p></td>
+<td><p>The operating system build identifier of the running system, as read from the <code class="code docutils literal notranslate"><span class="pre">BUILD_ID=</span></code> field of <code class="code docutils literal notranslate"><span class="pre">/etc/os-release</span></code>. If not set, resolves to an empty string. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/os-release.5.html">os-release(5)</a> for more information.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%C”</p></td>
+<td><p>System or user cache directory</p></td>
+<td><p>In <code class="code docutils literal notranslate"><span class="pre">--user</span></code> mode, this is the same as <code class="code docutils literal notranslate"><span class="pre">$XDG_CACHE_HOME</span></code>, and <code class="code docutils literal notranslate"><span class="pre">/var/cache</span></code> otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%g”</p></td>
+<td><p>User group</p></td>
+<td><p>This is the name of the group running the command. In case of the system instance this resolves to “root”.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%G”</p></td>
+<td><p>User GID</p></td>
+<td><p>This is the numeric GID of the group running the command. In case of the system instance this resolves to <code class="code docutils literal notranslate"><span class="pre">0</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%h”</p></td>
+<td><p>User home directory</p></td>
+<td><p>This is the home directory of the user running the command. In case of the system instance this resolves to “/root”.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%H”</p></td>
+<td><p>Host name</p></td>
+<td><p>The hostname of the running system.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%l”</p></td>
+<td><p>Short host name</p></td>
+<td><p>The hostname of the running system, truncated at the first dot to remove any domain component.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%L”</p></td>
+<td><p>System or user log directory</p></td>
+<td><p>In <code class="code docutils literal notranslate"><span class="pre">--user</span></code> mode, this is the same as <code class="code docutils literal notranslate"><span class="pre">$XDG_STATE_HOME</span></code> with <code class="code docutils literal notranslate"><span class="pre">/log</span></code> appended, and <code class="code docutils literal notranslate"><span class="pre">/var/log</span></code> otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%m”</p></td>
+<td><p>Machine ID</p></td>
+<td><p>The machine ID of the running system, formatted as string. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/machine-id.5.html">machine-id(5)</a> for more information.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%M”</p></td>
+<td><p>Operating system image identifier</p></td>
+<td><p>The operating system image identifier of the running system, as read from the <code class="code docutils literal notranslate"><span class="pre">IMAGE_ID=</span></code> field of <code class="code docutils literal notranslate"><span class="pre">/etc/os-release</span></code>. If not set, resolves to an empty string. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/os-release.5.html">os-release(5)</a> for more information.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%o”</p></td>
+<td><p>Operating system ID</p></td>
+<td><p>The operating system identifier of the running system, as read from the <code class="code docutils literal notranslate"><span class="pre">ID=</span></code> field of <code class="code docutils literal notranslate"><span class="pre">/etc/os-release</span></code>. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/os-release.5.html">os-release(5)</a> for more information.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%q”</p></td>
+<td><p>Pretty host name</p></td>
+<td><p>The pretty hostname of the running system, as read from the <code class="code docutils literal notranslate"><span class="pre">PRETTY_HOSTNAME=</span></code> field of <code class="code docutils literal notranslate"><span class="pre">/etc/machine-info</span></code>. If not set, resolves to the short hostname. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/machine-info.5.html">machine-info(5)</a> for more information.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%S”</p></td>
+<td><p>System or user state directory</p></td>
+<td><p>In <code class="code docutils literal notranslate"><span class="pre">--user</span></code> mode, this is the same as <code class="code docutils literal notranslate"><span class="pre">$XDG_STATE_HOME</span></code>, and <code class="code docutils literal notranslate"><span class="pre">/var/lib</span></code> otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%t”</p></td>
+<td><p>System or user runtime directory</p></td>
+<td><p>In <code class="code docutils literal notranslate"><span class="pre">--user</span></code> mode, this is the same <code class="code docutils literal notranslate"><span class="pre">$XDG_RUNTIME_DIR</span></code>, and <code class="code docutils literal notranslate"><span class="pre">/run/</span></code> otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%T”</p></td>
+<td><p>Directory for temporary files</p></td>
+<td><p>This is either <code class="code docutils literal notranslate"><span class="pre">/tmp</span></code> or the path “$TMPDIR”, “$TEMP” or “$TMP” are set to. (Note that the directory may be specified without a trailing slash.)</p></td>
+</tr>
+<tr class="row-even"><td><p>“%u”</p></td>
+<td><p>User name</p></td>
+<td><p>This is the name of the user running the command. In case of the system instance this resolves to “root”.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%U”</p></td>
+<td><p>User UID</p></td>
+<td><p>This is the numeric UID of the user running the command. In case of the system instance this resolves to <code class="code docutils literal notranslate"><span class="pre">0</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%v”</p></td>
+<td><p>Kernel release</p></td>
+<td><p>Identical to <code class="code docutils literal notranslate"><span class="pre">uname</span> <span class="pre">-r</span></code> output.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%V”</p></td>
+<td><p>Directory for larger and persistent temporary files</p></td>
+<td><p>This is either <code class="code docutils literal notranslate"><span class="pre">/var/tmp</span></code> or the path “$TMPDIR”, “$TEMP” or “$TMP” are set to. (Note that the directory may be specified without a trailing slash.)</p></td>
+</tr>
+<tr class="row-even"><td><p>“%w”</p></td>
+<td><p>Operating system version ID</p></td>
+<td><p>The operating system version identifier of the running system, as read from the <code class="code docutils literal notranslate"><span class="pre">VERSION_ID=</span></code> field of <code class="code docutils literal notranslate"><span class="pre">/etc/os-release</span></code>. If not set, resolves to an empty string. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/os-release.5.html">os-release(5)</a> for more information.</p></td>
+</tr>
+<tr class="row-odd"><td><p>“%W”</p></td>
+<td><p>Operating system variant ID</p></td>
+<td><p>The operating system variant identifier of the running system, as read from the <code class="code docutils literal notranslate"><span class="pre">VARIANT_ID=</span></code> field of <code class="code docutils literal notranslate"><span class="pre">/etc/os-release</span></code>. If not set, resolves to an empty string. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/os-release.5.html">os-release(5)</a> for more information.</p></td>
+</tr>
+<tr class="row-even"><td><p>“%%”</p></td>
+<td><p>Single percent sign</p></td>
+<td><p>Use “%%” in place of “%” to specify a single percent sign.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<section id="create-directories-with-specific-mode-and-ownership">
+<h3>Create directories with specific mode and ownership<a class="headerlink" href="#create-directories-with-specific-mode-and-ownership" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="http://linux.die.net/man/1/screen">screen(1)</a>, needs two directories created at boot with specific modes and ownership:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># /usr/lib/tmpfiles.d/screen.conf</span>
+d<span class="w"> </span>/run/screens<span class="w">  </span><span class="m">1777</span><span class="w"> </span>root<span class="w"> </span>screen<span class="w"> </span>10d
+d<span class="w"> </span>/run/uscreens<span class="w"> </span><span class="m">0755</span><span class="w"> </span>root<span class="w"> </span>screen<span class="w"> </span>10d12h
+</pre></div>
+</div>
+<p>Contents of <code class="code docutils literal notranslate"><span class="pre">/run/screens</span></code> and /run/uscreens will be cleaned up after 10 and 10½ days, respectively.</p>
+</section>
+<section id="create-a-directory-with-a-smack-attribute">
+<h3>Create a directory with a SMACK attribute<a class="headerlink" href="#create-a-directory-with-a-smack-attribute" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>D<span class="w"> </span>/run/cups<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-
+t<span class="w"> </span>/run/cups<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>security.SMACK64<span class="o">=</span>printing<span class="w"> </span>user.attr-with-spaces<span class="o">=</span><span class="s2">&quot;foo bar&quot;</span>
+</pre></div>
+</div>
+<p>The directory will be owned by root and have default mode. Its contents are not subject to time-based cleanup, but will be obliterated when <code class="code docutils literal notranslate"><span class="pre">systemd-tmpfiles</span> <span class="pre">--remove</span></code> runs.</p>
+</section>
+<section id="create-a-directory-and-prevent-its-contents-from-cleanup">
+<h3>Create a directory and prevent its contents from cleanup<a class="headerlink" href="#create-a-directory-and-prevent-its-contents-from-cleanup" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="http://linux.die.net/man/1/abrt">abrt(1)</a>, needs a directory created at boot with specific mode and ownership and its content should be preserved from the automatic cleanup applied to the contents of <code class="code docutils literal notranslate"><span class="pre">/var/tmp</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># /usr/lib/tmpfiles.d/tmp.conf</span>
+d<span class="w"> </span>/var/tmp<span class="w"> </span><span class="m">1777</span><span class="w"> </span>root<span class="w"> </span>root<span class="w"> </span>30d
+</pre></div>
+</div>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># /usr/lib/tmpfiles.d/abrt.conf</span>
+d<span class="w"> </span>/var/tmp/abrt<span class="w"> </span><span class="m">0755</span><span class="w"> </span>abrt<span class="w"> </span>abrt<span class="w"> </span>-
+</pre></div>
+</div>
+</section>
+<section id="apply-clean-up-during-boot-and-based-on-time">
+<h3>Apply clean up during boot and based on time<a class="headerlink" href="#apply-clean-up-during-boot-and-based-on-time" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># /usr/lib/tmpfiles.d/dnf.conf</span>
+r!<span class="w"> </span>/var/cache/dnf/*/*/download_lock.pid
+r!<span class="w"> </span>/var/cache/dnf/*/*/metadata_lock.pid
+r!<span class="w"> </span>/var/lib/dnf/rpmdb_lock.pid
+e<span class="w">  </span>/var/cache/dnf/<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>30d
+</pre></div>
+</div>
+<p>The lock files will be removed during boot. Any files and directories in <code class="code docutils literal notranslate"><span class="pre">/var/cache/dnf/</span></code> will be removed after they have not been accessed in 30 days.</p>
+</section>
+<section id="empty-the-contents-of-a-cache-directory-on-boot">
+<h3>Empty the contents of a cache directory on boot<a class="headerlink" href="#empty-the-contents-of-a-cache-directory-on-boot" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># /usr/lib/tmpfiles.d/krb5rcache.conf</span>
+e!<span class="w"> </span>/var/cache/krb5rcache<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span>-<span class="w"> </span><span class="m">0</span>
+</pre></div>
+</div>
+<p>Any files and subdirectories in <code class="code docutils literal notranslate"><span class="pre">/var/cache/krb5rcache/</span></code> will be removed on boot. The directory will not be created.</p>
+</section>
+<section id="provision-ssh-public-key-access-for-root-user-via-credentials-in-qemu">
+<h3>Provision SSH public key access for root user via Credentials in QEMU<a class="headerlink" href="#provision-ssh-public-key-access-for-root-user-via-credentials-in-qemu" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-smbios<span class="w"> </span><span class="nv">type</span><span class="o">=</span><span class="m">11</span>,value<span class="o">=</span>io.systemd.credential.binary:tmpfiles.extra<span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;d /root/.ssh 0750 root root -\nf~ /root/.ssh/authorized_keys 0600 root root - </span><span class="k">$(</span>ssh-add<span class="w"> </span>-L<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-w<span class="w"> </span><span class="m">0</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-w<span class="w"> </span><span class="m">0</span><span class="k">)</span>
+</pre></div>
+</div>
+<p>By passing this line to QEMU, the public key of the current user will be encoded in base64, added to a tmpfiles.d line that tells <a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a> to decode it into <code class="code docutils literal notranslate"><span class="pre">/root/.ssh/authorized_keys</span></code>, encode that line itself in base64 and pass it as a Credential that will be picked up by systemd from SMBIOS on boot.</p>
+</section>
+</section>
+<section id="run-and-var-run">
+<h2><code class="code docutils literal notranslate"><span class="pre">/run/</span></code> and <code class="code docutils literal notranslate"><span class="pre">/var/run/</span></code><a class="headerlink" href="#run-and-var-run" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">/var/run/</span></code> is a deprecated symlink to <code class="code docutils literal notranslate"><span class="pre">/run/</span></code>, and applications should use the latter. <code class="code docutils literal notranslate"><span class="pre">systemd-tmpfiles</span></code> will warn if <code class="code docutils literal notranslate"><span class="pre">/var/run/</span></code> is used.</p>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="systemd.html#systemd-1"><span class="std std-ref">systemd(1)</span></a>, <a class="reference internal" href="systemd-tmpfiles.html#systemd-tmpfiles-8"><span class="std std-ref">systemd-tmpfiles(8)</span></a>, <a class="reference internal" href="systemd-delta.html#systemd-delta-1"><span class="std std-ref">systemd-delta(1)</span></a>, <a class="reference internal" href="systemd.exec.html#systemd-exec-5"><span class="std std-ref">systemd.exec(5)</span></a>, <a class="reference external" href="https://man7.org/linux/man-pages/man5/attr.5.html">attr(5)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man1/getfattr.1.html">getfattr(1)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man1/setfattr.1.html">setfattr(1)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man1/setfacl.1.html">setfacl(1)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man1/getfacl.1.html">getfacl(1)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man1/chattr.1.html">chattr(1)</a>, <a class="reference external" href="https://btrfs.readthedocs.io/en/latest/btrfs-subvolume.html">btrfs-subvolume(8)</a>, <a class="reference external" href="https://btrfs.readthedocs.io/en/latest/btrfs-qgroup.html">btrfs-qgroup(8)</a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="udev.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">udev(7)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="timesyncd.conf.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">timesyncd.conf(5)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, systemd
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">tmpfiles.d(5)</a><ul>
+<li><a class="reference internal" href="#name">Name</a></li>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#configuration-directories-and-precedence">Configuration Directories and Precedence</a></li>
+<li><a class="reference internal" href="#configuration-file-format">Configuration File Format</a></li>
+<li><a class="reference internal" href="#type">Type</a></li>
+<li><a class="reference internal" href="#type-modifiers">Type Modifiers</a></li>
+<li><a class="reference internal" href="#path">Path</a></li>
+<li><a class="reference internal" href="#mode">Mode</a></li>
+<li><a class="reference internal" href="#user-group">User, Group</a></li>
+<li><a class="reference internal" href="#age">Age</a></li>
+<li><a class="reference internal" href="#argument">Argument</a></li>
+<li><a class="reference internal" href="#specifiers">Specifiers</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#create-directories-with-specific-mode-and-ownership">Create directories with specific mode and ownership</a></li>
+<li><a class="reference internal" href="#create-a-directory-with-a-smack-attribute">Create a directory with a SMACK attribute</a></li>
+<li><a class="reference internal" href="#create-a-directory-and-prevent-its-contents-from-cleanup">Create a directory and prevent its contents from cleanup</a></li>
+<li><a class="reference internal" href="#apply-clean-up-during-boot-and-based-on-time">Apply clean up during boot and based on time</a></li>
+<li><a class="reference internal" href="#empty-the-contents-of-a-cache-directory-on-boot">Empty the contents of a cache directory on boot</a></li>
+<li><a class="reference internal" href="#provision-ssh-public-key-access-for-root-user-via-credentials-in-qemu">Provision SSH public key access for root user via Credentials in QEMU</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#run-and-var-run"><code class="code docutils literal notranslate"><span class="pre">/run/</span></code> and <code class="code docutils literal notranslate"><span class="pre">/var/run/</span></code></a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/js/custom.js?v=abe08e2c"></script>
+    </body>
+</html>

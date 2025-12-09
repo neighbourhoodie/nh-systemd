@@ -1,0 +1,98 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_add_match
+:manvolnum: 3
+:summary: Add a match rule for incoming message dispatching
+:aliases: sd_bus_add_match_async, sd_bus_match_signal, sd_bus_match_signal_async
+
+.. _sd_bus_add_match(3):
+
+===================
+sd_bus_add_match(3)
+===================
+
+Name
+####
+
+sd_bus_add_match, sd_bus_add_match_async, sd_bus_match_signal, sd_bus_match_signal_async — Add a match rule for incoming message dispatching
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   typedef int (*sd_bus_message_handler_t)(sd_bus_message *m,
+	void *userdata,
+	sd_bus_error *ret_error); .. code-block::
+
+   int sd_bus_add_match(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *match,
+	sd_bus_message_handler_t callback,
+	void *userdata); .. code-block::
+
+   int sd_bus_add_match_async(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *match,
+	sd_bus_message_handler_t callback,
+	sd_bus_message_handler_t install_callback,
+	void *userdata); .. code-block::
+
+   int sd_bus_match_signal(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *sender,
+	const char *path,
+	const char *interface,
+	const char *member,
+	sd_bus_message_handler_t callback,
+	void *userdata); .. code-block::
+
+   int sd_bus_match_signal_async(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *sender,
+	const char *path,
+	const char *interface,
+	const char *member,
+	sd_bus_message_handler_t callback,
+	sd_bus_message_handler_t install_callback,
+	void *userdata);
+
+Description
+###########
+
+:code:`sd_bus_add_match()` installs a match rule for messages received on the specified bus connection object :code:`bus`. The syntax of the match rule expression passed in :code:`match` is described in the `D-Bus Specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_. The specified handler function :code:`callback` is called for each incoming message matching the specified expression, the :code:`userdata` parameter is passed as-is to the callback function. The match is installed synchronously when connected to a bus broker, i.e. the call sends a control message requested the match to be added to the broker and waits until the broker confirms the match has been installed successfully.
+
+:code:`sd_bus_add_match_async()` operates very similarly to :code:`sd_bus_add_match()`, however it installs the match asynchronously, in a non-blocking fashion: a request is sent to the broker, but the call does not wait for a response. The :code:`install_callback` function is called when the response is later received, with the response message from the broker as parameter. If this function is specified as :code:`NULL` a default implementation is used that terminates the bus connection should installing the match fail.
+
+:code:`sd_bus_match_signal()` is very similar to :code:`sd_bus_add_match()`, but only matches signals, and instead of a match expression accepts four parameters: :code:`sender` (the service name of the sender), :code:`path` (the object path of the emitting object), :code:`interface` (the interface the signal belongs to), :code:`member` (the signal name), from which the match string is internally generated. Optionally, these parameters may be specified as :code:`NULL` in which case the relevant field of incoming signals is not tested.
+
+:code:`sd_bus_match_signal_async()` combines the signal matching logic of :code:`sd_bus_match_signal()` with the asynchronous behaviour of :code:`sd_bus_add_match_async()`.
+
+On success, and if non-:code:`NULL`, the :code:`slot` return parameter will be set to a slot object that may be used as a reference to the installed match, and may be utilized to remove it again at a later time with :ref:`sd_bus_slot_unref(3)`. If specified as :code:`NULL` the lifetime of the match is bound to the lifetime of the bus object itself, and the match is generally not removed independently. See :ref:`sd_bus_slot_set_floating(3)` for details.
+
+The message :code:`m` passed to the callback is only borrowed, that is, the callback should not call :ref:`sd_bus_message_unref(3)` on it. If the callback wants to hold on to the message beyond the lifetime of the callback, it needs to call :ref:`sd_bus_message_ref(3)` to create a new reference.
+
+If an error occurs during the callback invocation, the callback should return a negative error number (optionally, a more precise error may be returned in :code:`ret_error`, as well). If it wants other callbacks that match the same rule to be called, it should return 0. Otherwise, it should return a positive integer.
+
+If the :code:`bus` refers to a direct connection (i.e. not a bus connection, as set with :ref:`sd_bus_set_bus_client(3)`) the match is only installed on the client side, and the synchronous and asynchronous functions operate the same.
+
+Return Value
+############
+
+On success, :code:`sd_bus_add_match()` and the other calls return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_add_match()` and :code:`sd_bus_message_handler_t()` were added in version 221.
+
+:code:`sd_bus_add_match_async()`, :code:`sd_bus_match_signal()`, and :code:`sd_bus_match_signal_async()` were added in version 237.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_slot_unref(3)`, :ref:`sd_bus_message_ref(3)`, :ref:`sd_bus_set_bus_client(3)`, :ref:`sd_bus_slot_set_floating(3)`
+
+

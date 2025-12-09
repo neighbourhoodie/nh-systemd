@@ -1,0 +1,46 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.image-filter
+:manvolnum: 7
+:summary: Disk Image Dissection Filter
+
+.. _systemd.image-filter(7):
+
+=======================
+systemd.image-filter(7)
+=======================
+
+Name
+####
+
+systemd.image-filter — Disk Image Dissection Filter
+
+Description
+###########
+
+In systemd, whenever a disk image (DDI) implementing the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_ is activated, a filter may be specified controlling which partitions to consider for mounting. Such a disk image dissection filter is a string that contains per-partition-type patterns, separated by colons (":"). The individual rules consist of a partition identifier, an equal sign ("="), and a shell globbing pattern applied to the GPT label string of the partition. See :man-pages:`glob(7)` for details on shell globbing.
+
+The partition identifiers currently defined are: :code:`root`, :code:`usr`, :code:`home`, :code:`srv`, :code:`esp`, :code:`xbootldr`, :code:`swap`, :code:`root-verity`, :code:`root-verity-sig`, :code:`usr-verity`, :code:`usr-verity-sig`, :code:`tmp`, :code:`var`. These identifiers match the relevant partition types in the Discoverable Partitions Specification, but are agnostic to CPU architectures.
+
+Use
+###
+
+Various systemd components that support operating with disk images support a :code:`--image-filter=` command line option to specify the image filter to use. If no filter is specified all partitions in partition table are considered and no per-label filtering is applied (except that partitions with the "_empty" label are always ignored).
+
+For the host root file system image itself :ref:`systemd-gpt-auto-generator(8)` is responsible for processing the GPT partition table and making use of the included discoverable partitions. It accepts an image filter via the kernel command line option :code:`systemd.image_filter=`.
+
+Examples
+########
+
+The following image filter string dictates that for the root file system partition only partitions shall be considered whose label begins with "ParticleOS-". For the :code:`/usr/` partition the precise label "ParticleOS_47110815" is required.
+
+.. code-block:: sh
+
+   root=ParticleOS-*:usr=ParticleOS_47110815
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-dissect(1)`, :ref:`systemd-gpt-auto-generator(8)`, :ref:`systemd.image-policy(7)`
+
+

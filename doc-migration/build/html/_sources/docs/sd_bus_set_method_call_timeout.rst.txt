@@ -1,0 +1,71 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_set_method_call_timeout
+:manvolnum: 3
+:summary: Set or query the default D-Bus method call timeout of a bus object
+:aliases: sd_bus_get_method_call_timeout
+
+.. _sd_bus_set_method_call_timeout(3):
+
+=================================
+sd_bus_set_method_call_timeout(3)
+=================================
+
+Name
+####
+
+sd_bus_set_method_call_timeout, sd_bus_get_method_call_timeout — Set or query the default D-Bus method call timeout of a bus object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_set_method_call_timeout(sd_bus *bus,
+	uint64_t usec); .. code-block::
+
+   int sd_bus_get_method_call_timeout(sd_bus *bus,
+	uint64_t *ret);
+
+Description
+###########
+
+:code:`sd_bus_set_method_call_timeout()` sets the default D-Bus method call timeout of :code:`bus` to :code:`usec` microseconds.
+
+:code:`sd_bus_get_method_call_timeout()` queries the default D-Bus method call timeout of :code:`bus`. If no method call timeout was set using :code:`sd_bus_set_method_call_timeout()`, the timeout is read from the :code:`$SYSTEMD_BUS_TIMEOUT` environment variable. If this environment variable is unset or does not contain a valid timeout, the implementation falls back to a predefined method call timeout of 25 seconds. Note that :code:`$SYSTEMD_BUS_TIMEOUT` is read once and cached so callers should not rely on being able to change the default method call timeout at runtime by changing the value of :code:`$SYSTEMD_BUS_TIMEOUT`. Instead, call :code:`sd_bus_set_method_call_timeout()` to change the default method call timeout.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The parameters :code:`bus` or :code:`ret` are :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOPKG
+
+   Bus object :code:`bus` could not be resolved.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_set_method_call_timeout()` and :code:`sd_bus_get_method_call_timeout()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_call(3)`
+
+

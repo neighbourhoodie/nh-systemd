@@ -1,0 +1,58 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: libsystemd
+:manvolnum: 3
+:summary: Functions for implementing services and interacting with systemd
+
+.. _libsystemd(3):
+
+=============
+libsystemd(3)
+=============
+
+Name
+####
+
+libsystemd — Functions for implementing services and interacting with systemd
+
+Synopsis
+########
+
+.. code-block:: sh
+
+   #include <systemd/sd-bus.h>
+   #include <systemd/sd-daemon.h>
+   #include <systemd/sd-device.h>
+   #include <systemd/sd-event.h>
+   #include <systemd/sd-gpt.h>
+   #include <systemd/sd-hwdb.h>
+   #include <systemd/sd-id128.h>
+   #include <systemd/sd-journal.h>
+   #include <systemd/sd-json.h>
+   #include <systemd/sd-login.h>
+   #include <systemd/sd-messages.h>
+   #include <systemd/sd-path.h>
+   #include <systemd/sd-varlink.h>
+
+:code:`pkg-config --cflags --libs libsystemd`
+
+Description
+###########
+
+The :code:`libsystemd` library provides functions that allow interacting with various interfaces provided by the :ref:`systemd(1)` service manager, as well as various other functions and constants useful for implementing services in general.
+
+See :ref:`sd-bus(3)`, :ref:`sd-bus-errors(3)`, :ref:`sd-daemon(3)`, :ref:`sd-device(3)`, :ref:`sd-event(3)`, :ref:`sd-hwdb(3)`, :ref:`sd-id128(3)`, :ref:`sd-journal(3)`, :ref:`sd-json(3)`, :ref:`sd-login(3)`, :ref:`sd-path(3)`, and :ref:`sd-varlink(3)` for information about different parts of the library interface.
+
+Interface stability
+###################
+
+Strict backwards-compatibility is maintained for the API (application programming interface) and ABI (application binary interface). Symbol versioning is used, with symbols only added and never removed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`libudev(3)`, :die-net:`pkg-config(1)`, `Interface Portability and Stability Promise <https://systemd.io/PORTABILITY_AND_STABILITY/>`_
+
+

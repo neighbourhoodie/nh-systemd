@@ -1,0 +1,89 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_set_destination
+:manvolnum: 3
+:summary: Set and query bus message addressing information
+:aliases: sd_bus_message_get_destination, sd_bus_message_get_path, sd_bus_message_get_interface, sd_bus_message_get_member, sd_bus_message_set_sender, sd_bus_message_get_sender
+
+.. _sd_bus_message_set_destination(3):
+
+=================================
+sd_bus_message_set_destination(3)
+=================================
+
+Name
+####
+
+sd_bus_message_set_destination, sd_bus_message_get_destination, sd_bus_message_get_path, sd_bus_message_get_interface, sd_bus_message_get_member, sd_bus_message_set_sender, sd_bus_message_get_sender — Set and query bus message addressing information
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_set_destination(sd_bus_message *message,
+	const char *destination); .. code-block::
+
+   const char* sd_bus_message_get_destination(sd_bus_message *message); .. code-block::
+
+   const char* sd_bus_message_get_path(sd_bus_message *message); .. code-block::
+
+   const char* sd_bus_message_get_interface(sd_bus_message *message); .. code-block::
+
+   const char* sd_bus_message_get_member(sd_bus_message *message); .. code-block::
+
+   int sd_bus_message_set_sender(sd_bus_message *message,
+	const char *sender); .. code-block::
+
+   const char* sd_bus_message_get_sender(sd_bus_message *message);
+
+Description
+###########
+
+:code:`sd_bus_message_set_destination()` sets the destination service name for the specified bus message object. The specified name must be a valid unique or well-known service name.
+
+:code:`sd_bus_message_get_destination()`, :code:`sd_bus_message_get_path()`, :code:`sd_bus_message_get_interface()`, and :code:`sd_bus_message_get_member()` return the destination, path, interface, and member fields from :code:`message` header. The return value will be :code:`NULL` is :code:`message` is :code:`NULL` or the message is of a type that does not use those fields or the message does not have them set. See :ref:`sd_bus_message_new_method_call(3)` and :ref:`sd_bus_message_set_destination(3)` for more discussion of those values.
+
+:code:`sd_bus_message_set_sender()` sets the sender service name for the specified bus message object. The specified name must be a valid unique or well-known service name. This function is useful only for messages to send on direct connections as for connections to bus brokers the broker will fill in the destination field anyway, and the sender field set by original sender is ignored.
+
+:code:`sd_bus_message_get_sender()` returns the sender field from :code:`message`.
+
+When a string is returned, it is a pointer to internal storage, and may not be modified or freed. It is only valid as long as the :code:`message` remains referenced and this field has not been changed by a different call.
+
+Return Value
+############
+
+On success, these calls return 0 or a positive integer. On failure, these calls return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`message` parameter or the output parameter are :code:`NULL`.
+
+.. systemd:option:: -EPERM
+
+   For :code:`sd_bus_message_set_destination()` and :code:`sd_bus_message_set_sender()`, the message is already sealed.
+
+.. systemd:option:: -EEXIST
+
+   The message already has a destination or sender field set.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_set_destination()` and :code:`sd_bus_message_set_sender()` were added in version 237.
+
+:code:`sd_bus_message_get_destination()`, :code:`sd_bus_message_get_path()`, :code:`sd_bus_message_get_interface()`, :code:`sd_bus_message_get_member()`, and :code:`sd_bus_message_get_sender()` were added in version 240.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_new(3)`, :ref:`sd_bus_set_sender(3)`
+
+

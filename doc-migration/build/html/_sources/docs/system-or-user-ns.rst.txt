@@ -1,0 +1,23 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+.. inclusion-marker-do-not-remove singular|
+
+.. inclusion-marker-do-not-remove singular|
+
+This option is only available for system services, or for services running in per-user instances of the service manager in which case :code:`PrivateUsers=` is implicitly enabled (requires unprivileged user namespaces support to be enabled in the kernel via the "kernel.unprivileged_userns_clone=" sysctl).
+
+.. inclusion-end-marker-do-not-remove singular|
+
+.. inclusion-end-marker-do-not-remove singular|
+
+.. inclusion-marker-do-not-remove plural|
+
+.. inclusion-marker-do-not-remove plural|
+
+These options are only available for system services, or for services running in per-user instances of the service manager in which case :code:`PrivateUsers=` is implicitly enabled (requires unprivileged user namespaces support to be enabled in the kernel via the "kernel.unprivileged_userns_clone=" sysctl).
+
+.. inclusion-end-marker-do-not-remove plural|
+
+.. inclusion-end-marker-do-not-remove plural|
+
+

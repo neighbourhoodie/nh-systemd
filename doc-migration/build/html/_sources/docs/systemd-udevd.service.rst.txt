@@ -1,0 +1,209 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-udevd.service
+:manvolnum: 8
+:summary: Device event managing daemon
+:aliases: systemd-udevd-control.socket, systemd-udevd-kernel.socket, systemd-udevd-varlink.socket, systemd-udevd
+
+.. _systemd-udevd.service(8):
+
+========================
+systemd-udevd.service(8)
+========================
+
+Name
+####
+
+systemd-udevd.service, systemd-udevd-control.socket, systemd-udevd-kernel.socket, systemd-udevd-varlink.socket, systemd-udevd — Device event managing daemon
+
+Synopsis
+########
+
+:code:`systemd-udevd.service`
+
+:code:`systemd-udevd-control.socket`
+
+:code:`systemd-udevd-kernel.socket`
+
+:code:`systemd-udevd-varlink.socket`
+
+:code:`/usr/lib/systemd/systemd-udevd [\--daemon] [\--debug] [\--children-max=] [\--exec-delay=] [\--event-timeout=] [\--resolve-names=early|late|never] [\--version] [\--help]`
+
+Description
+###########
+
+:code:`systemd-udevd` listens to kernel uevents. For every event, systemd-udevd executes matching instructions specified in udev rules. See :man-pages:`udev(7)`.
+
+The behavior of the daemon can be configured using :man-pages:`udev.conf(5)`, its command line options, environment variables, and on the kernel command line, or changed dynamically with :code:`udevadm control`.
+
+Options
+#######
+
+.. systemd:option:: -d, --daemon
+
+   Detach and run in the background.
+
+   .. versionadded:: 186
+
+.. systemd:option:: -D, --debug
+
+   Print debug messages to standard error.
+
+   .. versionadded:: 186
+
+.. systemd:option:: -c, --children-max=
+
+   Limit the number of events executed in parallel.
+
+   .. versionadded:: 186
+
+.. systemd:option:: -e, --exec-delay=
+
+   Delay the execution of each :code:`RUN{:emphasis:`program`}` parameter by the given number of seconds. This option might be useful when debugging system crashes during coldplug caused by loading non-working kernel modules.
+
+   .. versionadded:: 186
+
+.. systemd:option:: -t, --event-timeout=
+
+   Set the number of seconds to wait for events to finish. After this time, the event will be terminated. The default is 180 seconds.
+
+   .. versionadded:: 216
+
+.. systemd:option:: -s, --timeout-signal=
+
+   Set the signal which :code:`systemd-udevd` will send to forked off processes after reaching event timeout. The setting can be overridden at boot time with the kernel command line option :code:`udev.timeout_signal=`. Setting to :code:`SIGABRT` may be helpful in order to debug worker timeouts. Defaults to :code:`SIGKILL`. Note that setting the option on the command line overrides the setting from the configuration file.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -N, --resolve-names=
+
+   Specify when systemd-udevd should resolve names of users and groups. When set to :code:`early` (the default), names will be resolved when the rules are parsed. When set to :code:`late`, names will be resolved for every event. When set to :code:`never`, names will never be resolved and all devices will be owned by root.
+
+   .. versionadded:: 186
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Kernel command line
+###################
+
+Parameters prefixed with "rd." will be read when :code:`systemd-udevd` is used in an initrd, those without will be processed both in the initrd and on the host.
+
+.. systemd:option:: udev.log_level=, rd.udev.log_level=
+   :group: kernel-commandline-options
+
+   Set the log level.
+
+   .. versionadded:: 247
+
+.. systemd:option:: udev.trace[=BOOL], rd.udev.trace[=BOOL]
+   :group: kernel-commandline-options
+
+   Enable/disable trace logging. When enabled, :systemd:var:`udev.log_level=` will be ignored, and "debug" level is assumed.
+
+   .. versionadded:: 258
+
+.. systemd:option:: udev.children_max=, rd.udev.children_max=
+   :group: kernel-commandline-options
+
+   Limit the number of events executed in parallel.
+
+   .. versionadded:: 186
+
+.. systemd:option:: udev.exec_delay=, rd.udev.exec_delay=
+   :group: kernel-commandline-options
+
+   Delay the execution of each :systemd:var:`RUN{:emphasis:`program`}` parameter by the given number of seconds. This option might be useful when debugging system crashes during coldplug caused by loading non-working kernel modules.
+
+   .. versionadded:: 186
+
+.. systemd:option:: udev.event_timeout=, rd.udev.event_timeout=
+   :group: kernel-commandline-options
+
+   Wait for events to finish up to the given number of seconds. This option might be useful if events are terminated due to kernel drivers taking too long to initialize.
+
+   .. versionadded:: 216
+
+.. systemd:option:: udev.timeout_signal=, rd.udev.timeout_signal=
+   :group: kernel-commandline-options
+
+   Specifies a signal that :code:`systemd-udevd` will send to workers on timeout. Note that kernel command line option overrides both the setting in the configuration file and the one on the program command line.
+
+   .. versionadded:: 246
+
+.. systemd:option:: udev.blockdev_read_only, rd.udev.blockdev_read_only
+   :group: kernel-commandline-options
+
+   If specified, mark all physical block devices read-only as they appear. Synthetic block devices (such as loopback block devices or device mapper devices) are left as they are. This is useful to guarantee that the contents of physical block devices remains unmodified during runtime, for example to implement fully stateless systems, for testing or for recovery situations where corrupted file systems shall not be corrupted further through accidental modification.
+
+   A block device may be marked writable again by issuing the :code:`blockdev --setrw` command, see :man-pages:`blockdev(8)` for details.
+
+   .. versionadded:: 246
+
+.. systemd:option:: net.ifnames=
+   :group: kernel-commandline-options
+
+   Network interfaces are renamed to give them predictable names when possible. It is enabled by default; specifying 0 disables it.
+
+   .. versionadded:: 199
+
+.. systemd:option:: net.naming_scheme=
+   :group: kernel-commandline-options
+
+   Network interfaces are renamed to give them predictable names when possible (unless :systemd:var:`net.ifnames=0` is specified, see above). With this kernel command line option it is possible to pick a specific version of this algorithm and override the default chosen at compilation time. Expects one of the naming scheme identifiers listed in :ref:`systemd.net-naming-scheme(7)`, or "latest" to select the latest scheme known (to this particular version of :code:`systemd-udevd.service`).
+
+   Note that selecting a specific scheme is not sufficient to fully stabilize interface naming: the naming is generally derived from driver attributes exposed by the kernel. As the kernel is updated, previously missing attributes :code:`systemd-udevd.service` is checking might appear, which affects older name derivation algorithms, too.
+
+   .. versionadded:: 240
+
+.. systemd:option:: net.ifname_policy=policy1[,policy2,…][,MAC]
+   :group: kernel-commandline-options
+
+   Specifies naming policies applied when renaming network interfaces. Takes a list of policies and an optional MAC address separated with comma. Each policy value must be one of the policies understood by the :systemd:var:`NamePolicy=` setting in .link files, e.g. "onboard" or "path". See :ref:`systemd.link(5)` for more details. When the MAC address is specified, the policies are applied to the interface which has the address. When no MAC address is specified, the policies are applied to all interfaces. This kernel command line argument can be specified multiple times.
+
+   This argument is not directly read by :code:`systemd-udevd`, but is instead converted to a .link file by :ref:`systemd-network-generator.service(8)`. For this argument to take effect, :code:`systemd-network-generator.service` must be enabled.
+
+   Example:
+
+     .. code-block:: sh
+
+        net.ifname_policy=keep,kernel,path,slot,onboard,01:23:45:67:89:ab
+        net.ifname_policy=keep,kernel,path,slot,onboard,mac
+
+   This is mostly equivalent to creating the following .link files:
+
+     .. code-block:: sh
+
+        # 91-name-policy-with-mac.link
+        [Match]
+        MACAddress=01:23:45:67:89:ab
+        [Link]
+        NamePolicy=keep kernel path slot onboard
+        AlternativeNamePolicy=path slot onboard
+
+   and
+
+     .. code-block:: sh
+
+        # 92-name-policy-for-all.link
+        [Match]
+        OriginalName=*
+        [Link]
+        NamePolicy=keep kernel path slot onboard mac
+        AlternativeNamePolicy=path slot onboard mac
+
+   .. versionadded:: 250
+
+.. COMMENT: when adding entries here, consider also adding them in kernel-command-line.xml
+
+See Also
+########
+
+:man-pages:`udev.conf(5)`, :man-pages:`udev(7)`, :man-pages:`udevadm(8)`
+
+

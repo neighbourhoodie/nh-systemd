@@ -1,0 +1,67 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_journal_get_catalog
+:manvolnum: 3
+:summary: Retrieve message catalog entry
+:aliases: sd_journal_get_catalog_for_message_id
+
+.. _sd_journal_get_catalog(3):
+
+=========================
+sd_journal_get_catalog(3)
+=========================
+
+Name
+####
+
+sd_journal_get_catalog, sd_journal_get_catalog_for_message_id — Retrieve message catalog entry
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>` .. code-block::
+
+   int sd_journal_get_catalog(sd_journal *j,
+	char **ret); .. code-block::
+
+   int sd_journal_get_catalog_for_message_id(sd_id128_t id,
+	char **ret);
+
+Description
+###########
+
+:code:`sd_journal_get_catalog()` retrieves a message catalog entry for the current journal entry. This will look up an entry in the message catalog by using the "MESSAGE_ID=" field of the current journal entry. Before returning the entry all journal field names in the catalog entry text enclosed in "@" will be replaced by the respective field values of the current entry. If a field name referenced in the message catalog entry does not exist, in the current journal entry, the "@" will be removed, but the field name otherwise left untouched.
+
+:code:`sd_journal_get_catalog_for_message_id()` works similar to :code:`sd_journal_get_catalog()` but the entry is looked up by the specified message ID (no open journal context is necessary for this), and no field substitution is performed.
+
+For more information about the journal message catalog please refer to the `Journal Message Catalogs <https://systemd.io/CATALOG>`_ documentation page.
+
+Return Value
+############
+
+:code:`sd_journal_get_catalog()` and :code:`sd_journal_get_catalog_for_message_id()` return 0 on success or a negative errno-style error code. If no matching message catalog entry is found, -ENOENT is returned.
+
+On successful return, :code:`ret` points to a new string, which must be freed with :man-pages:`free(3)`.
+
+Notes
+#####
+
+Function :code:`sd_journal_get_catalog()` is thread-agnostic and only a single thread may operate on a given object at any given time. Multiple independent objects may be used from different threads in parallel.
+
+Function :code:`sd_journal_get_catalog_for_message_id()` is thread-safe and may be called from multiple threads in parallel.
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+History
+#######
+
+:code:`sd_journal_get_catalog()` and :code:`sd_journal_get_catalog_for_message_id()` were added in version 196.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.journal-fields(7)`, :ref:`sd-journal(3)`, :ref:`sd_journal_open(3)`, :ref:`sd_journal_next(3)`, :ref:`sd_journal_get_data(3)`, :man-pages:`malloc(3)`
+
+

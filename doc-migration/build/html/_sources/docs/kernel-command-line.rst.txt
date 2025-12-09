@@ -1,0 +1,419 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: kernel-command-line
+:manvolnum: 7
+:summary: Kernel command line parameters
+
+.. _kernel-command-line(7):
+
+======================
+kernel-command-line(7)
+======================
+
+Name
+####
+
+kernel-command-line — Kernel command line parameters
+
+Synopsis
+########
+
+:code:`/proc/cmdline`
+
+Description
+###########
+
+The kernel, the programs running in the initrd and in the host system may be configured at boot via kernel command line arguments.
+
+For command line parameters understood by the kernel, please see `:code:`kernel-parameters.html` <https://docs.kernel.org/admin-guide/kernel-parameters.html>`_ and :man-pages:`bootparam(7)`.
+
+For command line parameters understood by the initrd, see the documentation of the specific initrd implementation of your installation.
+
+Core OS Command Line Arguments
+##############################
+
+.. systemd:option:: systemd.unit=, rd.systemd.unit=, systemd.dump_core, systemd.crash_chvt, systemd.crash_shell, systemd.crash_action=, systemd.confirm_spawn, systemd.service_watchdogs, systemd.show_status, systemd.status_unit_format=, systemd.log_target=, systemd.log_level=, systemd.log_location=, systemd.log_color, systemd.log_ratelimit_kmsg, systemd.default_standard_output=, systemd.default_standard_error=, systemd.setenv=, systemd.machine_id=, systemd.set_credential=, systemd.set_credential_binary=, systemd.import_credentials=, systemd.reload_limit_interval_sec=, systemd.reload_limit_burst=
+   :group: kernel-commandline-options
+
+   Parameters understood by the system and service manager to control system behavior. For details, see :ref:`systemd(1)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: systemd.mask=, systemd.wants=, systemd.debug_shell, systemd.default_debug_tty=
+   :group: kernel-commandline-options
+
+   Additional parameters understood by :ref:`systemd-debug-generator(8)`, to mask or start specific units at boot, or invoke a debug shell on tty9.
+
+   .. versionadded:: 215
+
+.. systemd:option:: systemd.break=, rd.systemd.break=
+   :group: kernel-commandline-options
+
+   Parameters understood by :ref:`systemd-debug-generator(8)`, to pause the boot process at a certain point and spawn a debug shell.
+
+   .. versionadded:: 258
+
+.. systemd:option:: systemd.run=, systemd.run_success_action=, systemd.run_failure_action=
+   :group: kernel-commandline-options
+
+   Additional parameters understood by :ref:`systemd-run-generator(8)`, to run a command line specified on the kernel command line as system service after booting up.
+
+   .. versionadded:: 240
+
+.. systemd:option:: systemd.early_core_pattern=
+   :group: kernel-commandline-options
+
+   During early boot, the generation of core dump files is disabled until a core dump handler (if any) takes over. This parameter allows specifying an absolute path where core dump files should be stored until a handler is installed. The path should be absolute and may contain specifiers, see :man-pages:`core(5)` for details.
+
+   .. versionadded:: 240
+
+.. systemd:option:: systemd.restore_state=
+   :group: kernel-commandline-options
+
+   This parameter is understood by several system tools to control whether or not they should restore system state from the previous boot. For details, see :ref:`systemd-backlight@.service(8)` and :ref:`systemd-rfkill.service(8)`.
+
+   .. versionadded:: 209
+
+.. systemd:option:: systemd.ssh_auto=, systemd.ssh_listen=
+   :group: kernel-commandline-options
+
+   These parameters are interpreted by :ref:`systemd-ssh-generator(8)` and may be used to control SSH sockets the system shall be reachable on.
+
+   .. versionadded:: 256
+
+.. systemd:option:: systemd.volatile=
+   :group: kernel-commandline-options
+
+   This parameter controls whether the system shall boot up in volatile mode. Takes a boolean argument, or the special values "state" or "overlay". If false (the default), normal boot mode is selected, the root directory and :code:`/var/` are mounted as specified on the kernel command line or :code:`/etc/fstab`, or otherwise configured. If true, full state-less boot mode is selected. In this case, the root directory is mounted as volatile memory file system ("tmpfs"), and only :code:`/usr/` is mounted from the file system configured as root device, in read-only mode. This enables fully state-less boots where the vendor-supplied OS is used as shipped, with only default configuration and no stored state in effect, as :code:`/etc/` and :code:`/var/` (as well as all other resources shipped in the root file system) are reset at boot and lost on shutdown. If this setting is set to "state" the root file system is mounted read-only, however :code:`/var/` is mounted as a volatile memory file system ("tmpfs"), so that the system boots up with the normal configuration applied, but all state reset at boot and lost at shutdown. If this setting is set to "overlay" the root file system is set up as "overlayfs" mount combining the read-only root directory with a writable "tmpfs", so that no modifications are made to disk, but the file system may be modified nonetheless with all changes being lost at reboot. For details, see :ref:`systemd-volatile-root.service(8)` and :ref:`systemd-fstab-generator(8)`.
+
+   .. versionadded:: 233
+
+.. systemd:option:: quiet
+   :group: kernel-commandline-options
+
+   Parameter understood by both the kernel and the system and service manager to control console log verbosity. For details, see :ref:`systemd(1)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: debug
+   :group: kernel-commandline-options
+
+   Parameter understood by both the kernel and the system and service manager to control console log verbosity. For details, see :ref:`systemd(1)`.
+
+   .. versionadded:: 205
+
+.. systemd:option:: -b, rd.emergency, emergency, rd.rescue, rescue, single, s, 1, 2, 3, 4, 5
+   :group: kernel-commandline-options
+
+.. systemd:constant:: S
+   :group: kernel-commandline-options
+
+   Parameters understood by the system and service manager, as compatibility and convenience options. For details, see :ref:`systemd(1)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: locale.LANG=, locale.LANGUAGE=, locale.LC_CTYPE=, locale.LC_NUMERIC=, locale.LC_TIME=, locale.LC_COLLATE=, locale.LC_MONETARY=, locale.LC_MESSAGES=, locale.LC_PAPER=, locale.LC_NAME=, locale.LC_ADDRESS=, locale.LC_TELEPHONE=, locale.LC_MEASUREMENT=, locale.LC_IDENTIFICATION=
+   :group: kernel-commandline-options
+
+   Parameters understood by the system and service manager to control locale and language settings. For details, see :ref:`systemd(1)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: fsck.mode=, fsck.repair=
+   :group: kernel-commandline-options
+
+   Parameters understood by the file system checker services. For details, see :ref:`systemd-fsck@.service(8)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: quotacheck.mode=
+   :group: kernel-commandline-options
+
+   Parameter understood by the file quota checker service. For details, see :ref:`systemd-quotacheck@.service(8)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: systemd.journald.forward_to_syslog=, systemd.journald.forward_to_kmsg=, systemd.journald.forward_to_console=, systemd.journald.forward_to_wall=
+   :group: kernel-commandline-options
+
+   Parameters understood by the journal service. For details, see :ref:`systemd-journald.service(8)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: vconsole.keymap=, vconsole.keymap_toggle=, vconsole.font=, vconsole.font_map=, vconsole.font_unimap=
+   :group: kernel-commandline-options
+
+   Parameters understood by the virtual console setup logic. For details, see :man-pages:`vconsole.conf(5)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: udev.log_level=, rd.udev.log_level=, udev.trace=, rd.udev.trace=, udev.children_max=, rd.udev.children_max=, udev.exec_delay=, rd.udev.exec_delay=, udev.event_timeout=, rd.udev.event_timeout=, udev.timeout_signal=, rd.udev.timeout_signal=, udev.blockdev_read_only, rd.udev.blockdev_read_only, net.ifnames=, net.naming_scheme=
+   :group: kernel-commandline-options
+
+   Parameters understood by the device event managing daemon. For details, see :ref:`systemd-udevd.service(8)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: plymouth.enable=
+   :group: kernel-commandline-options
+
+   May be used to disable the Plymouth boot splash. For details, see :die-net:`plymouth(8)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: luks=, rd.luks=, luks.crypttab=, rd.luks.crypttab=, luks.name=, rd.luks.name=, luks.uuid=, rd.luks.uuid=, luks.options=, rd.luks.options=, luks.key=, rd.luks.key=
+   :group: kernel-commandline-options
+
+   Configures the LUKS full-disk encryption logic at boot. For details, see :ref:`systemd-cryptsetup-generator(8)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: fstab=, rd.fstab=
+   :group: kernel-commandline-options
+
+   Configures the :code:`/etc/fstab` logic at boot. For details, see :ref:`systemd-fstab-generator(8)`.
+
+   .. versionadded:: 186
+
+.. systemd:option:: root=, rootfstype=, rootflags=, ro, rw
+   :group: kernel-commandline-options
+
+   Configures the root file system and its file system type and mount options, as well as whether it shall be mounted read-only or read-write initially. For details, see :ref:`systemd-fstab-generator(8)`.
+
+   If :systemd:var:`root=` is not set (or set to "gpt-auto") the automatic root partition discovery implemented by :ref:`systemd-gpt-auto-generator(8)` will be in effect. In this case, :systemd:var:`rootfstype=`, :systemd:var:`rootflags=`, :systemd:var:`ro`, :systemd:var:`rw` will be interpreted by :code:`systemd-gpt-auto-generator`.
+
+   .. versionadded:: 215
+
+.. systemd:option:: mount.usr=, mount.usrfstype=, mount.usrflags=
+   :group: kernel-commandline-options
+
+   Configures the /usr file system (if required) and its file system type and mount options. For details, see :ref:`systemd-fstab-generator(8)`.
+
+   .. versionadded:: 235
+
+.. systemd:option:: veritytab=, rd.veritytab=, roothash=, systemd.verity=, rd.systemd.verity=, systemd.verity_root_data=, systemd.verity_root_hash=, systemd.verity_root_options=, usrhash=, systemd.verity_usr_data=, systemd.verity_usr_hash=, systemd.verity_usr_options=
+   :group: kernel-commandline-options
+
+   Configures the integrity protection root hash for the root and :code:`/usr` file systems, and other related parameters. For details, see :ref:`systemd-veritysetup-generator(8)`.
+
+   .. versionadded:: 233
+
+.. systemd:option:: systemd.getty_auto=
+   :group: kernel-commandline-options
+
+   Configures whether the :code:`serial-getty@.service` will run. For details, see :ref:`systemd-getty-generator(8)`.
+
+   .. versionadded:: 250
+
+.. systemd:option:: systemd.gpt_auto=, rd.systemd.gpt_auto=
+   :group: kernel-commandline-options
+
+   Configures whether GPT-based partition auto-discovery shall be attempted. For details, see :ref:`systemd-gpt-auto-generator(8)`.
+
+   .. versionadded:: 215
+
+.. systemd:option:: systemd.image_policy=
+   :group: kernel-commandline-options
+
+   When GPT-based partition auto-discovery is used, configures the image dissection policy string to apply, as per :ref:`systemd.image-policy(7)`. For details see :ref:`systemd-gpt-auto-generator(8)`.
+
+   .. versionadded:: 254
+
+.. systemd:option:: systemd.image_filter=
+   :group: kernel-commandline-options
+
+   When GPT-based partition auto-discovery is used, configures the image dissection filter string to apply, as per :ref:`systemd.image-filter(7)`. For details see :ref:`systemd-gpt-auto-generator(8)`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: systemd.default_timeout_start_sec=
+   :group: kernel-commandline-options
+
+   Overrides the default start job timeout :systemd:var:`DefaultTimeoutStartSec=` at boot. For details, see :ref:`systemd-system.conf(5)`.
+
+   .. versionadded:: 230
+
+.. systemd:option:: systemd.default_device_timeout_sec=
+   :group: kernel-commandline-options
+
+   Overrides the default device timeout :systemd:var:`DefaultDeviceTimeoutSec=` at boot. For details, see :ref:`systemd-system.conf(5)`.
+
+   .. versionadded:: 254
+
+.. systemd:option:: systemd.watchdog_device=
+   :group: kernel-commandline-options
+
+   Overrides the watchdog device path :systemd:var:`WatchdogDevice=`. For details, see :ref:`systemd-system.conf(5)`.
+
+   .. versionadded:: 236
+
+.. systemd:option:: systemd.watchdog_sec=
+   :group: kernel-commandline-options
+
+   Overrides the watchdog timeout settings otherwise configured with :systemd:var:`RuntimeWatchdog=`, :systemd:var:`RebootWatchdog=` and :systemd:var:`KExecWatchdogSec=`. Takes a time value (if no unit is specified, seconds is the implicitly assumed time unit) or the special strings "off" or "default". For details, see :ref:`systemd-system.conf(5)`.
+
+   .. versionadded:: 250
+
+.. systemd:option:: systemd.watchdog_pre_sec=
+   :group: kernel-commandline-options
+
+   Overrides the watchdog pre-timeout settings otherwise configured with :systemd:var:`RuntimeWatchdogPreSec=`. Takes a time value (if no unit is specified, seconds is the implicitly assumed time unit) or the special strings "off" or "default". For details, see :ref:`systemd-system.conf(5)`.
+
+   .. versionadded:: 251
+
+.. systemd:option:: systemd.watchdog_pretimeout_governor=
+   :group: kernel-commandline-options
+
+   Overrides the watchdog pre-timeout settings otherwise configured with :systemd:var:`RuntimeWatchdogPreGovernor=`. Takes a string value. For details, see :ref:`systemd-system.conf(5)`.
+
+   .. versionadded:: 251
+
+.. systemd:option:: systemd.cpu_affinity=
+   :group: kernel-commandline-options
+
+   Overrides the CPU affinity mask for the service manager and the default for all child processes it forks. This takes precedence over :systemd:var:`CPUAffinity=`, see :ref:`systemd-system.conf(5)` for details.
+
+   .. versionadded:: 245
+
+.. systemd:option:: modules_load=, rd.modules_load=
+   :group: kernel-commandline-options
+
+   Load a specific kernel module early at boot. For details, see :ref:`systemd-modules-load.service(8)`.
+
+   .. versionadded:: 187
+
+.. systemd:option:: nameserver=, domain=
+   :group: kernel-commandline-options
+
+   Configures DNS server information and search domains, see :ref:`systemd-resolved.service(8)` for details.
+
+   .. versionadded:: 253
+
+.. systemd:option:: resume=, resumeflags=
+   :group: kernel-commandline-options
+
+   Enable resume from hibernation using the specified device and timeout options. All :man-pages:`fstab(5)`-style device identifiers are supported. For details, see :ref:`systemd-hibernate-resume-generator(8)`.
+
+   .. versionadded:: 217
+
+.. systemd:option:: resume_offset=
+   :group: kernel-commandline-options
+
+   Configure the page offset of the swap space from the resume device. For details, see :ref:`systemd-hibernate-resume-generator(8)`.
+
+   .. versionadded:: 254
+
+.. systemd:option:: systemd.firstboot=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument, defaults to on. If off, :ref:`systemd-firstboot.service(8)` and :ref:`systemd-homed-firstboot.service(1)` will not query the user for basic system settings, even if the system boots up for the first time and the relevant settings are not initialized yet. Not to be confused with :systemd:var:`systemd.condition_first_boot=` (see below), which overrides the result of the :systemd:var:`ConditionFirstBoot=` unit file condition, and thus controls more than just :code:`systemd-firstboot.service` behaviour.
+
+   .. versionadded:: 233
+
+.. systemd:option:: systemd.condition_needs_update=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. If specified, overrides the result of :systemd:var:`ConditionNeedsUpdate=` unit condition checks. See :ref:`systemd.unit(5)` for details.
+
+   .. versionadded:: 246
+
+.. systemd:option:: systemd.condition_first_boot=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. If specified, overrides the result of :systemd:var:`ConditionFirstBoot=` unit condition checks. See :ref:`systemd.unit(5)` for details. Not to be confused with :systemd:var:`systemd.firstboot=` which only controls behaviour of the :code:`systemd-firstboot.service` system service but has no effect on the condition check (see above).
+
+   .. versionadded:: 246
+
+.. systemd:option:: systemd.clock_usec=
+   :group: kernel-commandline-options
+
+   Takes a decimal, numeric timestamp in μs since January 1st 1970, 00:00am, to set the system clock to. The system time is set to the specified timestamp early during boot. It is not propagated to the hardware clock (RTC).
+
+   .. versionadded:: 246
+
+.. systemd:option:: systemd.random_seed=
+   :group: kernel-commandline-options
+
+   Takes a base64 encoded random seed value to credit with full entropy to the kernel's random pool during early service manager initialization. This option is useful in testing environments where delays due to random pool initialization in entropy starved virtual machines shall be avoided.
+
+   Note that if this option is used the seed is accessible to unprivileged programs from :code:`/proc/cmdline`. This option is hence a security risk when used outside of test systems, since the (possibly) only seed used for initialization of the kernel's entropy pool might be easily acquired by unprivileged programs.
+
+   It is recommended to pass 512 bytes of randomized data (as that matches the Linux kernel pool size), which may be generated with a command like the following:
+
+     .. code-block:: sh
+
+        dd if=/dev/urandom bs=512 count=1 status=none | base64 -w 0
+
+   Again: do not use this option outside of testing environments, it is a security risk elsewhere, as secret key material derived from the entropy pool can possibly be reconstructed by unprivileged programs.
+
+   .. versionadded:: 246
+
+.. systemd:option:: systemd.allow_userspace_verity=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. Controls whether disk images that are Verity protected may be authenticated in userspace signature checks via :code:`/etc/verity.d/` (and related directories) public key drop-ins, or whether in-kernel signature checking only. Defaults to on.
+
+   .. versionadded:: 256
+
+.. systemd:option:: systemd.hostname=
+   :group: kernel-commandline-options
+
+   Accepts a hostname to set during early boot. If specified takes precedence over what is set in :code:`/etc/hostname`. Note that this does not bar later runtime changes to the hostname, it simply controls the initial hostname set during early boot.
+
+   .. versionadded:: 246
+
+.. systemd:option:: systemd.tty.term.tty=, systemd.tty.rows.tty=, systemd.tty.columns.tty=
+   :group: kernel-commandline-options
+
+   These arguments allow configuring default values for :systemd:var:`$TERM`, :systemd:var:`TTYRows=`, and :systemd:var:`TTYColumns=` for tty :emphasis:`tty`. Additionally, :systemd:var:`systemd.tty.term.console` will configure the :systemd:var:`$TERM` value used by :code:`systemd` if not set explicitly using :systemd:var:`TERM` on the kernel command line. The tty name should be specified without the :code:`/dev/` prefix (e.g. "systemd.tty.rows.ttyS0=80").
+
+   .. versionadded:: 254
+
+.. systemd:option:: systemd.battery_check=
+   :group: kernel-commandline-options
+
+   Accepts a boolean argument. If false the boot-time battery charge check implemented by :ref:`systemd-battery-check.service(8)` is disabled.
+
+   .. versionadded:: 254
+
+.. systemd:option:: ifname=, net.ifname_policy=
+   :group: kernel-commandline-options
+
+   Controls interface naming policies, implemented by :ref:`systemd-network-generator.service(8)`.
+
+   .. versionadded:: 245
+
+.. systemd:option:: systemd.tpm2_allow_clear=
+   :group: kernel-commandline-options
+
+   Controls whether to allow clearing of the TPM chip, implemented by :ref:`systemd-tpm2-clear.service(8)`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: systemd.tpm2_wait=
+   :group: kernel-commandline-options
+
+   Controls whether to wait for a TPM2 device at boot, implemented by :ref:`systemd-tpm2-generator(8)`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: systemd.factory_reset=
+   :group: kernel-commandline-options
+
+   Controls whether to to boot into factory reset mode, implemented by :ref:`systemd-factory-reset-generator(8)`, :ref:`systemd-repart(8)`, and other tools.
+
+   .. versionadded:: 258
+
+History
+#######
+
+.. systemd:option:: systemd 252
+
+   Kernel command-line arguments :code:`systemd.unified_cgroup_hierarchy` and :code:`systemd.legacy_systemd_cgroup_controller` were deprecated. Please switch to the unified cgroup hierarchy.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-system.conf(5)`, :man-pages:`bootparam(7)`, :ref:`systemd.system-credentials(7)`, :man-pages:`smbios-type-11(7)`, :ref:`systemd-debug-generator(8)`, :ref:`systemd-fsck@.service(8)`, :ref:`systemd-quotacheck@.service(8)`, :ref:`systemd-journald.service(8)`, :ref:`systemd-vconsole-setup.service(8)`, :ref:`systemd-udevd.service(8)`, :die-net:`plymouth(8)`, :ref:`systemd-cryptsetup-generator(8)`, :ref:`systemd-veritysetup-generator(8)`, :ref:`systemd-fstab-generator(8)`, :ref:`systemd-getty-generator(8)`, :ref:`systemd-gpt-auto-generator(8)`, :ref:`systemd-volatile-root.service(8)`, :ref:`systemd-modules-load.service(8)`, :ref:`systemd-backlight@.service(8)`, :ref:`systemd-rfkill.service(8)`, :ref:`systemd-hibernate-resume-generator(8)`, :ref:`systemd-firstboot.service(8)`, :man-pages:`bootctl(1)`
+
+

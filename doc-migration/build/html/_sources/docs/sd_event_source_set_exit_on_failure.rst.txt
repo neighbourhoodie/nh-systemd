@@ -1,0 +1,70 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_source_set_exit_on_failure
+:manvolnum: 3
+:summary: Set or retrieve the exit-on-failure feature of event sources
+:aliases: sd_event_source_get_exit_on_failure
+
+.. _sd_event_source_set_exit_on_failure(3):
+
+======================================
+sd_event_source_set_exit_on_failure(3)
+======================================
+
+Name
+####
+
+sd_event_source_set_exit_on_failure, sd_event_source_get_exit_on_failure — Set or retrieve the exit-on-failure feature of event sources
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   int sd_event_source_set_exit_on_failure(sd_event_source *source,
+	int b); .. code-block::
+
+   int sd_event_source_get_exit_on_failure(sd_event_source *source);
+
+Description
+###########
+
+:code:`sd_event_source_set_exit_on_failure()` may be used to set/unset the exit-on-failure flag of the event source object specified as :code:`source`. The flag defaults to off. If on and the callback function set for the event source returns a failure code (i.e. a negative value) the event loop is exited too, using the callback return code as the exit code for :ref:`sd_event_exit(3)`. If off, the event source is disabled but the event loop continues to run. Setting this flag is useful for "dominant" event sources that define the purpose and reason for the event loop, and whose failure hence should propagate to the event loop itself — as opposed to "auxiliary" event sources whose failures should remain local and affect the event source, but not propagate further.
+
+:code:`sd_event_source_get_exit_on_failure()` may be used to query the flag currently set for the event source object :code:`source`.
+
+Return Value
+############
+
+On success, :code:`sd_event_source_set_exit_on_failure()` returns a non-negative integer. :code:`sd_event_source_get_exit_on_failure()` returns 0 if the flag is off, > 0 if the flag is on. On failure, both return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   :code:`source` is not a valid pointer to an sd_event_source object.
+
+   .. versionadded:: 247
+
+.. systemd:option:: -EDOM
+
+   The event source refers to an exit event source (as created with :ref:`sd_event_add_exit(3)`), for which this functionality is not supported.
+
+   .. versionadded:: 247
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_source_set_exit_on_failure()` and :code:`sd_event_source_get_exit_on_failure()` were added in version 247.
+
+See Also
+########
+
+:ref:`sd-event(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`
+
+

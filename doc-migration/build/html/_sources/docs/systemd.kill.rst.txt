@@ -1,0 +1,103 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.kill
+:manvolnum: 5
+:summary: Process killing procedure configuration
+
+.. _systemd.kill(5):
+
+===============
+systemd.kill(5)
+===============
+
+Name
+####
+
+systemd.kill — Process killing procedure configuration
+
+Synopsis
+########
+
+:code:`service.service`, :code:`socket.socket`, :code:`mount.mount`, :code:`swap.swap`, :code:`scope.scope`
+
+Description
+###########
+
+Unit configuration files for services, sockets, mount points, swap devices and scopes share a subset of configuration options which define the killing procedure of processes belonging to the unit.
+
+This man page lists the configuration options shared by these five unit types. See :ref:`systemd.unit(5)` for the common options shared by all unit configuration files, and :ref:`systemd.service(5)`, :ref:`systemd.socket(5)`, :ref:`systemd.swap(5)`, :ref:`systemd.mount(5)` and :ref:`systemd.scope(5)` for more information on the configuration file options specific to each unit type.
+
+The kill procedure configuration options are configured in the \[Service], \[Socket], \[Mount] or \[Swap] section, depending on the unit type.
+
+Options
+#######
+
+.. systemd:option:: KillMode=
+   :group: unit-directives
+
+   Specifies how processes of this unit shall be killed. One of :systemd:option:`control-group`, :systemd:option:`mixed`, :systemd:option:`process`, :systemd:option:`none`.
+
+   If set to :systemd:option:`control-group`, all remaining processes in the control group of this unit will be killed on unit stop (for services: after the stop command is executed, as configured with :systemd:var:`ExecStop=`). If set to :systemd:option:`mixed`, the :systemd:constant:`SIGTERM` signal (see below) is sent to the main process while the subsequent :systemd:constant:`SIGKILL` signal (see below) is sent to all remaining processes of the unit's control group. If set to :systemd:option:`process`, only the main process itself is killed (not recommended!). If set to :systemd:option:`none`, no process is killed (strongly recommended against!). In this case, only the stop command will be executed on unit stop, but no process will be killed otherwise. Processes remaining alive after stop are left in their control group and the control group continues to exist after stop unless empty.
+
+   Note that it is not recommended to set :systemd:var:`KillMode=` to :systemd:constant:`process` or even :systemd:constant:`none`, as this allows processes to escape the service manager's lifecycle and resource management, and to remain running even while their service is considered stopped and is assumed to not consume any resources.
+
+   Processes will first be terminated via :systemd:constant:`SIGTERM` (unless the signal to send is changed via :systemd:var:`KillSignal=` or :systemd:var:`RestartKillSignal=`). Optionally, this is immediately followed by a :systemd:constant:`SIGHUP` (if enabled with :systemd:var:`SendSIGHUP=`). If processes still remain after: *       the main process of a unit has exited (applies to :systemd:var:`KillMode=`: :systemd:option:`mixed`)
+
+   *       the delay configured via the :systemd:var:`TimeoutStopSec=` has passed (applies to :systemd:var:`KillMode=`: :systemd:option:`control-group`, :systemd:option:`mixed`, :systemd:option:`process`)
+
+   the termination request is repeated with the :systemd:constant:`SIGKILL` signal or the signal specified via :systemd:var:`FinalKillSignal=` (unless this is disabled via the :systemd:var:`SendSIGKILL=` option). See :man-pages:`kill(2)` for more information.
+
+   Defaults to :systemd:option:`control-group`.
+
+   .. versionadded:: 187
+
+.. systemd:option:: KillSignal=
+   :group: unit-directives
+
+   Specifies which signal to use when stopping a service. This controls the signal that is sent as first step of shutting down a unit (see above), and is usually followed by :systemd:constant:`SIGKILL` (see above and below). For a list of valid signals, see :man-pages:`signal(7)`. Defaults to :systemd:constant:`SIGTERM`.
+
+   Note that, right after sending the signal specified in this setting, systemd will always send :systemd:constant:`SIGCONT`, to ensure that even suspended tasks can be terminated cleanly.
+
+   .. versionadded:: 187
+
+.. systemd:option:: RestartKillSignal=
+   :group: unit-directives
+
+   Specifies which signal to use when restarting a service. The same as :systemd:var:`KillSignal=` described above, with the exception that this setting is used in a restart job. Not set by default, and the value of :systemd:var:`KillSignal=` is used.
+
+   .. versionadded:: 244
+
+.. systemd:option:: SendSIGHUP=
+   :group: unit-directives
+
+   Specifies whether to send :systemd:constant:`SIGHUP` to remaining processes immediately after sending the signal configured with :systemd:var:`KillSignal=`. This is useful to indicate to shells and shell-like programs that their connection has been severed. Takes a boolean value. Defaults to "no".
+
+   .. versionadded:: 207
+
+.. systemd:option:: SendSIGKILL=
+   :group: unit-directives
+
+   Specifies whether to send :systemd:constant:`SIGKILL` (or the signal specified by :systemd:var:`FinalKillSignal=`) to remaining processes after a timeout, if the normal shutdown procedure left processes of the service around. When disabled, a :systemd:var:`KillMode=` of :systemd:constant:`control-group` or :systemd:constant:`mixed` service will not restart if processes from prior services exist within the control group. Takes a boolean value. Defaults to "yes".
+
+   .. versionadded:: 187
+
+.. systemd:option:: FinalKillSignal=
+   :group: unit-directives
+
+   Specifies which signal to send to remaining processes after a timeout if :systemd:var:`SendSIGKILL=` is enabled. The signal configured here should be one that is not typically caught and processed by services (:systemd:constant:`SIGTERM` is not suitable). Developers can find it useful to use this to generate a coredump to troubleshoot why a service did not terminate upon receiving the initial :systemd:constant:`SIGTERM` signal. This can be achieved by configuring :systemd:var:`LimitCORE=` and setting :systemd:var:`FinalKillSignal=` to either :systemd:constant:`SIGQUIT` or :systemd:constant:`SIGABRT`. Defaults to :systemd:constant:`SIGKILL`.
+
+   .. versionadded:: 240
+
+.. systemd:option:: WatchdogSignal=
+   :group: unit-directives
+
+   Specifies which signal to use to terminate the service when the watchdog timeout expires (enabled through :systemd:var:`WatchdogSec=`). Defaults to :systemd:constant:`SIGABRT`.
+
+   .. versionadded:: 240
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :man-pages:`journalctl(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.service(5)`, :ref:`systemd.socket(5)`, :ref:`systemd.swap(5)`, :ref:`systemd.mount(5)`, :ref:`systemd.exec(5)`, :ref:`systemd.directives(7)`, :man-pages:`kill(2)`, :man-pages:`signal(7)`
+
+

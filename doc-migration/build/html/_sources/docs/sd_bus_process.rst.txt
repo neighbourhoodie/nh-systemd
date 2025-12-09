@@ -1,0 +1,77 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_process
+:manvolnum: 3
+:summary: Drive the connection
+
+.. _sd_bus_process(3):
+
+=================
+sd_bus_process(3)
+=================
+
+Name
+####
+
+sd_bus_process — Drive the connection
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_process(sd_bus *bus,
+	sd_bus_message **ret);
+
+Description
+###########
+
+:code:`sd_bus_process()` drives the connection between the client and the message bus. That is, it handles connecting, authentication, and processing of messages. When invoked, pending I/O work is executed, and queued incoming messages are dispatched to registered callbacks. Each time it is invoked a single operation is executed. It returns zero when no operations were pending and positive if a message was processed. When zero is returned the caller should poll for I/O events before calling into :code:`sd_bus_process()` again. For that either use the simple, blocking :ref:`sd_bus_wait(3)` call, or hook up the bus connection object to an external or manual event loop using :ref:`sd_bus_get_fd(3)`.
+
+:code:`sd_bus_process()` processes at most one incoming message per call. If the parameter :code:`ret` is not :code:`NULL` and the call processed a message, :code:`*ret` is set to this message. The caller owns a reference to this message and should call :ref:`sd_bus_message_unref(3)` when the message is no longer needed. If :code:`ret` is not :code:`NULL` and progress was made, but no message was processed, :code:`*ret` is set to :code:`NULL`. Note that only messages not already handled by the various types of registered message handlers (i.e. by filters registered via :ref:`sd_bus_add_filter(3)`, object handlers registered via :ref:`sd_bus_add_object(3)`, matches registered via :ref:`sd_bus_add_match(3)`, and related) will be returned through this parameter. Also note that if such a message handler returns a zero return value (as opposed to some value > 0) an incoming message will not be considered handled, and be passed to other suitable handlers (until one returns > > 0), or returned by :code:`sd_bus_process()` (in case none returns > 0).
+
+If the bus object is connected to an :ref:`sd-event(3)` event loop (with :ref:`sd_bus_attach_event(3)`), it is not necessary to call :code:`sd_bus_process()` directly as it is invoked automatically when necessary.
+
+Return Value
+############
+
+If progress was made, a positive integer is returned. If no progress was made, 0 is returned. If an error occurs, a negative :code:`errno`-style error code is returned.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An invalid bus object was passed.
+
+.. systemd:option:: -ECHILD
+
+   The bus connection was allocated in a parent process and is being reused in a child process after :code:`fork()`.
+
+.. systemd:option:: -ENOTCONN
+
+   The bus connection has been terminated already.
+
+.. systemd:option:: -ECONNRESET
+
+   The bus connection has been terminated just now.
+
+.. systemd:option:: -EBUSY
+
+   This function is already being called, i.e. :code:`sd_bus_process()` has been called from a callback function that itself was called by :code:`sd_bus_process()`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_process()` was added in version 221.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_wait(3)`, :ref:`sd_bus_get_fd(3)`, :ref:`sd_bus_message_unref(3)`, :ref:`sd-event(3)`, :ref:`sd_bus_attach_event(3)`
+
+

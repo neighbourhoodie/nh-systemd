@@ -1,0 +1,68 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-validatefs@.service
+:manvolnum: 8
+:summary: Validate File System Mount Constraint Data
+
+.. _systemd-validatefs@.service(8):
+
+==============================
+systemd-validatefs@.service(8)
+==============================
+
+Name
+####
+
+systemd-validatefs@.service — Validate File System Mount Constraint Data
+
+Synopsis
+########
+
+:code:`systemd-validatefs@.service`
+
+:code:`/usr/lib/systemd/systemd-validatefs` [:emphasis:`DEVICE`]
+
+Description
+###########
+
+:code:`systemd-validatefs@.service` is a system service template that can be instantiated for newly established mount points. It reads file system mount constraint data from the file system, and ensures the mount runtime setup matches it. If it doesn't the service fails, which effects an immediate reboot.
+
+This functionality is supposed to ensure that trusted file systems cannot be used in a different context then what they were intended for. More specifically: in an :ref:`systemd-gpt-auto-generator(8)` based environment the file systems to mount are largely auto-discovered based on (unprotected) GPT partition table data. The mount constraint information can be used to validate the GPT partition data, based on the (protected) file system contents.
+
+Specifically, the mount constraints are encoded in the following extended attributes on the root inode of the file systems:
+
+1.    :code:`user.validatefs.mount_point`: this extended attribute shall contain one or more absolute, normalized paths, separated by NUL bytes. If set and the specified file system is mounted to a location not matching any of the listed paths the validation check will fail.
+
+2.    :code:`user.validatefs.gpt_label`: this extended attribute may contain one or more free-form strings, separated by NUL bytes. If set, all backing partitions of the file system are checked against this list, and if any backing partition's label is not listed, the validation will fail. Note that there may be multiple backing partition in case of Verity setups, which combines a data and a hash partition.
+
+3.    :code:`user.validatefs.gpt_type_uuid`: this extended attribute may contain one or more GPT partition type UUIDs, formatted as string, separated by NUL bytes. As above, all backing partitions of the file system are checked against this list, and if none is matching the validation will fail.
+
+The :code:`systemd-validatefs@.service` unit is automatically pulled into the initial transaction by :ref:`systemd-gpt-auto-generator(8)` for all file systems it discovers and generates mounts for. :ref:`systemd-fstab-generator(8)` will do this for all mounts with the :code:`x-systemd.validatefs` mount option in :code:`/etc/fstab`.
+
+The :ref:`systemd-repart(8)` tool generates these extended attributes automatically for the file systems it puts together, which may be controlled with the :code:`AddValidateFS=` configuration option.
+
+Options
+#######
+
+The :code:`/usr/lib/systemd/system-validatefs` executable may also be invoked from the command line, where it expects a path to a mount and the following options:
+
+.. systemd:option:: --root=
+
+   Takes an absolute path or the special string "auto". The specified path is removed as prefix from the specified mount point argument before the validation. If set to "auto" defaults to unspecified on the host and :code:`/sysroot/` when run in initrd context, in order to validate the mount constraint data relative to the future file system root.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-gpt-auto-generator(8)`, :ref:`systemd-fstab-generator(8)`, :ref:`systemd-repart(8)`
+
+

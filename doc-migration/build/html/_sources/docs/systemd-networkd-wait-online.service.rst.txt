@@ -1,0 +1,115 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-networkd-wait-online.service
+:manvolnum: 8
+:summary: Wait for network to come online
+:aliases: systemd-networkd-wait-online@.service, systemd-networkd-wait-online
+
+.. _systemd-networkd-wait-online.service(8):
+
+=======================================
+systemd-networkd-wait-online.service(8)
+=======================================
+
+Name
+####
+
+systemd-networkd-wait-online.service, systemd-networkd-wait-online@.service, systemd-networkd-wait-online — Wait for network to come online
+
+Synopsis
+########
+
+:code:`systemd-networkd-wait-online.service`
+
+:code:`systemd-networkd-wait-online@.service`
+
+:code:`/usr/lib/systemd/systemd-networkd-wait-online`
+
+Description
+###########
+
+:code:`systemd-networkd-wait-online` is a oneshot system service (see :ref:`systemd.service(5)`), that waits for the network to be configured. By default, it will wait for all links it is aware of and which are managed by :ref:`systemd-networkd.service(8)` to be fully configured or failed, and for at least one link to be online. Here, online means that the link's operational state is equal or higher than "degraded". The threshold can be configured by :code:`--operational-state=` option.
+
+The service :code:`systemd-networkd-wait-online.service` invokes :code:`systemd-networkd-wait-online` without any options. Thus, it waits for all managed interfaces to be configured or failed, and for at least one to be online.
+
+The service :code:`systemd-networkd-wait-online@.service` takes an interface name, and invokes :code:`systemd-networkd-wait-online` with :code:`-i` and the specified interface name. Thus, wait for the specified interface to be configured and online. For example, :code:`systemd-networkd-wait-online@eth0.service` waits for :code:`eth0` to be configured by :code:`systemd-networkd` and online.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: -i INTERFACE[:MIN_OPERSTATE[:MAX_OPERSTATE]], --interface=INTERFACE[:MIN_OPERSTATE[:MAX_OPERSTATE]]
+
+   Network interface to wait for before deciding if the system is online. This is useful when a system has several interfaces which will be configured, but a particular one is necessary to access some network resources. When used, all other interfaces are ignored. This option may be used more than once to wait for multiple network interfaces. When this option is specified multiple times, then :code:`systemd-networkd-wait-online` waits for all specified interfaces to be online. Optionally, required minimum and maximum operational states can be specified after a colon ":". Please see :man-pages:`networkctl(1)` for possible operational states. If the operational state is not specified here, then the value from :code:`RequiredForOnline=` in the corresponding :code:`.network` file is used if present, and "degraded" otherwise.
+
+   .. versionadded:: 213
+
+.. systemd:option:: --ignore=INTERFACE
+
+   Network interfaces to be ignored when deciding if the system is online. By default, only the loopback interface is ignored. This option may be used more than once to ignore multiple network interfaces.
+
+   .. versionadded:: 219
+
+.. systemd:option:: -o MIN_OPERSTATE[:MAX_OPERSTATE], --operational-state=MIN_OPERSTATE[:MAX_OPERSTATE]
+
+   Takes a minimum operational state and an optional maximum operational state. Please see :man-pages:`networkctl(1)` for possible operational states. If set, the specified value overrides :code:`RequiredForOnline=` settings in :code:`.network` files. But this does not override operational states specified in :code:`--interface=` option.
+
+   .. versionadded:: 242
+
+.. systemd:option:: -4, --ipv4
+
+   Waiting for an IPv4 address of each network interface to be configured. If this option is specified with :code:`--any`, then :code:`systemd-networkd-wait-online` exits with success when at least one interface becomes online and has an IPv4 address. If the required minimum operational state is below "routable", then each link (or at least one link with :code:`--any`) must have an IPv4 link-local or routable address. If the required minimum operational state is "routable", then each link must have an IPv4 routable address.
+
+   If neither :code:`--ipv4` nor :code:`--ipv6` is specified, then the value from :code:`RequiredFamilyForOnline=` in the corresponding :code:`.network` file is used if present.
+
+   .. versionadded:: 249
+
+.. systemd:option:: -6, --ipv6
+
+   Waiting for an IPv6 address of each network interface to be configured. If this option is specified with :code:`--any`, then :code:`systemd-networkd-wait-online` exits with success when at least one interface becomes online and has an IPv6 address. If the required minimum operational state is below "routable", then each link (or at least one link with :code:`--any`) must have an IPv6 link-local or routable address. If the required minimum operational state is "routable", then each link must have an IPv6 routable address.
+
+   If neither :code:`--ipv4` nor :code:`--ipv6` is specified, then the value from :code:`RequiredFamilyForOnline=` in the corresponding :code:`.network` file is used if present.
+
+   .. versionadded:: 249
+
+.. systemd:option:: --dns
+
+   Waiting for DNS servers to be accessible on each interface. If this option is specified with :code:`--any`, then :code:`systemd-networkd-wait-online` exits with success when at least one interface becomes online and has an accessible DNS server.
+
+   If a link has the property :code:`DefaultRoute=yes` (either because the :code:`DNSDefaultRoute=` network property is explicitly configured, or because the link does not have any "routing-only" domains), or if the search domain "." is configured, then wait for link-specific DNS servers to be accessible. Otherwise, allow global DNS servers to satisfy the condition.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --any
+
+   Even if several interfaces are in configuring state, :code:`systemd-networkd-wait-online` exits with success when at least one interface becomes online. When this option is specified with :code:`--interface=`, then :code:`systemd-networkd-wait-online` waits for one of the specified interfaces to be online. This option is useful when some interfaces may not have carrier on boot.
+
+   .. versionadded:: 242
+
+.. systemd:option:: --timeout=SECS
+
+   Fail the service if the network is not online by the time the timeout elapses. A timeout of 0 disables the timeout. Defaults to 120 seconds.
+
+   .. versionadded:: 219
+
+.. systemd:option:: -q, --quiet
+
+   Suppress log messages.
+
+   .. versionadded:: 242
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.service(5)`, :ref:`systemd-networkd.service(8)`, :man-pages:`networkctl(1)`
+
+

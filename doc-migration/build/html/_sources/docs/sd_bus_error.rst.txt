@@ -1,0 +1,182 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_error
+:manvolnum: 3
+:summary: sd-bus error handling
+:aliases: SD_BUS_ERROR_MAKE_CONST, SD_BUS_ERROR_NULL, sd_bus_error_free, sd_bus_error_set, sd_bus_error_setf, sd_bus_error_setfv, sd_bus_error_set_const, sd_bus_error_set_errno, sd_bus_error_set_errnof, sd_bus_error_set_errnofv, sd_bus_error_get_errno, sd_bus_error_copy, sd_bus_error_move, sd_bus_error_is_set, sd_bus_error_has_name, sd_bus_error_has_names_sentinel, sd_bus_error_has_names
+
+.. _sd_bus_error(3):
+
+===============
+sd_bus_error(3)
+===============
+
+Name
+####
+
+sd_bus_error, SD_BUS_ERROR_MAKE_CONST, SD_BUS_ERROR_NULL, sd_bus_error_free, sd_bus_error_set, sd_bus_error_setf, sd_bus_error_setfv, sd_bus_error_set_const, sd_bus_error_set_errno, sd_bus_error_set_errnof, sd_bus_error_set_errnofv, sd_bus_error_get_errno, sd_bus_error_copy, sd_bus_error_move, sd_bus_error_is_set, sd_bus_error_has_name, sd_bus_error_has_names_sentinel, sd_bus_error_has_names — sd-bus error handling
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` :code:`typedef struct { const char \*name; const char \*message; … } sd_bus_error;`
+
+:code:`SD_BUS_ERROR_MAKE_CONST(name, message)`
+
+:code:`SD_BUS_ERROR_NULL`
+
+.. code-block::
+
+   void sd_bus_error_free(sd_bus_error *e); .. code-block::
+
+   int sd_bus_error_set(sd_bus_error *e,
+	const char *name,
+	const char *message); .. code-block::
+
+   int sd_bus_error_setf(sd_bus_error *e,
+	const char *name,
+	const char *format,
+	…); .. code-block::
+
+   int sd_bus_error_setfv(sd_bus_error *e,
+	const char *name,
+	const char *format,
+	va_list ap); .. code-block::
+
+   int sd_bus_error_set_const(sd_bus_error *e,
+	const char *name,
+	const char *message); .. code-block::
+
+   int sd_bus_error_set_errno(sd_bus_error *e,
+	int error); .. code-block::
+
+   int sd_bus_error_set_errnof(sd_bus_error *e,
+	int error,
+	const char *format,
+	…); .. code-block::
+
+   int sd_bus_error_set_errnofv(sd_bus_error *e,
+	int error,
+	const char *format,
+	va_list ap); .. code-block::
+
+   int sd_bus_error_get_errno(const sd_bus_error *e); .. code-block::
+
+   int sd_bus_error_copy(sd_bus_error *dst,
+	const sd_bus_error *e); .. code-block::
+
+   int sd_bus_error_move(sd_bus_error *dst,
+	sd_bus_error *e); .. code-block::
+
+   int sd_bus_error_is_set(const sd_bus_error *e); .. code-block::
+
+   int sd_bus_error_has_name(const sd_bus_error *e,
+	const char *name); .. code-block::
+
+   int sd_bus_error_has_names_sentinel(const sd_bus_error *e,
+	...);
+
+#define sd_bus_error_has_names(e, ...) sd_bus_error_has_names_sentinel(e, ..., NULL)
+
+Description
+###########
+
+The sd_bus_error structure carries information about a D-Bus error condition, or lack thereof. The functions described below may be used to set and query fields in this structure. *    The :code:`name` field contains a short identifier of an error. It should follow the rules for error names described in the D-Bus specification, subsection `Valid D-Bus Names <https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names>`_. A number of common, standardized error names are described in :ref:`sd-bus-errors(3)`, but additional domain-specific errors may be defined by applications.
+
+*    The :code:`message` field usually contains a human-readable string describing the details, but might be :code:`NULL`.
+
+An unset sd_bus_error structure should have both fields initialized to :code:`NULL`, and signifies lack of an error, i.e. success. Assign :code:`SD_BUS_ERROR_NULL` to the structure in order to initialize both fields to :code:`NULL`. When no longer necessary, resources held by the sd_bus_error structure should be destroyed with :code:`sd_bus_error_free()`.
+
+:code:`sd_bus_error_set()` sets an error structure to the specified name and message strings. The strings will be copied into internal, newly allocated memory. It is essential to free the contents again when they are not required anymore (see above). Do not use this call on error structures that have already been set. If you intend to reuse an error structure, free the old data stored in it with :code:`sd_bus_error_free()` first.
+
+:code:`sd_bus_error_set()` will return an :code:`errno`-like value (see :man-pages:`errno(3)`) determined from the specified error name :code:`name`. If :code:`name` is :code:`NULL`, it is assumed that no error occurred, and :code:`0` is returned. If :code:`name` is nonnull, a negative value is always returned. If :code:`e` is :code:`NULL`, no error structure is initialized, but :code:`name` is still converted into an :code:`errno`-style value.
+
+Various well-known D-Bus errors are converted to well-known :code:`errno` counterparts, and the other ones to :code:`-EIO`. See :ref:`sd-bus-errors(3)` for a list of well-known error names. Additional error mappings may be defined with :ref:`sd_bus_error_add_map(3)`.
+
+:code:`sd_bus_error_set()` is designed to be conveniently used in a :code:`return` statement. If :code:`message` is :code:`NULL`, no message is set. This call can fail if no memory may be allocated for the name and message strings, in which case an :code:`SD_BUS_ERROR_NO_MEMORY` error will be set instead and :code:`-ENOMEM` returned.
+
+:code:`sd_bus_error_setf()` and :code:`sd_bus_error_setfv()` are similar to :code:`sd_bus_error_set()`, but take a :man-pages:`printf(3)` format string and corresponding arguments to generate the :code:`message` field. :code:`sd_bus_error_setf()` uses variadic arguments, and :code:`sd_bus_error_setfv()` accepts the arguments as a :man-pages:`va_arg(3)` parameter list.
+
+:code:`sd_bus_error_set_const()` is similar to :code:`sd_bus_error_set()`, but the string parameters are not copied internally, and must hence remain constant and valid for the lifetime of :code:`e`. Use this call to avoid memory allocations when setting error structures. Since this call does not allocate memory, it will not fail with an out-of-memory condition as :code:`sd_bus_error_set()` may, as described above. Alternatively, the :code:`SD_BUS_ERROR_MAKE_CONST()` macro may be used to generate a literal, constant bus error structure on-the-fly.
+
+:code:`sd_bus_error_set_errno()` will immediately return :code:`0` if the specified error parameter :code:`error` is :code:`0`. Otherwise, it will set :code:`name` from an :code:`errno`-like value that is converted to a D-Bus error. :die-net:`strerror_r(3)` will be used to set :code:`message`. Well-known D-Bus error names will be used for :code:`name` if applicable, otherwise a name in the "System.Error." namespace will be generated. The sign of the specified error number is ignored and the absolute value is used implicitly. If the specified error :code:`error` is non-zero, the call always returns a negative value, for convenient usage in :code:`return` statements. This call might fail due to lack of memory, in which case an :code:`SD_BUS_ERROR_NO_MEMORY` error is set instead, and :code:`-ENOMEM` is returned.
+
+:code:`sd_bus_error_set_errnof()` and :code:`sd_bus_error_set_errnof()` are similar to :code:`sd_bus_error_set_errno()`, but in addition to :code:`error`, take a :man-pages:`printf(3)` format string and corresponding arguments. The :code:`message` field will be generated from :code:`format` and the arguments. :code:`sd_bus_error_set_errnof()` uses variadic arguments, and :code:`sd_bus_error_set_errnofv()` accepts the arguments as a :man-pages:`va_arg(3)` parameter list.
+
+:code:`sd_bus_error_get_errno()` converts the :code:`name` field of an error structure to an :code:`errno`-like (positive) value using the same rules as :code:`sd_bus_error_set()`. If :code:`e` is :code:`NULL`, :code:`0` will be returned.
+
+:code:`sd_bus_error_copy()` will initialize :code:`dst` using the values in :code:`e`, if :code:`e` has been set with an error value before. Otherwise, it will return immediately. If the strings in :code:`e` were set using :code:`sd_bus_error_set_const()`, they will be shared. Otherwise, they will be copied. Before this call, :code:`dst` must be unset, i.e. either freshly initialized with :code:`NULL` or reset using :code:`sd_bus_error_free()`.
+
+:code:`sd_bus_error_copy()` generally returns :code:`0` or a negative :code:`errno`-like value based on the input parameter :code:`e`: :code:`0` if it was unset and a negative integer if it was set to some error, similarly to :code:`sd_bus_error_set()`. It may however also return an error generated internally, for example :code:`-ENOMEM` if a memory allocation fails.
+
+:code:`sd_bus_error_move()` is similar to :code:`sd_bus_error_copy()`, but will move any error information from :code:`e` into :code:`dst`, resetting the former. This function cannot fail, as no new memory is allocated. Note that if :code:`e` is not set, :code:`dst` is initialized to :code:`SD_BUS_ERROR_NULL`. Moreover, if :code:`dst` is :code:`NULL` no operation is executed on it and resources held by :code:`e` are freed and reset. Returns a converted :code:`errno`-like, non-positive error value.
+
+:code:`sd_bus_error_is_set()` will return a non-zero value if :code:`e` is non-:code:`NULL` and an error has been set, :code:`false` otherwise.
+
+:code:`sd_bus_error_has_name()` will return a non-zero value if :code:`e` is non-:code:`NULL` and an error with the same :code:`name` has been set, :code:`false` otherwise.
+
+:code:`sd_bus_error_has_names_sentinel()` is similar to :code:`sd_bus_error_has_name()`, but takes multiple names to check against. The list must be terminated with :code:`NULL`. :code:`sd_bus_error_has_names()` is a macro wrapper around :code:`sd_bus_error_has_names_sentinel()` that adds the :code:`NULL` sentinel automatically.
+
+:code:`sd_bus_error_free()` will destroy resources held by :code:`e`. The parameter itself will not be deallocated, and must be :man-pages:`free(3)`d by the caller if necessary. The function may also be called safely on unset errors (error structures with both fields set to :code:`NULL`), in which case it performs no operation. This call will reset the error structure after freeing the data, so that all fields are set to :code:`NULL`. The structure may be reused afterwards.
+
+Reference ownership
+###################
+
+sd_bus_error is not reference-counted. Users should destroy resources held by it by calling :code:`sd_bus_error_free()`. Usually, error structures are allocated on the stack or passed in as function parameters, but they may also be allocated dynamically, in which case it is the duty of the caller to :man-pages:`free(3)` the memory held by the structure itself after freeing its contents with :code:`sd_bus_error_free()`.
+
+Return Value
+############
+
+The functions :code:`sd_bus_error_set()`, :code:`sd_bus_error_setf()`, and :code:`sd_bus_error_set_const()` always return :code:`0` when the specified error value is :code:`NULL`, and a negative errno-like value corresponding to the :code:`name` parameter otherwise. The functions :code:`sd_bus_error_set_errno()`, :code:`sd_bus_error_set_errnof()` and :code:`sd_bus_error_set_errnofv()`, return :code:`0` when the specified error value is :code:`0`, and a negative errno-like value corresponding to the :code:`error` parameter otherwise. If an error occurs internally, one of the negative error values listed below will be returned. This allows those functions to be conveniently used in a :code:`return` statement, see the example below.
+
+:code:`sd_bus_error_get_errno()` returns :code:`false` when :code:`e` is :code:`NULL`, and a positive errno value mapped from :code:`e->name` otherwise.
+
+:code:`sd_bus_error_copy()` and :code:`sd_bus_error_move()` return a negative error value converted from the source error, and zero if the error has not been set. This allows those functions to be conveniently used in a :code:`return` statement, see the example below.
+
+:code:`sd_bus_error_is_set()` returns a non-zero value when :code:`e` and the :code:`name` field are non-:code:`NULL`, zero otherwise.
+
+:code:`sd_bus_error_has_name()`, :code:`sd_bus_error_has_names()`, and :code:`sd_bus_error_has_names_sentinel()` return a non-zero value when :code:`e` is non-:code:`NULL` and the :code:`name` field is equal to one of the given names, zero otherwise.
+
+Errors
+######
+
+Return value may indicate the following problems in the invocation of the function itself:
+
+.. systemd:option:: -EINVAL
+
+   Error was already set in the sd_bus_error structure when one the error-setting functions was called.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+On success, :code:`sd_bus_error_set()`, :code:`sd_bus_error_setf()`, :code:`sd_bus_error_set_const()`, :code:`sd_bus_error_set_errno()`, :code:`sd_bus_error_set_errnof()`, :code:`sd_bus_error_set_errnofv()`, :code:`sd_bus_error_copy()`, and :code:`sd_bus_error_move()` will return a negative converted :code:`errno`-style value, or :code:`0` if the error parameter is :code:`NULL` or unset. D-Bus errors are converted to the integral :code:`errno`-style value, and the mapping mechanism is extensible, see the discussion above. This effectively means that almost any negative :code:`errno`-style value can be returned.
+
+Examples
+########
+
+Using the negative return value to propagate an error
+-----------------------------------------------------
+
+.. literalinclude:: /code-examples/c/sd_bus_error-example.c
+    :language: c
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_error_free()`, :code:`sd_bus_error_set()`, :code:`sd_bus_error_setf()`, :code:`sd_bus_error_set_const()`, :code:`sd_bus_error_set_errno()`, :code:`sd_bus_error_set_errnof()`, :code:`sd_bus_error_set_errnofv()`, :code:`sd_bus_error_get_errno()`, :code:`sd_bus_error_copy()`, :code:`sd_bus_error_is_set()`, and :code:`sd_bus_error_has_name()` were added in version 221.
+
+:code:`sd_bus_error_move()` was added in version 240.
+
+:code:`sd_bus_error_has_names_sentinel()` was added in version 247.
+
+:code:`sd_bus_error_setfv()` was added in version 252.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd-bus-errors(3)`, :ref:`sd_bus_error_add_map(3)`, :man-pages:`errno(3)`, :man-pages:`strerror_r(3)`
+
+

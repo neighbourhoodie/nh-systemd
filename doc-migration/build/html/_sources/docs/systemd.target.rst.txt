@@ -1,0 +1,86 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.target
+:manvolnum: 5
+:summary: Target unit configuration
+
+.. _systemd.target(5):
+
+=================
+systemd.target(5)
+=================
+
+Name
+####
+
+systemd.target — Target unit configuration
+
+Synopsis
+########
+
+:code:`target.target`
+
+Description
+###########
+
+A unit configuration file whose name ends in ".target" encodes information about a target unit of systemd. Target units are used to group units and to set synchronization points for ordering dependencies with other unit files.
+
+This unit type has no specific options. See :ref:`systemd.unit(5)` for the common options of all unit configuration files. The common configuration items are configured in the generic \[Unit] and \[Install] sections. A separate \[Target] section does not exist, since no target-specific options may be configured.
+
+Target units do not offer any additional functionality on top of the generic functionality provided by units. They merely group units, allowing a single target name to be used in :code:`Wants=` and :code:`Requires=` settings to establish a dependency on a set of units defined by the target, and in :code:`Before=` and :code:`After=` settings to establish ordering. Targets establish standardized names for synchronization points during boot and shutdown. Importantly, see :ref:`systemd.special(7)` for examples and descriptions of standard systemd targets.
+
+Target units provide a more flexible replacement for SysV runlevels in the classic SysV init system.
+
+Note that a target unit file must not be empty, lest it be considered a masked unit. It is recommended to provide a \[Unit] section which includes informative :code:`Description=` and :code:`Documentation=` options.
+
+Automatic Dependencies
+######################
+
+Implicit Dependencies
+#####################
+
+There are no implicit dependencies for target units.
+
+Default Dependencies
+####################
+
+The following dependencies are added unless :code:`DefaultDependencies=no` is set:
+
+*    Target units will automatically complement all configured dependencies of type :code:`Wants=` or :code:`Requires=` with dependencies of type :code:`After=` unless :code:`DefaultDependencies=no` is set in the specified units.
+
+   Note that the reverse is not true. For example, defining :code:`Wants=that.target` in :code:`some.service` will not automatically add the :code:`After=that.target` ordering dependency for :code:`some.service`. Instead, :code:`some.service` should use the primary synchronization function of target type units, by setting a specific :code:`After=that.target` or :code:`Before=that.target` ordering dependency in its .service unit file.
+
+*    Target units automatically gain :code:`Conflicts=` and :code:`Before=` dependencies against :code:`shutdown.target`.
+
+Options
+#######
+
+Target unit files may include \[Unit] and \[Install] sections, which are described in :ref:`systemd.unit(5)`. No options specific to this file type are supported.
+
+Example
+#######
+
+Simple standalone target
+------------------------
+
+.. code-block:: sh
+
+   # emergency-net.target
+   [Unit]
+   Description=Emergency Mode with Networking
+   Requires=emergency.target systemd-networkd.service
+   After=emergency.target systemd-networkd.service
+   AllowIsolate=yes
+
+When adding dependencies to other units, it is important to check if they set :code:`DefaultDependencies=`. Service units, unless they set :code:`DefaultDependencies=no`, automatically get a dependency on :code:`sysinit.target`. In this case, both :code:`emergency.target` and :code:`systemd-networkd.service` have :code:`DefaultDependencies=no`, so they are suitable for use in this target, and do not pull in :code:`sysinit.target`.
+
+You can now switch into this emergency mode by running :code:`systemctl isolate emergency-net.target` or by passing the option :code:`systemd.unit=emergency-net.target` on the kernel command line.
+
+Other units can have :code:`WantedBy=emergency-net.target` in the :code:`[Install]` section. After they are enabled using :code:`systemctl enable`, they will be started before :code:`emergency-net.target` is started. It is also possible to add arbitrary units as dependencies of :code:`emergency.target` without modifying them by using :code:`systemctl add-wants`.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.special(7)`, :ref:`systemd.directives(7)`
+
+

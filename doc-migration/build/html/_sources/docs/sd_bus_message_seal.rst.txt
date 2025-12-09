@@ -1,0 +1,74 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_seal
+:manvolnum: 3
+:summary: Prepare a D-Bus message for transmission
+
+.. _sd_bus_message_seal(3):
+
+======================
+sd_bus_message_seal(3)
+======================
+
+Name
+####
+
+sd_bus_message_seal — Prepare a D-Bus message for transmission
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_seal(sd_bus_message *m,
+	uint64_t cookie,
+	uint64_t timeout_usec);
+
+Description
+###########
+
+:code:`sd_bus_message_seal()` finishes the message :code:`m` and prepares it for transmission using :ref:`sd_bus_send(3)`. :code:`cookie` specifies the identifier used to match the message reply to its corresponding request. :code:`timeout_usec` specifies the maximum time in microseconds to wait for a reply to arrive.
+
+Note that in most scenarios, it is not necessary to call this function directly. :ref:`sd_bus_call(3)`, :ref:`sd_bus_call_async(3)` and :ref:`sd_bus_send(3)` will seal any given messages if they have not been sealed yet.
+
+Return Value
+############
+
+On success, this function returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`m` parameter is :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EBADMSG
+
+   The D-Bus message :code:`m` has open containers.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOMSG
+
+   The D-Bus message :code:`m` is a reply but its type signature does not match the return type signature of its corresponding member in the object vtable.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_seal()` was added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_call(3)`, :ref:`sd_bus_call_async(3)`, :ref:`sd_bus_send(3)`
+
+

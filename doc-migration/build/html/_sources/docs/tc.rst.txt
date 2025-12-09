@@ -1,0 +1,39 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+.. inclusion-marker-do-not-remove qdisc-parent|
+
+.. systemd:option:: Parent=
+   :group: network-directives
+
+   Configures the parent Queueing Discipline (qdisc). Takes one of "root", "clsact", "ingress" or a class identifier. The class identifier is specified as the major and minor numbers in hexadecimal in the range 0x1–0xffff separated with a colon ("major:minor"). Defaults to "root".
+
+.. inclusion-end-marker-do-not-remove qdisc-parent|
+
+.. inclusion-marker-do-not-remove qdisc-handle|
+
+.. systemd:option:: Handle=
+   :group: network-directives
+
+   Configures the major number of unique identifier of the qdisc, known as the handle. Takes a hexadecimal number in the range 0x1–0xffff. Defaults to unset.
+
+.. inclusion-end-marker-do-not-remove qdisc-handle|
+
+.. inclusion-marker-do-not-remove tclass-parent|
+
+.. systemd:option:: Parent=
+   :group: network-directives
+
+   Configures the parent Queueing Discipline (qdisc). Takes one of "root", or a qdisc identifier. The qdisc identifier is specified as the major and minor numbers in hexadecimal in the range 0x1–0xffff separated with a colon ("major:minor"). Defaults to "root".
+
+.. inclusion-end-marker-do-not-remove tclass-parent|
+
+.. inclusion-marker-do-not-remove tclass-classid|
+
+.. systemd:option:: ClassId=
+   :group: network-directives
+
+   Configures the unique identifier of the class. It is specified as the major and minor numbers in hexadecimal in the range 0x1–0xffff separated with a colon ("major:minor"). Defaults to unset.
+
+.. inclusion-end-marker-do-not-remove tclass-classid|
+
+

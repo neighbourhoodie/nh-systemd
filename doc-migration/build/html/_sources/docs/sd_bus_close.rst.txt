@@ -1,0 +1,69 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_close
+:manvolnum: 3
+:summary: Close and flush a bus connection
+:aliases: sd_bus_flush, sd_bus_default_flush_close
+
+.. _sd_bus_close(3):
+
+===============
+sd_bus_close(3)
+===============
+
+Name
+####
+
+sd_bus_close, sd_bus_flush, sd_bus_default_flush_close — Close and flush a bus connection
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   void sd_bus_close(sd_bus *bus); .. code-block::
+
+   int sd_bus_flush(sd_bus *bus); .. code-block::
+
+   void sd_bus_default_flush_close(void);
+
+Description
+###########
+
+:code:`sd_bus_close()` disconnects the specified bus connection. When this call is invoked and the specified bus object refers to an active connection it is immediately terminated. No further messages may be sent or received on it. Any messages queued in the bus object (both incoming and outgoing) are released. If invoked on :code:`NULL` bus object or when the bus connection is already closed this function executes no operation. This call does not free or unreference the bus object itself. Use :ref:`sd_bus_unref(3)` for that.
+
+:code:`sd_bus_flush()` synchronously writes out all outgoing queued message on a bus connection if there are any. This function call may block if the peer is not processing bus messages quickly.
+
+Before a program exits it is usually a good idea to flush any pending messages with :code:`sd_bus_flush()` and then close connections with :code:`sd_bus_close()` to ensure that no unwritten messages are lost, no further messages may be queued and all incoming but unprocessed messages are released. After both operations have been done, it is a good idea to also drop any remaining references to the bus object so that it may be freed. Since these three operations are frequently done together a helper call :ref:`sd_bus_flush_close_unref(3)` is provided that combines them into one.
+
+:code:`sd_bus_default_flush_close()` is similar to :code:`sd_bus_flush_close_unref()`, but does not take a bus pointer argument and instead iterates over any of the "default" buses opened by :ref:`sd_bus_default(3)`, :ref:`sd_bus_default_user(3)`, :ref:`sd_bus_default_system(3)`, and similar calls. :code:`sd_bus_default_flush_close()` is particularly useful to clean up any buses opened using those calls before the program exits.
+
+Return Value
+############
+
+On success, :code:`sd_bus_flush()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ECHILD
+
+   The bus connection has been created in a different process, library or module instance.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_close()` and :code:`sd_bus_flush()` were added in version 221.
+
+:code:`sd_bus_default_flush_close()` was added in version 227.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_unref(3)`, :ref:`sd_bus_set_close_on_exit(3)`
+
+

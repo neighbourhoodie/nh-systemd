@@ -1,0 +1,49 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_booted
+:manvolnum: 3
+:summary: Test whether the system is running the systemd init system
+
+.. _sd_booted(3):
+
+============
+sd_booted(3)
+============
+
+Name
+####
+
+sd_booted — Test whether the system is running the systemd init system
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-daemon.h>` .. code-block::
+
+   int sd_booted(void);
+
+Description
+###########
+
+:code:`sd_booted()` checks whether the system was booted up using the systemd init system.
+
+Return Value
+############
+
+On failure, this call returns a negative errno-style error code. If the system was booted up with systemd as init system, this call returns a positive return value, zero otherwise.
+
+Notes
+#####
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+Internally, this function checks whether the directory :code:`/run/systemd/system/` exists. A simple check like this can also be implemented trivially in shell or any other language.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-daemon(3)`
+
+

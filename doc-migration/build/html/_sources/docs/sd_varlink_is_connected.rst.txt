@@ -1,0 +1,63 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_varlink_is_connected
+:manvolnum: 3
+:summary: Query if a Varlink connection object is currently connected or idle
+:aliases: sd_varlink_is_idle
+
+.. _sd_varlink_is_connected(3):
+
+==========================
+sd_varlink_is_connected(3)
+==========================
+
+Name
+####
+
+sd_varlink_is_connected, sd_varlink_is_idle — Query if a Varlink connection object is currently connected or idle
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-varlink.h>` .. code-block::
+
+   int sd_varlink_is_connected(sd_varlink *link); .. code-block::
+
+   int sd_varlink_is_idle(sd_varlink *link);
+
+Description
+###########
+
+:code:`sd_varlink_is_connected()` checks whether the specified Varlink connection object is currently connected or whether it has been fully disconnected already.
+
+:code:`sd_varlink_is_idle()` checks whether the specified Varlink connection object is currently connected but idle, i.e. may accept a method call for enqueuing (if client side of a Varlink connection) or is waiting for more incoming method calls to arrive (if server side of a Varlink connection).
+
+Return Value
+############
+
+If the connection is currently connected :code:`sd_varlink_is_connected()` returns a positive non-zero value. If disconnected it returns 0. If the connection currently is idle :code:`sd_varlink_is_idle()` returns a positive non-zero integer. If not, returns 0. On failure, both functions return a negative :code:`errno` error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The specified Varlink connection is invalid.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_varlink_is_connected()` was added in version 259.
+
+:code:`sd_varlink_is_idle()` was added in version 257.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-varlink(3)`
+
+

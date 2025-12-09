@@ -1,0 +1,324 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: loader.conf
+:manvolnum: 5
+:summary: Configuration file for systemd-boot
+
+.. _loader.conf(5):
+
+==============
+loader.conf(5)
+==============
+
+Name
+####
+
+loader.conf — Configuration file for systemd-boot
+
+Synopsis
+########
+
+:code:`ESP/loader/loader.conf`
+
+Description
+###########
+
+:ref:`systemd-boot(7)` reads :code:`ESP/loader/loader.conf`. This file configures whether the menu is shown and for how long, the font, audible beep, types of menu entries to show, the default choice, and some aspects of Secure Boot enrollment and firmware handling. See the list of available options below.
+
+The file uses UTF-8 encoding and consists of series of lines separated by "line feed" (i.e. ASCII code 10). Lines that are empty or start with the comment sign ("#") are ignored. Other lines consist of an option name, followed by whitespace, and the option value.
+
+Boolean arguments may be written as "yes"/"y"/"true"/"t"/"on"/"1" or "no"/"n"/"false"/"f"/"off"/"0".
+
+Note: :code:`systemd-boot` will also read boot loader entry files, type #1 (:code:`ESP/loader/entries/\*.conf` and :code:`XBOOTLDR/loader/entries/\*.conf`) and type #2 (:code:`ESP/EFI/Linux/\*.uki` and :code:`XBOOTLDR/EFI/Linux/\*.uki`). Those files are described by the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_.
+
+Note: the behaviour of :code:`systemd-boot` is also influenced by EFI variables. Some of the settings specified in this file can be overridden by those, for example the default boot menu entry or the menu timeouts. See :ref:`systemd-boot(7)` for details.
+
+Options
+#######
+
+The following configuration are supported in :code:`loader.conf`:
+
+.. systemd:option:: default
+
+   A glob pattern to select the default entry by id, which is the file name including literal suffix ".conf". The default entry may be changed in the boot menu itself, in which case the name of the selected entry will be stored as an EFI variable, overriding this option.
+
+   If set to "@saved" the chosen entry will be saved as an EFI variable on every boot and automatically selected the next time the boot loader starts.
+
+   .. list-table:: Automatically detected entries will use the following names:
+      :header-rows: 1
+
+      * - Name
+        - Description
+      * - auto-efi-default
+        - EFI Default Loader
+      * - auto-efi-shell
+        - EFI Shell
+      * - auto-osx
+        - macOS
+      * - auto-poweroff
+        - Power Off The System
+      * - auto-reboot
+        - Reboot The System
+      * - auto-reboot-to-firmware-setup
+        - Reboot Into Firmware Interface
+      * - auto-windows
+        - Windows Boot Manager
+
+   Supported glob wildcard patterns are "?", "*", and "[…]" (including ranges). Note that these patterns use the same syntax as :man-pages:`glob(7)`, but do not support all features. In particular, set negation and named character classes are not supported. The matching is done case-insensitively on the entry ID (as shown by :code:`bootctl list`).
+
+   .. versionadded:: 239
+
+.. systemd:option:: timeout
+
+   How long the boot menu should be shown before the default entry is booted, in seconds. This may be changed in the boot menu itself and will be stored as an EFI variable in that case, overriding this option.
+
+   If set to "menu-disabled" or "menu-hidden" or "0" (the default), no menu is shown and the default entry will be booted immediately. Unless "menu-disabled" is used, the menu can be shown by pressing and holding a key before systemd-boot is launched. Setting this to "menu-force" disables the timeout while always showing the menu.
+
+   .. versionadded:: 239
+
+.. systemd:option:: console-mode
+
+   This option configures the resolution of the console. This may be changed in the boot menu itself and will be stored as an EFI variable in that case, overriding this option.
+
+   Takes a number or one of the special values listed below. The following values may be used:
+
+   .. systemd:option:: 0
+
+         Standard UEFI 80x25 mode
+
+         .. versionadded:: 239
+
+   .. systemd:option:: 1
+
+         80x50 mode, not supported by all devices
+
+         .. versionadded:: 239
+
+   .. systemd:option:: 2
+
+         the first non-standard mode provided by the device firmware, if any
+
+         .. versionadded:: 239
+
+   .. systemd:option:: auto
+
+         Pick a suitable mode automatically using heuristics
+
+         .. versionadded:: 239
+
+   .. systemd:option:: max
+
+         Pick the highest-numbered available mode
+
+         .. versionadded:: 239
+
+   .. systemd:option:: keep
+
+         Keep the mode selected by firmware (the default)
+
+         .. versionadded:: 239
+
+   .. versionadded:: 239
+
+.. systemd:option:: editor
+
+   Takes a boolean argument. Enable (the default) or disable the editor. The editor should be disabled if the machine can be accessed by unauthorized persons.
+
+   .. versionadded:: 239
+
+.. systemd:option:: auto-entries
+
+   Takes a boolean argument. Enable (the default) or disable entries for other boot entries found on the boot partition. In particular, this may be useful when loader entries are created to show replacement descriptions for those entries.
+
+   .. versionadded:: 239
+
+.. systemd:option:: auto-firmware
+
+   A boolean controlling the presence of the "Reboot Into Firmware Interface" entry (enabled by default). If this is disabled, the firmware interface may still be reached by using the :kbd:`f` key.
+
+   .. versionadded:: 239
+
+.. systemd:option:: auto-reboot
+
+   A boolean controlling the presence of the "Reboot The System" entry (disabled by default). Even if this is disabled, the system may still be rebooted by pressing :kbd:`Shift` + :kbd:`b`.
+
+   .. versionadded:: 255
+
+.. systemd:option:: auto-poweroff
+
+   A boolean controlling the presence of the "Power Off The System" entry (disabled by default). Even if this is disabled, the system may still be powered off by pressing :kbd:`Shift` + :kbd:`o`.
+
+   .. versionadded:: 255
+
+.. systemd:option:: beep
+
+   Takes a boolean argument. If timeout enabled beep every second, otherwise beep n times when n-th entry in boot menu is selected (default disabled). Currently, only x86 is supported, where it uses the PC speaker.
+
+   .. versionadded:: 251
+
+.. systemd:option:: secure-boot-enroll
+
+   Danger: this feature might soft-brick your device if used improperly.
+
+   Controls enrollment of secure boot keys found on the ESP if the system is in setup mode: .. systemd:option:: off
+
+         No action is taken.
+
+         .. versionadded:: 253
+
+   .. systemd:option:: manual
+
+         Boot entries for found secure boot keys are created that allow manual enrollment.
+
+         .. versionadded:: 253
+
+   .. systemd:option:: if-safe
+
+         Same behavior as :code:`manual`, but will try to automatically enroll the key "auto" if it is considered to be safe. Currently, this is only the case if the system is running inside a virtual machine.
+
+         .. versionadded:: 253
+
+   .. systemd:option:: force
+
+         Always enroll the "auto" key if found. Note that a warning message with a timeout will still be shown if this operation is unknown to be safe.
+
+         .. versionadded:: 253
+
+   The different sets of variables can be set up under :code:`/loader/keys/NAME` where :emphasis:`NAME` is the name that is going to be used as the name of the entry. This allows one to ship multiple sets of Secure Boot variables and choose which one to enroll at runtime.
+
+   Supported Secure Boot variables are one database for authorized images, one for the key exchange key (KEK) and one for the platform key (PK). For more information, refer to the `UEFI specification <https://uefi.org/specifications>`_, under Secure Boot and Driver Signing. Another resource that describe the interplay of the different variables is the `EDK2 documentation <https://edk2-docs.gitbook.io/understanding-the-uefi-secure-boot-chain/secure_boot_chain_in_uefi/uefi_secure_boot>`_.
+
+   A complete set of UEFI variable includes :code:`db.auth`, :code:`KEK.auth` and :code:`PK.auth`. Note that these files need to be authenticated UEFI variables. See below for an example of how to generate them from regular X.509 keys.
+
+     .. code-block:: sh
+
+        uuid=$(systemd-id128 new --uuid)
+        for key in PK KEK db; do
+          openssl req -new -x509 -subj "/CN=${key}/" -keyout "${key}.key" -out "${key}.pem"
+          openssl x509 -outform DER -in "${key}.pem" -out "${key}.der"
+          sbsiglist --owner "${uuid}" --type x509 --output "${key}.esl" "${key}.der"
+        done
+        # See also: `Windows Secure Boot Key Creation and Management Guidance <https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-secure-boot-key-creation-and-management-guidance>`_
+        curl --location \
+             "https://go.microsoft.com/fwlink/p/?linkid=321192" -o ms-db-2011.der \
+             "https://go.microsoft.com/fwlink/p/?linkid=321185" -o ms-kek-2011.der \
+             "https://go.microsoft.com/fwlink/p/?linkid=321194" -o ms-uefi-db-2011.der \
+             "https://go.microsoft.com/fwlink/p/?linkid=2239776" -o ms-db-2023.der \
+             "https://go.microsoft.com/fwlink/p/?linkid=2239775" -o ms-kek-2023.der \
+             "https://go.microsoft.com/fwlink/p/?linkid=2239872" -o ms-uefi-db-2023.der
+        sha1sum -c <<END
+        580a6f4cc4e4b669b9ebdc1b2b3e087b80d0678d  ms-db-2011.der
+        31590bfd89c9d74ed087dfac66334b3931254b30  ms-kek-2011.der
+        46def63b5ce61cf8ba0de2e6639c1019d0ed14f3  ms-uefi-db-2011.der
+        45a0fa32604773c82433c3b7d59e7466b3ac0c67  ms-db-2023.der
+        459ab6fb5e284d272d5e3e6abc8ed663829d632b  ms-kek-2023.der
+        b5eeb4a6706048073f0ed296e7f580a790b59eaa  ms-uefi-db-2023.der
+        END
+        for key in ms-*.der; do
+          sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output "${key%der}esl" "${key}"
+        done
+        # Optionally add Microsoft Windows certificates (needed to boot into Windows).
+        cat ms-db-*.esl >>db.esl
+        # Optionally add Microsoft UEFI certificates for firmware drivers / option ROMs and third-party
+        # boot loaders (including shim). This is highly recommended on real hardware as not including this
+        # may soft-brick your device (see next paragraph).
+        cat ms-uefi-*.esl >>db.esl
+        # Optionally add Microsoft KEK certificates. Recommended if either of the Microsoft keys is used as
+        # the official UEFI revocation database is signed with this key. The revocation database can be
+        # updated with :man-pages:`fwupdmgr(1)`.
+        cat ms-kek-*.esl >>KEK.esl
+        attr=NON_VOLATILE,RUNTIME_ACCESS,BOOTSERVICE_ACCESS,TIME_BASED_AUTHENTICATED_WRITE_ACCESS
+        sbvarsign --attr "${attr}" --key PK.key --cert PK.pem --output PK.auth PK PK.esl
+        sbvarsign --attr "${attr}" --key PK.key --cert PK.pem --output KEK.auth KEK KEK.esl
+        sbvarsign --attr "${attr}" --key KEK.key --cert KEK.pem --output db.auth db db.esl
+
+   This feature is considered dangerous because even if all the required files are signed with the keys being loaded, some files necessary for the system to function properly still won't be. This is especially the case with Option ROMs (e.g. for storage controllers or graphics cards). See `Secure Boot and Option ROMs <https://github.com/Foxboron/sbctl/wiki/FAQ#option-rom>`_ for more details.
+
+   .. versionadded:: 252
+
+.. systemd:option:: secure-boot-enroll-action
+
+   Specifies the action to take after the automatic enrollment of secure boot keys is completed.
+
+   .. systemd:option:: reboot
+
+         Reboot the system after enrollment. This is the default.
+
+   .. systemd:option:: shutdown
+
+         Shut down the system after enrollment.
+
+   This option is only relevant if "secure-boot-enroll" is enabled.
+
+   .. versionadded:: 258
+
+.. systemd:option:: secure-boot-enroll-timeout-sec
+
+   How long the warning should be shown in seconds before the key enrollment process starts.
+
+   If set to "hidden" or "0", no warning is shown and the keys will be enrolled immediately. The default timeout (if not set explicitly) is 15 seconds.
+
+   This option is only relevant if "secure-boot-enroll" is enabled.
+
+   .. versionadded:: 259
+
+.. systemd:option:: reboot-for-bitlocker
+
+   Caveat: This feature is experimental, and is likely to be changed (or removed in its current form) in a future version of systemd.
+
+   Work around BitLocker requiring a recovery key when the boot loader was updated (disabled by default).
+
+   Try to detect BitLocker encrypted drives along with an active TPM. If both are found and Windows Boot Manager is selected in the boot menu, set the "BootNext" EFI variable and restart the system. The firmware will then start Windows Boot Manager directly, leaving the TPM PCRs in expected states so that Windows can unseal the encryption key. This allows :ref:`systemd-boot(7)` to be updated without having to provide the recovery key for BitLocker drive unlocking.
+
+   Note that the PCRs that Windows uses can be configured with the "Configure TPM platform validation profile for native UEFI firmware configurations" group policy under "Computer Configuration\\Administrative Templates\\Windows Components\\BitLocker Drive Encryption". When Secure Boot is enabled, changing this to PCRs "0,2,7,11" should be safe. The TPM key protector needs to be removed and then added back for the PCRs on an already encrypted drive to change. If PCR 4 is not measured, this setting can be disabled to speed up booting into Windows.
+
+   .. versionadded:: 251
+
+.. systemd:option:: reboot-on-error
+
+   Controls auto reboot in case the selected entry fails to start. .. systemd:option:: yes
+
+         Reboot the system if the selected boot entry failed to start.
+
+   .. systemd:option:: no
+
+         Don't reboot - pass control back to EFI firmware.
+
+   .. systemd:option:: auto
+
+         Perform the reboot if and only if boot counting is enabled for this entry and the tries left counter wasn't already at 0.
+
+         This is the default, as it is typically a safe option, that ensures a clean measurement log on each boot attempt, but also does not risk an unbounded reboot loop.
+
+   .. versionadded:: 258
+
+.. systemd:option:: log-level
+
+   Controls the log level used by :ref:`systemd-boot(7)`.
+
+   Valid values are "emerg", "alert", "crit", "err", "warning", "notice", "info", and "debug".
+
+   If unspecified, "info" will be used, unless one has already been configured via an SMBIOS Type 11 string, see :man-pages:`smbios-type-11(7)`.
+
+   Note that the configured level will only be used after :code:`loader.conf` has been parsed, so log messages generated before that point may be unaffected by this setting.
+
+   .. versionadded:: 259
+
+Example
+#######
+
+.. code-block:: sh
+
+   # /boot/efi/loader/loader.conf
+   timeout 0
+   default 01234567890abcdef1234567890abdf0-*
+   editor no
+
+The menu will not be shown by default (the menu can still be shown by pressing and holding a key during boot). One of the entries with files with a name starting with "01234567890abcdef1234567890abdf0-" will be selected by default. If more than one entry matches, the one with the highest priority will be selected (generally the one with the highest version number). The editor will be disabled, so it is not possible to alter the kernel command line.
+
+See Also
+########
+
+:ref:`systemd-boot(7)`, :man-pages:`bootctl(1)`
+
+

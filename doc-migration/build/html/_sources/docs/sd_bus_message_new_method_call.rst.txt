@@ -1,0 +1,108 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_new_method_call
+:manvolnum: 3
+:summary: Create a method call message
+:aliases: sd_bus_message_new_method_return
+
+.. _sd_bus_message_new_method_call(3):
+
+=================================
+sd_bus_message_new_method_call(3)
+=================================
+
+Name
+####
+
+sd_bus_message_new_method_call, sd_bus_message_new_method_return — Create a method call message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_new_method_call(sd_bus *bus,
+	sd_bus_message **m,
+	const char *destination,
+	const char *path,
+	const char *interface,
+	const char *member); .. code-block::
+
+   int sd_bus_message_new_method_return(sd_bus_message *call,
+	sd_bus_message **m);
+
+Description
+###########
+
+The :code:`sd_bus_message_new_method_call()` function creates a new bus message object that encapsulates a D-Bus method call, and returns it in the :code:`m` output parameter. The call will be made on the destination :code:`destination`, path :code:`path`, on the interface :code:`interface`, member :code:`member`.
+
+Briefly, the *destination* is a dot-separated name that identifies a service connected to the bus. The is a dot-separated name that identifies a service connected to the bus. The *path* is a slash-separated identifier of an object within the destination that resembles a file system path. The meaning of this path is defined by the destination. The is a slash-separated identifier of an object within the destination that resembles a file system path. The meaning of this path is defined by the destination. The *interface* is a dot-separated name that resembles a Java interface name that identifies a group of methods and signals supported by the object identified by path. Methods and signals are collectively called is a dot-separated name that resembles a Java interface name that identifies a group of methods and signals supported by the object identified by path. Methods and signals are collectively called *members* and are identified by a simple name composed of ASCII letters, numbers, and underscores. See the and are identified by a simple name composed of ASCII letters, numbers, and underscores. See the `D-Bus Tutorial <https://dbus.freedesktop.org/doc/dbus-tutorial.html#concepts>`_ for an in-depth explanation.
+
+The :code:`destination` parameter may be :code:`NULL`. The :code:`interface` parameter may be :code:`NULL`, if the destination has only a single member with the given name and there is no ambiguity if the interface name is omitted.
+
+Note that this is a low level interface. See :ref:`sd_bus_call_method(3)` for a more convenient way of calling D-Bus methods.
+
+The :code:`sd_bus_message_new_method_return()` function creates a new bus message object that is a reply to the method call :code:`call` and returns it in the :code:`m` output parameter. The :code:`call` parameter must be a method call message. The sender of :code:`call` is used as the destination.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The output parameter :code:`m` is :code:`NULL`.
+
+   The :code:`destination` parameter is non-null and is not a valid D-Bus service name ("org.somewhere.Something"), the :code:`path` parameter is not a valid D-Bus path ("/an/object/path"), the :code:`interface` parameter is non-null and is not a valid D-Bus interface name ("an.interface.name"), or the :code:`member` parameter is not a valid D-Bus member ("Name").
+
+   The :code:`call` parameter is not a method call object.
+
+.. systemd:option:: -ENOTCONN
+
+   The bus parameter :code:`bus` is :code:`NULL` or the bus is not connected.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. systemd:option:: -EPERM
+
+   The :code:`call` parameter is not sealed.
+
+.. systemd:option:: -EOPNOTSUPP
+
+   The :code:`call` message does not have a cookie.
+
+.. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+Examples
+########
+
+Make a call to a D-Bus method that takes a single parameter
+-----------------------------------------------------------
+
+.. literalinclude:: /code-examples/c/print-unit-path.c
+    :language: c
+
+This defines a minimally useful program that will open a connection to the bus, create a message object, send it, wait for the reply, and finally extract and print the answer. It does error handling and proper memory management.
+
+History
+#######
+
+:code:`sd_bus_message_new_method_call()` and :code:`sd_bus_message_new_method_return()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_call(3)`, :ref:`sd_bus_call_method(3)`, :ref:`sd_bus_path_encode(3)`
+
+

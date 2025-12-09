@@ -1,0 +1,35 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-loop@.service
+:manvolnum: 8
+:summary: Attach a loopback block device
+
+.. _systemd-loop@.service(8):
+
+========================
+systemd-loop@.service(8)
+========================
+
+Name
+####
+
+systemd-loop@.service — Attach a loopback block device
+
+Synopsis
+########
+
+:code:`systemd-loop@path.service`
+
+Description
+###########
+
+:code:`systemd-loop@.service` is a template service that may be used to automatically attach a loopback block device at boot (or later). Its instance string may reference an (escaped) file system path pointing to a disk image to attach as loopback block device. Use :ref:`systemd-escape(1)`'s :code:`--path` to properly escape a file system path.
+
+This unit invokes :code:`systemd-dissect --attach --quiet --loop-ref-auto` on the specified files, see :ref:`systemd-dissect(1)` for details.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-dissect(1)`, :ref:`systemd-import-generator(8)`
+
+

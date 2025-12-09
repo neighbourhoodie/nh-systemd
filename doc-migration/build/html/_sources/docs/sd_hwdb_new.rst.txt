@@ -1,0 +1,90 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_hwdb_new
+:manvolnum: 3
+:summary: Create a new hwdb object and create or destroy references to it
+:aliases: sd_hwdb_new_from_path, sd_hwdb_ref, sd_hwdb_unref
+
+.. _sd_hwdb_new(3):
+
+==============
+sd_hwdb_new(3)
+==============
+
+Name
+####
+
+sd_hwdb_new, sd_hwdb_new_from_path, sd_hwdb_ref, sd_hwdb_unref — Create a new hwdb object and create or destroy references to it
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-hwdb.h>` .. code-block::
+
+   int sd_hwdb_new(sd_hwdb **hwdb); .. code-block::
+
+   int sd_hwdb_new_from_path(const char *path,
+	sd_hwdb **hwdb); .. code-block::
+
+   sd_hwdb* sd_hwdb_ref(sd_hwdb *hwdb); .. code-block::
+
+   sd_hwdb* sd_hwdb_unref(sd_hwdb *hwdb);
+
+Description
+###########
+
+:code:`sd_hwdb_new()` creates a new hwdb object to access the binary hwdb database. Upon initialization, the file containing the binary representation of the hardware database is located and opened. The new object is returned in :code:`hwdb`.
+
+:code:`sd_hwdb_new_from_path()` may be used to specify the path from which the binary hardware database should be opened.
+
+The :code:`hwdb` object is reference counted. :code:`sd_hwdb_ref()` and :code:`sd_hwdb_unref()` may be used to get a new reference or destroy an existing reference to an object. The caller must dispose of the reference acquired with :code:`sd_hwdb_new()` by calling :code:`sd_hwdb_unref()` when done with the object.
+
+Use :ref:`sd_hwdb_seek(3)`, :ref:`sd_hwdb_get(3)`, and :ref:`sd_hwdb_enumerate(3)` to access entries.
+
+Return Value
+############
+
+On success, :code:`sd_hwdb_new()` and :code:`sd_hwdb_new_from_path()` return a non-negative integer. On failure, a negative errno-style error code is returned.
+
+:code:`sd_hwdb_ref()` always returns the argument.
+
+:code:`sd_hwdb_unref()` always returns :code:`NULL`.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENOENT
+
+   The binary hardware database file could not be located. See :ref:`systemd-hwdb(8)` for more information.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EINVAL
+
+   The located binary hardware database file is in an incompatible format.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_hwdb_new()`, :code:`sd_hwdb_ref()`, and :code:`sd_hwdb_unref()` were added in version 246.
+
+:code:`sd_hwdb_new_from_path()` was added in version 252.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-udevd.service(8)`, :ref:`sd-hwdb(3)`, :ref:`systemd-hwdb(8)`
+
+

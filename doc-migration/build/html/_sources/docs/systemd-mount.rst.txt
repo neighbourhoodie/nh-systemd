@@ -1,0 +1,261 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-mount
+:manvolnum: 1
+:summary: Establish and destroy transient mount or auto-mount points
+:aliases: systemd-umount
+
+.. _systemd-mount(1):
+
+================
+systemd-mount(1)
+================
+
+Name
+####
+
+systemd-mount, systemd-umount — Establish and destroy transient mount or auto-mount points
+
+Synopsis
+########
+
+:code:`systemd-mount [<OPTIONS>...] WHAT [<WHERE>]`
+
+:code:`systemd-mount [<OPTIONS>...] \--tmpfs [<NAME>] WHERE`
+
+:code:`systemd-mount [<OPTIONS>...] \--list`
+
+:code:`systemd-mount [<OPTIONS>...] \--umount WHAT|WHERE...`
+
+Description
+###########
+
+:code:`systemd-mount` may be used to create and start a transient :code:`.mount` or :code:`.automount` unit of the file system :emphasis:`WHAT` on the mount point :emphasis:`WHERE`.
+
+In many ways, :code:`systemd-mount` is similar to the lower-level :man-pages:`mount(8)` command, however instead of executing the mount operation directly and immediately, :code:`systemd-mount` schedules it through the service manager job queue, so that it may pull in further dependencies (such as parent mounts, or a file system checker to execute a priori), and may make use of the auto-mounting logic.
+
+The command takes either one or two arguments. If only one argument is specified it should refer to a block device or regular file containing a file system (e.g. "/dev/sdb1" or "/path/to/disk.img"). The block device or image file is then probed for a file system label and other metadata, and is mounted to a directory below :code:`/run/media/system/` whose name is generated from the file system label. In this mode the block device or image file must exist at the time of invocation of the command, so that it may be probed. If the device is found to be a removable block device (e.g. a USB stick), an automount point is created instead of a regular mount point (i.e. the :code:`--automount=` option is implied, see below). If the option :code:`--tmpfs` is specified, then the argument is interpreted as the path where the new temporary file system shall be mounted.
+
+If two arguments are specified, the first indicates the mount source (the :emphasis:`WHAT`) and the second indicates the path to mount it on (the :emphasis:`WHERE`). In this mode no probing of the source is attempted, and a backing device node does not have to exist. However, if this mode is combined with :code:`--discover`, device node probing for additional metadata is enabled, and – much like in the single-argument case discussed above – the specified device has to exist at the time of invocation of the command.
+
+Use the :code:`--list` command to show a terse table of all local, known block devices with file systems that may be mounted with this command.
+
+:code:`systemd-umount` can be used to unmount a mount or automount point. It is the same as :code:`systemd-mount` :code:`--umount`.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --no-block
+
+   Do not synchronously wait for the requested operation to finish. If this is not specified, the job will be verified, enqueued and :code:`systemd-mount` will wait until the mount or automount unit's start-up is completed. By passing this argument, it is only verified and enqueued.
+
+   .. versionadded:: 232
+
+.. systemd:option:: -l, --full
+
+   Do not ellipsize the output when :code:`--list` is specified.
+
+   .. versionadded:: 245
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. systemd:option:: --quiet, -q
+
+   Suppresses additional informational output while running.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --discover
+
+   Enable probing of the mount source. This switch is implied if a single argument is specified on the command line. If passed, additional metadata is read from the device to enhance the unit to create. For example, a descriptive string for the transient units is generated from the file system label and device model. Moreover, if a removable block device (e.g. USB stick) is detected an automount unit instead of a regular mount unit is created, with a short idle timeout, in order to ensure the file-system is placed in a clean state quickly after each access.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --type=, -t
+
+   Specifies the file system type to mount (e.g. "vfat" or "ext4"). If omitted or set to "auto", the file system type is determined automatically.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --options=, -o
+
+   Additional mount options for the mount point.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --owner=USER
+
+   Let the specified user :emphasis:`USER` own the mounted file system. This is done by appending :code:`uid=` and :code:`gid=` options to the list of mount options. Only certain file systems support this option.
+
+   .. versionadded:: 237
+
+.. systemd:option:: --fsck=
+
+   Takes a boolean argument, defaults to on. Controls whether to run a file system check immediately before the mount operation. In the automount case (see :code:`--automount=` below) the check will be run the moment the first access to the device is made, which might slightly delay the access.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --description=
+
+   Provide a description for the mount or automount unit. See :code:`Description=` in :ref:`systemd.unit(5)`.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --property=, -p
+
+   Sets a unit property for the mount unit that is created. This takes an assignment in the same format as :man-pages:`systemctl(1)`'s :code:`set-property` command.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --automount=
+
+   Takes a boolean argument. Controls whether to create an automount point or a regular mount point. If true an automount point is created that is backed by the actual file system at the time of first access. If false a plain mount point is created that is backed by the actual file system immediately. Automount points have the benefit that the file system stays unmounted and hence in clean state until it is first accessed. In automount mode the :code:`--timeout-idle-sec=` switch (see below) may be used to ensure the mount point is unmounted automatically after the last access and an idle period passed.
+
+   If this switch is not specified, it defaults to false. If not specified and :code:`--discover` is used (or only a single argument passed, which implies :code:`--discover`, see above), and the file system block device is detected to be removable, it is set to true, in order to increase the chance that the file system is in a fully clean state if the device is unplugged abruptly.
+
+   .. versionadded:: 232
+
+.. systemd:option:: -A
+
+   Equivalent to :code:`--automount=yes`.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --timeout-idle-sec=
+
+   Takes a time value that controls the idle timeout in automount mode. If set to "infinity" (the default) no automatic unmounts are done. Otherwise, the file system backing the automount point is detached after the last access and the idle timeout passed. See :ref:`systemd.time(7)` for details on the time syntax supported. This option has no effect if only a regular mount is established, and automounting is not used.
+
+   Note that if :code:`--discover` is used (or only a single argument passed, which implies :code:`--discover`, see above), and the file system block device is detected to be removable, :code:`--timeout-idle-sec=1s` is implied.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --automount-property=
+
+   Similar to :code:`--property=`, but applies additional properties to the automount unit created, instead of the mount unit.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --bind-device
+
+   Controls whether the generated mount/automount unit shall be bound to the backing device's lifetime. This setting is especially useful in automount mode. If set, the units will be stopped automatically when the backing device vanishes. By default, the automount unit stays around, and subsequent accesses will block until backing device is replugged. This option has no effect in case of non-device mounts, such as network or virtual file system mounts.
+
+   If :code:`--discover` is used (or only a single argument passed, which implies :code:`--discover`, see above), and the file system block device is detected to be removable, this option is implied.
+
+   Note that mount units by default gain a :code:`Requires=` dependency on the backing device. This behavior can be controlled via :code:`x-systemd.device-bound=` mount option, see :ref:`systemd.mount(5)` for details. In particular, :code:`x-systemd.device-bound=no` takes precedence over this option, which suppresses device dependencies both in the generated mount units and what's implied by service manager.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --list
+
+   Instead of establishing a mount or automount point, print a terse list of block devices containing file systems that may be mounted with "systemd-mount", along with useful metadata such as labels, etc.
+
+   .. versionadded:: 232
+
+.. systemd:option:: -u, --umount
+
+   Stop the mount and automount units corresponding to the specified mount points :emphasis:`WHERE` or the devices :emphasis:`WHAT`. :code:`systemd-mount` with this option or :code:`systemd-umount` can take multiple arguments which can be mount points, devices, :code:`/etc/fstab` style node names, or backing files corresponding to loop devices, like :code:`systemd-mount --umount /path/to/umount /dev/sda1 UUID=xxxxxx-xxxx LABEL=xxxxx /path/to/disk.img`. Note that when :code:`-H` or :code:`-M` is specified, only absolute paths to mount points are supported.
+
+   .. versionadded:: 233
+
+.. systemd:option:: -G, --collect
+
+   Unload the transient unit after it completed, even if it failed. Normally, without this option, all mount units that mount and failed are kept in memory until the user explicitly resets their failure state with :code:`systemctl reset-failed` or an equivalent command. On the other hand, units that stopped successfully are unloaded immediately. If this option is turned on the "garbage collection" of units is more aggressive, and unloads units regardless of whether they exited successfully or failed. This option is a shortcut for :code:`--property=CollectMode=inactive-or-failed`, see the explanation for :code:`CollectMode=` in :ref:`systemd.unit(5)` for further information.
+
+   .. versionadded:: 236
+
+.. systemd:option:: -T, --tmpfs
+
+   Create and mount a new :code:`tmpfs` file system on :emphasis:`WHERE`, with an optional :emphasis:`NAME` that defaults to "tmpfs".
+
+   The file system is mounted with the top-level directory mode determined by the :man-pages:`umask(2)` setting of the caller, i.e. :code:`rwxrwxrwx` masked by the umask of the caller. This matches what :man-pages:`mkdir(1)` does, but is different from the kernel default of "rwxrwxrwxt", i.e. a world-writable directory with the sticky bit set.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --canonicalize=
+
+   Controls whether the specified path shall be canonicalized on the client side before requesting the operation or not. Takes a boolean parameter, defaults to true. Note that for non-local operation (i.e. when :code:`--machine=` or --:code:`--host=` are used) canonicalization is implicitly turned off.
+
+   Canonicalization of path entails resolving of symlinks, ".." path elements and :code:`LABEL=`/:code:`UUID=` style device node expansion. If canonicalization is disabled and the path contains a symlink element, "..", or a :code:`LABEL=`/:code:`UUID=`/… expansion the operation will fail.
+
+   .. versionadded:: 258
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove user|
+    :end-before: .. inclusion-end-marker-do-not-remove user|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove system|
+    :end-before: .. inclusion-end-marker-do-not-remove system|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove machine|
+    :end-before: .. inclusion-end-marker-do-not-remove machine|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+The udev Database
+#################
+
+If :code:`--discover` is used, :code:`systemd-mount` honors a couple of additional udev properties of block devices:
+
+.. systemd:option:: SYSTEMD_MOUNT_OPTIONS=
+   :group: udev-directives
+
+   The mount options to use, if :systemd:option:`--options=` is not used.
+
+   .. versionadded:: 232
+
+.. systemd:option:: SYSTEMD_MOUNT_WHERE=
+   :group: udev-directives
+
+   The file system path to place the mount point at, instead of the automatically generated one.
+
+   .. versionadded:: 232
+
+Example
+#######
+
+Use a udev rule like the following to automatically mount all USB storage plugged in:
+
+.. code-block:: sh
+
+   ACTION=="add", SUBSYSTEMS=="usb", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", \
+           RUN{program}+="/usr/bin/systemd-mount --no-block --automount=yes --collect $devnode"
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`mount(8)`, :man-pages:`systemctl(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.mount(5)`, :ref:`systemd.automount(5)`, :ref:`systemd-run(1)`
+
+

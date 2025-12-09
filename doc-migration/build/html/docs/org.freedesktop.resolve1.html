@@ -1,0 +1,1285 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="org.freedesktop.systemd1(5)" href="org.freedesktop.systemd1.html"><link rel="prev" title="org.freedesktop.portable1(5)" href="org.freedesktop.portable1.html">
+        <link rel="prefetch" href="../_static/systemd-logo.svg" as="image">
+        <link rel="prefetch" href="../_static/systemd-logo-dark.svg" as="image">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>org.freedesktop.resolve1(5)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6e47b7e0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #35a764;
+  --color-brand-content: #35a764;
+  --color-brand-visited: #197b43;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">systemd</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/systemd-logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/systemd-logo-dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">B</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="binfmt.d.html">binfmt.d(5) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootctl.html">bootctl(1) — Control EFI firmware boot settings and manage boot loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootup.html">bootup(7) — System bootup process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="busctl.html">busctl(1) — Introspect the bus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capsule%40.service.html">capsule@.service(5) — System unit for the capsule service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredump.conf.html">coredump.conf(5) — Core dump storage configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredumpctl.html">coredumpctl(1) — Retrieve and process saved core dumps and metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypttab.html">crypttab(5) — Configuration for encrypted block devices</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">D</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daemon.html">daemon(7) — Writing and packaging system daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dnssec-trust-anchors.d.html">dnssec-trust-anchors.d(5) — DNSSEC trust anchor configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">E</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment.d.html">environment.d(5) — Definition of user service environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">F</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-hierarchy.html">file-hierarchy(7) — File system hierarchy overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">H</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="homectl.html">homectl(1) — Create, remove, change or inspect home directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homed.conf.html">homed.conf(5) — Home area/user account manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostname.html">hostname(5) — Local hostname configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostnamectl.html">hostnamectl(1) — Control the system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hwdb.html">hwdb(7) — Hardware Database</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">I</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="importctl.html">importctl(1) — Download, import or export disk images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integritytab.html">integritytab(5) — Configuration for integrity block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocost.conf.html">iocost.conf(5) — Configuration files for the iocost solution manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">J</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="journal-remote.conf.html">journal-remote.conf(5) — Configuration files for the service accepting remote journal uploads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal-upload.conf.html">journal-upload.conf(5) — Configuration files for the journal upload service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journalctl.html">journalctl(1) — Print log entries from the systemd journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journald.conf.html">journald.conf(5) — Journal service configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">K</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kernel-command-line.html">kernel-command-line(7) — Kernel command line parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-install.html">kernel-install(8) — Add and remove kernel and initrd images to and from the boot partition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">L</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libsystemd.html">libsystemd(3) — Functions for implementing services and interacting with systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libudev.html">libudev(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.conf.html">loader.conf(5) — Configuration file for systemd-boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locale.conf.html">locale.conf(5) — Configuration file for locale settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localectl.html">localectl(1) — Control the system locale and keyboard layout settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localtime.html">localtime(5) — Local timezone configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loginctl.html">loginctl(1) — Control the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logind.conf.html">logind.conf(5) — Login manager configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">M</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="machine-id.html">machine-id(5) — Local machine ID configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machine-info.html">machine-info(5) — Local machine information file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machinectl.html">machinectl(1) — Control the systemd machine manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules-load.d.html">modules-load.d(5) — Configure kernel modules to load at boot</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">N</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="networkctl.html">networkctl(1) — Query or modify the status of network links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networkd.conf.html">networkd.conf(5) — Global Network configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-myhostname.html">nss-myhostname(8) — Hostname resolution for the locally configured system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-mymachines.html">nss-mymachines(8) — Hostname resolution for local container instances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-resolve.html">nss-resolve(8) — Hostname resolution via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-systemd.html">nss-systemd(8) — UNIX user and group name resolution for user/group lookup via Varlink</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">O</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="oomctl.html">oomctl(1) — Analyze the state stored in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oomd.conf.html">oomd.conf(5) — Global</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.home1.html">org.freedesktop.home1(5) — The D-Bus interface of systemd-homed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.hostname1.html">org.freedesktop.hostname1(5) — The D-Bus interface of systemd-hostnamed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.import1.html">org.freedesktop.import1(5) — The D-Bus interface of systemd-importd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.locale1.html">org.freedesktop.locale1(5) — The D-Bus interface of systemd-localed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.LogControl1.html">org.freedesktop.LogControl1(5) — D-Bus interface to query and set logging configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.login1.html">org.freedesktop.login1(5) — The D-Bus interface of systemd-logind</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.machine1.html">org.freedesktop.machine1(5) — The D-Bus interface of systemd-machined</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.network1.html">org.freedesktop.network1(5) — The D-Bus interface of systemd-networkd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.oom1.html">org.freedesktop.oom1(5) — The D-Bus interface of systemd-oomd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.portable1.html">org.freedesktop.portable1(5) — The D-Bus interface of systemd-portabled</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">org.freedesktop.resolve1(5) — The D-Bus interface of systemd-resolved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.systemd1.html">org.freedesktop.systemd1(5) — The D-Bus interface of systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.sysupdate1.html">org.freedesktop.sysupdate1(5) — The D-Bus interface of systemd-sysupdated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timedate1.html">org.freedesktop.timedate1(5) — The D-Bus interface of systemd-timedated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timesync1.html">org.freedesktop.timesync1(5) — The D-Bus interface of systemd-timesyncd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="os-release.html">os-release(5) — Operating system identification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">P</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd.html">pam_systemd(8) — Register user sessions in the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_home.html">pam_systemd_home(8) — Authenticate users and mount home directories via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_loadkey.html">pam_systemd_loadkey(8) — Read password from kernel keyring and set it as PAM authtok</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portablectl.html">portablectl(1) — Attach, detach or inspect portable service images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="poweroff.html">poweroff(8) — Power off, reboot, or halt the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pstore.conf.html">pstore.conf(5) — PStore configuration file</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">R</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="repart.d.html">repart.d(5) — Partition Definition Files for Automatic Boot-Time Repartitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolvectl.html">resolvectl(1) — Resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services; introspect and reconfigure the DNS resolver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolved.conf.html">resolved.conf(5) — Network Name Resolution configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run0.html">run0(1) — Elevate privileges</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">S</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus.html">sd-bus(3) — A lightweight D-Bus IPC client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus-errors.html">sd-bus-errors(3) — Standard D-Bus error names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-daemon.html">sd-daemon(3) — APIs for new-style daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-device.html">sd-device(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-event.html">sd-event(3) — A generic event loop implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-hwdb.html">sd-hwdb(3) — Read-only access to the hardware description database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-id128.html">sd-id128(3) — APIs for processing 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-journal.html">sd-journal(3) — APIs for submitting and querying log entries to and from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-json.html">sd-json(3) — APIs for Dealing with JSON Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-login.html">sd-login(3) — APIs for tracking logins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-path.html">sd-path(3) — APIs to query file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-varlink.html">sd-varlink(3) — APIs for Varlink IPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_booted.html">sd_booted(3) — Test whether the system is running the systemd init system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_match.html">sd_bus_add_match(3) — Add a match rule for incoming message dispatching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_node_enumerator.html">sd_bus_add_node_enumerator(3) — Add a node enumerator for a D-Bus object path prefix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object.html">sd_bus_add_object(3) — Declare properties and methods for a D-Bus path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object_manager.html">sd_bus_add_object_manager(3) — Add a D-Bus object manager for a D-Bus object sub-tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_attach_event.html">sd_bus_attach_event(3) — Attach a bus connection object to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call.html">sd_bus_call(3) — Invoke a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call_method.html">sd_bus_call_method(3) — Initialize a bus message object and invoke the corresponding D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_can_send.html">sd_bus_can_send(3) — Check which types can be sent over a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_close.html">sd_bus_close(3) — Close and flush a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_get_pid.html">sd_bus_creds_get_pid(3) — Retrieve fields from a credentials object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_new_from_pid.html">sd_bus_creds_new_from_pid(3) — Retrieve credentials object for the specified PID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_default.html">sd_bus_default(3) — Acquire a connection to a system or user bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_emit_signal.html">sd_bus_emit_signal(3) — Convenience functions for emitting (standard) D-Bus signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_enqueue_for_read.html">sd_bus_enqueue_for_read(3) — Re-enqueue a bus message on a bus connection, for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error.html">sd_bus_error(3) — sd-bus error handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error_add_map.html">sd_bus_error_add_map(3) — Additional sd-dbus error mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_current_handler.html">sd_bus_get_current_handler(3) — Query information of the callback a bus object is currently running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_fd.html">sd_bus_get_fd(3) — Get the file descriptor, I/O events and timeout to wait for from a message bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_n_queued_read.html">sd_bus_get_n_queued_read(3) — Get the number of pending bus messages in the read and write queues of a bus connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_creds.html">sd_bus_get_name_creds(3) — Query bus client credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_machine_id.html">sd_bus_get_name_machine_id(3) — Retrieve a bus client's machine identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_interface_name_is_valid.html">sd_bus_interface_name_is_valid(3) — Check if a string is a valid bus name or object path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_is_open.html">sd_bus_is_open(3) — Check whether the bus connection is open or ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_list_names.html">sd_bus_list_names(3) — Retrieve information about registered names on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append.html">sd_bus_message_append(3) — Attach fields to a D-Bus message based on a type string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_array.html">sd_bus_message_append_array(3) — Append an array of fields to a D-Bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_basic.html">sd_bus_message_append_basic(3) — Attach a single field to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_string_memfd.html">sd_bus_message_append_string_memfd(3) — Attach a string to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_strv.html">sd_bus_message_append_strv(3) — Attach an array of strings to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_at_end.html">sd_bus_message_at_end(3) — Check if a message has been fully read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_copy.html">sd_bus_message_copy(3) — Copy the contents of one message to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_dump.html">sd_bus_message_dump(3) — Produce a string representation of a message for debugging purposes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_cookie.html">sd_bus_message_get_cookie(3) — Returns the transaction cookie of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_monotonic_usec.html">sd_bus_message_get_monotonic_usec(3) — Retrieve the sender timestamps and sequence number of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_signature.html">sd_bus_message_get_signature(3) — Query bus message signature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_type.html">sd_bus_message_get_type(3) — Query bus message addressing/credentials metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new.html">sd_bus_message_new(3) — Create a new bus message object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_call.html">sd_bus_message_new_method_call(3) — Create a method call message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_error.html">sd_bus_message_new_method_error(3) — Create an error reply for a method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_signal.html">sd_bus_message_new_signal(3) — Create a signal message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_open_container.html">sd_bus_message_open_container(3) — Create and move between containers in D-Bus messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read.html">sd_bus_message_read(3) — Read a sequence of values from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_array.html">sd_bus_message_read_array(3) — Access an array of elements in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_basic.html">sd_bus_message_read_basic(3) — Read a basic type from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_strv.html">sd_bus_message_read_strv(3) — Access an array of strings in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_rewind.html">sd_bus_message_rewind(3) — Return to beginning of message or current container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_seal.html">sd_bus_message_seal(3) — Prepare a D-Bus message for transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_sensitive.html">sd_bus_message_sensitive(3) — Mark a message object as containing sensitive data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_destination.html">sd_bus_message_set_destination(3) — Set and query bus message addressing information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_expect_reply.html">sd_bus_message_set_expect_reply(3) — Set and query bus message metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_skip.html">sd_bus_message_skip(3) — Skip elements in a bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_verify_type.html">sd_bus_message_verify_type(3) — Check if the message has specified type at the current location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_negotiate_fds.html">sd_bus_negotiate_fds(3) — Control feature negotiation on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_new.html">sd_bus_new(3) — Create a new bus object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_path_encode.html">sd_bus_path_encode(3) — Convert an external identifier into an object path and back</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_pending_method_calls.html">sd_bus_pending_method_calls(3) — Return the number of currently pending, outgoing method calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_process.html">sd_bus_process(3) — Drive the connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_query_sender_creds.html">sd_bus_query_sender_creds(3) — Query bus message sender credentials/privileges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_error.html">sd_bus_reply_method_error(3) — Reply with an error to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_return.html">sd_bus_reply_method_return(3) — Reply to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_request_name.html">sd_bus_request_name(3) — Request or release a well-known service name on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_send.html">sd_bus_send(3) — Queue a D-Bus message for transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_address.html">sd_bus_set_address(3) — Set or query the address of the bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_close_on_exit.html">sd_bus_set_close_on_exit(3) — Control whether to close the bus connection during the event loop exit phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_connected_signal.html">sd_bus_set_connected_signal(3) — Control emission of local connection establishment signal on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_description.html">sd_bus_set_description(3) — Set or query properties of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_exit_on_disconnect.html">sd_bus_set_exit_on_disconnect(3) — Control the exit behavior when the bus object disconnects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_fd.html">sd_bus_set_fd(3) — Set the file descriptors to use for bus communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_method_call_timeout.html">sd_bus_set_method_call_timeout(3) — Set or query the default D-Bus method call timeout of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_property.html">sd_bus_set_property(3) — Set or query D-Bus service properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_sender.html">sd_bus_set_sender(3) — Configure default sender for outgoing messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_server.html">sd_bus_set_server(3) — Configure connection mode for a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_watch_bind.html">sd_bus_set_watch_bind(3) — Control socket binding watching on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_get_bus.html">sd_bus_slot_get_bus(3) — Query information attached to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_ref.html">sd_bus_slot_ref(3) — Create and destroy references to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_description.html">sd_bus_slot_set_description(3) — Set or query the description of bus slot objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_destroy_callback.html">sd_bus_slot_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_floating.html">sd_bus_slot_set_floating(3) — Control whether a bus slot object is "floating"</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_userdata.html">sd_bus_slot_set_userdata(3) — Set and query the value in the "userdata" field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_start.html">sd_bus_start(3) — Initiate a bus connection to the D-bus broker daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_add_name.html">sd_bus_track_add_name(3) — Add, remove and retrieve bus peers tracked in a bus peer tracking object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_new.html">sd_bus_track_new(3) — Track bus peers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_wait.html">sd_bus_wait(3) — Wait for I/O on a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_add_match_parent.html">sd_device_enumerator_add_match_parent(3) — Add a filter to the device enumerator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_get_device_first.html">sd_device_enumerator_get_device_first(3) — Enumerates devices and get the first or next device.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_new.html">sd_device_enumerator_new(3) — Create, reference, and release a device enumerator object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_get_syspath.html">sd_device_get_syspath(3) — Returns various fields of device objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_ref.html">sd_device_ref(3) — Create or destroy references to a device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_child.html">sd_event_add_child(3) — Add a child process state change event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_defer.html">sd_event_add_defer(3) — Add static event sources to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_inotify.html">sd_event_add_inotify(3) — Add an "inotify" file system inode event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_io.html">sd_event_add_io(3) — Add an I/O event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_memory_pressure.html">sd_event_add_memory_pressure(3) — Add and configure an event source run as result of memory pressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_signal.html">sd_event_add_signal(3) — Add a UNIX process signal event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_time.html">sd_event_add_time(3) — Add a timer event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_exit.html">sd_event_exit(3) — Ask the event loop to exit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_get_fd.html">sd_event_get_fd(3) — Obtain a file descriptor to poll for event loop events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_new.html">sd_event_new(3) — Acquire and release an event loop object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_now.html">sd_event_now(3) — Retrieve current event loop iteration timestamp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_run.html">sd_event_run(3) — Run an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_exit_on_idle.html">sd_event_set_exit_on_idle(3) — Enable event loop exit-on-idle support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_signal_exit.html">sd_event_set_signal_exit(3) — Automatically leave event loop on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_watchdog.html">sd_event_set_watchdog(3) — Enable event loop watchdog support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_event.html">sd_event_source_get_event(3) — Retrieve the event loop of an event source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_pending.html">sd_event_source_get_pending(3) — Determine pending state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_description.html">sd_event_source_set_description(3) — Set or retrieve descriptive names of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_destroy_callback.html">sd_event_source_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_enabled.html">sd_event_source_set_enabled(3) — Enable or disable event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_exit_on_failure.html">sd_event_source_set_exit_on_failure(3) — Set or retrieve the exit-on-failure feature of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_floating.html">sd_event_source_set_floating(3) — Set or retrieve 'floating' state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_prepare.html">sd_event_source_set_prepare(3) — Set a preparation callback for event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_priority.html">sd_event_source_set_priority(3) — Set or retrieve the priority of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_ratelimit.html">sd_event_source_set_ratelimit(3) — Configure rate limiting on event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_userdata.html">sd_event_source_set_userdata(3) — Set or retrieve user data pointer of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_unref.html">sd_event_source_unref(3) — Increase or decrease event source reference counters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_wait.html">sd_event_wait(3) — Low-level event loop operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_get_seats.html">sd_get_seats(3) — Determine available seats, sessions, logged in users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_get.html">sd_hwdb_get(3) — Seek to a location in hwdb or access entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_new.html">sd_hwdb_new(3) — Create a new hwdb object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_get_machine.html">sd_id128_get_machine(3) — Retrieve 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_randomize.html">sd_id128_randomize(3) — Generate 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_to_string.html">sd_id128_to_string(3) — Format or parse 128-bit IDs as strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_is_fifo.html">sd_is_fifo(3) — Check the type of a file descriptor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_add_match.html">sd_journal_add_match(3) — Add or remove entry matches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_enumerate_fields.html">sd_journal_enumerate_fields(3) — Read used field names from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_catalog.html">sd_journal_get_catalog(3) — Retrieve message catalog entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cursor.html">sd_journal_get_cursor(3) — Get cursor string for or test cursor string against the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cutoff_realtime_usec.html">sd_journal_get_cutoff_realtime_usec(3) — Read cut-off timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_data.html">sd_journal_get_data(3) — Read data fields from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_fd.html">sd_journal_get_fd(3) — Journal change notification interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_realtime_usec.html">sd_journal_get_realtime_usec(3) — Read timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_seqnum.html">sd_journal_get_seqnum(3) — Read sequence number from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_usage.html">sd_journal_get_usage(3) — Journal disk usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_has_runtime_files.html">sd_journal_has_runtime_files(3) — Query availability of runtime or persistent journal files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_next.html">sd_journal_next(3) — Advance or set back the read pointer in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_open.html">sd_journal_open(3) — Open the system journal for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_print.html">sd_journal_print(3) — Submit log entries to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_query_unique.html">sd_journal_query_unique(3) — Read unique data fields from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_seek_head.html">sd_journal_seek_head(3) — Seek to a position in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_stream_fd.html">sd_journal_stream_fd(3) — Create log stream file descriptor to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_json_dispatch_string.html">sd_json_dispatch_string(3) — Decode JSON variant values and write them to the specified memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_listen_fds.html">sd_listen_fds(3) — Check for file descriptors passed by the system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_login_monitor_new.html">sd_login_monitor_new(3) — Monitor login sessions, seats, users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_machine_get_class.html">sd_machine_get_class(3) — Determine the class and network interface indices of a locally running virtual machine or container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_notify.html">sd_notify(3) — Notify service manager about start-up completion and other service status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_path_lookup.html">sd_path_lookup(3) — Query well-known file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pid_get_owner_uid.html">sd_pid_get_owner_uid(3) — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pidfd_get_inode_id.html">sd_pidfd_get_inode_id(3) — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_seat_get_active.html">sd_seat_get_active(3) — Determine state of a specific seat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_session_is_active.html">sd_session_is_active(3) — Determine state of a specific session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_uid_get_state.html">sd_uid_get_state(3) — Determine login state of a specific Unix user ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_is_connected.html">sd_varlink_is_connected(3) — Query if a Varlink connection object is currently connected or idle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_push_fd.html">sd_varlink_push_fd(3) — Submit a file descriptor to send along with the next outgoing Varlink message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_send.html">sd_varlink_send(3) — Enqueues a Varlink method call, not expecting a reply</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_server_new.html">sd_varlink_server_new(3) — Allocate Varlink server object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_description.html">sd_varlink_set_description(3) — Set or query description of a Varlink connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_relative_timeout.html">sd_varlink_set_relative_timeout(3) — Set method call time-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_watchdog_enabled.html">sd_watchdog_enabled(3) — Check whether the service manager expects watchdog keep-alive notifications from a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shutdown.html">shutdown(8) — Halt, power off or reboot the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smbios-type-11.html">smbios-type-11(7) — SMBIOS Type 11 strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysctl.d.html">sysctl.d(5) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysext.conf.html">sysext.conf(5) — Configuration files for systemd-sysext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemctl.html">systemctl(1) — Control the systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.html">systemd(1) — systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ac-power.html">systemd-ac-power(1) — Report whether we are connected to an external power source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-analyze.html">systemd-analyze(1) — Analyze and debug system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password.html">systemd-ask-password(1) — Query the user for a system password</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password-console.service.html">systemd-ask-password-console.service(8) — Query the user for system passwords on the console and via wall</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-backlight%40.service.html">systemd-backlight@.service(8) — Load and save the display backlight brightness at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-battery-check.service.html">systemd-battery-check.service(8) — Check battery level whether there's enough charge, and power off if not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-binfmt.service.html">systemd-binfmt.service(8) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot-generator.html">systemd-bless-boot-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot.service.html">systemd-bless-boot.service(8) — Mark current boot process as successful</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot.html">systemd-boot(7) — A simple UEFI boot manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-check-no-failures.service.html">systemd-boot-check-no-failures.service(8) — verify that the system booted up cleanly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-clear-sysfail.service.html">systemd-boot-clear-sysfail.service(8) — Clear LoaderEntrySysFail entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-random-seed.service.html">systemd-boot-random-seed.service(8) — Refresh boot loader random seed at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bsod.service.html">systemd-bsod.service(8) — Displays boot-time emergency log message in full screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cat.html">systemd-cat(1) — Connect a pipeline or program's output with the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgls.html">systemd-cgls(1) — Recursively show control group contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgtop.html">systemd-cgtop(1) — Show top control groups by their resource usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-coredump.html">systemd-coredump(8) — Acquire, save and process core dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-creds.html">systemd-creds(1) — Lists, shows, encrypts and decrypts service credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptenroll.html">systemd-cryptenroll(1) — Enroll PKCS#11, FIDO2, TPM2 token/devices to LUKS2 encrypted volumes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup.html">systemd-cryptsetup(8) — Full disk decryption logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup-generator.html">systemd-cryptsetup-generator(8) — Unit generator for</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-debug-generator.html">systemd-debug-generator(8) — Generator for enabling a runtime debug shell and masking specific units at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-delta.html">systemd-delta(1) — Find overridden configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-detect-virt.html">systemd-detect-virt(1) — Detect execution in a virtualized environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-dissect.html">systemd-dissect(1) — Dissect Discoverable Disk Images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-environment-d-generator.html">systemd-environment-d-generator(8) — Load variables specified by</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-escape.html">systemd-escape(1) — Escape strings for usage in systemd unit names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset.html">systemd-factory-reset(8) — Request or complete a factory reset operation, or query current factory reset mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset-generator.html">systemd-factory-reset-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-firstboot.html">systemd-firstboot(1) — Initialize basic system settings on or before the first boot-up of a system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fsck%40.service.html">systemd-fsck@.service(8) — File system checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fstab-generator.html">systemd-fstab-generator(8) — Unit generator for /etc/fstab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-getty-generator.html">systemd-getty-generator(8) — Generator for enabling getty instances on the console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-gpt-auto-generator.html">systemd-gpt-auto-generator(8) — Generator for automatically discovering and mounting root,</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume-generator.html">systemd-hibernate-resume-generator(8) — Unit generator for resume= kernel parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume.service.html">systemd-hibernate-resume.service(8) — Resume from hibernation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-homed.service.html">systemd-homed.service(8) — Home Area/User Account Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hostnamed.service.html">systemd-hostnamed.service(8) — Daemon to control system hostname from programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hwdb.html">systemd-hwdb(8) — hardware database management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-id128.html">systemd-id128(1) — Generate and print sd-128 identifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-import-generator.html">systemd-import-generator(8) — Generator for automatically downloading disk images at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-importd.service.html">systemd-importd.service(8) — VM and container image import and export service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-inhibit.html">systemd-inhibit(1) — Execute a program with an inhibition lock taken</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup-generator.html">systemd-integritysetup-generator(8) — Unit generator for integrity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup%40.service.html">systemd-integritysetup@.service(8) — Disk integrity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-gatewayd.service.html">systemd-journal-gatewayd.service(8) — HTTP server for journal events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-remote.service.html">systemd-journal-remote.service(8) — Receive journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-upload.service.html">systemd-journal-upload.service(8) — Send journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journald.service.html">systemd-journald.service(8) — Journal service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-keyutil.html">systemd-keyutil(1) — Perform various operations on private keys and X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-localed.service.html">systemd-localed.service(8) — Locale bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-logind.service.html">systemd-logind.service(8) — Login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-loop%40.service.html">systemd-loop@.service(8) — Attach a loopback block device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-commit.service.html">systemd-machine-id-commit.service(8) — Commit a transient machine ID to disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-setup.html">systemd-machine-id-setup(1) — Initialize the machine ID in /etc/machine-id</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machined.service.html">systemd-machined.service(8) — Virtual machine and container registration manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-makefs%40.service.html">systemd-makefs@.service(8) — Creating and growing file systems on demand</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-measure.html">systemd-measure(1) — Pre-calculate and sign expected TPM2 PCR 11 values for booted unified kernel images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-modules-load.service.html">systemd-modules-load.service(8) — Load kernel modules at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mount.html">systemd-mount(1) — Establish and destroy transient mount or auto-mount points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mountfsd.service.html">systemd-mountfsd.service(8) — Disk Image File System Mount Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mute-console.html">systemd-mute-console(1) — Temporarily mute kernel log output and service manager status output to the system console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-network-generator.service.html">systemd-network-generator.service(8) — Generate network configuration from the kernel command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd-wait-online.service.html">systemd-networkd-wait-online.service(8) — Wait for network to come online</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd.service.html">systemd-networkd.service(8) — Network manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-notify.html">systemd-notify(1) — Notify service manager about start-up completion and other daemon status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nspawn.html">systemd-nspawn(1) — Spawn a command or OS in a lightweight container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nsresourced.service.html">systemd-nsresourced.service(8) — User Namespace Resource Delegation Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-oomd.service.html">systemd-oomd.service(8) — A userspace out-of-memory (OOM) killer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-path.html">systemd-path(1) — List and query system and user paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrlock.html">systemd-pcrlock(8) — Analyze and predict TPM2 PCR states and generate an access policy from the prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrphase.service.html">systemd-pcrphase.service(8) — Measure boot phases, machine ID, product UUID and file system identity into TPM PCRs and NvPCRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-portabled.service.html">systemd-portabled.service(8) — Portable service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-poweroff.service.html">systemd-poweroff.service(8) — System shutdown logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pstore.service.html">systemd-pstore.service(8) — A service to archive contents of pstore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pty-forward.html">systemd-pty-forward(1) — Run a command with a custom terminal background color or title</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-quotacheck%40.service.html">systemd-quotacheck@.service(8) — File system quota checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-random-seed.service.html">systemd-random-seed.service(8) — Load and save the OS system random seed at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rc-local-generator.html">systemd-rc-local-generator(8) — Compatibility generator and service to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-remount-fs.service.html">systemd-remount-fs.service(8) — Remount root and kernel file systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-repart.html">systemd-repart(8) — Automatically grow and add partitions, and generate disk images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-resolved.service.html">systemd-resolved.service(8) — Network Name Resolution manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rfkill.service.html">systemd-rfkill.service(8) — Load and save the RF kill switch state at boot and change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run.html">systemd-run(1) — Run programs in transient scope units, service units, or path-, socket-, or timer-triggered service units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run-generator.html">systemd-run-generator(8) — Generator for invoking commands specified on the kernel command line as system service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sbsign.html">systemd-sbsign(1) — Sign PE binaries for EFI Secure Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sleep.conf.html">systemd-sleep.conf(5) — Suspend and hibernation configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-activate.html">systemd-socket-activate(1) — Test socket activation of daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-proxyd.html">systemd-socket-proxyd(8) — Bidirectionally proxy local sockets to another (possibly remote) socket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-soft-reboot.service.html">systemd-soft-reboot.service(8) — Userspace reboot operation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-generator.html">systemd-ssh-generator(8) — Generator for binding a socket-activated SSH server to local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-issue.html">systemd-ssh-issue(1) — Generator for SSH login prompt drop-ins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-proxy.html">systemd-ssh-proxy(1) — SSH client plugin for connecting to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stdio-bridge.html">systemd-stdio-bridge(1) — D-Bus proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-storagetm.service.html">systemd-storagetm.service(8) — Exposes all local block devices as NVMe-TCP mass storage devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stub.html">systemd-stub(7) — A simple UEFI kernel boot stub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-suspend.service.html">systemd-suspend.service(8) — System sleep state logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysctl.service.html">systemd-sysctl.service(8) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysext.html">systemd-sysext(8) — Activates System Extension Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system-update-generator.html">systemd-system-update-generator(8) — Generator for redirecting boot to offline update mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system.conf.html">systemd-system.conf(5) — System and session service manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdate.html">systemd-sysupdate(8) — Automatically Update OS or Other Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdated.service.html">systemd-sysupdated.service(8) — System Update Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysusers.html">systemd-sysusers(8) — Allocate system users and groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysv-generator.html">systemd-sysv-generator(8) — Unit generator for SysV init scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-time-wait-sync.service.html">systemd-time-wait-sync.service(8) — Wait until kernel time is synchronized</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timedated.service.html">systemd-timedated.service(8) — Time and date bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timesyncd.service.html">systemd-timesyncd.service(8) — Network Time Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tmpfiles.html">systemd-tmpfiles(8) — Create, delete, and clean up files and directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-clear.service.html">systemd-tpm2-clear.service(8) — Request that the TPM security chip is cleared on next boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-generator.html">systemd-tpm2-generator(8) — Generator for inserting TPM2 synchronization point in the boot process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-setup.service.html">systemd-tpm2-setup.service(8) — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tty-ask-password-agent.html">systemd-tty-ask-password-agent(1) — List or process pending systemd password requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udev-settle.service.html">systemd-udev-settle.service(8) — Wait for all pending udev events to be handled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udevd.service.html">systemd-udevd.service(8) — Device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-done.service.html">systemd-update-done.service(8) — Mark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-utmp.service.html">systemd-update-utmp.service(8) — Write audit and utmp updates at bootup and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-user-sessions.service.html">systemd-user-sessions.service(8) — Permit user logins after boot, prohibit user logins at shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-userdbd.service.html">systemd-userdbd.service(8) — JSON User/Group Record Query Multiplexer/NSS Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-validatefs%40.service.html">systemd-validatefs@.service(8) — Validate File System Mount Constraint Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vconsole-setup.service.html">systemd-vconsole-setup.service(8) — Configure the virtual consoles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup-generator.html">systemd-veritysetup-generator(8) — Unit generator for verity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup%40.service.html">systemd-veritysetup@.service(8) — Disk verity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vmspawn.html">systemd-vmspawn(1) — Spawn an OS in a virtual machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-volatile-root.service.html">systemd-volatile-root.service(8) — Make the root file system volatile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vpick.html">systemd-vpick(1) — Resolve paths to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-xdg-autostart-generator.html">systemd-xdg-autostart-generator(8) — User unit generator for XDG autostart files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.automount.html">systemd.automount(5) — Automount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.device.html">systemd.device(5) — Device unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dns-delegate.html">systemd.dns-delegate(5) — DNS Server Delegation Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dnssd.html">systemd.dnssd(5) — DNS-SD configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.environment-generator.html">systemd.environment-generator(7) — systemd environment file generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.exec.html">systemd.exec(5) — Execution environment configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.generator.html">systemd.generator(7) — systemd unit generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-filter.html">systemd.image-filter(7) — Disk Image Dissection Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-policy.html">systemd.image-policy(7) — Disk Image Dissection Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.journal-fields.html">systemd.journal-fields(7) — Special journal fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.kill.html">systemd.kill(5) — Process killing procedure configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.link.html">systemd.link(5) — Network device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.mount.html">systemd.mount(5) — Mount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.net-naming-scheme.html">systemd.net-naming-scheme(7) — Network device naming schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.netdev.html">systemd.netdev(5) — Virtual Network Device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.network.html">systemd.network(5) — Network configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.nspawn.html">systemd.nspawn(5) — Container settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.offline-updates.html">systemd.offline-updates(7) — Implementation of offline updates in systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.path.html">systemd.path(5) — Path unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.pcrlock.html">systemd.pcrlock(5) — PCR measurement prediction files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.preset.html">systemd.preset(5) — Service enablement presets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.resource-control.html">systemd.resource-control(5) — Resource control unit settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.scope.html">systemd.scope(5) — Scope unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.service.html">systemd.service(5) — Service unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.slice.html">systemd.slice(5) — Slice unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.socket.html">systemd.socket(5) — Socket unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.special.html">systemd.special(7) — Special systemd units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.swap.html">systemd.swap(5) — Swap unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.syntax.html">systemd.syntax(7) — General syntax of systemd configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.system-credentials.html">systemd.system-credentials(7) — System Credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.target.html">systemd.target(5) — Target unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.time.html">systemd.time(7) — Time and date specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.timer.html">systemd.timer(5) — Timer unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.unit.html">systemd.unit(5) — Unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.v.html">systemd.v(7) — Directory with Versioned Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.d.html">sysupdate.d(5) — Transfer Definition Files for Automatic Updates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.features.html">sysupdate.features(5) — Definition Files for Optional Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysusers.d.html">sysusers.d(5) — Declarative allocation of system users and groups</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">T</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timedatectl.html">timedatectl(1) — Control the system time and date</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesyncd.conf.html">timesyncd.conf(5) — Network Time Synchronization configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tmpfiles.d.html">tmpfiles.d(5) — Configuration for creation, deletion, and cleaning of files and directories</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">U</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="udev.html">udev(7) — Dynamic device management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev.conf.html">udev.conf(5) — Configuration for device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_get_syspath.html">udev_device_get_syspath(3) — Query device properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_has_tag.html">udev_device_has_tag(3) — Retrieve or set device attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_new_from_syspath.html">udev_device_new_from_syspath(3) — Create, acquire and release a udev device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_add_match_subsystem.html">udev_enumerate_add_match_subsystem(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_new.html">udev_enumerate_new(3) — Create, acquire and release a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_scan_devices.html">udev_enumerate_scan_devices(3) — Query or modify a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_list_entry.html">udev_list_entry(3) — Iterate and access udev lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_filter_update.html">udev_monitor_filter_update(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_new_from_netlink.html">udev_monitor_new_from_netlink(3) — Create, acquire and release a udev monitor object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_receive_device.html">udev_monitor_receive_device(3) — Query and modify device monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_new.html">udev_new(3) — Create, acquire and release a udev context object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udevadm.html">udevadm(8) — udev management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ukify.html">ukify(1) — Combine components into a signed Unified Kernel Image for UEFI systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updatectl.html">updatectl(1) — Control the system update service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user%40.service.html">user@.service(5) — System units to start the user manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="userdbctl.html">userdbctl(1) — Inspect users, groups and group memberships</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">V</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="varlinkctl.html">varlinkctl(1) — Introspect with and invoke Varlink services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vconsole.conf.html">vconsole.conf(5) — Configuration file for the virtual console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="veritytab.html">veritytab(5) — Configuration for verity block devices</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/blob/man_pages_in_sphinx/doc-migration/source/docs/org.freedesktop.resolve1.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/edit/man_pages_in_sphinx/doc-migration/source/docs/org.freedesktop.resolve1.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="org-freedesktop-resolve1-5">
+<span id="id1"></span><h1>org.freedesktop.resolve1(5)<a class="headerlink" href="#org-freedesktop-resolve1-5" title="Link to this heading">¶</a></h1>
+<section id="name">
+<h2>Name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
+<p>org.freedesktop.resolve1 — The D-Bus interface of systemd-resolved</p>
+</section>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="systemd-resolved.service.html#systemd-resolved-service-8"><span class="std std-ref">systemd-resolved.service(8)</span></a> is a system service that provides hostname resolution and caching using DNS, LLMNR, and mDNS. It also does DNSSEC validation. This page describes the resolve semantics and the D-Bus interface.</p>
+<p>This page contains an API reference only. If you are looking for a longer explanation how to use this API, please consult <a class="reference external" href="https://wiki.freedesktop.org/www/Software/systemd/writing-network-configuration-managers">Writing Network Configuration Managers</a> and <a class="reference external" href="https://wiki.freedesktop.org/www/Software/systemd/writing-resolver-clients">Writing Resolver Clients</a>.</p>
+</section>
+<section id="the-manager-object">
+<h2>The Manager Object<a class="headerlink" href="#the-manager-object" title="Link to this heading">¶</a></h2>
+<p>The service exposes the following interfaces on the Manager object on the bus:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>node<span class="w"> </span>/org/freedesktop/resolve1<span class="w"> </span><span class="o">{</span>
+<span class="w">  </span>interface<span class="w"> </span>org.freedesktop.resolve1.Manager<span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>methods:
+<span class="w">      </span>ResolveHostname<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>name,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>family,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>t<span class="w"> </span>flags,
+<span class="w">                      </span>out<span class="w"> </span>a<span class="o">(</span>iiay<span class="o">)</span><span class="w"> </span>addresses,
+<span class="w">                      </span>out<span class="w"> </span>s<span class="w"> </span>canonical,
+<span class="w">                      </span>out<span class="w"> </span>t<span class="w"> </span>flags<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>ResolveAddress<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>family,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>ay<span class="w"> </span>address,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>t<span class="w"> </span>flags,
+<span class="w">                     </span>out<span class="w"> </span>a<span class="o">(</span>is<span class="o">)</span><span class="w"> </span>names,
+<span class="w">                     </span>out<span class="w"> </span>t<span class="w"> </span>flags<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>ResolveRecord<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                    </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>name,
+<span class="w">                    </span><span class="k">in</span><span class="w">  </span>q<span class="w"> </span>class,
+<span class="w">                    </span><span class="k">in</span><span class="w">  </span>q<span class="w"> </span>type,
+<span class="w">                    </span><span class="k">in</span><span class="w">  </span>t<span class="w"> </span>flags,
+<span class="w">                    </span>out<span class="w"> </span>a<span class="o">(</span>iqqay<span class="o">)</span><span class="w"> </span>records,
+<span class="w">                    </span>out<span class="w"> </span>t<span class="w"> </span>flags<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>ResolveService<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>name,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>type,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>domain,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>family,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>t<span class="w"> </span>flags,
+<span class="w">                     </span>out<span class="w"> </span>a<span class="o">(</span>qqqsa<span class="o">(</span>iiay<span class="o">)</span>s<span class="o">)</span><span class="w"> </span>srv_data,
+<span class="w">                     </span>out<span class="w"> </span>aay<span class="w"> </span>txt_data,
+<span class="w">                     </span>out<span class="w"> </span>s<span class="w"> </span>canonical_name,
+<span class="w">                     </span>out<span class="w"> </span>s<span class="w"> </span>canonical_type,
+<span class="w">                     </span>out<span class="w"> </span>s<span class="w"> </span>canonical_domain,
+<span class="w">                     </span>out<span class="w"> </span>t<span class="w"> </span>flags<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>GetLink<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">              </span>out<span class="w"> </span>o<span class="w"> </span>path<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkDNS<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                 </span><span class="k">in</span><span class="w">  </span>a<span class="o">(</span>iay<span class="o">)</span><span class="w"> </span>addresses<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkDNSEx<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                   </span><span class="k">in</span><span class="w">  </span>a<span class="o">(</span>iayqs<span class="o">)</span><span class="w"> </span>addresses<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkDomains<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                     </span><span class="k">in</span><span class="w">  </span>a<span class="o">(</span>sb<span class="o">)</span><span class="w"> </span>domains<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkDefaultRoute<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                          </span><span class="k">in</span><span class="w">  </span>b<span class="w"> </span><span class="nb">enable</span><span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkLLMNR<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                   </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>mode<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkMulticastDNS<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                          </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>mode<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkDNSOverTLS<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                        </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>mode<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkDNSSEC<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                    </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>mode<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLinkDNSSECNegativeTrustAnchors<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex,
+<span class="w">                                        </span><span class="k">in</span><span class="w">  </span>as<span class="w"> </span>names<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>RevertLink<span class="o">(</span><span class="k">in</span><span class="w">  </span>i<span class="w"> </span>ifindex<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>RegisterService<span class="o">(</span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>id,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>name_template,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>type,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>q<span class="w"> </span>service_port,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>q<span class="w"> </span>service_priority,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>q<span class="w"> </span>service_weight,
+<span class="w">                      </span><span class="k">in</span><span class="w">  </span>aa<span class="o">{</span>say<span class="o">}</span><span class="w"> </span>txt_datas,
+<span class="w">                      </span>out<span class="w"> </span>o<span class="w"> </span>service_path<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>UnregisterService<span class="o">(</span><span class="k">in</span><span class="w">  </span>o<span class="w"> </span>service_path<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>ResetStatistics<span class="o">()</span><span class="p">;</span>
+<span class="w">      </span>FlushCaches<span class="o">()</span><span class="p">;</span>
+<span class="w">      </span>ResetServerFeatures<span class="o">()</span><span class="p">;</span>
+<span class="w">      </span>GetDelegate<span class="o">(</span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>id,
+<span class="w">                  </span>out<span class="w"> </span>o<span class="w"> </span>path<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>ListDelegates<span class="o">(</span>out<span class="w"> </span>a<span class="o">(</span>so<span class="o">)</span><span class="w"> </span>delegates<span class="o">)</span><span class="p">;</span>
+<span class="w">    </span>properties:
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">LLMNRHostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">LLMNR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">MulticastDNS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">DNSOverTLS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>a<span class="o">(</span>iiay<span class="o">)</span><span class="w"> </span><span class="nv">DNS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>a<span class="o">(</span>iiayqs<span class="o">)</span><span class="w"> </span><span class="nv">DNSEx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;const&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>a<span class="o">(</span>iiay<span class="o">)</span><span class="w"> </span><span class="nv">FallbackDNS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;const&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>a<span class="o">(</span>iiayqs<span class="o">)</span><span class="w"> </span><span class="nv">FallbackDNSEx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span><span class="o">(</span>iiay<span class="o">)</span><span class="w"> </span><span class="nv">CurrentDNSServer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span><span class="o">(</span>iiayqs<span class="o">)</span><span class="w"> </span><span class="nv">CurrentDNSServerEx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>a<span class="o">(</span>isb<span class="o">)</span><span class="w"> </span><span class="nv">Domains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span><span class="o">(</span>tt<span class="o">)</span><span class="w"> </span><span class="nv">TransactionStatistics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span><span class="o">(</span>ttt<span class="o">)</span><span class="w"> </span><span class="nv">CacheStatistics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">DNSSEC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span><span class="o">(</span>tttt<span class="o">)</span><span class="w"> </span><span class="nv">DNSSECStatistics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>b<span class="w"> </span><span class="nv">DNSSECSupported</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>as<span class="w"> </span><span class="nv">DNSSECNegativeTrustAnchors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;...&#39;</span>,<span class="w"> </span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">DNSStubListener</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">ResolvConfMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">  </span><span class="o">}</span><span class="p">;</span>
+<span class="w">  </span>interface<span class="w"> </span>org.freedesktop.DBus.Peer<span class="w"> </span><span class="o">{</span><span class="w"> </span>...<span class="w"> </span><span class="o">}</span><span class="p">;</span>
+<span class="w">  </span>interface<span class="w"> </span>org.freedesktop.DBus.Introspectable<span class="w"> </span><span class="o">{</span><span class="w"> </span>...<span class="w"> </span><span class="o">}</span><span class="p">;</span>
+<span class="w">  </span>interface<span class="w"> </span>org.freedesktop.DBus.Properties<span class="w"> </span><span class="o">{</span><span class="w"> </span>...<span class="w"> </span><span class="o">}</span><span class="p">;</span>
+<span class="o">}</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">ResolveHostname()</span></code> takes a hostname and resolves it to one or more IP addresses. As parameters it takes the Linux network interface index to execute the query on, or 0 if it may be done on any suitable interface. The <code class="code docutils literal notranslate"><span class="pre">name</span></code> parameter specifies the hostname to resolve. Note that if required, IDNA conversion is applied to this name unless it is resolved via LLMNR or MulticastDNS. The <code class="code docutils literal notranslate"><span class="pre">family</span></code> parameter limits the results to a specific address family. It may be <code class="code docutils literal notranslate"><span class="pre">AF_INET</span></code>, <code class="code docutils literal notranslate"><span class="pre">AF_INET6</span></code> or <code class="code docutils literal notranslate"><span class="pre">AF_UNSPEC</span></code>. If <code class="code docutils literal notranslate"><span class="pre">AF_UNSPEC</span></code> is specified (recommended), both kinds are retrieved, subject to local network configuration (i.e. if no local, routable IPv6 address is found, no IPv6 address is retrieved; and similarly for IPv4). A 64-bit <code class="code docutils literal notranslate"><span class="pre">flags</span></code> field may be used to alter the behaviour of the resolver operation (see below). The method returns an array of address records. Each address record consists of the interface index the address belongs to, an address family as well as a byte array with the actual IP address data (which either has 4 or 16 elements, depending on the address family). The returned address family will be one of <code class="code docutils literal notranslate"><span class="pre">AF_INET</span></code> or <code class="code docutils literal notranslate"><span class="pre">AF_INET6</span></code>. For IPv6, the returned address interface index should be used to initialize the .sin6_scope_id field of a struct sockaddr_in6 instance to permit support for resolution to link-local IP addresses. The address array is followed by the canonical name of the host, which may or may not be identical to the resolved hostname. Finally, a 64-bit <code class="code docutils literal notranslate"><span class="pre">flags</span></code> field is returned that is defined similarly to the <code class="code docutils literal notranslate"><span class="pre">flags</span></code> field that was passed in, but contains information about the resolved data (see below). If the hostname passed in is an IPv4 or IPv6 address formatted as string, it is parsed, and the result is returned. In this case, no network communication is done.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">ResolveAddress()</span></code> executes the reverse operation: it takes an IP address and acquires one or more hostnames for it. As parameters it takes the interface index to execute the query on, or <code class="code docutils literal notranslate"><span class="pre">0</span></code> if all suitable interfaces are OK. The <code class="code docutils literal notranslate"><span class="pre">family</span></code> parameter indicates the address family of the IP address to resolve. It may be either <code class="code docutils literal notranslate"><span class="pre">AF_INET</span></code> or <code class="code docutils literal notranslate"><span class="pre">AF_INET6</span></code>. The <code class="code docutils literal notranslate"><span class="pre">address</span></code> parameter takes the raw IP address data (as either a 4 or 16 byte array). The <code class="code docutils literal notranslate"><span class="pre">flags</span></code> input parameter may be used to alter the resolver operation (see below). The method returns an array of name records, each consisting of an interface index and a hostname. The <code class="code docutils literal notranslate"><span class="pre">flags</span></code> output field contains additional information about the resolver operation (see below).</p>
+<p><code class="code docutils literal notranslate"><span class="pre">ResolveRecord()</span></code> takes a DNS resource record (RR) type, class and name, and retrieves the full resource record set (RRset), including the RDATA, for it. As parameter it takes the Linux network interface index to execute the query on, or <code class="code docutils literal notranslate"><span class="pre">0</span></code> if it may be done on any suitable interface. The <code class="code docutils literal notranslate"><span class="pre">name</span></code> parameter specifies the RR domain name to look up (no IDNA conversion is applied), followed by the 16-bit class and type fields (which may be ANY). Finally, a <code class="code docutils literal notranslate"><span class="pre">flags</span></code> field may be passed in to alter behaviour of the look-up (see below). On completion, an array of RR items is returned. Each array entry consists of the network interface index the RR was discovered on, the type and class field of the RR found, and a byte array of the raw RR discovered. The raw RR data starts with the RR’s domain name, in the original casing, followed by the RR type, class, TTL and RDATA, in the binary format documented in <a class="reference external" href="https://www.ietf.org/rfc/rfc1035.txt">RFC 1035</a>. For RRs that support name compression in the payload (such as MX or PTR), the compression is expanded in the returned data.</p>
+<p>Note that currently, the class field has to be specified as IN or ANY. Specifying a different class will return an error indicating that look-ups of this kind are unsupported. Similarly, some special types are not supported either (AXFR, OPT, …). While <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> parses and validates resource records of many types, it is crucial that clients using this API understand that the RR data originates from the network and should be thoroughly validated before use.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">ResolveService()</span></code> may be used to resolve a DNS <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> service record, as well as the hostnames referenced in it, and possibly an accompanying DNS-SD <code class="code docutils literal notranslate"><span class="pre">TXT</span></code> record containing additional service metadata. The primary benefit of using this method over <code class="code docutils literal notranslate"><span class="pre">ResolveRecord()</span></code> specifying the <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> type is that it will resolve the <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> and <code class="code docutils literal notranslate"><span class="pre">TXT</span></code> RRs as well as the hostnames referenced in the SRV in a single operation. As parameters it takes a Linux network interface index, a service name, a service type and a service domain. This method may be invoked in three different modes:</p>
+<ol class="arabic simple">
+<li><p>To resolve a DNS-SD service, specify the service name (e.g. “Lennart’s Files”), the service type (e.g. “_webdav._tcp”) and the domain to search in (e.g. “local”) as the three service parameters. The service name must be in UTF-8 format, and no IDNA conversion is applied to it in this mode (as mandated by the DNS-SD specifications). However, if necessary, IDNA conversion is applied to the domain parameter.</p></li>
+<li><p>To resolve a plain <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> record, set the service name parameter to the empty string and set the service type and domain properly. (IDNA conversion is applied to the domain, if necessary.)</p></li>
+<li><p>Alternatively, leave both the service name and type empty and specify the full domain name of the <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> record (i.e. prefixed with the service type) in the domain parameter. (No IDNA conversion is applied in this mode.)</p></li>
+</ol>
+<p>The <code class="code docutils literal notranslate"><span class="pre">family</span></code> parameter of the <code class="code docutils literal notranslate"><span class="pre">ResolveService()</span></code> method encodes the desired family of the addresses to resolve (use <code class="code docutils literal notranslate"><span class="pre">AF_INET</span></code>, <code class="code docutils literal notranslate"><span class="pre">AF_INET6</span></code>, or <code class="code docutils literal notranslate"><span class="pre">AF_UNSPEC</span></code>). If this is enabled (Use the <code class="code docutils literal notranslate"><span class="pre">NO_ADDRESS</span></code> flag to turn address resolution off, see below). The <code class="code docutils literal notranslate"><span class="pre">flags</span></code> parameter takes a couple of flags that may be used to alter the resolver operation.</p>
+<p>On completion, <code class="code docutils literal notranslate"><span class="pre">ResolveService()</span></code> returns an array of <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> record structures. Each items consisting of the priority, weight and port fields as well as the hostname to contact, as encoded in the <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> record. Immediately following is an array of the addresses of this hostname, with each item consisting of the interface index, the address family and the address data in a byte array. This address array is followed by the canonicalized hostname. After this array of <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> record structures an array of byte arrays follows that encodes the TXT RR strings, in case DNS-SD look-ups are enabled. The next parameters are the canonical service name, type and domain. This may or may not be identical to the parameters passed in. Finally, a <code class="code docutils literal notranslate"><span class="pre">flags</span></code> field is returned that contains information about the resolver operation performed.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ResetStatistics()</span></code> method resets the various statistics counters that <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> maintains to zero. (For details, see the statistics properties below.)</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">GetLink()</span></code> method takes a network interface index and returns the object path to the <code class="code docutils literal notranslate"><span class="pre">org.freedesktop.resolve1.Link</span></code> object corresponding to it.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">SetLinkDNS()</span></code> method sets the DNS servers to use on a specific interface. This method (and the following ones) may be used by network management software to configure per-interface DNS settings. It takes a network interface index as well as an array of DNS server IP address records. Each array item consists of an address family (either <code class="code docutils literal notranslate"><span class="pre">AF_INET</span></code> or <code class="code docutils literal notranslate"><span class="pre">AF_INET6</span></code>), followed by a 4-byte or 16-byte array with the raw address data. This method is a one-step shortcut for retrieving the Link object for a network interface using <code class="code docutils literal notranslate"><span class="pre">GetLink()</span></code> (see above) and then invoking the <code class="code docutils literal notranslate"><span class="pre">SetDNS()</span></code> method (see below) on it.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">SetLinkDNSEx()</span></code> is similar to <code class="code docutils literal notranslate"><span class="pre">SetLinkDNS()</span></code>, but allows an IP port (instead of the default 53) and DNS name to be specified for each DNS server. The server name is used for Server Name Indication (SNI), which is useful when DNS-over-TLS is used. C.f. <code class="code docutils literal notranslate"><span class="pre">DNS=</span></code> in <a class="reference external" href="https://man7.org/linux/man-pages/man5/resolved.conf.5.html">resolved.conf(5)</a>.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">SetLinkDefaultRoute()</span></code> specifies whether the link shall be used as the default route for name queries. See the description of name routing in <a class="reference internal" href="systemd-resolved.service.html#systemd-resolved-service-8"><span class="std std-ref">systemd-resolved.service(8)</span></a> for details.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">SetLinkDomains()</span></code> method sets the search and routing domains to use on a specific network interface for DNS look-ups. It takes a network interface index and an array of domains, each with a boolean parameter indicating whether the specified domain shall be used as a search domain (false), or just as a routing domain (true). Search domains are used for qualifying single-label names into FQDN when looking up hostnames, as well as for making routing decisions on which interface to send queries ending in the domain to. Routing domains are only used for routing decisions and not used for single-label name qualification. Pass the search domains in the order they should be used.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">SetLinkLLMNR()</span></code> method enables or disables LLMNR support on a specific network interface. It takes a network interface index as well as a string that may either be empty or one of “yes”, “no” or “resolve”. If empty, the systemd-wide default LLMNR setting is used. If “yes”, LLMNR is used for resolution of single-label names and the local hostname is registered on all local LANs for LLMNR resolution by peers. If “no”, LLMNR is turned off fully on this interface. If “resolve”, LLMNR is only enabled for resolving names, but the local hostname is not registered for other peers to use.</p>
+<p>Similarly, the <code class="code docutils literal notranslate"><span class="pre">SetLinkMulticastDNS()</span></code> method enables or disables MulticastDNS support on a specific interface. It takes the same parameters as <code class="code docutils literal notranslate"><span class="pre">SetLinkLLMNR()</span></code> described above.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">SetLinkDNSSEC()</span></code> method enables or disables DNSSEC validation on a specific network interface. It takes a network interface index as well as a string that may either be empty or one of “yes”, “no”, or “allow-downgrade”. When empty, the system-wide default DNSSEC setting is used. If “yes”, full DNSSEC validation is done for all look-ups. If the selected DNS server does not support DNSSEC, look-ups will fail if this mode is used. If “no”, DNSSEC validation is fully disabled. If “allow-downgrade”, DNSSEC validation is enabled, but is turned off automatically if the selected server does not support it (thus opening up behaviour to downgrade attacks). Note that DNSSEC only applies to traditional DNS, not to LLMNR or MulticastDNS.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">SetLinkDNSSECNegativeTrustAnchors()</span></code> method may be used to configure DNSSEC Negative Trust Anchors (NTAs) for a specific network interface. It takes a network interface index and a list of domains as arguments.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">SetLinkDNSOverTLS()</span></code> method enables or disables DNS-over-TLS. C.f. <code class="code docutils literal notranslate"><span class="pre">DNSOverTLS=</span></code> in <a class="reference internal" href="systemd-resolved.service.html#systemd-resolved-service-8"><span class="std std-ref">systemd-resolved.service(8)</span></a> for details.</p>
+<p>Network management software integrating with <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> should call <code class="code docutils literal notranslate"><span class="pre">SetLinkDNS()</span></code> or <code class="code docutils literal notranslate"><span class="pre">SetLinkDNSEx()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetLinkDefaultRoute()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetLinkDomains()</span></code> and others after the interface appeared in the kernel (and thus after a network interface index has been assigned), but before the network interfaces is activated (<code class="code docutils literal notranslate"><span class="pre">IFF_UP</span></code> set) so that all settings take effect during the full time the network interface is up. It is safe to alter settings while the interface is up, however. Use <code class="code docutils literal notranslate"><span class="pre">RevertLink()</span></code> (described below) to reset all per-interface settings.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">RevertLink()</span></code> method may be used to revert all per-link settings described above to the defaults.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">FlushCaches()</span></code> method flushes all resource record caches maintained by the resolver, and ensures that any subsequent lookups re-request their responses from their sources.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ResetServerFeatures()</span></code> method flushes any feature information learned about remote DNS servers. This ensures that subsequent lookups will be initially attempted at the highest DNS protocol feature level again, possibly requiring a (potentially slow) downgrade cycle to recognize the supported feature level again.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">RegisterService()</span></code> method may be used to register a DNS-SD service on the host. This functionality is closely related to the functionality provided by <a class="reference internal" href="systemd.dnssd.html#systemd-dnssd-5"><span class="std std-ref">systemd.dnssd(5)</span></a> files. It takes a server identifier string as first parameter (this is just a local identifier, and should be chosen so that it neither collides with the basename of <code class="code docutils literal notranslate"><span class="pre">*.dnssd</span></code> files nor with names chosen by other IPC clients). It also takes a name template string for the DNS-SD service name visible on the network. This string is subject to specifier expansation, as documented for the <code class="code docutils literal notranslate"><span class="pre">Name=</span></code> setting in <code class="code docutils literal notranslate"><span class="pre">*.dnssd</span></code> files. It also takes a service type string containing the DNS-SD service type, as well as an IP port, a priority/weight pair for the DNS-SD SRV record. Finally, it takes an array of TXT record data. It returns an object path which may be used as handle to the registered service.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">UnregisterService()</span></code> method undoes the effect of <code class="code docutils literal notranslate"><span class="pre">RegisterService()</span></code> and deletes a DNS-SD service previously created via IPC again.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">GetDelegate()</span></code> method returns the D-Bus object path for the specified DNS delegate ID.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ListDelegates()</span></code> method returns a list of the IDs and D-Bus object paths of the currently configured DNS delegates.</p>
+</section>
+<section id="the-flags-parameter">
+<h2>The Flags Parameter<a class="headerlink" href="#the-flags-parameter" title="Link to this heading">¶</a></h2>
+<p>The four methods above accept and return a 64-bit flags value. In most cases passing 0 is sufficient and recommended. However, the following flags are defined to alter the look-up:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>/*<span class="w"> </span>Input+Output:<span class="w"> </span>Protocol/scope<span class="w"> </span>*/
+<span class="c1">#define SD_RESOLVED_DNS                (UINT64_C(1) &lt;&lt;  0)</span>
+<span class="c1">#define SD_RESOLVED_LLMNR_IPV4         (UINT64_C(1) &lt;&lt;  1)</span>
+<span class="c1">#define SD_RESOLVED_LLMNR_IPV6         (UINT64_C(1) &lt;&lt;  2)</span>
+<span class="c1">#define SD_RESOLVED_MDNS_IPV4          (UINT64_C(1) &lt;&lt;  3)</span>
+<span class="c1">#define SD_RESOLVED_MDNS_IPV6          (UINT64_C(1) &lt;&lt;  4)</span>
+/*<span class="w"> </span>Input:<span class="w"> </span>Restrictions<span class="w"> </span>*/
+<span class="c1">#define SD_RESOLVED_NO_CNAME           (UINT64_C(1) &lt;&lt;  5)</span>
+<span class="c1">#define SD_RESOLVED_NO_TXT             (UINT64_C(1) &lt;&lt;  6)</span>
+<span class="c1">#define SD_RESOLVED_NO_ADDRESS         (UINT64_C(1) &lt;&lt;  7)</span>
+<span class="c1">#define SD_RESOLVED_NO_SEARCH          (UINT64_C(1) &lt;&lt;  8)</span>
+<span class="c1">#define SD_RESOLVED_NO_VALIDATE        (UINT64_C(1) &lt;&lt; 10)</span>
+<span class="c1">#define SD_RESOLVED_NO_SYNTHESIZE      (UINT64_C(1) &lt;&lt; 11)</span>
+<span class="c1">#define SD_RESOLVED_NO_CACHE           (UINT64_C(1) &lt;&lt; 12)</span>
+<span class="c1">#define SD_RESOLVED_NO_ZONE            (UINT64_C(1) &lt;&lt; 13)</span>
+<span class="c1">#define SD_RESOLVED_NO_TRUST_ANCHOR    (UINT64_C(1) &lt;&lt; 14)</span>
+<span class="c1">#define SD_RESOLVED_NO_NETWORK         (UINT64_C(1) &lt;&lt; 15)</span>
+<span class="c1">#define SD_RESOLVED_NO_STALE           (UINT64_C(1) &lt;&lt; 24)</span>
+<span class="c1">#define SD_RESOLVED_RELAX_SINGLE_LABEL (UINT64_C(1) &lt;&lt; 25)</span>
+/*<span class="w"> </span>Output:<span class="w"> </span>Security<span class="w"> </span>*/
+<span class="c1">#define SD_RESOLVED_AUTHENTICATED      (UINT64_C(1) &lt;&lt;  9)</span>
+<span class="c1">#define SD_RESOLVED_CONFIDENTIAL       (UINT64_C(1) &lt;&lt; 18)</span>
+/*<span class="w"> </span>Output:<span class="w"> </span>Origin<span class="w"> </span>*/
+<span class="c1">#define SD_RESOLVED_SYNTHETIC          (UINT64_C(1) &lt;&lt; 19)</span>
+<span class="c1">#define SD_RESOLVED_FROM_CACHE         (UINT64_C(1) &lt;&lt; 20)</span>
+<span class="c1">#define SD_RESOLVED_FROM_ZONE          (UINT64_C(1) &lt;&lt; 21)</span>
+<span class="c1">#define SD_RESOLVED_FROM_TRUST_ANCHOR  (UINT64_C(1) &lt;&lt; 22)</span>
+<span class="c1">#define SD_RESOLVED_FROM_NETWORK       (UINT64_C(1) &lt;&lt; 23)</span>
+<span class="c1">#define SD_RESOLVED_FROM_HOOK          (UINT64_C(1) &lt;&lt; 27)</span>
+</pre></div>
+</div>
+<p>On input, the first five flags control the protocols to use for the look-up. They refer to classic unicast DNS, LLMNR via IPv4/UDP and IPv6/UDP respectively, as well as MulticastDNS via IPv4/UDP and IPv6/UDP. If all of these five bits are off on input (which is strongly recommended) the look-up will be done via all suitable protocols for the specific look-up. Note that these flags operate as filter only, but cannot force a look-up to be done via a protocol. Specifically, <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> will only route look-ups within the .local TLD to MulticastDNS (plus some reverse look-up address domains), and single-label names to LLMNR (plus some reverse address lookup domains). It will route neither of these to Unicast DNS servers. Also, it will do LLMNR and Multicast DNS only on interfaces suitable for multicast.</p>
+<p>On output, these five flags indicate which protocol was used to execute the operation, and hence where the data was found.</p>
+<p>The primary use cases for these five flags are follow-up look-ups based on DNS data retrieved earlier. In this case, it is often a good idea to limit the follow-up look-up to the protocol that was used to discover the first DNS result.</p>
+<p>The NO_CNAME flag controls whether CNAME/DNAME resource records shall be followed during the look-up. This flag is only available at input, none of the functions will return it on output. If a CNAME/DNAME RR is discovered while resolving a hostname, an error is returned instead. By default, when the flag is off, CNAME/DNAME RRs are followed.</p>
+<p>The NO_TXT and NO_ADDRESS flags only influence operation of the <code class="code docutils literal notranslate"><span class="pre">ResolveService()</span></code> method. They are only defined for input, not output. If NO_TXT is set, the DNS-SD TXT RR look-up is not done in the same operation. If NO_ADDRESS is set, the discovered hostnames are not implicitly translated to their addresses.</p>
+<p>The NO_SEARCH flag turns off the search domain logic. It is only defined for input in <code class="code docutils literal notranslate"><span class="pre">ResolveHostname()</span></code>. When specified, single-label hostnames are not qualified using defined search domains, if any are configured. Note that <code class="code docutils literal notranslate"><span class="pre">ResolveRecord()</span></code> will never qualify single-label domain names using search domains. Also note that multi-label hostnames are never subject to search list expansion.</p>
+<p>NO_VALIDATE can be set to disable validation via DNSSEC even if it would normally be used.</p>
+<p>The next six flags allow disabling certain sources during resolution. NO_SYNTHESIZE disables synthetic records, e.g. the local host name, see section SYNTHETIC RECORDS in <a class="reference internal" href="systemd-resolved.service.html#systemd-resolved-service-8"><span class="std std-ref">systemd-resolved.service(8)</span></a> for more information. NO_CACHE disables the use of the cache of previously resolved records. NO_ZONE disables answers using locally registered public LLMNR/mDNS resource records. NO_TRUST_ANCHOR disables answers using locally configured trust anchors. NO_NETWORK requires all answers to be provided without using the network, i.e. either from local sources or the cache. NO_STALE flag can be set to disable answering request with stale records.</p>
+<p>The AUTHENTICATED bit is defined only in the output flags of the four functions. If set, the returned data has been fully authenticated. Specifically, this bit is set for all DNSSEC-protected data for which a full trust chain may be established to a trusted domain anchor. It is also set for locally synthesized data, such as “localhost” or data from <code class="code docutils literal notranslate"><span class="pre">/etc/hosts</span></code>. Moreover, it is set for all LLMNR or mDNS RRs which originate from the local host. Applications that require authenticated RR data for operation should check this flag before trusting the data. Note that <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> will never return invalidated data, hence this flag simply allows one to discern the cases where data is known to be trusted, or where there is proof that the data is “rightfully” unauthenticated (which includes cases where the underlying protocol or server does not support authenticating data).</p>
+<p>CONFIDENTIAL means the query was resolved via encrypted channels or never left this system.</p>
+<p>The next five bits flags are used in output and provide information about the origin of the answer. FROM_SYNTHETIC means the query was (at least partially) synthesized locally. FROM_CACHE means the query was answered (at least partially) using the cache. FROM_ZONE means the query was answered (at least partially) based on public, locally registered records. FROM_TRUST_ANCHOR means the query was answered (at least partially) using local trust anchors. FROM_NETWORK means the query was answered (at least partially) using the network.</p>
+</section>
+<section id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Link to this heading">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">LLMNR</span></code> and <code class="code docutils literal notranslate"><span class="pre">MulticastDNS</span></code> properties report whether LLMNR and MulticastDNS are (globally) enabled. Each may be one of “yes”, “no”, and “resolve”. See <code class="code docutils literal notranslate"><span class="pre">SetLinkLLMNR()</span></code> and <code class="code docutils literal notranslate"><span class="pre">SetLinkMulticastDNS()</span></code> above.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">LLMNRHostname</span></code> contains the hostname currently exposed on the network via LLMNR. It usually follows the system hostname as may be queried via <a class="reference external" href="https://man7.org/linux/man-pages/man3/gethostname.3.html">gethostname(3)</a>, but may differ if a conflict is detected on the network.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">DNS</span></code> and <code class="code docutils literal notranslate"><span class="pre">DNSEx</span></code> contain arrays of all DNS servers currently used by <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code>. <code class="code docutils literal notranslate"><span class="pre">DNS</span></code> contains information similar to the DNS server data in <code class="code docutils literal notranslate"><span class="pre">/run/systemd/resolve/resolv.conf</span></code>. Each structure in the array consists of a numeric network interface index, an address family, and a byte array containing the DNS server address (either 4 bytes in length for IPv4 or 16 bytes in lengths for IPv6). <code class="code docutils literal notranslate"><span class="pre">DNSEx</span></code> is similar, but additionally contains the IP port and server name (used for Server Name Indication, SNI). Both arrays contain DNS servers configured system-wide, including those possibly read from a foreign <code class="code docutils literal notranslate"><span class="pre">/etc/resolv.conf</span></code> or the <code class="code docutils literal notranslate"><span class="pre">DNS=</span></code> setting in <code class="code docutils literal notranslate"><span class="pre">/etc/systemd/resolved.conf</span></code>, as well as per-interface DNS server information either retrieved from <a class="reference internal" href="systemd-networkd.service.html#systemd-networkd-service-8"><span class="std std-ref">systemd-networkd(8)</span></a>, or configured by external software via <code class="code docutils literal notranslate"><span class="pre">SetLinkDNS()</span></code> or <code class="code docutils literal notranslate"><span class="pre">SetLinkDNSEx()</span></code> (see above). The network interface index will be 0 for the system-wide configured services and non-zero for the per-link servers.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">FallbackDNS</span></code> and <code class="code docutils literal notranslate"><span class="pre">FallbackDNSEx</span></code> contain arrays of all DNS servers configured as fallback servers, if any, using the same format as <code class="code docutils literal notranslate"><span class="pre">DNS</span></code> and <code class="code docutils literal notranslate"><span class="pre">DNSEx</span></code> described above. See the description of <code class="code docutils literal notranslate"><span class="pre">FallbackDNS=</span></code> in <a class="reference external" href="https://man7.org/linux/man-pages/man5/resolved.conf.5.html">resolved.conf(5)</a> for the description of when those servers are used.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">CurrentDNSServer</span></code> and <code class="code docutils literal notranslate"><span class="pre">CurrentDNSServerEx</span></code> specify the server that is currently used for query resolution, in the same format as a single entry in the <code class="code docutils literal notranslate"><span class="pre">DNS</span></code> and <code class="code docutils literal notranslate"><span class="pre">DNSEx</span></code> arrays described above.</p>
+<p>Similarly, the <code class="code docutils literal notranslate"><span class="pre">Domains</span></code> property contains an array of all search and routing domains currently used by <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code>. Each entry consists of a network interface index (again, 0 encodes system-wide entries), the actual domain name, and whether the entry is used only for routing (true) or for both routing and searching (false).</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">TransactionStatistics</span></code> property contains information about the number of transactions <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> has processed. It contains a pair of unsigned 64-bit counters, the first containing the number of currently ongoing transactions, the second the number of total transactions <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> is processing or has processed. The latter value may be reset using the <code class="code docutils literal notranslate"><span class="pre">ResetStatistics()</span></code> method described above. Note that the number of transactions does not directly map to the number of issued resolver bus method calls. While simple look-ups usually require a single transaction only, more complex look-ups might result in more, for example when CNAMEs or DNSSEC are in use.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">CacheStatistics</span></code> property contains information about the executed cache operations so far. It exposes three 64-bit counters: the first being the total number of current cache entries (both positive and negative), the second the number of cache hits, and the third the number of cache misses. The latter counters may be reset using <code class="code docutils literal notranslate"><span class="pre">ResetStatistics()</span></code> (see above).</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">DNSSEC</span></code> property specifies current status of DNSSEC validation. It is one of “yes” (validation is enforced), “no” (no validation is done), “allow-downgrade” (validation is done if the current DNS server supports it). See the description of <code class="code docutils literal notranslate"><span class="pre">DNSSEC=</span></code> in <a class="reference external" href="https://man7.org/linux/man-pages/man5/resolved.conf.5.html">resolved.conf(5)</a>.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">DNSSECStatistics</span></code> property contains information about the DNSSEC validations executed so far. It contains four 64-bit counters: the number of secure, insecure, bogus, and indeterminate DNSSEC validations so far. The counters are increased for each validated RRset, and each non-existence proof. The secure counter is increased for each operation that successfully verified a signed reply, the insecure counter is increased for each operation that successfully verified that an unsigned reply is rightfully unsigned. The bogus counter is increased for each operation where the validation did not check out and the data is likely to have been tempered with. Finally, the indeterminate counter is increased for each operation which did not complete because the necessary keys could not be acquired or the cryptographic algorithms were unknown.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">DNSSECSupported</span></code> boolean property reports whether DNSSEC is enabled and the selected DNS servers support it. It combines information about system-wide and per-link DNS settings (see below), and only reports true if DNSSEC is enabled and supported on every interface for which DNS is configured and for the system-wide settings if there are any. Note that <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> assumes DNSSEC is supported by DNS servers until it verifies that this is not the case. Thus, the reported value may initially be true, until the first transactions are executed.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">DNSOverTLS</span></code> boolean property reports whether DNS-over-TLS is enabled.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ResolvConfMode</span></code> property exposes how <code class="code docutils literal notranslate"><span class="pre">/etc/resolv.conf</span></code> is managed on the host. Currently, the values “uplink”, “stub”, “static” (these three correspond to the three different files <code class="code docutils literal notranslate"><span class="pre">systemd-resolved.service</span></code> provides), “foreign” (the file is managed by admin or another service, <code class="code docutils literal notranslate"><span class="pre">systemd-resolved.service</span></code> just consumes it), “missing” (<code class="code docutils literal notranslate"><span class="pre">/etc/resolv.conf</span></code> is missing).</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">DNSStubListener</span></code> property reports whether the stub listener on port 53 is enabled. Possible values are “yes” (enabled), “no” (disabled), “udp” (only the UDP listener is enabled), and “tcp” (only the TCP listener is enabled).</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">DNSSECNegativeTrustAnchors</span></code> property contains a list of recognized DNSSEC negative trust anchors and contains a list of domains.</p>
+</section>
+<section id="link-object">
+<h2>Link Object<a class="headerlink" href="#link-object" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>node<span class="w"> </span>/org/freedesktop/resolve1/link/_1<span class="w"> </span><span class="o">{</span>
+<span class="w">  </span>interface<span class="w"> </span>org.freedesktop.resolve1.Link<span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>methods:
+<span class="w">      </span>SetDNS<span class="o">(</span><span class="k">in</span><span class="w">  </span>a<span class="o">(</span>iay<span class="o">)</span><span class="w"> </span>addresses<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetDNSEx<span class="o">(</span><span class="k">in</span><span class="w">  </span>a<span class="o">(</span>iayqs<span class="o">)</span><span class="w"> </span>addresses<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetDomains<span class="o">(</span><span class="k">in</span><span class="w">  </span>a<span class="o">(</span>sb<span class="o">)</span><span class="w"> </span>domains<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetDefaultRoute<span class="o">(</span><span class="k">in</span><span class="w">  </span>b<span class="w"> </span><span class="nb">enable</span><span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetLLMNR<span class="o">(</span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>mode<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetMulticastDNS<span class="o">(</span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>mode<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetDNSOverTLS<span class="o">(</span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>mode<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetDNSSEC<span class="o">(</span><span class="k">in</span><span class="w">  </span>s<span class="w"> </span>mode<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>SetDNSSECNegativeTrustAnchors<span class="o">(</span><span class="k">in</span><span class="w">  </span>as<span class="w"> </span>names<span class="o">)</span><span class="p">;</span>
+<span class="w">      </span>Revert<span class="o">()</span><span class="p">;</span>
+<span class="w">    </span>properties:
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>t<span class="w"> </span><span class="nv">ScopesMask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>a<span class="o">(</span>iay<span class="o">)</span><span class="w"> </span><span class="nv">DNS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>a<span class="o">(</span>iayqs<span class="o">)</span><span class="w"> </span><span class="nv">DNSEx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span><span class="o">(</span>iay<span class="o">)</span><span class="w"> </span><span class="nv">CurrentDNSServer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span><span class="o">(</span>iayqs<span class="o">)</span><span class="w"> </span><span class="nv">CurrentDNSServerEx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>a<span class="o">(</span>sb<span class="o">)</span><span class="w"> </span><span class="nv">Domains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>b<span class="w"> </span><span class="nv">DefaultRoute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">LLMNR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">MulticastDNS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">DNSOverTLS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>s<span class="w"> </span><span class="nv">DNSSEC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>as<span class="w"> </span><span class="nv">DNSSECNegativeTrustAnchors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;...&#39;</span>,<span class="w"> </span>...<span class="o">]</span><span class="p">;</span>
+<span class="w">      </span>@org.freedesktop.DBus.Property.EmitsChangedSignal<span class="o">(</span><span class="s2">&quot;false&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="nb">readonly</span><span class="w"> </span>b<span class="w"> </span><span class="nv">DNSSECSupported</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>...<span class="p">;</span>
+<span class="w">  </span><span class="o">}</span><span class="p">;</span>
+<span class="w">  </span>interface<span class="w"> </span>org.freedesktop.DBus.Peer<span class="w"> </span><span class="o">{</span><span class="w"> </span>...<span class="w"> </span><span class="o">}</span><span class="p">;</span>
+<span class="w">  </span>interface<span class="w"> </span>org.freedesktop.DBus.Introspectable<span class="w"> </span><span class="o">{</span><span class="w"> </span>...<span class="w"> </span><span class="o">}</span><span class="p">;</span>
+<span class="w">  </span>interface<span class="w"> </span>org.freedesktop.DBus.Properties<span class="w"> </span><span class="o">{</span><span class="w"> </span>...<span class="w"> </span><span class="o">}</span><span class="p">;</span>
+<span class="o">}</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For each Linux network interface a “Link” object is created which exposes per-link DNS configuration and state. Use <code class="code docutils literal notranslate"><span class="pre">GetLink()</span></code> on the Manager interface to retrieve the object path for a link object given the network interface index (see above).</p>
+</section>
+<section id="id2">
+<h2>Methods<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>The various methods exposed by the Link interface are equivalent to their similarly named counterparts on the Manager interface. e.g. <code class="code docutils literal notranslate"><span class="pre">SetDNS()</span></code> on the Link object maps to <code class="code docutils literal notranslate"><span class="pre">SetLinkDNS()</span></code> on the Manager object, the main difference being that the later expects an interface index to be specified. Invoking the methods on the Manager interface has the benefit of reducing roundtrips, as it is not necessary to first request the Link object path via <code class="code docutils literal notranslate"><span class="pre">GetLink()</span></code> before invoking the methods. The same relationship holds for <code class="code docutils literal notranslate"><span class="pre">SetDNSEx()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetDomains()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetDefaultRoute()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetLLMNR()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetMulticastDNS()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetDNSOverTLS()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetDNSSEC()</span></code>, <code class="code docutils literal notranslate"><span class="pre">SetDNSSECNegativeTrustAnchors()</span></code>, and <code class="code docutils literal notranslate"><span class="pre">Revert()</span></code>. For further details on these methods see the <code class="code docutils literal notranslate"><span class="pre">Manager</span></code> documentation above.</p>
+</section>
+<section id="id3">
+<h2>Properties<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">ScopesMask</span></code> defines which resolver scopes are currently active on this interface. This 64-bit unsigned integer field is a bit mask consisting of a subset of the bits of the flags parameter describe above. Specifically, it may have the DNS, LLMNR and MDNS bits (the latter in IPv4 and IPv6 flavours) set. Each individual bit is set when the protocol applies to a specific interface and is enabled for it. It is unset otherwise. Specifically, a multicast-capable interface in the “UP” state with an IP address is suitable for LLMNR or MulticastDNS, and any interface that is UP and has an IP address is suitable for DNS. Note the relationship of the bits exposed here with the LLMNR and MulticastDNS properties also exposed on the Link interface. The latter expose what is *configured* to be used on the interface, the former expose what is actually used on the interface, taking into account the abilities of the interface.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">DNSSECSupported</span></code> exposes a boolean field that indicates whether DNSSEC is currently configured and in use on the interface. Note that if DNSSEC is enabled on an interface, it is assumed available until it is detected that the configured server does not actually support it. Thus, this property may initially report that DNSSEC is supported on an interface.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">DefaultRoute</span></code> exposes a boolean field that indicates whether the interface will be used as default route for name queries. See <code class="code docutils literal notranslate"><span class="pre">SetLinkDefaultRoute()</span></code> above.</p>
+<p>The other properties reflect the state of the various configuration settings for the link which may be set with the various methods calls such as <code class="code docutils literal notranslate"><span class="pre">SetDNS()</span></code> or <code class="code docutils literal notranslate"><span class="pre">SetLLMNR()</span></code>.</p>
+</section>
+<section id="common-errors">
+<h2>Common Errors<a class="headerlink" href="#common-errors" title="Link to this heading">¶</a></h2>
+<p>Many bus methods <code class="code docutils literal notranslate"><span class="pre">systemd-resolved</span></code> exposes (in particular the resolver methods such as <code class="code docutils literal notranslate"><span class="pre">ResolveHostname()</span></code> on the <code class="code docutils literal notranslate"><span class="pre">Manager</span></code> interface) may return some of the following errors:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-nonameservers">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.NoNameServers</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-nonameservers" title="Link to this definition">¶</a></dt>
+<dd><p>No suitable DNS servers were found to resolve a request.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-invalidreply">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.InvalidReply</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-invalidreply" title="Link to this definition">¶</a></dt>
+<dd><p>A response from the selected DNS server was not understood.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-nosuchrr">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.NoSuchRR</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-nosuchrr" title="Link to this definition">¶</a></dt>
+<dd><p>The requested name exists, but there is no resource record of the requested type for it. (This is the DNS NODATA case).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-cnameloop">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.CNameLoop</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-cnameloop" title="Link to this definition">¶</a></dt>
+<dd><p>The look-up failed because a CNAME or DNAME loop was detected.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-aborted">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.Aborted</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-aborted" title="Link to this definition">¶</a></dt>
+<dd><p>The look-up was aborted because the selected protocol became unavailable while the operation was ongoing.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-nosuchservice">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.NoSuchService</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-nosuchservice" title="Link to this definition">¶</a></dt>
+<dd><p>A service look-up was successful, but the <code class="code docutils literal notranslate"><span class="pre">SRV</span></code> record reported that the service is not available.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-dnssecfailed">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.DnssecFailed</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-dnssecfailed" title="Link to this definition">¶</a></dt>
+<dd><p>The acquired response did not pass DNSSEC validation.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-notrustanchor">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.NoTrustAnchor</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-notrustanchor" title="Link to this definition">¶</a></dt>
+<dd><p>No chain of trust could be established for the response to a configured DNSSEC trust anchor.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-resourcerecordtypeunsupported">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.ResourceRecordTypeUnsupported</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-resourcerecordtypeunsupported" title="Link to this definition">¶</a></dt>
+<dd><p>The requested resource record type is not supported on the selected DNS servers. This error is generated for example when an RRSIG record is requested from a DNS server that does not support DNSSEC.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-nosuchlink">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.NoSuchLink</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-nosuchlink" title="Link to this definition">¶</a></dt>
+<dd><p>No network interface with the specified network interface index exists.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-linkbusy">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.LinkBusy</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-linkbusy" title="Link to this definition">¶</a></dt>
+<dd><p>The requested configuration change could not be made because <a class="reference internal" href="systemd-networkd.service.html#systemd-networkd-service-8"><span class="std std-ref">systemd-networkd(8)</span></a>, already took possession of the interface and supplied configuration data for it.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-networkdown">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.NetworkDown</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-networkdown" title="Link to this definition">¶</a></dt>
+<dd><p>The requested look-up failed because the system is currently not connected to any suitable network.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-dnserror-nxdomain">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.DnsError.NXDOMAIN</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-dnserror-nxdomain" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-dnserror-refused">
+<span class="sig-name descname"><span class="pre">org.freedesktop.resolve1.DnsError.REFUSED</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-org-freedesktop-resolve1-dnserror-refused" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-org-freedesktop-resolve1-">
+<span class="sig-name descname"><span class="pre">...</span></span><a class="headerlink" href="#systemd-option-org-freedesktop-resolve1-" title="Link to this definition">¶</a></dt>
+<dd><p>The look-up failed with a DNS return code reporting a failure. The error names used as suffixes here are defined in by IANA in <a class="reference external" href="https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6">DNS RCODEs</a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<section id="introspect-org-freedesktop-resolve1-manager-on-the-bus">
+<h3>Introspect <code class="code docutils literal notranslate"><span class="pre">org.freedesktop.resolve1.Manager</span></code> on the bus<a class="headerlink" href="#introspect-org-freedesktop-resolve1-manager-on-the-bus" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>gdbus<span class="w"> </span>introspect<span class="w"> </span>--system<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dest<span class="w"> </span>org.freedesktop.resolve1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--object-path<span class="w"> </span>/org/freedesktop/resolve1
+</pre></div>
+</div>
+</section>
+<section id="introspect-org-freedesktop-resolve1-link-on-the-bus">
+<h3>Introspect <code class="code docutils literal notranslate"><span class="pre">org.freedesktop.resolve1.Link</span></code> on the bus<a class="headerlink" href="#introspect-org-freedesktop-resolve1-link-on-the-bus" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>gdbus<span class="w"> </span>introspect<span class="w"> </span>--system<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dest<span class="w"> </span>org.freedesktop.resolve1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--object-path<span class="w"> </span>/org/freedesktop/resolve1/link/_11
+</pre></div>
+</div>
+</section>
+</section>
+<section id="versioning">
+<h2>Versioning<a class="headerlink" href="#versioning" title="Link to this heading">¶</a></h2>
+<p>These D-Bus interfaces follow <a class="reference external" href="https://0pointer.de/blog/projects/versioning-dbus.html">the usual interface versioning guidelines</a>.</p>
+</section>
+<section id="history">
+<h2>History<a class="headerlink" href="#history" title="Link to this heading">¶</a></h2>
+</section>
+<section id="id4">
+<h2>The Manager Object<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">GetDelegate()</span></code> and <code class="code docutils literal notranslate"><span class="pre">ListDelegates()</span></code> were added in version 258.</p>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="systemd.html#systemd-1"><span class="std std-ref">systemd(1)</span></a>, <a class="reference internal" href="systemd-resolved.service.html#systemd-resolved-service-8"><span class="std std-ref">systemd-resolved.service(8)</span></a>, <a class="reference external" href="https://man7.org/linux/man-pages/man1/resolvectl.1.html">resolvectl(1)</a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="org.freedesktop.systemd1.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">org.freedesktop.systemd1(5)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="org.freedesktop.portable1.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">org.freedesktop.portable1(5)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, systemd
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">org.freedesktop.resolve1(5)</a><ul>
+<li><a class="reference internal" href="#name">Name</a></li>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#the-manager-object">The Manager Object</a></li>
+<li><a class="reference internal" href="#methods">Methods</a></li>
+<li><a class="reference internal" href="#the-flags-parameter">The Flags Parameter</a></li>
+<li><a class="reference internal" href="#properties">Properties</a></li>
+<li><a class="reference internal" href="#link-object">Link Object</a></li>
+<li><a class="reference internal" href="#id2">Methods</a></li>
+<li><a class="reference internal" href="#id3">Properties</a></li>
+<li><a class="reference internal" href="#common-errors">Common Errors</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#introspect-org-freedesktop-resolve1-manager-on-the-bus">Introspect <code class="code docutils literal notranslate"><span class="pre">org.freedesktop.resolve1.Manager</span></code> on the bus</a></li>
+<li><a class="reference internal" href="#introspect-org-freedesktop-resolve1-link-on-the-bus">Introspect <code class="code docutils literal notranslate"><span class="pre">org.freedesktop.resolve1.Link</span></code> on the bus</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#versioning">Versioning</a></li>
+<li><a class="reference internal" href="#history">History</a></li>
+<li><a class="reference internal" href="#id4">The Manager Object</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/js/custom.js?v=abe08e2c"></script>
+    </body>
+</html>

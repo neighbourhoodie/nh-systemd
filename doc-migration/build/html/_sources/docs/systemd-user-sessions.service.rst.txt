@@ -1,0 +1,36 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-user-sessions.service
+:manvolnum: 8
+:summary: Permit user logins after boot, prohibit user logins at shutdown
+:aliases: systemd-user-sessions
+
+.. _systemd-user-sessions.service(8):
+
+================================
+systemd-user-sessions.service(8)
+================================
+
+Name
+####
+
+systemd-user-sessions.service, systemd-user-sessions — Permit user logins after boot, prohibit user logins at shutdown
+
+Synopsis
+########
+
+:code:`systemd-user-sessions.service`
+
+:code:`/usr/lib/systemd/systemd-user-sessions`
+
+Description
+###########
+
+:code:`systemd-user-sessions.service` is a service that controls user logins through :man-pages:`pam_nologin(8)`. After basic system initialization is complete, it removes :code:`/run/nologin`, thus permitting logins. Before system shutdown, it creates :code:`/run/nologin`, thus prohibiting further logins.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-logind.service(8)`, :man-pages:`pam_nologin(8)`
+
+

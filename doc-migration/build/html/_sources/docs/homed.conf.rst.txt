@@ -1,0 +1,66 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: homed.conf
+:manvolnum: 5
+:summary: Home area/user account manager configuration files
+:aliases: homed.conf.d
+
+.. _homed.conf(5):
+
+=============
+homed.conf(5)
+=============
+
+Name
+####
+
+homed.conf, homed.conf.d — Home area/user account manager configuration files
+
+Synopsis
+########
+
+| :code:`/etc/systemd/homed.conf`
+| :code:`/run/systemd/homed.conf`
+| :code:`/usr/local/lib/systemd/homed.conf`
+| :code:`/usr/lib/systemd/homed.conf`
+| :code:`/etc/systemd/homed.conf.d/\*.conf`
+| :code:`/run/systemd/homed.conf.d/\*.conf`
+| :code:`/usr/local/lib/systemd/homed.conf.d/\*.conf`
+| :code:`/usr/lib/systemd/homed.conf.d/\*.conf`
+
+Description
+###########
+
+These configuration files control default parameters for home areas/user accounts created and managed by :ref:`systemd-homed.service(8)`.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+The following options are available in the \[Home] section:
+
+.. systemd:option:: DefaultStorage=
+   :group: home-directives
+
+   The default storage to use for home areas. Takes one of "luks", "fscrypt", "directory", "subvolume", "cifs". For details about these options, see :man-pages:`homectl(1)`. If not configured or assigned the empty string, the default storage is automatically determined: if not running in a container environment and :code:`/home/` is not itself encrypted, defaults to "luks". Otherwise, defaults to "subvolume" if :code:`/home/` is on a btrfs file system, and "directory" otherwise. Note that the storage selected on the :code:`homectl` command line always takes precedence.
+
+   .. versionadded:: 246
+
+.. systemd:option:: DefaultFileSystemType=
+   :group: home-directives
+
+   When using "luks" as storage (see above), selects the default file system to use inside the user's LUKS volume. Takes one of "btrfs", "ext4" or "xfs". If not specified, defaults to "btrfs". This setting has no effect if a different storage mechanism is used. The file system type selected on the :code:`homectl` command line always takes precedence.
+
+   .. versionadded:: 246
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-homed.service(8)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

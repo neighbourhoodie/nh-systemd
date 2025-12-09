@@ -1,0 +1,1609 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="daemon(7)" href="daemon.html"><link rel="prev" title="coredumpctl(1)" href="coredumpctl.html">
+        <link rel="prefetch" href="../_static/systemd-logo.svg" as="image">
+        <link rel="prefetch" href="../_static/systemd-logo-dark.svg" as="image">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>crypttab(5)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6e47b7e0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #35a764;
+  --color-brand-content: #35a764;
+  --color-brand-visited: #197b43;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">systemd</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/systemd-logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/systemd-logo-dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">B</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="binfmt.d.html">binfmt.d(5) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootctl.html">bootctl(1) — Control EFI firmware boot settings and manage boot loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootup.html">bootup(7) — System bootup process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="busctl.html">busctl(1) — Introspect the bus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="capsule%40.service.html">capsule@.service(5) — System unit for the capsule service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredump.conf.html">coredump.conf(5) — Core dump storage configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredumpctl.html">coredumpctl(1) — Retrieve and process saved core dumps and metadata</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">crypttab(5) — Configuration for encrypted block devices</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">D</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daemon.html">daemon(7) — Writing and packaging system daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dnssec-trust-anchors.d.html">dnssec-trust-anchors.d(5) — DNSSEC trust anchor configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">E</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment.d.html">environment.d(5) — Definition of user service environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">F</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-hierarchy.html">file-hierarchy(7) — File system hierarchy overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">H</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="homectl.html">homectl(1) — Create, remove, change or inspect home directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homed.conf.html">homed.conf(5) — Home area/user account manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostname.html">hostname(5) — Local hostname configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostnamectl.html">hostnamectl(1) — Control the system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hwdb.html">hwdb(7) — Hardware Database</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">I</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="importctl.html">importctl(1) — Download, import or export disk images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integritytab.html">integritytab(5) — Configuration for integrity block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocost.conf.html">iocost.conf(5) — Configuration files for the iocost solution manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">J</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="journal-remote.conf.html">journal-remote.conf(5) — Configuration files for the service accepting remote journal uploads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal-upload.conf.html">journal-upload.conf(5) — Configuration files for the journal upload service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journalctl.html">journalctl(1) — Print log entries from the systemd journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journald.conf.html">journald.conf(5) — Journal service configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">K</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kernel-command-line.html">kernel-command-line(7) — Kernel command line parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-install.html">kernel-install(8) — Add and remove kernel and initrd images to and from the boot partition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">L</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libsystemd.html">libsystemd(3) — Functions for implementing services and interacting with systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libudev.html">libudev(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.conf.html">loader.conf(5) — Configuration file for systemd-boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locale.conf.html">locale.conf(5) — Configuration file for locale settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localectl.html">localectl(1) — Control the system locale and keyboard layout settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localtime.html">localtime(5) — Local timezone configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loginctl.html">loginctl(1) — Control the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logind.conf.html">logind.conf(5) — Login manager configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">M</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="machine-id.html">machine-id(5) — Local machine ID configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machine-info.html">machine-info(5) — Local machine information file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machinectl.html">machinectl(1) — Control the systemd machine manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules-load.d.html">modules-load.d(5) — Configure kernel modules to load at boot</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">N</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="networkctl.html">networkctl(1) — Query or modify the status of network links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networkd.conf.html">networkd.conf(5) — Global Network configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-myhostname.html">nss-myhostname(8) — Hostname resolution for the locally configured system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-mymachines.html">nss-mymachines(8) — Hostname resolution for local container instances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-resolve.html">nss-resolve(8) — Hostname resolution via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-systemd.html">nss-systemd(8) — UNIX user and group name resolution for user/group lookup via Varlink</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">O</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oomctl.html">oomctl(1) — Analyze the state stored in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oomd.conf.html">oomd.conf(5) — Global</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.home1.html">org.freedesktop.home1(5) — The D-Bus interface of systemd-homed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.hostname1.html">org.freedesktop.hostname1(5) — The D-Bus interface of systemd-hostnamed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.import1.html">org.freedesktop.import1(5) — The D-Bus interface of systemd-importd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.locale1.html">org.freedesktop.locale1(5) — The D-Bus interface of systemd-localed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.LogControl1.html">org.freedesktop.LogControl1(5) — D-Bus interface to query and set logging configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.login1.html">org.freedesktop.login1(5) — The D-Bus interface of systemd-logind</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.machine1.html">org.freedesktop.machine1(5) — The D-Bus interface of systemd-machined</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.network1.html">org.freedesktop.network1(5) — The D-Bus interface of systemd-networkd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.oom1.html">org.freedesktop.oom1(5) — The D-Bus interface of systemd-oomd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.portable1.html">org.freedesktop.portable1(5) — The D-Bus interface of systemd-portabled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.resolve1.html">org.freedesktop.resolve1(5) — The D-Bus interface of systemd-resolved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.systemd1.html">org.freedesktop.systemd1(5) — The D-Bus interface of systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.sysupdate1.html">org.freedesktop.sysupdate1(5) — The D-Bus interface of systemd-sysupdated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timedate1.html">org.freedesktop.timedate1(5) — The D-Bus interface of systemd-timedated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timesync1.html">org.freedesktop.timesync1(5) — The D-Bus interface of systemd-timesyncd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="os-release.html">os-release(5) — Operating system identification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">P</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd.html">pam_systemd(8) — Register user sessions in the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_home.html">pam_systemd_home(8) — Authenticate users and mount home directories via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_loadkey.html">pam_systemd_loadkey(8) — Read password from kernel keyring and set it as PAM authtok</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portablectl.html">portablectl(1) — Attach, detach or inspect portable service images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="poweroff.html">poweroff(8) — Power off, reboot, or halt the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pstore.conf.html">pstore.conf(5) — PStore configuration file</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">R</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="repart.d.html">repart.d(5) — Partition Definition Files for Automatic Boot-Time Repartitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolvectl.html">resolvectl(1) — Resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services; introspect and reconfigure the DNS resolver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolved.conf.html">resolved.conf(5) — Network Name Resolution configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run0.html">run0(1) — Elevate privileges</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">S</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus.html">sd-bus(3) — A lightweight D-Bus IPC client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus-errors.html">sd-bus-errors(3) — Standard D-Bus error names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-daemon.html">sd-daemon(3) — APIs for new-style daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-device.html">sd-device(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-event.html">sd-event(3) — A generic event loop implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-hwdb.html">sd-hwdb(3) — Read-only access to the hardware description database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-id128.html">sd-id128(3) — APIs for processing 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-journal.html">sd-journal(3) — APIs for submitting and querying log entries to and from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-json.html">sd-json(3) — APIs for Dealing with JSON Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-login.html">sd-login(3) — APIs for tracking logins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-path.html">sd-path(3) — APIs to query file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-varlink.html">sd-varlink(3) — APIs for Varlink IPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_booted.html">sd_booted(3) — Test whether the system is running the systemd init system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_match.html">sd_bus_add_match(3) — Add a match rule for incoming message dispatching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_node_enumerator.html">sd_bus_add_node_enumerator(3) — Add a node enumerator for a D-Bus object path prefix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object.html">sd_bus_add_object(3) — Declare properties and methods for a D-Bus path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object_manager.html">sd_bus_add_object_manager(3) — Add a D-Bus object manager for a D-Bus object sub-tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_attach_event.html">sd_bus_attach_event(3) — Attach a bus connection object to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call.html">sd_bus_call(3) — Invoke a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call_method.html">sd_bus_call_method(3) — Initialize a bus message object and invoke the corresponding D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_can_send.html">sd_bus_can_send(3) — Check which types can be sent over a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_close.html">sd_bus_close(3) — Close and flush a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_get_pid.html">sd_bus_creds_get_pid(3) — Retrieve fields from a credentials object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_new_from_pid.html">sd_bus_creds_new_from_pid(3) — Retrieve credentials object for the specified PID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_default.html">sd_bus_default(3) — Acquire a connection to a system or user bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_emit_signal.html">sd_bus_emit_signal(3) — Convenience functions for emitting (standard) D-Bus signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_enqueue_for_read.html">sd_bus_enqueue_for_read(3) — Re-enqueue a bus message on a bus connection, for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error.html">sd_bus_error(3) — sd-bus error handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error_add_map.html">sd_bus_error_add_map(3) — Additional sd-dbus error mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_current_handler.html">sd_bus_get_current_handler(3) — Query information of the callback a bus object is currently running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_fd.html">sd_bus_get_fd(3) — Get the file descriptor, I/O events and timeout to wait for from a message bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_n_queued_read.html">sd_bus_get_n_queued_read(3) — Get the number of pending bus messages in the read and write queues of a bus connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_creds.html">sd_bus_get_name_creds(3) — Query bus client credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_machine_id.html">sd_bus_get_name_machine_id(3) — Retrieve a bus client's machine identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_interface_name_is_valid.html">sd_bus_interface_name_is_valid(3) — Check if a string is a valid bus name or object path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_is_open.html">sd_bus_is_open(3) — Check whether the bus connection is open or ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_list_names.html">sd_bus_list_names(3) — Retrieve information about registered names on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append.html">sd_bus_message_append(3) — Attach fields to a D-Bus message based on a type string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_array.html">sd_bus_message_append_array(3) — Append an array of fields to a D-Bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_basic.html">sd_bus_message_append_basic(3) — Attach a single field to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_string_memfd.html">sd_bus_message_append_string_memfd(3) — Attach a string to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_strv.html">sd_bus_message_append_strv(3) — Attach an array of strings to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_at_end.html">sd_bus_message_at_end(3) — Check if a message has been fully read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_copy.html">sd_bus_message_copy(3) — Copy the contents of one message to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_dump.html">sd_bus_message_dump(3) — Produce a string representation of a message for debugging purposes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_cookie.html">sd_bus_message_get_cookie(3) — Returns the transaction cookie of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_monotonic_usec.html">sd_bus_message_get_monotonic_usec(3) — Retrieve the sender timestamps and sequence number of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_signature.html">sd_bus_message_get_signature(3) — Query bus message signature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_type.html">sd_bus_message_get_type(3) — Query bus message addressing/credentials metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new.html">sd_bus_message_new(3) — Create a new bus message object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_call.html">sd_bus_message_new_method_call(3) — Create a method call message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_error.html">sd_bus_message_new_method_error(3) — Create an error reply for a method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_signal.html">sd_bus_message_new_signal(3) — Create a signal message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_open_container.html">sd_bus_message_open_container(3) — Create and move between containers in D-Bus messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read.html">sd_bus_message_read(3) — Read a sequence of values from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_array.html">sd_bus_message_read_array(3) — Access an array of elements in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_basic.html">sd_bus_message_read_basic(3) — Read a basic type from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_strv.html">sd_bus_message_read_strv(3) — Access an array of strings in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_rewind.html">sd_bus_message_rewind(3) — Return to beginning of message or current container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_seal.html">sd_bus_message_seal(3) — Prepare a D-Bus message for transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_sensitive.html">sd_bus_message_sensitive(3) — Mark a message object as containing sensitive data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_destination.html">sd_bus_message_set_destination(3) — Set and query bus message addressing information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_expect_reply.html">sd_bus_message_set_expect_reply(3) — Set and query bus message metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_skip.html">sd_bus_message_skip(3) — Skip elements in a bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_verify_type.html">sd_bus_message_verify_type(3) — Check if the message has specified type at the current location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_negotiate_fds.html">sd_bus_negotiate_fds(3) — Control feature negotiation on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_new.html">sd_bus_new(3) — Create a new bus object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_path_encode.html">sd_bus_path_encode(3) — Convert an external identifier into an object path and back</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_pending_method_calls.html">sd_bus_pending_method_calls(3) — Return the number of currently pending, outgoing method calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_process.html">sd_bus_process(3) — Drive the connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_query_sender_creds.html">sd_bus_query_sender_creds(3) — Query bus message sender credentials/privileges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_error.html">sd_bus_reply_method_error(3) — Reply with an error to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_return.html">sd_bus_reply_method_return(3) — Reply to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_request_name.html">sd_bus_request_name(3) — Request or release a well-known service name on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_send.html">sd_bus_send(3) — Queue a D-Bus message for transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_address.html">sd_bus_set_address(3) — Set or query the address of the bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_close_on_exit.html">sd_bus_set_close_on_exit(3) — Control whether to close the bus connection during the event loop exit phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_connected_signal.html">sd_bus_set_connected_signal(3) — Control emission of local connection establishment signal on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_description.html">sd_bus_set_description(3) — Set or query properties of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_exit_on_disconnect.html">sd_bus_set_exit_on_disconnect(3) — Control the exit behavior when the bus object disconnects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_fd.html">sd_bus_set_fd(3) — Set the file descriptors to use for bus communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_method_call_timeout.html">sd_bus_set_method_call_timeout(3) — Set or query the default D-Bus method call timeout of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_property.html">sd_bus_set_property(3) — Set or query D-Bus service properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_sender.html">sd_bus_set_sender(3) — Configure default sender for outgoing messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_server.html">sd_bus_set_server(3) — Configure connection mode for a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_watch_bind.html">sd_bus_set_watch_bind(3) — Control socket binding watching on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_get_bus.html">sd_bus_slot_get_bus(3) — Query information attached to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_ref.html">sd_bus_slot_ref(3) — Create and destroy references to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_description.html">sd_bus_slot_set_description(3) — Set or query the description of bus slot objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_destroy_callback.html">sd_bus_slot_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_floating.html">sd_bus_slot_set_floating(3) — Control whether a bus slot object is "floating"</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_userdata.html">sd_bus_slot_set_userdata(3) — Set and query the value in the "userdata" field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_start.html">sd_bus_start(3) — Initiate a bus connection to the D-bus broker daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_add_name.html">sd_bus_track_add_name(3) — Add, remove and retrieve bus peers tracked in a bus peer tracking object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_new.html">sd_bus_track_new(3) — Track bus peers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_wait.html">sd_bus_wait(3) — Wait for I/O on a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_add_match_parent.html">sd_device_enumerator_add_match_parent(3) — Add a filter to the device enumerator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_get_device_first.html">sd_device_enumerator_get_device_first(3) — Enumerates devices and get the first or next device.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_new.html">sd_device_enumerator_new(3) — Create, reference, and release a device enumerator object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_get_syspath.html">sd_device_get_syspath(3) — Returns various fields of device objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_ref.html">sd_device_ref(3) — Create or destroy references to a device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_child.html">sd_event_add_child(3) — Add a child process state change event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_defer.html">sd_event_add_defer(3) — Add static event sources to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_inotify.html">sd_event_add_inotify(3) — Add an "inotify" file system inode event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_io.html">sd_event_add_io(3) — Add an I/O event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_memory_pressure.html">sd_event_add_memory_pressure(3) — Add and configure an event source run as result of memory pressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_signal.html">sd_event_add_signal(3) — Add a UNIX process signal event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_time.html">sd_event_add_time(3) — Add a timer event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_exit.html">sd_event_exit(3) — Ask the event loop to exit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_get_fd.html">sd_event_get_fd(3) — Obtain a file descriptor to poll for event loop events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_new.html">sd_event_new(3) — Acquire and release an event loop object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_now.html">sd_event_now(3) — Retrieve current event loop iteration timestamp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_run.html">sd_event_run(3) — Run an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_exit_on_idle.html">sd_event_set_exit_on_idle(3) — Enable event loop exit-on-idle support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_signal_exit.html">sd_event_set_signal_exit(3) — Automatically leave event loop on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_watchdog.html">sd_event_set_watchdog(3) — Enable event loop watchdog support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_event.html">sd_event_source_get_event(3) — Retrieve the event loop of an event source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_pending.html">sd_event_source_get_pending(3) — Determine pending state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_description.html">sd_event_source_set_description(3) — Set or retrieve descriptive names of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_destroy_callback.html">sd_event_source_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_enabled.html">sd_event_source_set_enabled(3) — Enable or disable event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_exit_on_failure.html">sd_event_source_set_exit_on_failure(3) — Set or retrieve the exit-on-failure feature of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_floating.html">sd_event_source_set_floating(3) — Set or retrieve 'floating' state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_prepare.html">sd_event_source_set_prepare(3) — Set a preparation callback for event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_priority.html">sd_event_source_set_priority(3) — Set or retrieve the priority of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_ratelimit.html">sd_event_source_set_ratelimit(3) — Configure rate limiting on event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_userdata.html">sd_event_source_set_userdata(3) — Set or retrieve user data pointer of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_unref.html">sd_event_source_unref(3) — Increase or decrease event source reference counters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_wait.html">sd_event_wait(3) — Low-level event loop operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_get_seats.html">sd_get_seats(3) — Determine available seats, sessions, logged in users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_get.html">sd_hwdb_get(3) — Seek to a location in hwdb or access entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_new.html">sd_hwdb_new(3) — Create a new hwdb object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_get_machine.html">sd_id128_get_machine(3) — Retrieve 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_randomize.html">sd_id128_randomize(3) — Generate 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_to_string.html">sd_id128_to_string(3) — Format or parse 128-bit IDs as strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_is_fifo.html">sd_is_fifo(3) — Check the type of a file descriptor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_add_match.html">sd_journal_add_match(3) — Add or remove entry matches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_enumerate_fields.html">sd_journal_enumerate_fields(3) — Read used field names from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_catalog.html">sd_journal_get_catalog(3) — Retrieve message catalog entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cursor.html">sd_journal_get_cursor(3) — Get cursor string for or test cursor string against the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cutoff_realtime_usec.html">sd_journal_get_cutoff_realtime_usec(3) — Read cut-off timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_data.html">sd_journal_get_data(3) — Read data fields from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_fd.html">sd_journal_get_fd(3) — Journal change notification interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_realtime_usec.html">sd_journal_get_realtime_usec(3) — Read timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_seqnum.html">sd_journal_get_seqnum(3) — Read sequence number from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_usage.html">sd_journal_get_usage(3) — Journal disk usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_has_runtime_files.html">sd_journal_has_runtime_files(3) — Query availability of runtime or persistent journal files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_next.html">sd_journal_next(3) — Advance or set back the read pointer in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_open.html">sd_journal_open(3) — Open the system journal for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_print.html">sd_journal_print(3) — Submit log entries to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_query_unique.html">sd_journal_query_unique(3) — Read unique data fields from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_seek_head.html">sd_journal_seek_head(3) — Seek to a position in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_stream_fd.html">sd_journal_stream_fd(3) — Create log stream file descriptor to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_json_dispatch_string.html">sd_json_dispatch_string(3) — Decode JSON variant values and write them to the specified memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_listen_fds.html">sd_listen_fds(3) — Check for file descriptors passed by the system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_login_monitor_new.html">sd_login_monitor_new(3) — Monitor login sessions, seats, users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_machine_get_class.html">sd_machine_get_class(3) — Determine the class and network interface indices of a locally running virtual machine or container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_notify.html">sd_notify(3) — Notify service manager about start-up completion and other service status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_path_lookup.html">sd_path_lookup(3) — Query well-known file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pid_get_owner_uid.html">sd_pid_get_owner_uid(3) — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pidfd_get_inode_id.html">sd_pidfd_get_inode_id(3) — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_seat_get_active.html">sd_seat_get_active(3) — Determine state of a specific seat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_session_is_active.html">sd_session_is_active(3) — Determine state of a specific session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_uid_get_state.html">sd_uid_get_state(3) — Determine login state of a specific Unix user ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_is_connected.html">sd_varlink_is_connected(3) — Query if a Varlink connection object is currently connected or idle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_push_fd.html">sd_varlink_push_fd(3) — Submit a file descriptor to send along with the next outgoing Varlink message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_send.html">sd_varlink_send(3) — Enqueues a Varlink method call, not expecting a reply</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_server_new.html">sd_varlink_server_new(3) — Allocate Varlink server object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_description.html">sd_varlink_set_description(3) — Set or query description of a Varlink connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_relative_timeout.html">sd_varlink_set_relative_timeout(3) — Set method call time-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_watchdog_enabled.html">sd_watchdog_enabled(3) — Check whether the service manager expects watchdog keep-alive notifications from a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shutdown.html">shutdown(8) — Halt, power off or reboot the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smbios-type-11.html">smbios-type-11(7) — SMBIOS Type 11 strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysctl.d.html">sysctl.d(5) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysext.conf.html">sysext.conf(5) — Configuration files for systemd-sysext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemctl.html">systemctl(1) — Control the systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.html">systemd(1) — systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ac-power.html">systemd-ac-power(1) — Report whether we are connected to an external power source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-analyze.html">systemd-analyze(1) — Analyze and debug system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password.html">systemd-ask-password(1) — Query the user for a system password</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password-console.service.html">systemd-ask-password-console.service(8) — Query the user for system passwords on the console and via wall</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-backlight%40.service.html">systemd-backlight@.service(8) — Load and save the display backlight brightness at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-battery-check.service.html">systemd-battery-check.service(8) — Check battery level whether there's enough charge, and power off if not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-binfmt.service.html">systemd-binfmt.service(8) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot-generator.html">systemd-bless-boot-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot.service.html">systemd-bless-boot.service(8) — Mark current boot process as successful</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot.html">systemd-boot(7) — A simple UEFI boot manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-check-no-failures.service.html">systemd-boot-check-no-failures.service(8) — verify that the system booted up cleanly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-clear-sysfail.service.html">systemd-boot-clear-sysfail.service(8) — Clear LoaderEntrySysFail entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-random-seed.service.html">systemd-boot-random-seed.service(8) — Refresh boot loader random seed at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bsod.service.html">systemd-bsod.service(8) — Displays boot-time emergency log message in full screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cat.html">systemd-cat(1) — Connect a pipeline or program's output with the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgls.html">systemd-cgls(1) — Recursively show control group contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgtop.html">systemd-cgtop(1) — Show top control groups by their resource usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-coredump.html">systemd-coredump(8) — Acquire, save and process core dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-creds.html">systemd-creds(1) — Lists, shows, encrypts and decrypts service credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptenroll.html">systemd-cryptenroll(1) — Enroll PKCS#11, FIDO2, TPM2 token/devices to LUKS2 encrypted volumes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup.html">systemd-cryptsetup(8) — Full disk decryption logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup-generator.html">systemd-cryptsetup-generator(8) — Unit generator for</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-debug-generator.html">systemd-debug-generator(8) — Generator for enabling a runtime debug shell and masking specific units at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-delta.html">systemd-delta(1) — Find overridden configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-detect-virt.html">systemd-detect-virt(1) — Detect execution in a virtualized environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-dissect.html">systemd-dissect(1) — Dissect Discoverable Disk Images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-environment-d-generator.html">systemd-environment-d-generator(8) — Load variables specified by</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-escape.html">systemd-escape(1) — Escape strings for usage in systemd unit names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset.html">systemd-factory-reset(8) — Request or complete a factory reset operation, or query current factory reset mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset-generator.html">systemd-factory-reset-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-firstboot.html">systemd-firstboot(1) — Initialize basic system settings on or before the first boot-up of a system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fsck%40.service.html">systemd-fsck@.service(8) — File system checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fstab-generator.html">systemd-fstab-generator(8) — Unit generator for /etc/fstab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-getty-generator.html">systemd-getty-generator(8) — Generator for enabling getty instances on the console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-gpt-auto-generator.html">systemd-gpt-auto-generator(8) — Generator for automatically discovering and mounting root,</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume-generator.html">systemd-hibernate-resume-generator(8) — Unit generator for resume= kernel parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume.service.html">systemd-hibernate-resume.service(8) — Resume from hibernation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-homed.service.html">systemd-homed.service(8) — Home Area/User Account Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hostnamed.service.html">systemd-hostnamed.service(8) — Daemon to control system hostname from programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hwdb.html">systemd-hwdb(8) — hardware database management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-id128.html">systemd-id128(1) — Generate and print sd-128 identifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-import-generator.html">systemd-import-generator(8) — Generator for automatically downloading disk images at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-importd.service.html">systemd-importd.service(8) — VM and container image import and export service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-inhibit.html">systemd-inhibit(1) — Execute a program with an inhibition lock taken</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup-generator.html">systemd-integritysetup-generator(8) — Unit generator for integrity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup%40.service.html">systemd-integritysetup@.service(8) — Disk integrity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-gatewayd.service.html">systemd-journal-gatewayd.service(8) — HTTP server for journal events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-remote.service.html">systemd-journal-remote.service(8) — Receive journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-upload.service.html">systemd-journal-upload.service(8) — Send journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journald.service.html">systemd-journald.service(8) — Journal service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-keyutil.html">systemd-keyutil(1) — Perform various operations on private keys and X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-localed.service.html">systemd-localed.service(8) — Locale bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-logind.service.html">systemd-logind.service(8) — Login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-loop%40.service.html">systemd-loop@.service(8) — Attach a loopback block device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-commit.service.html">systemd-machine-id-commit.service(8) — Commit a transient machine ID to disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-setup.html">systemd-machine-id-setup(1) — Initialize the machine ID in /etc/machine-id</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machined.service.html">systemd-machined.service(8) — Virtual machine and container registration manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-makefs%40.service.html">systemd-makefs@.service(8) — Creating and growing file systems on demand</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-measure.html">systemd-measure(1) — Pre-calculate and sign expected TPM2 PCR 11 values for booted unified kernel images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-modules-load.service.html">systemd-modules-load.service(8) — Load kernel modules at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mount.html">systemd-mount(1) — Establish and destroy transient mount or auto-mount points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mountfsd.service.html">systemd-mountfsd.service(8) — Disk Image File System Mount Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mute-console.html">systemd-mute-console(1) — Temporarily mute kernel log output and service manager status output to the system console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-network-generator.service.html">systemd-network-generator.service(8) — Generate network configuration from the kernel command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd-wait-online.service.html">systemd-networkd-wait-online.service(8) — Wait for network to come online</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd.service.html">systemd-networkd.service(8) — Network manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-notify.html">systemd-notify(1) — Notify service manager about start-up completion and other daemon status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nspawn.html">systemd-nspawn(1) — Spawn a command or OS in a lightweight container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nsresourced.service.html">systemd-nsresourced.service(8) — User Namespace Resource Delegation Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-oomd.service.html">systemd-oomd.service(8) — A userspace out-of-memory (OOM) killer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-path.html">systemd-path(1) — List and query system and user paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrlock.html">systemd-pcrlock(8) — Analyze and predict TPM2 PCR states and generate an access policy from the prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrphase.service.html">systemd-pcrphase.service(8) — Measure boot phases, machine ID, product UUID and file system identity into TPM PCRs and NvPCRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-portabled.service.html">systemd-portabled.service(8) — Portable service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-poweroff.service.html">systemd-poweroff.service(8) — System shutdown logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pstore.service.html">systemd-pstore.service(8) — A service to archive contents of pstore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pty-forward.html">systemd-pty-forward(1) — Run a command with a custom terminal background color or title</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-quotacheck%40.service.html">systemd-quotacheck@.service(8) — File system quota checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-random-seed.service.html">systemd-random-seed.service(8) — Load and save the OS system random seed at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rc-local-generator.html">systemd-rc-local-generator(8) — Compatibility generator and service to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-remount-fs.service.html">systemd-remount-fs.service(8) — Remount root and kernel file systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-repart.html">systemd-repart(8) — Automatically grow and add partitions, and generate disk images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-resolved.service.html">systemd-resolved.service(8) — Network Name Resolution manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rfkill.service.html">systemd-rfkill.service(8) — Load and save the RF kill switch state at boot and change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run.html">systemd-run(1) — Run programs in transient scope units, service units, or path-, socket-, or timer-triggered service units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run-generator.html">systemd-run-generator(8) — Generator for invoking commands specified on the kernel command line as system service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sbsign.html">systemd-sbsign(1) — Sign PE binaries for EFI Secure Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sleep.conf.html">systemd-sleep.conf(5) — Suspend and hibernation configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-activate.html">systemd-socket-activate(1) — Test socket activation of daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-proxyd.html">systemd-socket-proxyd(8) — Bidirectionally proxy local sockets to another (possibly remote) socket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-soft-reboot.service.html">systemd-soft-reboot.service(8) — Userspace reboot operation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-generator.html">systemd-ssh-generator(8) — Generator for binding a socket-activated SSH server to local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-issue.html">systemd-ssh-issue(1) — Generator for SSH login prompt drop-ins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-proxy.html">systemd-ssh-proxy(1) — SSH client plugin for connecting to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stdio-bridge.html">systemd-stdio-bridge(1) — D-Bus proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-storagetm.service.html">systemd-storagetm.service(8) — Exposes all local block devices as NVMe-TCP mass storage devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stub.html">systemd-stub(7) — A simple UEFI kernel boot stub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-suspend.service.html">systemd-suspend.service(8) — System sleep state logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysctl.service.html">systemd-sysctl.service(8) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysext.html">systemd-sysext(8) — Activates System Extension Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system-update-generator.html">systemd-system-update-generator(8) — Generator for redirecting boot to offline update mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system.conf.html">systemd-system.conf(5) — System and session service manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdate.html">systemd-sysupdate(8) — Automatically Update OS or Other Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdated.service.html">systemd-sysupdated.service(8) — System Update Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysusers.html">systemd-sysusers(8) — Allocate system users and groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysv-generator.html">systemd-sysv-generator(8) — Unit generator for SysV init scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-time-wait-sync.service.html">systemd-time-wait-sync.service(8) — Wait until kernel time is synchronized</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timedated.service.html">systemd-timedated.service(8) — Time and date bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timesyncd.service.html">systemd-timesyncd.service(8) — Network Time Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tmpfiles.html">systemd-tmpfiles(8) — Create, delete, and clean up files and directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-clear.service.html">systemd-tpm2-clear.service(8) — Request that the TPM security chip is cleared on next boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-generator.html">systemd-tpm2-generator(8) — Generator for inserting TPM2 synchronization point in the boot process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-setup.service.html">systemd-tpm2-setup.service(8) — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tty-ask-password-agent.html">systemd-tty-ask-password-agent(1) — List or process pending systemd password requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udev-settle.service.html">systemd-udev-settle.service(8) — Wait for all pending udev events to be handled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udevd.service.html">systemd-udevd.service(8) — Device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-done.service.html">systemd-update-done.service(8) — Mark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-utmp.service.html">systemd-update-utmp.service(8) — Write audit and utmp updates at bootup and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-user-sessions.service.html">systemd-user-sessions.service(8) — Permit user logins after boot, prohibit user logins at shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-userdbd.service.html">systemd-userdbd.service(8) — JSON User/Group Record Query Multiplexer/NSS Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-validatefs%40.service.html">systemd-validatefs@.service(8) — Validate File System Mount Constraint Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vconsole-setup.service.html">systemd-vconsole-setup.service(8) — Configure the virtual consoles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup-generator.html">systemd-veritysetup-generator(8) — Unit generator for verity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup%40.service.html">systemd-veritysetup@.service(8) — Disk verity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vmspawn.html">systemd-vmspawn(1) — Spawn an OS in a virtual machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-volatile-root.service.html">systemd-volatile-root.service(8) — Make the root file system volatile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vpick.html">systemd-vpick(1) — Resolve paths to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-xdg-autostart-generator.html">systemd-xdg-autostart-generator(8) — User unit generator for XDG autostart files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.automount.html">systemd.automount(5) — Automount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.device.html">systemd.device(5) — Device unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dns-delegate.html">systemd.dns-delegate(5) — DNS Server Delegation Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dnssd.html">systemd.dnssd(5) — DNS-SD configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.environment-generator.html">systemd.environment-generator(7) — systemd environment file generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.exec.html">systemd.exec(5) — Execution environment configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.generator.html">systemd.generator(7) — systemd unit generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-filter.html">systemd.image-filter(7) — Disk Image Dissection Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-policy.html">systemd.image-policy(7) — Disk Image Dissection Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.journal-fields.html">systemd.journal-fields(7) — Special journal fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.kill.html">systemd.kill(5) — Process killing procedure configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.link.html">systemd.link(5) — Network device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.mount.html">systemd.mount(5) — Mount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.net-naming-scheme.html">systemd.net-naming-scheme(7) — Network device naming schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.netdev.html">systemd.netdev(5) — Virtual Network Device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.network.html">systemd.network(5) — Network configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.nspawn.html">systemd.nspawn(5) — Container settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.offline-updates.html">systemd.offline-updates(7) — Implementation of offline updates in systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.path.html">systemd.path(5) — Path unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.pcrlock.html">systemd.pcrlock(5) — PCR measurement prediction files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.preset.html">systemd.preset(5) — Service enablement presets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.resource-control.html">systemd.resource-control(5) — Resource control unit settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.scope.html">systemd.scope(5) — Scope unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.service.html">systemd.service(5) — Service unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.slice.html">systemd.slice(5) — Slice unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.socket.html">systemd.socket(5) — Socket unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.special.html">systemd.special(7) — Special systemd units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.swap.html">systemd.swap(5) — Swap unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.syntax.html">systemd.syntax(7) — General syntax of systemd configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.system-credentials.html">systemd.system-credentials(7) — System Credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.target.html">systemd.target(5) — Target unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.time.html">systemd.time(7) — Time and date specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.timer.html">systemd.timer(5) — Timer unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.unit.html">systemd.unit(5) — Unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.v.html">systemd.v(7) — Directory with Versioned Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.d.html">sysupdate.d(5) — Transfer Definition Files for Automatic Updates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.features.html">sysupdate.features(5) — Definition Files for Optional Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysusers.d.html">sysusers.d(5) — Declarative allocation of system users and groups</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">T</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timedatectl.html">timedatectl(1) — Control the system time and date</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesyncd.conf.html">timesyncd.conf(5) — Network Time Synchronization configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tmpfiles.d.html">tmpfiles.d(5) — Configuration for creation, deletion, and cleaning of files and directories</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">U</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="udev.html">udev(7) — Dynamic device management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev.conf.html">udev.conf(5) — Configuration for device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_get_syspath.html">udev_device_get_syspath(3) — Query device properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_has_tag.html">udev_device_has_tag(3) — Retrieve or set device attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_new_from_syspath.html">udev_device_new_from_syspath(3) — Create, acquire and release a udev device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_add_match_subsystem.html">udev_enumerate_add_match_subsystem(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_new.html">udev_enumerate_new(3) — Create, acquire and release a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_scan_devices.html">udev_enumerate_scan_devices(3) — Query or modify a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_list_entry.html">udev_list_entry(3) — Iterate and access udev lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_filter_update.html">udev_monitor_filter_update(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_new_from_netlink.html">udev_monitor_new_from_netlink(3) — Create, acquire and release a udev monitor object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_receive_device.html">udev_monitor_receive_device(3) — Query and modify device monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_new.html">udev_new(3) — Create, acquire and release a udev context object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udevadm.html">udevadm(8) — udev management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ukify.html">ukify(1) — Combine components into a signed Unified Kernel Image for UEFI systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updatectl.html">updatectl(1) — Control the system update service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user%40.service.html">user@.service(5) — System units to start the user manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="userdbctl.html">userdbctl(1) — Inspect users, groups and group memberships</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">V</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="varlinkctl.html">varlinkctl(1) — Introspect with and invoke Varlink services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vconsole.conf.html">vconsole.conf(5) — Configuration file for the virtual console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="veritytab.html">veritytab(5) — Configuration for verity block devices</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/blob/man_pages_in_sphinx/doc-migration/source/docs/crypttab.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/edit/man_pages_in_sphinx/doc-migration/source/docs/crypttab.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="crypttab-5">
+<span id="id1"></span><h1>crypttab(5)<a class="headerlink" href="#crypttab-5" title="Link to this heading">¶</a></h1>
+<section id="name">
+<h2>Name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
+<p>crypttab — Configuration for encrypted block devices</p>
+</section>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">/etc/crypttab</span></code></p>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">/etc/crypttab</span></code> file describes encrypted block devices that are set up during system boot.</p>
+<p>Empty lines and lines starting with the “#” character are ignored. Each of the remaining lines describes one encrypted block device. Fields are delimited by white space.</p>
+<p>Each line is in the form</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>volume-name<span class="w">  </span>encrypted-device<span class="w">  </span>key-file<span class="w">  </span>options
+</pre></div>
+</div>
+<p>The first two fields are mandatory, the remaining two are optional.</p>
+<p>Setting up encrypted block devices using this file supports four encryption modes: LUKS, TrueCrypt, BitLocker and plain. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for more information about each mode. When no mode is specified in the options field and the block device contains a LUKS signature, it is opened as a LUKS device; otherwise, it is assumed to be in raw dm-crypt (plain mode) format.</p>
+<p>The four fields of <code class="code docutils literal notranslate"><span class="pre">/etc/crypttab</span></code> are defined as follows:</p>
+<ol class="arabic simple">
+<li><p>The first field contains the name of the resulting volume with decrypted data; its block device is set up below <code class="code docutils literal notranslate"><span class="pre">/dev/mapper/</span></code>.</p></li>
+<li><p>The second field contains a path to the underlying block device or file, or a specification of a block device via “UUID=” followed by the UUID.</p></li>
+<li><p>The third field specifies an absolute path to a file with the encryption key. Optionally, the path may be followed by “:” and an <code class="code docutils literal notranslate"><span class="pre">/etc/fstab</span></code> style device specification (e.g. starting with “LABEL=” or similar); in which case the path is taken relative to the specified device’s file system root. If the field is not present or is “none” or “-”, a key file named after the volume to unlock (i.e. the first column of the line), suffixed with <code class="code docutils literal notranslate"><span class="pre">.key</span></code> is automatically loaded from the <code class="code docutils literal notranslate"><span class="pre">/etc/cryptsetup-keys.d/</span></code> and <code class="code docutils literal notranslate"><span class="pre">/run/cryptsetup-keys.d/</span></code> directories, if present. Otherwise, the password has to be manually entered during system boot. For swap encryption, <code class="code docutils literal notranslate"><span class="pre">/dev/urandom</span></code> may be used as key file, resulting in a randomized key.</p></li>
+</ol>
+<blockquote>
+<div><p>If the specified key file path refers to an <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> stream socket in the file system, the key is acquired by connecting to the socket and reading it from the connection. This allows the implementation of a service to provide key information dynamically, at the moment when it is needed. For details see below.</p>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p>The fourth field, if present, is a comma-delimited list of options. The supported options are listed below.</p></li>
+</ol>
+</section>
+<section id="key-acquisition">
+<h2>Key Acquisition<a class="headerlink" href="#key-acquisition" title="Link to this heading">¶</a></h2>
+<p>Six different mechanisms for acquiring the decryption key or passphrase unlocking the encrypted volume are supported. Specifically:</p>
+<ol class="arabic simple">
+<li><p>Most prominently, the user may be queried interactively during volume activation (i.e. typically at boot), asking them to type in the necessary passphrases.</p></li>
+<li><p>The (unencrypted) key may be read from a file on disk, possibly on removable media. The third field of each line encodes the location, for details see above.</p></li>
+<li><p>The (unencrypted) key may be requested from another service, by specifying an <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> file system socket in place of a key file in the third field. For details see above and below.</p></li>
+<li><p>The key may be acquired via a PKCS#11 compatible hardware security token or smartcard. In this case, a saved key used in unlock process is stored on disk/removable media, acquired via <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code>, or stored in the LUKS2 JSON token metadata header. For RSA, the saved key is an encrypted volume key. The encrypted volume key is then decrypted by the PKCS#11 token with an RSA private key stored on it, and used to unlock the encrypted volume. For elliptic-curve (EC) cryptography, the saved key is the public key generated in enrollment process. The public key is then used to derive a shared secret with a private key stored in the PKCS#11 token. The derived shared secret is then used to unlock the volume. Use the <code class="code docutils literal notranslate"><span class="pre">pkcs11-uri=</span></code> option described below to use this mechanism.</p></li>
+<li><p>Similarly, the key may be acquired via a FIDO2 compatible hardware security token (which must implement the “hmac-secret” extension). In this case, a key generated randomly during enrollment is stored on disk/removable media, acquired via <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code>, or stored in the LUKS2 JSON token metadata header. The random key is hashed via a keyed hash function (HMAC) on the FIDO2 token, using a secret key stored on the token that never leaves it. The resulting hash value is then used as key to unlock the encrypted volume. Use the <code class="code docutils literal notranslate"><span class="pre">fido2-device=</span></code> option described below to use this mechanism.</p></li>
+<li><p>Similarly, the key may be acquired via a TPM2 security chip. In this case, a (during enrollment) randomly generated key — encrypted by an asymmetric key derived from the TPM2 chip’s seed key — is stored on disk/removable media, acquired via <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code>, or stored in the LUKS2 JSON token metadata header. Use the <code class="code docutils literal notranslate"><span class="pre">tpm2-device=</span></code> option described below to use this mechanism.</p></li>
+</ol>
+<p>For the latter five mechanisms the source for the key material used for unlocking the volume is primarily configured in the third field of each <code class="code docutils literal notranslate"><span class="pre">/etc/crypttab</span></code> line, but may also be configured in <code class="code docutils literal notranslate"><span class="pre">/etc/cryptsetup-keys.d/</span></code> and <code class="code docutils literal notranslate"><span class="pre">/run/cryptsetup-keys.d/</span></code> (see above) or in the LUKS2 JSON token header (in case of the latter three). Use the <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> tool to enroll PKCS#11, FIDO2 and TPM2 devices in LUKS2 volumes.</p>
+</section>
+<section id="supported-options">
+<h2>Supported Options<a class="headerlink" href="#supported-options" title="Link to this heading">¶</a></h2>
+<p>The following options may be used in the fourth field of each line:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-cipher">
+<span class="sig-name descname"><span class="pre">cipher=</span></span><a class="headerlink" href="#systemd-option-crypttab-cipher" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the cipher to use. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for possible values and the default value of this option. A cipher with unpredictable IV values, such as “aes-cbc-essiv:sha256”, is recommended. Embedded commas in the cipher specification need to be escaped by preceding them with a backslash, see example below.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-discard">
+<span class="sig-name descname"><span class="pre">discard</span></span><a class="headerlink" href="#systemd-option-crypttab-discard" title="Link to this definition">¶</a></dt>
+<dd><p>Allow discard requests to be passed through the encrypted block device. This improves performance on SSD storage but has security implications.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 207.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-hash">
+<span class="sig-name descname"><span class="pre">hash=</span></span><a class="headerlink" href="#systemd-option-crypttab-hash" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the hash to use for password hashing. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for possible values and the default value of this option.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-header">
+<span class="sig-name descname"><span class="pre">header=</span></span><a class="headerlink" href="#systemd-option-crypttab-header" title="Link to this definition">¶</a></dt>
+<dd><p>Use a detached (separated) metadata device or file where the header containing the master key(s) is stored. This option is only relevant for LUKS and TrueCrypt/VeraCrypt devices. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for possible values and the default value of this option.</p>
+<p>Optionally, the path may be followed by “:” and an <code class="code docutils literal notranslate"><span class="pre">/etc/fstab</span></code> device specification (e.g. starting with “UUID=” or similar); in which case, the path is relative to the device file system root. The device gets mounted automatically for LUKS device activation duration only.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 219.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-keyfile-offset">
+<span class="sig-name descname"><span class="pre">keyfile-offset=</span></span><a class="headerlink" href="#systemd-option-crypttab-keyfile-offset" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the number of bytes to skip at the start of the key file. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for possible values and the default value of this option.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 187.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-keyfile-size">
+<span class="sig-name descname"><span class="pre">keyfile-size=</span></span><a class="headerlink" href="#systemd-option-crypttab-keyfile-size" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the maximum number of bytes to read from the key file. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for possible values and the default value of this option. This option is ignored in plain encryption mode, where the key file size is determined by the key size. It is also ignored when the key file is used as a salt file for a FIDO2 token, as the salt size in that case is defined by the FIDO2 specification to be exactly 32 bytes.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 188.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-keyfile-erase">
+<span class="sig-name descname"><span class="pre">keyfile-erase</span></span><a class="headerlink" href="#systemd-option-crypttab-keyfile-erase" title="Link to this definition">¶</a></dt>
+<dd><p>If enabled, the specified key file is erased after the volume is activated or when activation fails. This is in particular useful when the key file is only acquired transiently before activation (e.g. via a file in <code class="code docutils literal notranslate"><span class="pre">/run/</span></code>, generated by a service running before activation), and shall be removed after use. Defaults to off.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-key-slot">
+<span class="sig-name descname"><span class="pre">key-slot=</span></span><a class="headerlink" href="#systemd-option-crypttab-key-slot" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the key slot to compare the passphrase or key against. If the key slot does not match the given passphrase or key, but another would, the setup of the device will fail regardless. This option implies <a class="reference internal" href="#systemd-option-crypttab-luks"><code class="docutils literal notranslate"><span class="pre">luks</span></code></a>. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for possible values. The default is to try all key slots in sequential order.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 209.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-keyfile-timeout">
+<span class="sig-name descname"><span class="pre">keyfile-timeout=</span></span><a class="headerlink" href="#systemd-option-crypttab-keyfile-timeout" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the timeout for the device on which the key file resides or the device used as the key file, and falls back to a password if it could not be accessed. See <a class="reference internal" href="systemd-cryptsetup-generator.html#systemd-cryptsetup-generator-8"><span class="std std-ref">systemd-cryptsetup-generator(8)</span></a> for key files on external devices.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 243.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-link-volume-key">
+<span class="sig-name descname"><span class="pre">link-volume-key=</span></span><a class="headerlink" href="#systemd-option-crypttab-link-volume-key" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the kernel keyring and key description (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/keyrings.7.html">keyrings(7)</a>) where LUKS2 volume key gets linked during device activation. The kernel keyring description and key description must be separated by “::”.</p>
+<p>The kernel keyring part can be a string description or a predefined kernel keyring prefixed with “&#64;” (e.g.: to use “&#64;s” session or “&#64;u” user keyring directly). The type prefix text in the kernel keyring description is not required. The specified kernel keyring must already exist at the time of device activation.</p>
+<p>The key part is a string description optionally prefixed by a “%key_type:”. If no type is specified, the “user” type key is linked by default. See <a class="reference external" href="https://man7.org/linux/man-pages/man1/keyctl.1.html">keyctl(1)</a> for more information on key descriptions (KEY IDENTIFIERS section).</p>
+<p>Note that the linked volume key is not cleaned up automatically when the device is detached.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-luks">
+<span class="sig-name descname"><span class="pre">luks</span></span><a class="headerlink" href="#systemd-option-crypttab-luks" title="Link to this definition">¶</a></dt>
+<dd><p>Force LUKS mode. When this mode is used, the following options are ignored since they are provided by the LUKS header on the device: <a class="reference internal" href="#systemd-option-crypttab-cipher"><code class="docutils literal notranslate"><span class="pre">cipher=</span></code></a>, <a class="reference internal" href="#systemd-option-crypttab-hash"><code class="docutils literal notranslate"><span class="pre">hash=</span></code></a>, <a class="reference internal" href="#systemd-option-crypttab-size"><code class="docutils literal notranslate"><span class="pre">size=</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-bitlk">
+<span class="sig-name descname"><span class="pre">bitlk</span></span><a class="headerlink" href="#systemd-option-crypttab-bitlk" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypt BitLocker drive. Encryption parameters are deduced by cryptsetup from BitLocker header.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-netdev">
+<span class="sig-name descname"><span class="pre">_netdev</span></span><a class="headerlink" href="#systemd-option-crypttab-netdev" title="Link to this definition">¶</a></dt>
+<dd><p>Marks this cryptsetup device as requiring network. It will be started after the network is available, similarly to <a class="reference internal" href="systemd.mount.html#systemd-mount-5"><span class="std std-ref">systemd.mount(5)</span></a> units marked with <a class="reference internal" href="#systemd-option-crypttab-netdev"><code class="docutils literal notranslate"><span class="pre">_netdev</span></code></a>. The service unit to set up this device will be ordered between <code class="code docutils literal notranslate"><span class="pre">remote-fs-pre.target</span></code> and <code class="code docutils literal notranslate"><span class="pre">remote-cryptsetup.target</span></code>, instead of <code class="code docutils literal notranslate"><span class="pre">cryptsetup-pre.target</span></code> and <code class="code docutils literal notranslate"><span class="pre">cryptsetup.target</span></code>.</p>
+<p>Hint: if this device is used for a mount point that is specified in <a class="reference external" href="https://man7.org/linux/man-pages/man5/fstab.5.html">fstab(5)</a>, the <a class="reference internal" href="#systemd-option-crypttab-netdev"><code class="docutils literal notranslate"><span class="pre">_netdev</span></code></a> option should also be used for the mount point. Otherwise, a dependency loop might be created where the mount point will be pulled in by <code class="code docutils literal notranslate"><span class="pre">local-fs.target</span></code>, while the service to configure the network is usually only started <em>after</em> the local file system has been mounted. the local file system has been mounted.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 235.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-noauto">
+<span class="sig-name descname"><span class="pre">noauto</span></span><a class="headerlink" href="#systemd-option-crypttab-noauto" title="Link to this definition">¶</a></dt>
+<dd><p>This device will not be added to <code class="code docutils literal notranslate"><span class="pre">cryptsetup.target</span></code>. This means that it will not be automatically unlocked on boot, unless something else pulls it in. In particular, if the device is used for a mount point, it’ll be unlocked automatically during boot, unless the mount point itself is also disabled with <a class="reference internal" href="#systemd-option-crypttab-noauto"><code class="docutils literal notranslate"><span class="pre">noauto</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-nofail">
+<span class="sig-name descname"><span class="pre">nofail</span></span><a class="headerlink" href="#systemd-option-crypttab-nofail" title="Link to this definition">¶</a></dt>
+<dd><p>This device will not be a hard dependency of <code class="code docutils literal notranslate"><span class="pre">cryptsetup.target</span></code>. It’ll still be pulled in and started, but the system will not wait for the device to show up and be unlocked, and boot will not fail if this is unsuccessful. Note that other units that depend on the unlocked device may still fail. In particular, if the device is used for a mount point, the mount point itself also needs to have the <a class="reference internal" href="#systemd-option-crypttab-nofail"><code class="docutils literal notranslate"><span class="pre">nofail</span></code></a> option, or the boot will fail if the device is not unlocked successfully. If a keyfile and/or a <a class="reference internal" href="#systemd-option-crypttab-header"><code class="docutils literal notranslate"><span class="pre">header</span></code></a> are specified, the dependencies on their respective directories will also not be fatal, so that unmounting said directories will not cause the generated cryptset unit to be deactivated.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-offset">
+<span class="sig-name descname"><span class="pre">offset=</span></span><a class="headerlink" href="#systemd-option-crypttab-offset" title="Link to this definition">¶</a></dt>
+<dd><p>Start offset in the backend device, in 512-byte sectors. This option is only relevant for plain devices.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 220.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-plain">
+<span class="sig-name descname"><span class="pre">plain</span></span><a class="headerlink" href="#systemd-option-crypttab-plain" title="Link to this definition">¶</a></dt>
+<dd><p>Force plain encryption mode.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-read-only">
+<span class="sig-name descname"><span class="pre">read-only</span></span><a class="headerlink" href="#systemd-option-crypttab-read-only" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-readonly">
+<span class="sig-name descname"><span class="pre">readonly</span></span><a class="headerlink" href="#systemd-option-crypttab-readonly" title="Link to this definition">¶</a></dt>
+<dd><p>Set up the encrypted block device in read-only mode.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-same-cpu-crypt">
+<span class="sig-name descname"><span class="pre">same-cpu-crypt</span></span><a class="headerlink" href="#systemd-option-crypttab-same-cpu-crypt" title="Link to this definition">¶</a></dt>
+<dd><p>Perform encryption using the same CPU that IO was submitted on. The default is to use an unbound workqueue so that encryption work is automatically balanced between available CPUs.</p>
+<p>This requires kernel 4.0 or newer.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 242.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-submit-from-crypt-cpus">
+<span class="sig-name descname"><span class="pre">submit-from-crypt-cpus</span></span><a class="headerlink" href="#systemd-option-crypttab-submit-from-crypt-cpus" title="Link to this definition">¶</a></dt>
+<dd><p>Disable offloading writes to a separate thread after encryption. There are some situations where offloading write requests from the encryption threads to a dedicated thread degrades performance significantly. The default is to offload write requests to a dedicated thread because it benefits the CFQ scheduler to have writes submitted using the same context.</p>
+<p>This requires kernel 4.0 or newer.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 242.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-no-read-workqueue">
+<span class="sig-name descname"><span class="pre">no-read-workqueue</span></span><a class="headerlink" href="#systemd-option-crypttab-no-read-workqueue" title="Link to this definition">¶</a></dt>
+<dd><p>Bypass dm-crypt internal workqueue and process read requests synchronously. The default is to queue these requests and process them asynchronously.</p>
+<p>This requires kernel 5.9 or newer.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-no-write-workqueue">
+<span class="sig-name descname"><span class="pre">no-write-workqueue</span></span><a class="headerlink" href="#systemd-option-crypttab-no-write-workqueue" title="Link to this definition">¶</a></dt>
+<dd><p>Bypass dm-crypt internal workqueue and process write requests synchronously. The default is to queue these requests and process them asynchronously.</p>
+<p>This requires kernel 5.9 or newer.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-skip">
+<span class="sig-name descname"><span class="pre">skip=</span></span><a class="headerlink" href="#systemd-option-crypttab-skip" title="Link to this definition">¶</a></dt>
+<dd><p>How many 512-byte sectors of the encrypted data to skip at the beginning. This is different from the <a class="reference internal" href="#systemd-option-crypttab-offset"><code class="docutils literal notranslate"><span class="pre">offset=</span></code></a> option with respect to the sector numbers used in initialization vector (IV) calculation. Using <a class="reference internal" href="#systemd-option-crypttab-offset"><code class="docutils literal notranslate"><span class="pre">offset=</span></code></a> will shift the IV calculation by the same negative amount. Hence, if <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">offset=:emphasis:`n`</span></code> is given, sector <em>n</em> will get a sector number of 0 for the IV calculation. Using <a class="reference internal" href="#systemd-option-crypttab-skip"><code class="docutils literal notranslate"><span class="pre">skip=</span></code></a> causes sector <em>n</em> to also be the first sector of the mapped device, but with its number for IV generation being <em>n</em>.</p>
+<p>This option is only relevant for plain devices.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 220.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-size">
+<span class="sig-name descname"><span class="pre">size=</span></span><a class="headerlink" href="#systemd-option-crypttab-size" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the key size in bits. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for possible values and the default value of this option.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-sector-size">
+<span class="sig-name descname"><span class="pre">sector-size=</span></span><a class="headerlink" href="#systemd-option-crypttab-sector-size" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the sector size in bytes. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for possible values and the default value of this option.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-swap">
+<span class="sig-name descname"><span class="pre">swap</span></span><a class="headerlink" href="#systemd-option-crypttab-swap" title="Link to this definition">¶</a></dt>
+<dd><p>The encrypted block device will be used as a swap device, and will be formatted accordingly after setting up the encrypted block device, with <a class="reference external" href="https://man7.org/linux/man-pages/man8/mkswap.8.html">mkswap(8)</a>. This option implies <a class="reference internal" href="#systemd-option-crypttab-plain"><code class="docutils literal notranslate"><span class="pre">plain</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Using the <a class="reference internal" href="#systemd-option-crypttab-swap"><code class="docutils literal notranslate"><span class="pre">swap</span></code></a> option will destroy the contents of the named partition during every boot, so make sure the underlying block device is specified correctly.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tcrypt">
+<span class="sig-name descname"><span class="pre">tcrypt</span></span><a class="headerlink" href="#systemd-option-crypttab-tcrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Use TrueCrypt encryption mode. When this mode is used, the following options are ignored since they are provided by the TrueCrypt header on the device or do not apply: <a class="reference internal" href="#systemd-option-crypttab-cipher"><code class="docutils literal notranslate"><span class="pre">cipher=</span></code></a>, <a class="reference internal" href="#systemd-option-crypttab-hash"><code class="docutils literal notranslate"><span class="pre">hash=</span></code></a>, <a class="reference internal" href="#systemd-option-crypttab-keyfile-offset"><code class="docutils literal notranslate"><span class="pre">keyfile-offset=</span></code></a>, <a class="reference internal" href="#systemd-option-crypttab-keyfile-size"><code class="docutils literal notranslate"><span class="pre">keyfile-size=</span></code></a>, <a class="reference internal" href="#systemd-option-crypttab-size"><code class="docutils literal notranslate"><span class="pre">size=</span></code></a>.</p>
+<p>When this mode is used, the passphrase is read from the key file given in the third field. Only the first line of this file is read, excluding the new line character.</p>
+<p>Note that the TrueCrypt format uses both passphrase and key files to derive a password for the volume. Therefore, the passphrase and all key files need to be provided. Use <a class="reference internal" href="#systemd-option-crypttab-tcrypt-keyfile"><code class="docutils literal notranslate"><span class="pre">tcrypt-keyfile=</span></code></a> to provide the absolute path to all key files. When using an empty passphrase in combination with one or more key files, use “/dev/null” as the password file in the third field.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 206.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tcrypt-hidden">
+<span class="sig-name descname"><span class="pre">tcrypt-hidden</span></span><a class="headerlink" href="#systemd-option-crypttab-tcrypt-hidden" title="Link to this definition">¶</a></dt>
+<dd><p>Use the hidden TrueCrypt volume. This option implies <a class="reference internal" href="#systemd-option-crypttab-tcrypt"><code class="docutils literal notranslate"><span class="pre">tcrypt</span></code></a>.</p>
+<p>This will map the hidden volume that is inside of the volume provided in the second field. Please note that there is no protection for the hidden volume if the outer volume is mounted instead. See <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a> for more information on this limitation.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 206.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tcrypt-keyfile">
+<span class="sig-name descname"><span class="pre">tcrypt-keyfile=</span></span><a class="headerlink" href="#systemd-option-crypttab-tcrypt-keyfile" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the absolute path to a key file to use for a TrueCrypt volume. This implies <a class="reference internal" href="#systemd-option-crypttab-tcrypt"><code class="docutils literal notranslate"><span class="pre">tcrypt</span></code></a> and can be used more than once to provide several key files.</p>
+<p>See the entry for <a class="reference internal" href="#systemd-option-crypttab-tcrypt"><code class="docutils literal notranslate"><span class="pre">tcrypt</span></code></a> on the behavior of the passphrase and key files when using TrueCrypt encryption mode.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 206.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tcrypt-system">
+<span class="sig-name descname"><span class="pre">tcrypt-system</span></span><a class="headerlink" href="#systemd-option-crypttab-tcrypt-system" title="Link to this definition">¶</a></dt>
+<dd><p>Use TrueCrypt in system encryption mode. This option implies <a class="reference internal" href="#systemd-option-crypttab-tcrypt"><code class="docutils literal notranslate"><span class="pre">tcrypt</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 206.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tcrypt-veracrypt">
+<span class="sig-name descname"><span class="pre">tcrypt-veracrypt</span></span><a class="headerlink" href="#systemd-option-crypttab-tcrypt-veracrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Check for a VeraCrypt volume. VeraCrypt is a fork of TrueCrypt that is mostly compatible, but uses different, stronger key derivation algorithms that cannot be detected without this flag. Enabling this option could substantially slow down unlocking, because VeraCrypt’s key derivation takes much longer than TrueCrypt’s. This option implies <a class="reference internal" href="#systemd-option-crypttab-tcrypt"><code class="docutils literal notranslate"><span class="pre">tcrypt</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 232.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-veracrypt-pim">
+<span class="sig-name descname"><span class="pre">veracrypt-pim=</span></span><a class="headerlink" href="#systemd-option-crypttab-veracrypt-pim" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a custom Personal Iteration Multiplier (PIM) value, which can range from 0..2147468 for standard veracrypt volumes and 0..65535 for veracrypt system volumes. A value of 0 will imply the VeraCrypt default. This option is only effective when <a class="reference internal" href="#systemd-option-crypttab-tcrypt-veracrypt"><code class="docutils literal notranslate"><span class="pre">tcrypt-veracrypt</span></code></a> is set.</p>
+<p>Note that VeraCrypt enforces a minimal allowed PIM value depending on the password strength and the hash algorithm used for key derivation, however <a class="reference internal" href="#systemd-option-crypttab-veracrypt-pim"><code class="docutils literal notranslate"><span class="pre">veracrypt-pim=</span></code></a> is not checked against these bounds. See <a class="reference external" href="https://www.veracrypt.fr/en/Personal%20Iterations%20Multiplier%20%28PIM%29.html">Veracrypt Personal Iterations Multiplier</a> documentation for more information.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-timeout">
+<span class="sig-name descname"><span class="pre">timeout=</span></span><a class="headerlink" href="#systemd-option-crypttab-timeout" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the timeout for querying for a password. If no unit is specified, seconds is used. Supported units are s, ms, us, min, h, d. A timeout of 0 waits indefinitely (which is the default).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tmp">
+<span class="sig-name descname"><span class="pre">tmp=</span></span><a class="headerlink" href="#systemd-option-crypttab-tmp" title="Link to this definition">¶</a></dt>
+<dd><p>The encrypted block device will be prepared for using it as <code class="code docutils literal notranslate"><span class="pre">/tmp/</span></code>; it will be formatted using <a class="reference external" href="https://man7.org/linux/man-pages/man8/mkfs.8.html">mkfs(8)</a>. Takes a file system type as argument, such as “ext4”, “xfs” or “btrfs”. If no argument is specified defaults to “ext4”. This option implies <a class="reference internal" href="#systemd-option-crypttab-plain"><code class="docutils literal notranslate"><span class="pre">plain</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Using the <a class="reference internal" href="#systemd-option-crypttab-tmp"><code class="docutils literal notranslate"><span class="pre">tmp</span></code></a> option will destroy the contents of the named partition during every boot, so make sure the underlying block device is specified correctly.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tries">
+<span class="sig-name descname"><span class="pre">tries=</span></span><a class="headerlink" href="#systemd-option-crypttab-tries" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the maximum number of times the user is queried for a password. The default is 3. If set to 0, the user is queried for a password indefinitely.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-headless">
+<span class="sig-name descname"><span class="pre">headless=</span></span><a class="headerlink" href="#systemd-option-crypttab-headless" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument, defaults to false. If true, never query interactively for the password/PIN. Useful for headless systems.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 249.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><a class="headerlink" href="#systemd-option-crypttab-verify" title="Link to this definition">¶</a></dt>
+<dd><p>If the encryption password is read from console, it has to be entered twice to prevent typos.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 186.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-password-echo-yes-no-masked">
+<span class="sig-name descname"><span class="pre">password-echo=yes|no|masked</span></span><a class="headerlink" href="#systemd-option-crypttab-password-echo-yes-no-masked" title="Link to this definition">¶</a></dt>
+<dd><p>Controls whether to echo passwords or security token PINs that are read from console. Takes a boolean or the special string “masked”. The default is <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">password-echo=masked</span></code>.</p>
+<p>If enabled, the typed characters are echoed literally. If disabled, the typed characters are not echoed in any form, the user will not get feedback on their input. If set to “masked”, an asterisk (“*”) is echoed for each character typed. Regardless of which mode is chosen, if the user hits the tabulator key (”↹”) at any time, or the backspace key (”⌫”) before any other data has been entered, then echo is turned off.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 249.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-password-cache-yes-no-read-only">
+<span class="sig-name descname"><span class="pre">password-cache=yes|no|read-only</span></span><a class="headerlink" href="#systemd-option-crypttab-password-cache-yes-no-read-only" title="Link to this definition">¶</a></dt>
+<dd><p>Controls whether to use cache for passwords or security token PINs. Takes a boolean or the special string “read-only”. Defaults to “yes”.</p>
+<p>If set to “read-only”, the kernel keyring is checked for a password/PIN before requesting one interactively. If set to “yes”, in addition to checking the keyring, any password/PIN entered interactively is cached in the keyring with a 2.5-minute timeout before being purged.</p>
+<p>Note that this option is not permitted for PKCS#11 security tokens. The reasoning behind this is that PKCS#11 security tokens are usually configured to lock after being supplied an invalid PIN multiple times, so using the cache might inadvertently lock the token.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-pkcs11-uri">
+<span class="sig-name descname"><span class="pre">pkcs11-uri=</span></span><a class="headerlink" href="#systemd-option-crypttab-pkcs11-uri" title="Link to this definition">¶</a></dt>
+<dd><p>Takes either the special value “auto” or an <a class="reference external" href="https://tools.ietf.org/html/rfc7512">RFC7512 PKCS#11 URI</a> pointing to a private key which is used to decrypt the encrypted key specified in the third column of the line. This is useful for unlocking encrypted volumes through PKCS#11 compatible security tokens or smartcards. See below for an example how to set up this mechanism for unlocking a LUKS2 volume with a YubiKey security token.</p>
+<p>If specified as “auto” the volume must be of type LUKS2 and must carry PKCS#11 security token metadata in its LUKS2 JSON token section. In this mode the URI and the encrypted key are automatically read from the LUKS2 JSON token header. Use <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> as a simple tool for enrolling PKCS#11 security tokens or smartcards in a way compatible with “auto”. In this mode the third column of the line should remain empty (that is, specified as “-“).</p>
+<p>The specified URI can refer directly to a private key stored on a token or alternatively just to a slot or token, in which case a search for a suitable private key will be performed. In this case, if multiple suitable objects are found, the token is refused. The keyfile configured in the third column of the line is used as is (i.e. in binary form, unprocessed). The resulting decrypted key (for RSA) or derived shared secret (for ECC) is then Base64 encoded before it is used to unlock the LUKS volume.</p>
+<p>Use <code class="code docutils literal notranslate"><span class="pre">systemd-cryptenroll</span> <span class="pre">--pkcs11-token-uri=list</span></code> to list all suitable PKCS#11 security tokens currently plugged in, along with their URIs.</p>
+<p>Note that many newer security tokens that may be used as PKCS#11 security token typically also implement the newer and simpler FIDO2 standard. Consider using <a class="reference internal" href="#systemd-option-crypttab-fido2-device"><code class="docutils literal notranslate"><span class="pre">fido2-device=</span></code></a> (described below) to enroll it via FIDO2 instead. Note that a security token enrolled via PKCS#11 cannot be used to unlock the volume via FIDO2, unless also enrolled via FIDO2, and vice versa.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-fido2-device">
+<span class="sig-name descname"><span class="pre">fido2-device=</span></span><a class="headerlink" href="#systemd-option-crypttab-fido2-device" title="Link to this definition">¶</a></dt>
+<dd><p>Takes either the special value “auto” or the path to a “hidraw” device node (e.g. <code class="code docutils literal notranslate"><span class="pre">/dev/hidraw1</span></code>) referring to a FIDO2 security token that implements the “hmac-secret” extension (most current hardware security tokens do). See below for an example how to set up this mechanism for unlocking an encrypted volume with a FIDO2 security token.</p>
+<p>If specified as “auto” the FIDO2 token device is automatically discovered, as it is plugged in.</p>
+<p>FIDO2 volume unlocking requires a client ID hash (CID) to be configured via <a class="reference internal" href="#systemd-option-crypttab-fido2-cid"><code class="docutils literal notranslate"><span class="pre">fido2-cid=</span></code></a> (see below) and a key to pass to the security token’s HMAC functionality (configured in the line’s third column) to operate. If not configured and the volume is of type LUKS2, the CID and the key are read from LUKS2 JSON token metadata instead. Use <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> as simple tool for enrolling FIDO2 security tokens for LUKS2 volumes.</p>
+<p>Use <code class="code docutils literal notranslate"><span class="pre">systemd-cryptenroll</span> <span class="pre">--fido2-device=list</span></code> to list all suitable FIDO2 security tokens currently plugged in, along with their device nodes.</p>
+<p>This option implements the following mechanism: the configured key is hashed via they HMAC keyed hash function the FIDO2 device implements, keyed by a secret key embedded on the device. The resulting hash value is Base64 encoded and used to unlock the LUKS2 volume. As it should not be possible to extract the secret from the hardware token, it should not be possible to retrieve the hashed key given the configured key — without possessing the hardware token.</p>
+<p>Note that many security tokens that implement FIDO2 also implement PKCS#11, suitable for unlocking volumes via the <a class="reference internal" href="#systemd-option-crypttab-pkcs11-uri"><code class="docutils literal notranslate"><span class="pre">pkcs11-uri=</span></code></a> option described above. Typically the newer, simpler FIDO2 standard is preferable.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-fido2-cid">
+<span class="sig-name descname"><span class="pre">fido2-cid=</span></span><a class="headerlink" href="#systemd-option-crypttab-fido2-cid" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a Base64 encoded FIDO2 client ID to use for the FIDO2 unlock operation. If specified, but <a class="reference internal" href="#systemd-option-crypttab-fido2-device"><code class="docutils literal notranslate"><span class="pre">fido2-device=</span></code></a> is not, <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">fido2-device=auto</span></code> is implied. If <a class="reference internal" href="#systemd-option-crypttab-fido2-device"><code class="docutils literal notranslate"><span class="pre">fido2-device=</span></code></a> is used but <a class="reference internal" href="#systemd-option-crypttab-fido2-cid"><code class="docutils literal notranslate"><span class="pre">fido2-cid=</span></code></a> is not, the volume must be of LUKS2 type, and the CID is read from the LUKS2 JSON token header. Use <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> for enrolling a FIDO2 token in the LUKS2 header compatible with this automatic mode.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-fido2-rp">
+<span class="sig-name descname"><span class="pre">fido2-rp=</span></span><a class="headerlink" href="#systemd-option-crypttab-fido2-rp" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a string, configuring the FIDO2 Relying Party (rp) for the FIDO2 unlock operation. If not specified, “io.systemd.cryptsetup” is used, except if the LUKS2 JSON token header contains a different value. It should normally not be necessary to override this.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-fido2-pin">
+<span class="sig-name descname"><span class="pre">fido2-pin=</span></span><a class="headerlink" href="#systemd-option-crypttab-fido2-pin" title="Link to this definition">¶</a></dt>
+<dd><p>Controls whether to require the user to enter a PIN when unlocking the volume (the FIDO2 “clientPin” feature). This option only applies when in manual mode, i.e. when <a class="reference internal" href="#systemd-option-crypttab-fido2-cid"><code class="docutils literal notranslate"><span class="pre">fido2-cid=</span></code></a> option is set. Defaults to neither true or false, but rather to <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">v248</span></code> behavior, that is: try with no PIN first, but if token reports that PIN is required, try again asking for PIN.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-fido2-up">
+<span class="sig-name descname"><span class="pre">fido2-up=</span></span><a class="headerlink" href="#systemd-option-crypttab-fido2-up" title="Link to this definition">¶</a></dt>
+<dd><p>Controls whether to require the user to verify presence (tap the token, the FIDO2 “up” feature) when unlocking the volume. This option only applies when in manual mode, i.e. when <a class="reference internal" href="#systemd-option-crypttab-fido2-cid"><code class="docutils literal notranslate"><span class="pre">fido2-cid=</span></code></a> option is set. Defaults to neither true or false, but rather to <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">v248</span></code> behavior, that is: try with no UP first, but if token reports that UP is required, try again with UP enabled.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-fido2-uv">
+<span class="sig-name descname"><span class="pre">fido2-uv=</span></span><a class="headerlink" href="#systemd-option-crypttab-fido2-uv" title="Link to this definition">¶</a></dt>
+<dd><p>Controls whether to require user verification (the FIDO2 “uv” feature) when unlocking the volume. This option only applies when in manual mode, i.e. when <a class="reference internal" href="#systemd-option-crypttab-fido2-cid"><code class="docutils literal notranslate"><span class="pre">fido2-cid=</span></code></a> option is set. Defaults to neither true or false, but rather to <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">v248</span></code> behavior, that is: omit configuring UV whatsoever.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tpm2-device">
+<span class="sig-name descname"><span class="pre">tpm2-device=</span></span><a class="headerlink" href="#systemd-option-crypttab-tpm2-device" title="Link to this definition">¶</a></dt>
+<dd><p>Takes either the special value “auto” or the path to a device node (e.g. <code class="code docutils literal notranslate"><span class="pre">/dev/tpmrm0</span></code>) referring to a TPM2 security chip. See below for an example how to set up this mechanism for unlocking an encrypted volume with a TPM2 chip.</p>
+<p>Use <a class="reference internal" href="#systemd-option-crypttab-tpm2-pcrs"><code class="docutils literal notranslate"><span class="pre">tpm2-pcrs=</span></code></a> (see below) to configure the set of TPM2 PCRs to bind the volume unlocking to. Use <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> as simple tool for enrolling TPM2 security chips in LUKS2 volumes.</p>
+<p>If specified as “auto” the TPM2 device is automatically discovered. Use <code class="code docutils literal notranslate"><span class="pre">systemd-cryptenroll</span> <span class="pre">--tpm2-device=list</span></code> to list all suitable TPM2 devices currently available, along with their device nodes.</p>
+<p>This option implements the following mechanism: when enrolling a TPM2 device via <code class="code docutils literal notranslate"><span class="pre">systemd-cryptenroll</span></code> on a LUKS2 volume, a randomized key unlocking the volume is generated on the host and loaded into the TPM2 chip where it is encrypted with an asymmetric “primary” key pair derived from the TPM2’s internal “seed” key. Neither the seed key nor the primary key are permitted to ever leave the TPM2 chip — however, the now encrypted randomized key may. It is saved in the LUKS2 volume JSON token header. When unlocking the encrypted volume, the primary key pair is generated on the TPM2 chip again (which works as long as the chip’s seed key is correctly maintained by the TPM2 chip), which is then used to decrypt (on the TPM2 chip) the encrypted key from the LUKS2 volume JSON token header saved there during enrollment. The resulting decrypted key is then used to unlock the volume. When the randomized key is encrypted the current values of the selected PCRs (see below) are included in the operation, so that different PCR state results in different encrypted keys and the decrypted key can only be recovered if the same PCR state is reproduced.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tpm2-pcrs">
+<span class="sig-name descname"><span class="pre">tpm2-pcrs=</span></span><a class="headerlink" href="#systemd-option-crypttab-tpm2-pcrs" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a “+” separated list of numeric TPM2 PCR (i.e. “Platform Configuration Register”) indexes to bind the TPM2 volume unlocking to. This option is only useful when TPM2 enrollment metadata is not available in the LUKS2 JSON token header already, the way <code class="code docutils literal notranslate"><span class="pre">systemd-cryptenroll</span></code> writes it there. If not used (and no metadata in the LUKS2 JSON token header defines it), defaults to a list of a single entry: PCR 7. Assign an empty string to encode a policy that binds the key to no PCRs, making the key accessible to local programs regardless of the current PCR state.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tpm2-pin">
+<span class="sig-name descname"><span class="pre">tpm2-pin=</span></span><a class="headerlink" href="#systemd-option-crypttab-tpm2-pin" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument, defaults to “false”. Controls whether TPM2 volume unlocking is bound to a PIN in addition to PCRs. Similarly, this option is only useful when TPM2 enrollment metadata is not available.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tpm2-signature">
+<span class="sig-name descname"><span class="pre">tpm2-signature=</span></span><a class="headerlink" href="#systemd-option-crypttab-tpm2-signature" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an absolute path to a TPM2 PCR JSON signature file, as produced by the <a class="reference internal" href="systemd-measure.html#systemd-measure-1"><span class="std std-ref">systemd-measure(1)</span></a> tool. This permits locking LUKS2 volumes to any PCR values for which a valid signature matching a public key specified at key enrollment time can be provided. See <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> for details on enrolling TPM2 PCR public keys. If this option is not specified but it is attempted to unlock a LUKS2 volume with a signed TPM2 PCR enrollment, a suitable signature file <code class="code docutils literal notranslate"><span class="pre">tpm2-pcr-signature.json</span></code> is searched for in <code class="code docutils literal notranslate"><span class="pre">/etc/systemd/</span></code>, <code class="code docutils literal notranslate"><span class="pre">/run/systemd/</span></code>, <code class="code docutils literal notranslate"><span class="pre">/usr/lib/systemd/</span></code> (in this order).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 252.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tpm2-pcrlock">
+<span class="sig-name descname"><span class="pre">tpm2-pcrlock=</span></span><a class="headerlink" href="#systemd-option-crypttab-tpm2-pcrlock" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an absolute path to a TPM2 pcrlock policy file, as produced by the <a class="reference internal" href="systemd-pcrlock.html#systemd-pcrlock-8"><span class="std std-ref">systemd-pcrlock(8)</span></a> tool. This permits locking LUKS2 volumes to a local policy of allowed PCR values with variants. See <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> for details on enrolling TPM2 pcrlock policies. If this option is not specified but it is attempted to unlock a LUKS2 volume with a TPM2 pcrlock enrollment, a suitable signature file <code class="code docutils literal notranslate"><span class="pre">pcrlock.json</span></code> is searched for in <code class="code docutils literal notranslate"><span class="pre">/run/systemd/</span></code> and <code class="code docutils literal notranslate"><span class="pre">/var/lib/systemd/</span></code> (in this order).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tpm2-measure-pcr">
+<span class="sig-name descname"><span class="pre">tpm2-measure-pcr=</span></span><a class="headerlink" href="#systemd-option-crypttab-tpm2-measure-pcr" title="Link to this definition">¶</a></dt>
+<dd><p>Controls whether to measure the volume key of the encrypted volume to a TPM2 PCR. If set to “no” (which is the default) no PCR extension is done. If set to “yes” the volume key is measured into PCR 15. If set to a decimal integer in the range 0…23 the volume key is measured into the specified PCR. The volume key is measured along with the activated volume name and its UUID. This functionality is particularly useful for the encrypted volume backing the root file system, as it then allows later TPM objects to be securely bound to the root file system and hence the specific installation.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tpm2-measure-bank">
+<span class="sig-name descname"><span class="pre">tpm2-measure-bank=</span></span><a class="headerlink" href="#systemd-option-crypttab-tpm2-measure-bank" title="Link to this definition">¶</a></dt>
+<dd><p>Selects one or more TPM2 PCR banks to measure the volume key into, as configured with <a class="reference internal" href="#systemd-option-crypttab-tpm2-measure-pcr"><code class="docutils literal notranslate"><span class="pre">tpm2-measure-pcr=</span></code></a> above. Multiple banks may be specified, separated by a colon character. If not specified, automatically determines available and used banks. Expects a message digest name (e.g. “sha1”, “sha256”, …) as argument, to identify the bank.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-tpm2-measure-keyslot-nvpcr">
+<span class="sig-name descname"><span class="pre">tpm2-measure-keyslot-nvpcr=</span></span><a class="headerlink" href="#systemd-option-crypttab-tpm2-measure-keyslot-nvpcr" title="Link to this definition">¶</a></dt>
+<dd><p>Controls whether to measure information about the used LUKS unlock keyslot to a TPM2 non-volatile index (nvindex in PCR mode). If set to to an empty string (which is the default) no TPM2 nvindex extension is done, otherwise keyslot information is measured to an nvindex of the specified name, which is allocated if needed. It is recommended to set this to “cryptsetup” to enable this logic. The slot index and the used unlock mechanism (i.e. “tpm2”, “fido2”, “pkcs11”) is measured along with the activated volume name and its UUID.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 259.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-token-timeout">
+<span class="sig-name descname"><span class="pre">token-timeout=</span></span><a class="headerlink" href="#systemd-option-crypttab-token-timeout" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies how long to wait at most for configured security devices (i.e. FIDO2, PKCS#11, TPM2) to show up. Takes a time value in seconds (but other time units may be specified too, see <a class="reference internal" href="systemd.time.html#systemd-time-7"><span class="std std-ref">systemd.time(7)</span></a> for supported formats). Defaults to 30s. Once the specified timeout elapsed authentication via password is attempted. Note that this timeout applies to waiting for the security device to show up — it does not apply to the PIN prompt for the device (should one be needed) or similar. Pass 0 to turn off the timeout and wait forever.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-try-empty-password">
+<span class="sig-name descname"><span class="pre">try-empty-password=</span></span><a class="headerlink" href="#systemd-option-crypttab-try-empty-password" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. If enabled, right before asking the user for a password it is first attempted to unlock the volume with an empty password. This is useful for systems that are initialized with an encrypted volume with only an empty password set, which shall be replaced with a suitable password during first boot, but after activation.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-x-systemd-device-timeout">
+<span class="sig-name descname"><span class="pre">x-systemd.device-timeout=</span></span><a class="headerlink" href="#systemd-option-crypttab-x-systemd-device-timeout" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies how long systemd should wait for a block device to show up before giving up on the entry. The argument is a time in seconds or explicitly specified units of “s”, “min”, “h”, “ms”.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 216.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-crypttab-x-initrd-attach">
+<span class="sig-name descname"><span class="pre">x-initrd.attach</span></span><a class="headerlink" href="#systemd-option-crypttab-x-initrd-attach" title="Link to this definition">¶</a></dt>
+<dd><p>Setup this encrypted block device in the initrd, similarly to <a class="reference internal" href="systemd.mount.html#systemd-mount-5"><span class="std std-ref">systemd.mount(5)</span></a> units marked with <a class="reference internal" href="systemd.mount.html#systemd-option-systemd-mount-x-initrd-mount"><code class="docutils literal notranslate"><span class="pre">x-initrd.mount</span></code></a>.</p>
+<p>Although it is not necessary to mark the mount entry for the root file system with <a class="reference internal" href="systemd.mount.html#systemd-option-systemd-mount-x-initrd-mount"><code class="docutils literal notranslate"><span class="pre">x-initrd.mount</span></code></a>, <a class="reference internal" href="#systemd-option-crypttab-x-initrd-attach"><code class="docutils literal notranslate"><span class="pre">x-initrd.attach</span></code></a> is still recommended with the encrypted block device containing the root file system as otherwise systemd will attempt to detach the device during the regular system shutdown while it is still in use. With this option the device will still be detached but later after the root file system is unmounted.</p>
+<p>All other encrypted block devices that contain file systems mounted in the initrd should use this option.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 245.</span></p>
+</div>
+</dd></dl>
+
+<p>At early boot and when the system manager configuration is reloaded, this file is translated into native systemd units by <a class="reference internal" href="systemd-cryptsetup-generator.html#systemd-cryptsetup-generator-8"><span class="std std-ref">systemd-cryptsetup-generator(8)</span></a>.</p>
+</section>
+<section id="af-unix-key-files">
+<h2><code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> Key Files<a class="headerlink" href="#af-unix-key-files" title="Link to this heading">¶</a></h2>
+<p>If the key file path (as specified in the third column of <code class="code docutils literal notranslate"><span class="pre">/etc/crypttab</span></code> entries, see above) refers to an <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> stream socket in the file system, the key is acquired by connecting to the socket and reading the key from the connection. The connection is made from an <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> socket name in the abstract namespace, see <a class="reference external" href="https://man7.org/linux/man-pages/man7/unix.7.html">unix(7)</a> for details. The source socket name is chosen according to the following format:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>NUL<span class="w">  </span>RANDOM<span class="w">  </span>/cryptsetup/<span class="w"> </span>VOLUME
+</pre></div>
+</div>
+<p>In other words: a <code class="code docutils literal notranslate"><span class="pre">NUL</span></code> byte (as required for abstract namespace sockets), followed by a random string (consisting of alphanumeric characters only), followed by the literal string “/cryptsetup/”, followed by the name of the volume to acquire they key for. For example, for the volume “myvol”:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="se">\0</span>d7067f78d9827418/cryptsetup/myvol
+</pre></div>
+</div>
+<p>Services listening on the <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> stream socket may query the source socket name with <a class="reference external" href="https://man7.org/linux/man-pages/man2/getpeername.2.html">getpeername(2)</a>, and use this to determine which key to send, allowing a single listening socket to serve keys for multiple volumes. If the PKCS#11 logic is used (see above), the socket source name is picked in similar fashion, except that the literal string “/cryptsetup-pkcs11/” is used. And similarly for FIDO2 (“/cryptsetup-fido2-salt/”) and TPM2 (“/cryptsetup-tpm2/”). A different path component is used so that services providing key material know that the secret key was not requested directly, but instead an encrypted key that will be decrypted via the PKCS#11/FIDO2/TPM2 logic to acquire the final secret key.</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<section id="etc-crypttab-example">
+<h3>/etc/crypttab example<a class="headerlink" href="#etc-crypttab-example" title="Link to this heading">¶</a></h3>
+<p>Set up four encrypted block devices. One using LUKS for normal storage, another one for usage as a swap device and two TrueCrypt volumes. For the fourth device, the option string is interpreted as two options “cipher=xchacha12,aes-adiantum-plain64”, “keyfile-timeout=10s”.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>luks<span class="w">       </span><span class="nv">UUID</span><span class="o">=</span>2505567a-9e27-4efe-a4d5-15ad146c258b
+swap<span class="w">       </span>/dev/sda7<span class="w">       </span>/dev/urandom<span class="w">       </span>swap
+truecrypt<span class="w">  </span>/dev/sda2<span class="w">       </span>/etc/container_password<span class="w">  </span>tcrypt
+hidden<span class="w">     </span>/mnt/tc_hidden<span class="w">  </span>/dev/null<span class="w">    </span>tcrypt-hidden,tcrypt-keyfile<span class="o">=</span>/etc/keyfile
+external<span class="w">   </span>/dev/sda3<span class="w">       </span>keyfile:LABEL<span class="o">=</span>keydev<span class="w"> </span>keyfile-timeout<span class="o">=</span>10s,cipher<span class="o">=</span>xchacha12<span class="se">\,</span>aes-adiantum-plain64
+</pre></div>
+</div>
+</section>
+<section id="yubikey-based-pkcs-11-volume-unlocking-example">
+<h3>Yubikey-based PKCS#11 Volume Unlocking Example<a class="headerlink" href="#yubikey-based-pkcs-11-volume-unlocking-example" title="Link to this heading">¶</a></h3>
+<p>The PKCS#11 logic allows hooking up any compatible security token that is capable of storing RSA or EC cryptographic keys for unlocking an encrypted volume. Here’s an example how to set up a Yubikey security token for this purpose on a LUKS2 volume, using <a class="reference external" href="https://manpages.debian.org/unstable/ykmap/ykmap.1.en.html">ykmap(1)</a> from the yubikey-manager project to initialize the token and <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a> to add it in the LUKS2 volume:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># SPDX-License-Identifier: MIT-0</span>
+
+<span class="c1"># Destroy any old key on the Yubikey (careful!)</span>
+ykman<span class="w"> </span>piv<span class="w"> </span>reset
+
+<span class="c1"># Generate a new private/public key pair on the device, store the public key in</span>
+<span class="c1"># &#39;pubkey.pem&#39;.</span>
+ykman<span class="w"> </span>piv<span class="w"> </span>generate-key<span class="w"> </span>-a<span class="w"> </span>RSA2048<span class="w"> </span>9d<span class="w"> </span>pubkey.pem
+
+<span class="c1"># Create a self-signed certificate from this public key, and store it on the</span>
+<span class="c1"># device. The &quot;subject&quot; should be an arbitrary user-chosen string to identify</span>
+<span class="c1"># the token with.</span>
+ykman<span class="w"> </span>piv<span class="w"> </span>generate-certificate<span class="w"> </span>--subject<span class="w"> </span><span class="s2">&quot;Knobelei&quot;</span><span class="w"> </span>9d<span class="w"> </span>pubkey.pem
+
+<span class="c1"># We do not need the public key anymore, let&#39;s remove it. Since it is not</span>
+<span class="c1"># security sensitive we just do a regular &quot;rm&quot; here.</span>
+rm<span class="w"> </span>pubkey.pem
+
+<span class="c1"># Enroll the freshly initialized security token in the LUKS2 volume. Replace</span>
+<span class="c1"># /dev/sdXn by the partition to use (e.g. /dev/sda1).</span>
+sudo<span class="w"> </span>systemd-cryptenroll<span class="w"> </span>--pkcs11-token-uri<span class="o">=</span>auto<span class="w"> </span>/dev/sdXn
+
+<span class="c1"># Test: Let&#39;s run systemd-cryptsetup to test if this all worked.</span>
+sudo<span class="w"> </span>systemd-cryptsetup<span class="w"> </span>attach<span class="w"> </span>mytest<span class="w"> </span>/dev/sdXn<span class="w"> </span>none<span class="w"> </span>pkcs11-uri<span class="o">=</span>auto
+
+<span class="c1"># If that worked, let&#39;s now add the same line persistently to /etc/crypttab,</span>
+<span class="c1"># for the future. We do not want to use the (unstable) /dev/sdX name, so let&#39;s</span>
+<span class="c1"># figure out a stable link:</span>
+udevadm<span class="w"> </span>info<span class="w"> </span>-q<span class="w"> </span>symlink<span class="w"> </span>-r<span class="w"> </span>/dev/sdXn
+
+<span class="c1"># Now add the line using the by-uuid symlink to /etc/crypttab:</span>
+sudo<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;echo &quot;mytest /dev/disk/by-uuid/... none pkcs11-uri=auto&quot; &gt;&gt;/etc/crypttab&#39;</span>
+
+<span class="c1"># Depending on your distribution and encryption setup, you may need to manually</span>
+<span class="c1"># regenerate your initramfs to be able to use a Yubikey / PKCS#11 token to</span>
+<span class="c1"># unlock the partition during early boot.</span>
+<span class="c1"># More information at https://unix.stackexchange.com/a/705809.</span>
+<span class="c1"># On Fedora based systems:</span>
+sudo<span class="w"> </span>dracut<span class="w"> </span>--force
+<span class="c1"># On Debian based systems:</span>
+sudo<span class="w"> </span>update-initramfs<span class="w"> </span>-u
+</pre></div>
+</div>
+<p>A few notes on the above:</p>
+<ul class="simple">
+<li><p>We use RSA2048, which is the longest key size current Yubikeys support</p></li>
+<li><p>We use Yubikey key slot 9d, since that’s apparently the keyslot to use for decryption purposes, see <a class="reference external" href="https://developers.yubico.com/PIV/Introduction/Certificate_slots.html">Yubico PIV certificate slots</a>.</p></li>
+</ul>
+</section>
+<section id="fido2-volume-unlocking-example">
+<h3>FIDO2 Volume Unlocking Example<a class="headerlink" href="#fido2-volume-unlocking-example" title="Link to this heading">¶</a></h3>
+<p>The FIDO2 logic allows using any compatible FIDO2 security token that implements the “hmac-secret” extension for unlocking an encrypted volume. Here’s an example how to set up a FIDO2 security token for this purpose for a LUKS2 volume, using <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># SPDX-License-Identifier: MIT-0</span>
+
+<span class="c1"># Enroll the security token in the LUKS2 volume. Replace /dev/sdXn by the</span>
+<span class="c1"># partition to use (e.g. /dev/sda1).</span>
+sudo<span class="w"> </span>systemd-cryptenroll<span class="w"> </span>--fido2-device<span class="o">=</span>auto<span class="w"> </span>/dev/sdXn
+
+<span class="c1"># Test: Let&#39;s run systemd-cryptsetup to test if this worked.</span>
+sudo<span class="w"> </span>systemd-cryptsetup<span class="w"> </span>attach<span class="w"> </span>mytest<span class="w"> </span>/dev/sdXn<span class="w"> </span>none<span class="w"> </span>fido2-device<span class="o">=</span>auto
+
+<span class="c1"># If that worked, let&#39;s now add the same line persistently to /etc/crypttab,</span>
+<span class="c1"># for the future. We do not want to use the (unstable) /dev/sdX name, so let&#39;s</span>
+<span class="c1"># figure out a stable link:</span>
+udevadm<span class="w"> </span>info<span class="w"> </span>-q<span class="w"> </span>symlink<span class="w"> </span>-r<span class="w"> </span>/dev/sdXn
+
+<span class="c1"># Now add the line using the by-uuid symlink to /etc/crypttab:</span>
+sudo<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;echo &quot;mytest /dev/disk/by-uuid/... none fido2-device=auto&quot; &gt;&gt;/etc/crypttab&#39;</span>
+
+<span class="c1"># Depending on your distribution and encryption setup, you may need to manually</span>
+<span class="c1"># regenerate your initramfs to be able to use a FIDO2 device to unlock the</span>
+<span class="c1"># partition during early boot.</span>
+<span class="c1"># More information at https://unix.stackexchange.com/a/705809.</span>
+<span class="c1"># On Fedora based systems:</span>
+sudo<span class="w"> </span>dracut<span class="w"> </span>--force
+<span class="c1"># On Debian based systems:</span>
+sudo<span class="w"> </span>update-initramfs<span class="w"> </span>-u
+</pre></div>
+</div>
+</section>
+<section id="tpm2-volume-unlocking-example">
+<h3>TPM2 Volume Unlocking Example<a class="headerlink" href="#tpm2-volume-unlocking-example" title="Link to this heading">¶</a></h3>
+<p>The TPM2 logic allows using any TPM2 chip supported by the Linux kernel for unlocking an encrypted volume. Here’s an example how to set up a TPM2 chip for this purpose for a LUKS2 volume, using <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># SPDX-License-Identifier: MIT-0</span>
+
+<span class="c1"># Enroll the TPM2 security chip in the LUKS2 volume, and bind it to PCR 7</span>
+<span class="c1"># only. Replace /dev/sdXn by the partition to use (e.g. /dev/sda1).</span>
+sudo<span class="w"> </span>systemd-cryptenroll<span class="w"> </span>--tpm2-device<span class="o">=</span>auto<span class="w"> </span>--tpm2-pcrs<span class="o">=</span><span class="m">7</span><span class="w"> </span>/dev/sdXn
+
+<span class="c1"># Test: Let&#39;s run systemd-cryptsetup to test if this worked.</span>
+sudo<span class="w"> </span>systemd-cryptsetup<span class="w"> </span>attach<span class="w"> </span>mytest<span class="w"> </span>/dev/sdXn<span class="w"> </span>none<span class="w"> </span>tpm2-device<span class="o">=</span>auto
+
+<span class="c1"># If that worked, let&#39;s now add the same line persistently to /etc/crypttab,</span>
+<span class="c1"># for the future. We do not want to use the (unstable) /dev/sdX name, so let&#39;s</span>
+<span class="c1"># figure out a stable link:</span>
+udevadm<span class="w"> </span>info<span class="w"> </span>-q<span class="w"> </span>symlink<span class="w"> </span>-r<span class="w"> </span>/dev/sdXn
+
+<span class="c1"># Now add the line using the by-uuid symlink to /etc/crypttab:</span>
+sudo<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;echo &quot;mytest /dev/disk/by-uuid/... none tpm2-device=auto&quot; &gt;&gt;/etc/crypttab&#39;</span>
+
+<span class="c1"># And now let&#39;s check that automatic unlocking works:</span>
+sudo<span class="w"> </span>systemd-cryptsetup<span class="w"> </span>detach<span class="w"> </span>mytest
+sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
+sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>cryptsetup.target
+systemctl<span class="w"> </span>is-active<span class="w"> </span>systemd-cryptsetup@mytest.service
+
+<span class="c1"># Once we have the device which will be unlocked automatically, we can use it.</span>
+<span class="c1"># Usually we would create a file system and add it to /etc/fstab:</span>
+sudo<span class="w"> </span>mkfs.ext4<span class="w"> </span>/dev/mapper/mytest
+<span class="c1"># This prints a &#39;Filesystem UUID&#39;, which we can use as a stable name:</span>
+sudo<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;echo &quot;/dev/disk/by-uuid/... /var/mytest ext4 defaults,x-systemd.mkdir 0 2&quot; &gt;&gt;/etc/fstab&#39;</span>
+<span class="c1"># And now let&#39;s check that the mounting works:</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
+sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>/var/mytest
+systemctl<span class="w"> </span>status<span class="w"> </span>/var/mytest
+
+<span class="c1"># Depending on your distribution and encryption setup, you may need to manually</span>
+<span class="c1"># regenerate your initramfs to be able to use a TPM2 security chip to unlock</span>
+<span class="c1"># the partition during early boot.</span>
+<span class="c1"># More information at https://unix.stackexchange.com/a/705809.</span>
+<span class="c1"># On Fedora based systems:</span>
+sudo<span class="w"> </span>dracut<span class="w"> </span>--force
+<span class="c1"># On Debian based systems:</span>
+sudo<span class="w"> </span>update-initramfs<span class="w"> </span>-u
+</pre></div>
+</div>
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="systemd.html#systemd-1"><span class="std std-ref">systemd(1)</span></a>, <a class="reference internal" href="systemd-cryptsetup.html#systemd-cryptsetup-8"><span class="std std-ref">systemd-cryptsetup&#64;.service(8)</span></a>, <a class="reference internal" href="systemd-cryptsetup-generator.html#systemd-cryptsetup-generator-8"><span class="std std-ref">systemd-cryptsetup-generator(8)</span></a>, <a class="reference internal" href="systemd-cryptenroll.html#systemd-cryptenroll-1"><span class="std std-ref">systemd-cryptenroll(1)</span></a>, <a class="reference external" href="https://man7.org/linux/man-pages/man5/fstab.5.html">fstab(5)</a>, <a class="reference external" href="http://linux.die.net/man/8/cryptsetup">cryptsetup(8)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man8/mkswap.8.html">mkswap(8)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man8/mke2fs.8.html">mke2fs(8)</a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="daemon.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">daemon(7)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="coredumpctl.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">coredumpctl(1)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, systemd
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">crypttab(5)</a><ul>
+<li><a class="reference internal" href="#name">Name</a></li>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#key-acquisition">Key Acquisition</a></li>
+<li><a class="reference internal" href="#supported-options">Supported Options</a></li>
+<li><a class="reference internal" href="#af-unix-key-files"><code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> Key Files</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#etc-crypttab-example">/etc/crypttab example</a></li>
+<li><a class="reference internal" href="#yubikey-based-pkcs-11-volume-unlocking-example">Yubikey-based PKCS#11 Volume Unlocking Example</a></li>
+<li><a class="reference internal" href="#fido2-volume-unlocking-example">FIDO2 Volume Unlocking Example</a></li>
+<li><a class="reference internal" href="#tpm2-volume-unlocking-example">TPM2 Volume Unlocking Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/js/custom.js?v=abe08e2c"></script>
+    </body>
+</html>

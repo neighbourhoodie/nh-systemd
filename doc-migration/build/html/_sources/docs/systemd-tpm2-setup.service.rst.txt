@@ -1,0 +1,73 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-tpm2-setup.service
+:manvolnum: 8
+:summary: Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot
+:aliases: systemd-tpm2-setup-early.service, systemd-tpm2-setup
+
+.. _systemd-tpm2-setup.service(8):
+
+=============================
+systemd-tpm2-setup.service(8)
+=============================
+
+Name
+####
+
+systemd-tpm2-setup.service, systemd-tpm2-setup-early.service, systemd-tpm2-setup — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot
+
+Synopsis
+########
+
+:code:`systemd-tpm2-setup.service`
+
+:code:`/usr/lib/systemd/systemd-tpm2-setup`
+
+Description
+###########
+
+:code:`systemd-tpm2-setup.service` and :code:`systemd-tpm2-setup-early.service` are services that generate the Storage Root Key (SRK) if it has not been generated yet, and stores it in the TPM. If NvPCRs (additional PCR registers in TPM NV Indexes) are defined, these are initialized with the anchoring secret.
+
+The services will store the public key of the SRK key pair in a PEM file in :code:`/run/systemd/tpm2-srk-public-key.pem` and :code:`/var/lib/systemd/tpm2-srk-public-key.pem`. They will also store it in TPM2B_PUBLIC format in :code:`/run/systemd/tpm2-srk-public-key.tpm2_public` and :code:`/var/lib/systemd/tpm2-srk-public-key.tpm2b_public`.
+
+:code:`systemd-tpm2-setup-early.service` runs very early at boot (possibly in the initrd), and writes the SRK public key to :code:`/run/systemd/tpm2-srk-public-key.*` (as :code:`/var/` is generally not accessible this early yet), while :code:`systemd-tpm2-setup.service` runs during a later boot phase and saves the public key to :code:`/var/lib/systemd/tpm2-srk-public-key.*`.
+
+Files
+#####
+
+.. systemd:option:: /run/systemd/tpm2-srk-public-key.pem, /run/systemd/tpm2-srk-public-key.tpm2b_public
+
+   The SRK public key in PEM and TPM2B_PUBLIC format, written during early boot.
+
+   .. versionadded:: 255
+
+.. systemd:option:: /var/lib/systemd/tpm2-srk-public-key.pem, /var/lib/systemd/tpm2-srk-public-key.tpm2_public
+
+   The SRK public key in PEM and TPM2B_PUBLIC format, written during later boot (once :code:`/var/` is available).
+
+   .. versionadded:: 255
+
+.. systemd:option:: /usr/lib/nvpcr/\*.nvpcr
+
+   Definition files for NvPCRs.
+
+   .. versionadded:: 259
+
+.. systemd:option:: /run/credentials/@encrypted/nvpcr-anchor.*
+
+   Encrypted NvPCR anchor secret, received into the system via system credentials.
+
+   .. versionadded:: 259
+
+.. systemd:var:: $BOOT/loader/credentials/nvpcr-anchor.*.cred
+
+   Encrypted NvPCR anchor secret, to be picked up by the kernel loader stub, i.e. :ref:`systemd-stub(7)`.
+
+   .. versionadded:: 259
+
+See Also
+########
+
+:ref:`systemd(1)`
+
+

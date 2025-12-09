@@ -1,0 +1,186 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: updatectl
+:manvolnum: 1
+:summary: Control the system update service
+
+.. _updatectl(1):
+
+============
+updatectl(1)
+============
+
+Name
+####
+
+updatectl — Control the system update service
+
+Synopsis
+########
+
+:code:`updatectl [OPTIONS...] {COMMAND} [TARGET...]`
+
+Description
+###########
+
+:code:`updatectl` may be used to check for and install system updates managed by :ref:`systemd-sysupdated.service(8)`.
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: list [TARGET[@VERSION]]
+
+   Show information about targets and their versions.
+
+   When no :emphasis:`TARGET` is specified, this command lists all available targets. When a :emphasis:`TARGET` is specified without a :emphasis:`VERSION`, this command lists all known versions of the specified target. If a :emphasis:`VERSION` is specified, this command lists all known information about the specific version.
+
+   See the example below for details of the output.
+
+   .. versionadded:: 257
+
+.. systemd:option:: check [TARGET…]
+
+   Check if any updates are available for the specified targets. If no targets are specified, all available targets will be checked for updates.
+
+   See the example below for details of the output.
+
+   .. versionadded:: 257
+
+.. systemd:option:: update [TARGET[@VERSION]…]
+
+   Update the specified targets to the specified versions. If a target is specified without a version, then it will be updated to the latest version. If no targets are specified, then all available targets will be updated to the latest version.
+
+   .. versionadded:: 257
+
+.. systemd:option:: vacuum [TARGET…]
+
+   Clean up old versions of the specified targets. If no targets are specified, all available targets will be vacuumed.
+
+   .. versionadded:: 257
+
+.. systemd:option:: features [FEATURE]
+
+   When no :emphasis:`FEATURE` is specified, this command lists all optional features. When a :emphasis:`FEATURE` is specified, this command lists all known information about that feature.
+
+   .. versionadded:: 257
+
+.. systemd:option:: enable FEATURE…, disable FEATURE…
+
+   These commands enable or disable optional features. See :man-pages:`sysupdate.features(5)`. These commands always operate on the host system.
+
+   By default, these commands will only change the system's configuration by creating or deleting drop-in files; they will not immediately download the enabled features, or clean up after the disabled ones. Enabled features will be downloaded and installed the next time the target is updated, and disabled transfers will be cleaned up the next time the target is updated or vacuumed. Pass :code:`--now` to immediately apply these changes.
+
+   .. versionadded:: 257
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Options
+#######
+
+The following commands are understood:
+
+.. systemd:option:: --reboot
+
+   When used with the :code:`update` command, reboots the system after updates finish applying. If any update fails, the system will not reboot.
+
+   When used with the :code:`enable` or :code:`disable` commands and the :code:`--now` flag, reboots the system after download or clean-up finish applying.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --offline
+
+   When used with the :code:`list` command, disables fetching metadata from the network. This makes the :code:`list` command only return information that is available locally (i.e. about versions already installed on the system).
+
+   .. versionadded:: 257
+
+.. systemd:option:: --now
+
+   When used with the :code:`enable` command, downloads and installs the enabled features. When used with the :code:`disable` command, deletes all resources downloaded by the disabled features.
+
+   .. versionadded:: 257
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+.. include:: common-variables.rst
+
+Examples
+########
+
+Note that these examples are just here for demonstration purposes, and the output of these commands is free to change. These commands are intended for display to a user. If you'd like machine-readable output, use the :man-pages:`org.freedesktop.sysupdate1(5)` D-Bus API directly.
+
+Output from :code:`list`
+------------------------
+
+.. code-block:: sh
+
+   $ updatectl list
+   TARGET         VERSION PATH
+   host           48      sysupdate.d
+   machine:fedora 38      /var/lib/machines/fedora.raw
+   component:shim 15.7    sysupdate.shim.d
+   $ updatectl list host
+     VERSION STATUS
+   ↻ 50      candidate
+     49      available
+   ● 48      current
+     47      available
+     46      available
+     45      available
+   [...]
+   × 25      available+obsolete
+   × 24      available+obsolete
+   × 23      available+obsolete
+   [...]
+   $ updatectl list host@49
+   ↻ Version: 50
+     State: candidate
+     ChangeLog: https://vendor.com/os/v50.html
+   TYPE     PATH                                                                   PTUUID                               PTFLAGS SHA256
+   url-file http://dl.vendor.com/os/uki_50                                         -                                          - 90f6534282dd720f7a222fa781086990dc9c83e5c7499f085970a8e75e3ac349
+   url-file http://dl.vendor.com/os/usr_50_981a5b84-a301-c819-f681-3e575fe16f16    981a5b84-a301-c819-f681-3e575fe16f16       - c0596ab1095258ec6f16c7c281a50d71c419a9f587c1ef858cfbbb69fb0a16f3
+   url-file http://dl.vendor.com/os/verity_50_2f8d0f3b-f80a-6ddc-a556-3722bfbb5b79 2f8d0f3b-f80a-6ddc-a556-3722bfbb5b79       - e1e90a128e038b3a53455e55d1ca717c743aba31fe6b4b4624109df0243c6338
+   url-file http://dl.vendor.com/os/verity_sig_50                                  -                                          - ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356
+
+Checking for and installing updates
+-----------------------------------
+
+.. code-block:: sh
+
+   $ updatectl check
+   TARGET         UPDATE
+   host           48 → 50
+   machine:fedora 38 → 40
+   $ updatectl update host machine:fedora@39
+   [...]
+   ✓ host@50
+   ✓ machine:fedora@39
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-sysupdate(8)` :ref:`systemd-sysupdated.service(8)` :man-pages:`sysupdate.d(5)`,
+
+

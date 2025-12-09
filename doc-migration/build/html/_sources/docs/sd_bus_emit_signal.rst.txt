@@ -1,0 +1,154 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_emit_signal
+:manvolnum: 3
+:summary: Convenience functions for emitting (standard) D-Bus signals
+:aliases: sd_bus_emit_signalv, sd_bus_emit_signal_to, sd_bus_emit_signal_tov, sd_bus_emit_interfaces_added, sd_bus_emit_interfaces_added_strv, sd_bus_emit_interfaces_removed, sd_bus_emit_interfaces_removed_strv, sd_bus_emit_properties_changed, sd_bus_emit_properties_changed_strv, sd_bus_emit_object_added, sd_bus_emit_object_removed
+
+.. _sd_bus_emit_signal(3):
+
+=====================
+sd_bus_emit_signal(3)
+=====================
+
+Name
+####
+
+sd_bus_emit_signal, sd_bus_emit_signalv, sd_bus_emit_signal_to, sd_bus_emit_signal_tov, sd_bus_emit_interfaces_added, sd_bus_emit_interfaces_added_strv, sd_bus_emit_interfaces_removed, sd_bus_emit_interfaces_removed_strv, sd_bus_emit_properties_changed, sd_bus_emit_properties_changed_strv, sd_bus_emit_object_added, sd_bus_emit_object_removed — Convenience functions for emitting (standard) D-Bus signals
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus-vtable.h>` .. code-block::
+
+   int sd_bus_emit_signal(sd_bus *bus,
+	const char *path,
+	const char *interface,
+	const char *member,
+	const char *types,
+	...); .. code-block::
+
+   int sd_bus_emit_signalv(sd_bus *bus,
+	const char *path,
+	const char *interface,
+	const char *member,
+	const char *types,
+	va_list ap); .. code-block::
+
+   int sd_bus_emit_signal_to(sd_bus *bus,
+	const char *destination,
+	const char *path,
+	const char *interface,
+	const char *member,
+	const char *types,
+	...); .. code-block::
+
+   int sd_bus_emit_signal_tov(sd_bus *bus,
+	const char *destination,
+	const char *path,
+	const char *interface,
+	const char *member,
+	const char *types,
+	va_list ap); .. code-block::
+
+   int sd_bus_emit_interfaces_added(sd_bus *bus,
+	const char *path,
+	const char *interface,
+	...); .. code-block::
+
+   int sd_bus_emit_interfaces_added_strv(sd_bus *bus,
+	const char *path,
+	char **interfaces); .. code-block::
+
+   int sd_bus_emit_interfaces_removed(sd_bus *bus,
+	const char *path,
+	const char *interface,
+	...); .. code-block::
+
+   int sd_bus_emit_interfaces_removed_strv(sd_bus *bus,
+	const char *path,
+	char **interfaces); .. code-block::
+
+   int sd_bus_emit_properties_changed(sd_bus *bus,
+	const char *path,
+	const char *interface,
+	const char *name,
+	...); .. code-block::
+
+   int sd_bus_emit_properties_changed_strv(sd_bus *bus,
+	const char *path,
+	const char *interface,
+	char **names); .. code-block::
+
+   int sd_bus_emit_object_added(sd_bus *bus,
+	const char *path); .. code-block::
+
+   int sd_bus_emit_object_removed(sd_bus *bus,
+	const char *path);
+
+Description
+###########
+
+:code:`sd_bus_emit_signal()` is a convenience function for initializing a bus message object and emitting the corresponding D-Bus signal. It combines the :ref:`sd_bus_message_new_signal(3)`, :ref:`sd_bus_message_append(3)` and :ref:`sd_bus_send(3)` functions into a single function call. :code:`sd_bus_emit_signalv()` is equivalent to :code:`sd_bus_message_append()`, except that it is called with a "va_list" instead of a variable number of arguments.
+
+:code:`sd_bus_emit_signal_to()` and :code:`sd_bus_emit_signal_tov()` are identical to :code:`sd_bus_emit_signal()` and :code:`sd_bus_emit_signalv()`, except that they can emit the signal to a single destination. Give :code:`destination` as :code:`NULL` to broadcast the signal.
+
+:code:`sd_bus_emit_interfaces_added()` and :code:`sd_bus_emit_interfaces_removed()` are used to implement the :code:`InterfacesAdded` and :code:`InterfacesRemoved` signals of the :code:`org.freedesktop.DBus.ObjectManager` interface. They take a path whose interfaces have been modified as an argument and a variable list of interfaces that have been added or removed, respectively. The final argument passed to :code:`sd_bus_emit_interfaces_added()` and :code:`sd_bus_emit_interfaces_removed()` *must* be be :code:`NULL`. This allows both functions to safely determine the number of passed interface arguments. :code:`sd_bus_emit_interfaces_added_strv()` and :code:`sd_bus_emit_interfaces_removed_strv()` are identical to their respective counterparts but both take the list of interfaces as a single argument instead of a variable number of arguments.
+
+:code:`sd_bus_emit_properties_changed()` is used to implement the :code:`PropertiesChanged` signal of the :code:`org.freedesktop.DBus.Properties` interface. It takes an object path, interface and a variable list of property names as its arguments. The final argument passed to :code:`sd_bus_emit_properties_changed()` *must* be be :code:`NULL`. This allows it to safely determine the number of passed property names. :code:`sd_bus_emit_properties_changed_strv()` is identical to :code:`sd_bus_emit_properties_changed()` but takes the list of property names as a single argument instead of a variable number of arguments.
+
+:code:`sd_bus_emit_object_added()` and :code:`sd_bus_emit_object_removed()` are convenience functions for emitting the :code:`InterfacesAdded` or :code:`InterfacesRemoved` signals for all interfaces registered on a specific object path, respectively. This includes any parent fallback vtables if they are not overridden by a more applicable child vtable. It also includes all the standard D-Bus interfaces implemented by sd-bus itself on any registered object.
+
+Note that :code:`sd_bus_emit_interfaces_added()`, :code:`sd_bus_emit_interfaces_removed()`, :code:`sd_bus_emit_object_added()` and :code:`sd_bus_emit_object_removed()` require an object manager to have been registered on the given object path or one of its parent object paths using :ref:`sd_bus_add_object_manager(3)`.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   One of the required parameters is :code:`NULL` or invalid. A reserved D-Bus interface was passed as the :emphasis:`interface` parameter.
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+.. systemd:option:: -ECHILD
+
+   The bus was created in a different process, library or module instance.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. systemd:option:: -ESRCH
+
+   One of :code:`sd_bus_emit_interfaces_added()`, :code:`sd_bus_emit_interfaces_removed()`, :code:`sd_bus_emit_object_added()` or :code:`sd_bus_emit_object_removed()` was called on an object without an object manager registered on its own object path or one of its parent object paths.
+
+See the man pages of :ref:`sd_bus_message_new_signal(3)`, :ref:`sd_bus_message_append(3)` and :ref:`sd_bus_send(3)` for more possible errors.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_emit_signal()`, :code:`sd_bus_emit_interfaces_added()`, :code:`sd_bus_emit_interfaces_added_strv()`, :code:`sd_bus_emit_interfaces_removed()`, :code:`sd_bus_emit_interfaces_removed_strv()`, :code:`sd_bus_emit_properties_changed()`, :code:`sd_bus_emit_properties_changed_strv()`, were added in version 221.
+
+:code:`sd_bus_emit_object_added()`, and :code:`sd_bus_emit_object_removed()` were added in version 222.
+
+:code:`sd_bus_emit_signalv()` was added in version 246.
+
+:code:`sd_bus_emit_signal_to()` and :code:`sd_bus_emit_signal_tov()` were added in version 253.
+
+See Also
+########
+
+:ref:`sd-bus(3)`, :man-pages:`busctl(1)`, :ref:`sd_bus_message_new_signal(3)`, :ref:`sd_bus_message_append(3)`, :ref:`sd_bus_send(3)`, :ref:`sd_bus_call_method(3)`
+
+

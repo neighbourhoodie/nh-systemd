@@ -1,0 +1,100 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_device_enumerator_new
+:manvolnum: 3
+:summary: Create, reference, and release a device enumerator object
+:aliases: sd_device_enumerator_ref, sd_device_enumerator_unref, sd_device_enumerator_unrefp
+
+.. _sd_device_enumerator_new(3):
+
+===========================
+sd_device_enumerator_new(3)
+===========================
+
+Name
+####
+
+sd_device_enumerator_new, sd_device_enumerator_ref, sd_device_enumerator_unref, sd_device_enumerator_unrefp — Create, reference, and release a device enumerator object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-device.h>` .. code-block::
+
+   int sd_device_enumerator_new(sd_device_enumerator **ret); .. code-block::
+
+   sd_device_enumerator* sd_device_enumerator_ref(sd_device_enumerator *enumerator); .. code-block::
+
+   sd_device_enumerator* sd_device_enumerator_unref(sd_device_enumerator *enumerator); .. code-block::
+
+   void sd_device_enumerator_unrefp(sd_device_enumerator **enumerator);
+
+Description
+###########
+
+The :code:`sd_device_enumerator` family of functions provides a way to iterate over devices recognized by :ref:`systemd-udevd(8)`. The enumerator allows filtering and matching devices by subsystem, properties and other attributes.
+
+:code:`sd_device_enumerator_new()` creates a new device enumerator object and stores the result in the pointer referenced by :code:`ret`. Returns 0 on success, or a negative errno-style error code on failure.
+
+:code:`sd_device_enumerator_ref()` increases the reference count of the specified :code:`enumerator` by one.
+
+:code:`sd_device_enumerator_unref()` decreases the reference count of the :code:`enumerator` by one. When the reference count reaches zero, the enumerator object is destroyed and cannot be used anymore, so further calls to :code:`sd_device_enumerator_unref()` or :code:`sd_device_enumerator_unrefp()` are illegal.
+
+:code:`sd_device_enumerator_unrefp()` is similar to :code:`sd_device_enumerator_unref()` but takes a pointer to a pointer to an sd_device_enumerator object. This call is useful in conjunction with GCC's and LLVM's `Clean-up Variable Attribute <https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html>`_. Note that this function is defined as an inline function. Use a declaration like the following, in order to allocate a sd_device_enumerator object that is freed automatically as the code block is left:
+
+.. code-block:: sh
+
+   {
+     __attribute__((cleanup(sd_device_enumerator_unrefp))) sd_device_enumerator *enumerator = NULL;
+     int r;
+     …
+     r = sd_device_enumerator_new(&enumerator);
+     if (r < 0)
+       fprintf(stderr, "Failed to allocate sd_device_enumerator: %s\n", strerror(-r));
+     …
+   }
+
+:code:`sd_device_enumerator_ref()` and :code:`sd_device_enumerator_unref()` execute no operation if the :code:`enumerator` is :code:`NULL`. :code:`sd_device_enumerator_unrefp()` will first dereference its argument, which must not be :code:`NULL`, and will execute no operation if *that* is is :code:`NULL`.
+
+Return Value
+############
+
+:code:`sd_device_enumerator_new()` returns 0 on success or a negative errno-style error code on failure.
+
+:code:`sd_device_enumerator_ref()` always returns the enumerator pointer.
+
+:code:`sd_device_enumerator_unref()` always returns :code:`NULL`.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. systemd:option:: -EINVAL
+
+   The argument is invalid.
+
+Example
+#######
+
+Using sd_device_enumerator_new()
+--------------------------------
+
+.. literalinclude:: /code-examples/c/sd_device_enumerator_new-example.c
+    :language: c
+
+History
+#######
+
+:code:`sd_device_enumerator_new()`, :code:`sd_device_enumerator_ref()`, :code:`sd_device_enumerator_unref()`, and :code:`sd_device_enumerator_unrefp()` were added in version 240.
+
+See Also
+########
+
+:ref:`sd_device_ref(3)`, :ref:`sd_device_enumerator_add_match_parent(3)`
+
+

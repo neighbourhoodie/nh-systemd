@@ -1,0 +1,422 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-vmspawn
+:manvolnum: 1
+:summary: Spawn an OS in a virtual machine
+
+.. _systemd-vmspawn(1):
+
+==================
+systemd-vmspawn(1)
+==================
+
+Name
+####
+
+systemd-vmspawn — Spawn an OS in a virtual machine
+
+Synopsis
+########
+
+:code:`systemd-vmspawn [OPTIONS...] [ARGS...]`
+
+Description
+###########
+
+:code:`systemd-vmspawn` may be used to start a virtual machine from an OS image. In many ways it is similar to :ref:`systemd-nspawn(1)`, but launches a full virtual machine instead of using namespaces.
+
+File descriptors for :code:`/dev/kvm` and :code:`/dev/vhost-vsock` can be passed to :code:`systemd-vmspawn` via systemd's native socket passing interface (see :ref:`sd_listen_fds(3)` for details about the precise protocol used and the order in which the file descriptors are passed), these file descriptors must be passed with the names "kvm" and "vhost-vsock" respectively.
+
+Note: on Ubuntu/Debian derivatives :code:`systemd-vmspawn` requires the user to be in the "kvm" group to use the VSOCK options.
+
+Options
+#######
+
+The excess arguments are passed as extra kernel command line arguments using SMBIOS.
+
+The following options are understood:
+
+.. systemd:option:: -q, --quiet
+
+   Turns off any status output by the tool itself. When this switch is used, the only output from vmspawn will be the console output of the Virtual Machine OS itself.
+
+   .. versionadded:: 256
+
+Image Options
+#############
+
+.. systemd:option:: -D, --directory=
+
+   Directory to use as file system root for the virtual machine.
+
+   One of either :code:`--directory=` or :code:`--image=` must be specified. If neither are specified :code:`--directory=.` is assumed.
+
+   Note: If mounting a non-root owned directory you may require :code:`--private-users=` to map into the user's subuid namespace. An example of how to use :code:`/etc/subuid` for this is given later.
+
+   .. versionadded:: 256
+
+.. systemd:option:: -i, --image=
+
+   Root file system disk image (or device node) for the virtual machine.
+
+   .. versionadded:: 255
+
+Host Configuration
+##################
+
+.. systemd:option:: --cpus=CPUS
+
+   The number of CPUs to start the virtual machine with. Defaults to 1.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --ram=BYTES
+
+   The amount of memory to start the virtual machine with. Defaults to 2G.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --kvm=BOOL
+
+   If :code:`--kvm=` is not specified, KVM support will be detected automatically. If true, KVM is always used, and if false, KVM is never used.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --vsock=BOOL
+
+   If :code:`--vsock=` is not specified, VSOCK networking support will be detected automatically. If true, VSOCK networking is always used, and if false, VSOCK networking is never used.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --vsock-cid=CID
+
+   Sets the specific CID to use for the guest. Valid CIDs are in the range :code:`3` to :code:`4294967294` (:code:`0xFFFF_FFFE`). CIDs outside of this range are reserved. By default, vmspawn will attempt to derive a CID for the guest derived from the machine name, falling back to a random CID if this CID is taken.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --tpm=BOOL
+
+   If :code:`--tpm=` is not specified, vmspawn will detect the presence of :debian:`swtpm(8)` and use it if available. If yes is specified :debian:`swtpm(8)` is always used, and if no is set :debian:`swtpm(8)` is never used.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --tpm-state=PATH|auto|off
+
+   Configures where to place TPM state, in case TPM support is enabled (see :code:`--tpm=` above). This takes an absolute file system path to a directory to persistently place the state in. If the directory is missing it is created as needed. If set to the special string "auto" a persistent path is automatically derived from the VM image path or directory path, with the ".tpmstate" suffix appended. If set to the special string "off" the TPM state is only maintained transiently and flushed out when the VM shuts down. This mode is not suitable for VMs which lock disk encryption keys to the TPM, as these keys will be lost on every reboot. Defaults to "auto".
+
+   .. versionadded:: 258
+
+.. systemd:option:: --linux=PATH
+
+   Set the linux kernel image to use for direct kernel boot. If a directory type image is used and :code:`--linux=` was omitted, vmspawn will search for boot loader entries according to the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ assuming XBOOTLDR to be located at /boot and ESP to be /efi respectively. If no kernel was installed into the image then the image will fail to boot.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --initrd=PATH
+
+   Set the initrd to use for direct kernel boot. If the :code:`--linux=` supplied is a `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ Type #2 entry, then this argument is not required. If no initrd was installed into the image then the image will fail to boot.
+
+   :code:`--initrd=` can be specified multiple times and vmspawn will merge them together.
+
+   .. versionadded:: 256
+
+.. systemd:option:: -n, --network-tap
+
+   Create a TAP device to network with the virtual machine.
+
+   Note: root privileges are required to use TAP networking. Additionally, :ref:`systemd-networkd(8)` must be running and correctly set up on the host to provision the host interface. The relevant ".network" file can be found at :code:`/usr/lib/systemd/network/80-vm-vt.network`.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --network-user-mode
+
+   Use user mode networking.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --firmware=PATH
+
+   Takes an absolute path, or a relative path beginning with :code:`./`. Specifies a JSON firmware definition file, which allows selecting the firmware to boot in the VM. If not specified, a suitable firmware is automatically discovered. If the special string "list" is specified lists all discovered firmwares.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --discard-disk=BOOL
+
+   Controls whether qemu processes discard requests from the VM. This prevents long running VMs from using more disk space than required. This is enabled by default.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --secure-boot=BOOL
+
+   Configure whether to search for firmware which supports Secure Boot.
+
+   If the option is not specified, the first firmware which is detected will be used. If the option is set to yes, then the first firmware with Secure Boot support will be selected. If no is specified, then the first firmware without Secure Boot will be selected.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --grow-image=BYTES, -G BYTES
+
+   Grows the image file specified by :code:`--image=` to the specified size in bytes if it is smaller. Executes no operation if no image file is used or the image file is already as large or larger than requested. The specified size accepts the usual K, M, G suffixes (to the base of 1024). Specified values are rounded up to multiples of 4096.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --smbios11=STRING, -s STRING
+
+   Passes the specified string into the VM as an SMBIOS Type #11 vendor string. This is useful to parameterize the invoked VM in various ways. See :man-pages:`smbios-type-11(7)` for details.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --notify-ready=
+
+   Configures support for notifications from the VM's init process to :code:`systemd-vmspawn`. If true, :code:`systemd-vmspawn` will consider the machine as ready only when it has received a "READY=1" message from the init process in the VM. If false, :code:`systemd-vmspawn` will consider the machine as ready immediately after creation. In either case, :code:`systemd-vmspawn` sends its own readiness notification to its manager after the spawned VM is ready. For more details about notifications see :ref:`sd_notify(3)`.
+
+   Defaults to true. (Note that this is unlike the option of the same name to :ref:`systemd-vmspawn(1)` that defaults to false.)
+
+   .. versionadded:: 258
+
+System Identity Options
+#######################
+
+.. systemd:option:: -M, --machine=
+
+   Sets the machine name for this virtual machine. This name may be used to identify this virtual machine during its runtime (for example in tools like :man-pages:`machinectl(1)` and similar).
+
+   .. versionadded:: 255
+
+.. systemd:option:: --uuid=
+
+   Set the specified UUID for the virtual machine. The init system will initialize :code:`/etc/machine-id` from this if this file is not set yet. Note that this option takes effect only if :code:`/etc/machine-id` in the virtual machine is unpopulated.
+
+   .. versionadded:: 256
+
+Property Options
+################
+
+.. systemd:option:: -S, --slice=
+
+   Make the VM part of the specified slice, instead of the default :code:`machine.slice`. This applies only if the machine is run in its own scope unit, i.e. if :code:`--keep-unit` is not used.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --property=
+
+   Set a unit property on the scope unit to register for the machine. This applies only if the machine is run in its own scope unit, i.e. if :code:`--keep-unit` is not used. Takes unit property assignments in the same format as :code:`systemctl set-property`. This is useful to set memory limits and similar for the VM.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --register=
+
+   Controls whether the virtual machine is registered with :ref:`systemd-machined(8)`. Takes a boolean argument, which defaults to "yes" when running as root, and "no" when running as a regular user. This ensures that the virtual machine is accessible via :man-pages:`machinectl(1)`.
+
+   Note: root privileges are required to use this option as registering with :ref:`systemd-machined(8)` requires privileged D-Bus method calls.
+
+   .. versionadded:: 256
+
+User Namespacing Options
+########################
+
+.. systemd:option:: --private-users=UID_SHIFT[:UID_RANGE]
+
+   Controls user namespacing under :code:`--directory=`. If enabled, `virtiofsd(1) <https://manpages.debian.org/unstable/qemu-system-common/virtiofsd.1.en.html>`_ is instructed to map user and group ids (UIDs and GIDs). This involves mapping the private UIDs/GIDs used in the virtual machine (starting with the virtual machine's root user 0 and up) to a range of UIDs/GIDs on the host that are not used for other purposes (usually in the range beyond the host's UID/GID 65536).
+
+   If one or two colon-separated numbers are specified, user namespacing is turned on. :emphasis:`UID_SHIFT` specifies the first host UID/GID to map, :emphasis:`UID_RANGE` is optional and specifies number of host UIDs/GIDs to assign to the virtual machine. If :emphasis:`UID_RANGE` is omitted, 65536 UIDs/GIDs are assigned.
+
+   When user namespaces are used, the GID range assigned to each virtual machine is always chosen identical to the UID range.
+
+   .. versionadded:: 256
+
+Mount Options
+#############
+
+.. systemd:option:: --bind=PATH, --bind-ro=PATH
+
+   Mount a directory from the host into the virtual machine. Takes one of: a path argument — in which case the specified path will be mounted from the host to the same path in the virtual machine, or a colon-separated pair of paths — in which case the first specified path is the source in the host, and the second path is the destination in the virtual machine. If the source path is not absolute, it is resolved relative to the current working directory. The :code:`--bind-ro=` option creates read-only bind mounts. Backslash escapes are interpreted, so "\\:" may be used to embed colons in either path. This option may be specified multiple times for creating multiple independent bind mount points.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --extra-drive=PATH
+
+   Takes a disk image or block device on the host and supplies it to the virtual machine as another drive.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --bind-user=
+
+   Binds the home directory of the specified user on the host into the virtual machine. Takes the name of an existing user on the host as argument. May be used multiple times to bind multiple users into the virtual machine. This does two things:
+
+   1.       The user's home directory is made available from the host into :code:`/run/vmhost/home/` using virtiofs. virtiofsd id translation to map the host user's UID/GID to its assigned UID/GID in the virtual machine.
+
+   2.       JSON user and group records are generated in that describes the mapped user which are passed into the virtual machine using "userdb.transient.*" credentials. They contain a minimized representation of the host's user record, adjusted to the UID/GID and home directory path assigned to the user in the virtual machine. The :man-pages:`nss-systemd(8)` glibc NSS module will pick up these records from there and make them available in the virtual machine's user/group databases.
+
+   The combination of the two operations above ensures that it is possible to log into the virtual machine using the same account information as on the host. The user is only mapped transiently, while the virtual machine is running, and the mapping itself does not result in persistent changes to the virtual machine (except maybe for log messages generated at login time, and similar). Note that in particular the UID/GID assignment in the virtual machine is not made persistently. If the user is mapped transiently, it is best to not allow the user to make persistent changes to the virtual machine. If the user leaves files or directories owned by the user, and those UIDs/GIDs are reused during later virtual machine invocations (possibly with a different :code:`--bind-user=` mapping), those files and directories will be accessible to the "new" user.
+
+   The user/group record mapping only works if the virtual machine contains systemd 258 or newer, with :code:`nss-systemd` properly configured in :code:`nsswitch.conf`. See :man-pages:`nss-systemd(8)` for details.
+
+   Note that the user record propagated from the host into the virtual machine will contain the UNIX password hash of the user, so that seamless logins in the virtual machine are possible. If the virtual machine is less trusted than the host it is hence important to use a strong UNIX password hash function (e.g. yescrypt or similar, with the "$y$" hash prefix).
+
+   .. versionadded:: 259
+
+.. systemd:option:: --bind-user-shell=
+
+   When used with :code:`--bind-user=`, includes the specified shell in the user records of users bound into the virtual machine. Takes either a boolean or an absolute path.
+
+   *       If false (the default), no shell is passed in the user records for users bound into the virtual machine. This causes bound users to the use the virtual machine's default shell.
+
+   *       If true, the shells specified by the host user records are included in the user records of all users bound into the virtual machine.
+
+   *       If passed an absolute path, sets that path as the shell for user records of all users bound into the virtual machine.
+
+   Note: This will not check whether the specified shells exist in the virtual machine.
+
+   This operation is only supported in combination with :code:`--bind-user=`.
+
+   .. versionadded:: 259
+
+.. systemd:option:: --bind-user-group=NAME
+
+   When used with :code:`--bind-user=`, includes the specified group as an auxiliary group in the user records of users bound into the virtual machine. Takes a group name.
+
+   Note: This will not check whether the specified groups exist in the virtual machine.
+
+   This operation is only supported in combination with :code:`--bind-user=`.
+
+   .. versionadded:: 259
+
+Integration Options
+###################
+
+.. systemd:option:: --forward-journal=FILE|DIR
+
+   Forward the virtual machine's journal to the host. :ref:`systemd-journal-remote(8)` is currently used to receive the guest VM's forwarded journal entries. This option determines where this journal is saved on the host and has the same semantics as :code:`-o`/:code:`--output` described in :ref:`systemd-journal-remote(8)`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --pass-ssh-key=BOOL
+
+   By default, an SSH key is generated to allow :code:`systemd-vmspawn` to open a D-Bus connection to the VM's systemd bus. Setting this to "no" will disable SSH key generation.
+
+   The generated keys are ephemeral. That is they are valid only for the current invocation of :code:`systemd-vmspawn`, and are typically not persisted.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --ssh-key-type=TYPE
+
+   Configures the type of SSH key to generate, see :man-pages:`ssh-keygen(1)` for more information.
+
+   By default, "ed25519" keys are generated, however "rsa" keys may also be useful if the VM has a particularly old version of :man-pages:`sshd(8)`.
+
+   .. versionadded:: 256
+
+Input/Output Options
+####################
+
+.. systemd:option:: --console=MODE
+
+   Configures how to set up the console of the VM. Takes one of "interactive", "read-only", "native", "gui". Defaults to "interactive". "interactive" provides an interactive terminal interface to the VM. "read-only" is similar, but is strictly read-only, i.e. does not accept any input from the user. "native" also provides a TTY-based interface, but uses qemu native implementation (which means the qemu monitor is available). "gui" shows the qemu graphical UI.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --background=COLOR
+
+   Change the terminal background color to the specified ANSI color as long as the VM runs. The color specified should be an ANSI X3.64 SGR background color, i.e. strings such as "40", "41", …, "47", "48;2;…", "48;5;…". See `ANSI Escape Code (Wikipedia) <https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters>`_ for details. Assign an empty string to disable any coloring. This only has an effect in :code:`--console=interactive` and :code:`--console=read-only` modes.
+
+   .. versionadded:: 256
+
+Credentials
+###########
+
+.. systemd:option:: --load-credential=ID:PATH, --set-credential=ID:VALUE
+
+   Pass a credential to the virtual machine. These two options correspond to the :code:`LoadCredential=` and :code:`SetCredential=` settings in unit files. See :ref:`systemd.exec(5)` for details about these concepts, as well as the syntax of the option's arguments.
+
+   In order to embed binary data into the credential data for :code:`--set-credential=`, use C-style escaping (i.e. "\\n" to embed a newline, or "\\x00" to embed a :code:`NUL` byte). Note that the invoking shell might already apply unescaping once, hence this might require double escaping!
+
+   .. versionadded:: 255
+
+Other
+#####
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: common-variables.rst
+
+Examples
+########
+
+Run an Arch Linux VM image generated by mkosi
+---------------------------------------------
+
+.. code-block:: sh
+
+   $ mkosi -d arch -p systemd -p linux --autologin -o image.raw -f build
+   $ systemd-vmspawn --image=image.raw
+
+Import and run a Fedora \|fedora_latest_version| Cloud image using machinectl
+-----------------------------------------------------------------------------
+
+.. code-block:: sh
+
+   $ curl -L \
+          -O https://download.fedoraproject.org/pub/fedora/linux/releases/|fedora_latest_version|/Cloud/x86_64/images/Fedora-Cloud-Base-|fedora_latest_version|-|fedora_cloud_release|.x86_64.raw.xz \
+          -O https://download.fedoraproject.org/pub/fedora/linux/releases/|fedora_latest_version|/Cloud/x86_64/images/Fedora-Cloud-|fedora_latest_version|-|fedora_cloud_release|-x86_64-CHECKSUM \
+          -O https://fedoraproject.org/fedora.gpg
+   $ gpgv --keyring ./fedora.gpg Fedora-Cloud-|fedora_latest_version|-|fedora_cloud_release|-x86_64-CHECKSUM
+   $ sha256sum -c Fedora-Cloud-|fedora_latest_version|-|fedora_cloud_release|-x86_64-CHECKSUM
+   # machinectl import-raw Fedora-Cloud-Base-|fedora_latest_version|-|fedora_cloud_release|.x86_64.raw.xz fedora-|fedora_latest_version|-cloud
+   # systemd-vmspawn -M fedora-|fedora_latest_version|-cloud
+
+Build and run systemd's system image and forward the VM's journal to a local file
+---------------------------------------------------------------------------------
+
+.. code-block:: sh
+
+   $ mkosi build
+   $ systemd-vmspawn \
+       -D mkosi.output/system \
+       --private-users $(grep $(whoami) /etc/subuid | cut -d: -f2) \
+       --linux mkosi.output/system.efi \
+       --forward-journal=vm.journal \
+       enforcing=0
+
+Note: this example also uses a kernel command line argument to ensure SELinux is not started in enforcing mode.
+
+SSH into a running VM using :code:`systemd-ssh-proxy`
+-----------------------------------------------------
+
+.. code-block:: sh
+
+   $ mkosi build
+   $ my_vsock_cid=3735928559
+   $ systemd-vmspawn \
+       -D mkosi.output/system \
+       --private-users $(grep $(whoami) /etc/subuid | cut -d: -f2) \
+       --linux mkosi.output/system.efi \
+       --vsock-cid $my_vsock_cid \
+       enforcing=0
+   $ ssh root@vsock/$my_vsock_cid -i /run/user/$UID/systemd/vmspawn/machine-*-system-ed25519
+
+Exit status
+###########
+
+If an error occurred the value errno is propagated to the return code. If EXIT_STATUS is supplied by the running image that is returned. Otherwise, EXIT_SUCCESS is returned.
+
+See Also
+########
+
+:ref:`systemd(1)`, :debian:`mkosi(1)`, :man-pages:`machinectl(1)`, :man-pages:`importctl(1)`, `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_
+
+

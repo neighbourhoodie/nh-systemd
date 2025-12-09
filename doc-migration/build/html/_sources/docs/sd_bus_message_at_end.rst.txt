@@ -1,0 +1,65 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_at_end
+:manvolnum: 3
+:summary: Check if a message has been fully read
+
+.. _sd_bus_message_at_end(3):
+
+========================
+sd_bus_message_at_end(3)
+========================
+
+Name
+####
+
+sd_bus_message_at_end — Check if a message has been fully read
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_at_end(sd_bus_message *m,
+	int complete);
+
+Description
+###########
+
+:code:`sd_bus_message_at_end()` returns whether all data from the currently opened container in :code:`m` or all data from all containers in :code:`m` has been read. If :code:`complete` is zero, this function returns whether all data from the currently opened container has been read. If :code:`complete` is non-zero, this function returns whether all data from all containers in :code:`m` has been read.
+
+Return Value
+############
+
+If all data from all containers or the current container (depending on the value of :code:`complete`) has been read, :code:`sd_bus_message_at_end()` returns a positive integer. If there is still data left to be read, it returns zero. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`m` parameter is :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EPERM
+
+   The message is not sealed.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_at_end()` was added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_read(3)`
+
+

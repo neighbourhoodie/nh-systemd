@@ -1,0 +1,370 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-system.conf
+:manvolnum: 5
+:summary: System and session service manager configuration files
+:aliases: system.conf.d, systemd-user.conf, user.conf.d
+
+.. _systemd-system.conf(5):
+
+======================
+systemd-system.conf(5)
+======================
+
+Name
+####
+
+systemd-system.conf, system.conf.d, systemd-user.conf, user.conf.d — System and session service manager configuration files
+
+Synopsis
+########
+
+:code:`/etc/systemd/system.conf`, :code:`/run/systemd/system.conf`, :code:`/usr/lib/systemd/system.conf`, :code:`/etc/systemd/system.conf.d/\*.conf`, :code:`/run/systemd/system.conf.d/\*.conf`, :code:`/usr/lib/systemd/system.conf.d/\*.conf`
+
+:code:`~/.config/systemd/user.conf`, :code:`/etc/systemd/user.conf`, :code:`/run/systemd/user.conf`, :code:`/usr/lib/systemd/user.conf`, :code:`/etc/systemd/user.conf.d/\*.conf`, :code:`/run/systemd/user.conf.d/\*.conf`, :code:`/usr/lib/systemd/user.conf.d/\*.conf`
+
+Description
+###########
+
+When run as a system instance, :code:`systemd` interprets the configuration file :code:`system.conf` and the files in :code:`system.conf.d` directories; when run as a user instance, it interprets the configuration file :code:`user.conf` (in order of priority, in the home directory of the user and under :code:`/etc/systemd/`, :code:`/run/systemd/`, and :code:`/usr/lib/systemd/`) and the files in :code:`user.conf.d` directories. These configuration files contain a few settings controlling basic manager operations.
+
+See :ref:`systemd.syntax(7)` for a general description of the syntax.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+All options are configured in the \[Manager] section:
+
+.. systemd:option:: LogColor=, LogLevel=, LogLocation=, LogTarget=, LogTime=, DumpCore=yes, CrashChangeVT=no, CrashShell=no, CrashAction=freeze, ShowStatus=yes, DefaultStandardOutput=journal, DefaultStandardError=inherit
+   :group: config-directives
+
+   Configures various parameters of basic manager operation. These options may be overridden by the respective process and kernel command line arguments. See :ref:`systemd(1)` for details.
+
+   .. versionadded:: 198
+
+.. systemd:option:: CtrlAltDelBurstAction=
+   :group: config-directives
+
+   Defines what action will be performed if user presses Ctrl-Alt-Delete more than 7 times in 2s. Can be set to "reboot-force", "poweroff-force", "reboot-immediate", "poweroff-immediate" or disabled with "none". Defaults to "reboot-force".
+
+   .. versionadded:: 232
+
+.. systemd:option:: StatusUnitFormat=
+   :group: config-directives
+
+   Takes :systemd:option:`name`, :systemd:option:`description` or :systemd:option:`combined` as the value. If :systemd:option:`name`, the system manager will use unit names in status messages (e.g. "systemd-journald.service"), instead of the longer and more informative descriptions set with :systemd:var:`Description=` (e.g. "Journal Logging Service"). If :systemd:option:`combined`, the system manager will use both unit names and descriptions in status messages (e.g. "systemd-journald.service - Journal Logging Service").
+
+   See :ref:`systemd.unit(5)` for details about unit names and :systemd:var:`Description=`.
+
+   .. versionadded:: 243
+
+.. systemd:option:: DefaultTimerAccuracySec=
+   :group: config-directives
+
+   Sets the default accuracy of timer units. This controls the global default for the :systemd:var:`AccuracySec=` setting of timer units, see :ref:`systemd.timer(5)` for details. :systemd:var:`AccuracySec=` set in individual units override the global default for the specific unit. Defaults to 1min. Note that the accuracy of timer units is also affected by the configured timer slack for PID 1, see :systemd:var:`TimerSlackNSec=` above.
+
+   .. versionadded:: 212
+
+Resource Management
+###################
+
+.. systemd:option:: TimerSlackNSec=
+   :group: config-directives
+
+   Sets the timer slack in nanoseconds for PID 1, which is inherited by all executed processes, unless overridden individually, for example with the :systemd:var:`TimerSlackNSec=` setting in service units (for details see :ref:`systemd.exec(5)`). The timer slack controls the accuracy of wake-ups triggered by system timers. See :man-pages:`prctl(2)` for more information. Note that in contrast to most other time span definitions this parameter takes an integer value in nano-seconds if no unit is specified. The usual time units are understood too.
+
+   .. versionadded:: 198
+
+.. systemd:option:: CPUAffinity=
+   :group: config-directives
+
+   Configures the CPU affinity for the service manager as well as the default CPU affinity for all forked off processes. Takes a list of CPU indices or ranges separated by either whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash. This option may be specified more than once, in which case the specified CPU affinity masks are merged. If the empty string is assigned, the mask is reset, all assignments prior to this will have no effect. Individual services may override the CPU affinity for their processes with the :systemd:var:`CPUAffinity=` setting in unit files, see :ref:`systemd.exec(5)`.
+
+   .. versionadded:: 198
+
+.. systemd:option:: NUMAPolicy=
+   :group: config-directives
+
+   Configures the NUMA memory policy for the service manager and the default NUMA memory policy for all forked off processes. Individual services may override the default policy with the :systemd:var:`NUMAPolicy=` setting in unit files, see :ref:`systemd.exec(5)`.
+
+   .. versionadded:: 243
+
+.. systemd:option:: NUMAMask=
+   :group: config-directives
+
+   Configures the NUMA node mask that will be associated with the selected NUMA policy. Note that :systemd:option:`default` and :systemd:option:`local` NUMA policies do not require explicit NUMA node mask and value of the option can be empty. Similarly to :systemd:var:`NUMAPolicy=`, value can be overridden by individual services in unit files, see :ref:`systemd.exec(5)`.
+
+   .. versionadded:: 243
+
+.. systemd:option:: DefaultMemoryAccounting=, DefaultTasksAccounting=, DefaultIOAccounting=, DefaultIPAccounting=
+   :group: config-directives
+
+   Configure the default resource accounting settings, as configured per-unit by :systemd:var:`MemoryAccounting=`, :systemd:var:`TasksAccounting=`, :systemd:var:`IOAccounting=`, and :systemd:var:`IPAccounting=`. See :ref:`systemd.resource-control(5)` for details on the per-unit settings.
+
+   :systemd:var:`DefaultMemoryAccounting=` defaults to \|MEMORY_ACCOUNTING_DEFAULT|. :systemd:var:`DefaultTasksAccounting=` defaults to yes. The other settings default to no.
+
+   .. versionadded:: 211
+
+.. systemd:option:: DefaultTasksMax=
+   :group: config-directives
+
+   Configure the default value for the per-unit :systemd:var:`TasksMax=` setting. See :ref:`systemd.resource-control(5)` for details. This setting applies to all unit types that support resource control settings, with the exception of slice units. Defaults to 15% of the minimum of :systemd:var:`kernel.pid_max=`, :systemd:var:`kernel.threads-max=` and root cgroup :systemd:var:`pids.max`. Kernel has a default value for :systemd:var:`kernel.pid_max=` and an algorithm of counting in case of more than 32 cores. For example, with the default :systemd:var:`kernel.pid_max=`, :systemd:var:`DefaultTasksMax=` defaults to 4915, but might be greater in other systems or smaller in OS containers.
+
+   .. versionadded:: 228
+
+.. systemd:option:: DefaultLimitCPU=, DefaultLimitFSIZE=, DefaultLimitDATA=, DefaultLimitSTACK=, DefaultLimitCORE=, DefaultLimitRSS=, DefaultLimitNOFILE=, DefaultLimitAS=, DefaultLimitNPROC=, DefaultLimitMEMLOCK=, DefaultLimitLOCKS=, DefaultLimitSIGPENDING=, DefaultLimitMSGQUEUE=, DefaultLimitNICE=, DefaultLimitRTPRIO=, DefaultLimitRTTIME=
+   :group: config-directives
+
+   These settings control various default resource limits for processes executed by units. See :man-pages:`setrlimit(2)` for details. These settings may be overridden in individual units using the corresponding :systemd:var:`LimitXXX=` directives and they accept the same parameter syntax, see :ref:`systemd.exec(5)` for details. Note that these resource limits are only defaults for units, they are not applied to the service manager process (i.e. PID 1) itself.
+
+   Most of these settings are unset, which means the resource limits are inherited from the kernel or, if invoked in a container, from the container manager. However, the following have defaults:
+
+   *       :systemd:var:`DefaultLimitNOFILE=` defaults to 1024:\|HIGH_RLIMIT_NOFILE|.
+
+   *       :systemd:var:`DefaultLimitMEMLOCK=` defaults to 8M.
+
+   *       :systemd:var:`DefaultLimitCORE=` does not have a default but it is worth mentioning that :systemd:var:`RLIMIT_CORE` is set to "infinity" by PID 1 which is inherited by its children.
+
+   Note that the service manager internally in PID 1 bumps :systemd:var:`RLIMIT_NOFILE` and :systemd:var:`RLIMIT_MEMLOCK` to higher values, however the limit is reverted to the mentioned defaults for all child processes forked off.
+
+   .. versionadded:: 198
+
+.. systemd:option:: DefaultOOMPolicy=
+   :group: config-directives
+
+   Configure the default policy for reacting to processes being killed by the Linux Out-Of-Memory (OOM) killer or :code:`systemd-oomd`. This may be used to pick a global default for the per-unit :systemd:var:`OOMPolicy=` setting. See :ref:`systemd.service(5)` for details. Note that this default is not used for services that have :systemd:var:`Delegate=` turned on.
+
+   .. versionadded:: 243
+
+.. systemd:option:: DefaultOOMScoreAdjust=
+   :group: config-directives
+
+   Configures the default OOM score adjustments of processes run by the service manager. This defaults to unset (meaning the forked off processes inherit the service manager's OOM score adjustment value), except if the service manager is run for an unprivileged user, in which case this defaults to the service manager's OOM adjustment value plus 100 (this makes service processes slightly more likely to be killed under memory pressure than the manager itself). This may be used to pick a global default for the per-unit :systemd:var:`OOMScoreAdjust=` setting. See :ref:`systemd.exec(5)` for details. Note that this setting has no effect on the OOM score adjustment value of the service manager process itself, it retains the original value set during its invocation.
+
+   .. versionadded:: 250
+
+.. systemd:option:: DefaultMemoryPressureWatch=, DefaultMemoryPressureThresholdSec=
+   :group: config-directives
+
+   Configures the default settings for the per-unit :systemd:var:`MemoryPressureWatch=` and :systemd:var:`MemoryPressureThresholdSec=` settings. See :ref:`systemd.resource-control(5)` for details. Defaults to "auto" and "200ms", respectively. This also sets the memory pressure monitoring threshold for the service manager itself.
+
+   .. versionadded:: 254
+
+Hardware Watchdog
+#################
+
+.. systemd:option:: RuntimeWatchdogSec=, RebootWatchdogSec=, KExecWatchdogSec=
+   :group: config-directives
+
+   Configure the hardware watchdog at runtime and at reboot. Takes a timeout value in seconds (or in other time units if suffixed with "ms", "min", "h", "d", "w"), or the special strings "off" or "default". If set to "off" (alternatively: "0") the watchdog logic is disabled: no watchdog device is opened, configured, or pinged. If set to the special string "default" the watchdog is opened and pinged in regular intervals, but the timeout is not changed from the default. If set to any other time value the watchdog timeout is configured to the specified value (or a value close to it, depending on hardware capabilities).
+
+   If :systemd:var:`RuntimeWatchdogSec=` is set to a non-zero value, the watchdog hardware (:code:`/dev/watchdog0` or the path specified with :systemd:var:`WatchdogDevice=` or the kernel option :systemd:var:`systemd.watchdog_device=`) will be programmed to automatically reboot the system if it is not contacted within the specified timeout interval. The system manager will ensure to contact it at least once in half the specified timeout interval. This feature requires a hardware watchdog device to be present, as it is commonly the case in embedded and server systems. Not all hardware watchdogs allow configuration of all possible reboot timeout values, in which case the closest available timeout is picked.
+
+   :systemd:var:`RebootWatchdogSec=` may be used to configure the hardware watchdog when the system is asked to reboot. It works as a safety net to ensure that the reboot takes place even if a clean reboot attempt times out. Note that the :systemd:var:`RebootWatchdogSec=` timeout applies only to the second phase of the reboot, i.e. after all regular services are already terminated, and after the system and service manager process (PID 1) got replaced by the :code:`systemd-shutdown` binary, see system :man-pages:`bootup(7)` for details. During the first phase of the shutdown operation the system and service manager remains running and hence :systemd:var:`RuntimeWatchdogSec=` is still honoured. In order to define a timeout on this first phase of system shutdown, configure :systemd:var:`JobTimeoutSec=` and :systemd:var:`JobTimeoutAction=` in the \[Unit] section of the :code:`shutdown.target` unit. By default, :systemd:var:`RuntimeWatchdogSec=` defaults to 0 (off), and :systemd:var:`RebootWatchdogSec=` to 10min.
+
+   :systemd:var:`KExecWatchdogSec=` may be used to additionally enable the watchdog when kexec is being executed rather than when rebooting. Note that if the kernel does not reset the watchdog on kexec (depending on the specific hardware and/or driver), in this case the watchdog might not get disabled after kexec succeeds and thus the system might get rebooted, unless :systemd:var:`RuntimeWatchdogSec=` is also enabled at the same time. For this reason it is recommended to enable :systemd:var:`KExecWatchdogSec=` only if :systemd:var:`RuntimeWatchdogSec=` is also enabled.
+
+   These settings have no effect if a hardware watchdog is not available.
+
+   .. versionadded:: 198
+
+.. systemd:option:: RuntimeWatchdogPreSec=
+   :group: config-directives
+
+   Configure the hardware watchdog device pre-timeout value. Takes a timeout value in seconds (or in other time units similar to :systemd:var:`RuntimeWatchdogSec=`). A watchdog pre-timeout is a notification generated by the watchdog before the watchdog reset might occur in the event the watchdog has not been serviced. This notification is handled by the kernel and can be configured to take an action (i.e. generate a kernel panic) using :systemd:var:`RuntimeWatchdogPreGovernor=`. Not all watchdog hardware or drivers support generating a pre-timeout and depending on the state of the system, the kernel may be unable to take the configured action before the watchdog reboot. The watchdog will be configured to generate the pre-timeout event at the amount of time specified by :systemd:var:`RuntimeWatchdogPreSec=` before the runtime watchdog timeout (set by :systemd:var:`RuntimeWatchdogSec=`). For example, if the we have :systemd:var:`RuntimeWatchdogSec=30` and :systemd:var:`RuntimeWatchdogPreSec=10`, then the pre-timeout event will occur if the watchdog has not pinged for 20s (10s before the watchdog would fire). By default, :systemd:var:`RuntimeWatchdogPreSec=` defaults to 0 (off). The value set for :systemd:var:`RuntimeWatchdogPreSec=` must be smaller than the timeout value for :systemd:var:`RuntimeWatchdogSec=`. This setting has no effect if a hardware watchdog is not available or the hardware watchdog does not support a pre-timeout and will be ignored by the kernel if the setting is greater than the actual watchdog timeout.
+
+   .. versionadded:: 251
+
+.. systemd:option:: RuntimeWatchdogPreGovernor=
+   :group: config-directives
+
+   Configure the action taken by the hardware watchdog device when the pre-timeout expires. The default action for the pre-timeout event depends on the kernel configuration, but it is usually to log a kernel message. For a list of valid actions available for a given watchdog device, check the content of the :code:`/sys/class/watchdog/watchdogX/pretimeout_available_governors` file. Typically, available governor types are :systemd:var:`noop` and :systemd:var:`panic`. Availability, names and functionality might vary depending on the specific device driver in use. If the :code:`pretimeout_available_governors` sysfs file is empty, the governor might be built as a kernel module and might need to be manually loaded (e.g. :systemd:var:`pretimeout_noop.ko`), or the watchdog device might not support pre-timeouts.
+
+   .. versionadded:: 251
+
+.. systemd:option:: WatchdogDevice=
+   :group: config-directives
+
+   Configure the hardware watchdog device that the runtime and shutdown watchdog timers will open and use. Defaults to :code:`/dev/watchdog0`. This setting has no effect if a hardware watchdog is not available.
+
+   .. versionadded:: 236
+
+Security
+########
+
+.. systemd:option:: CapabilityBoundingSet=
+   :group: config-directives
+
+   Controls which capabilities to include in the capability bounding set for PID 1 and its children. See :man-pages:`capabilities(7)` for details. Takes a whitespace-separated list of capability names as read by :mankier:`cap_from_name(3)`. Capabilities listed will be included in the bounding set, all others are removed. If the list of capabilities is prefixed with ~, all but the listed capabilities will be included, the effect of the assignment inverted. Note that this option also affects the respective capabilities in the effective, permitted and inheritable capability sets. The capability bounding set may also be individually configured for units using the :systemd:var:`CapabilityBoundingSet=` directive for units, but note that capabilities dropped for PID 1 cannot be regained in individual units, they are lost for good.
+
+   .. versionadded:: 198
+
+.. systemd:option:: NoNewPrivileges=
+   :group: config-directives
+
+   Takes a boolean argument. If true, ensures that PID 1 and all its children can never gain new privileges through :man-pages:`execve(2)` (e.g. via setuid or setgid bits, or filesystem capabilities). Defaults to false. General purpose distributions commonly rely on executables with setuid or setgid bits and will thus not function properly with this option enabled. Individual units cannot disable this option. Also see `No New Privileges Flag <https://docs.kernel.org/userspace-api/no_new_privs.html>`_.
+
+   .. versionadded:: 239
+
+.. systemd:option:: ProtectSystem=
+   :group: config-directives
+
+   Takes a boolean argument or the string "auto". If set to true this will remount :code:`/usr/` read-only. If set to "auto" (the default) and running in an initrd equivalent to true, otherwise false. This implements a restricted subset of the per-unit setting of the same name, see :ref:`systemd.exec(5)` for details: currently, the "full" or "strict" values are not supported.
+
+   .. versionadded:: 256
+
+.. systemd:option:: SystemCallArchitectures=
+   :group: config-directives
+
+   Takes a space-separated list of architecture identifiers. Selects from which architectures system calls may be invoked on this system. This may be used as an effective way to disable invocation of non-native binaries system-wide, for example to prohibit execution of 32-bit x86 binaries on 64-bit x86-64 systems. This option operates system-wide, and acts similar to the :systemd:var:`SystemCallArchitectures=` setting of unit files, see :ref:`systemd.exec(5)` for details. This setting defaults to the empty list, in which case no filtering of system calls based on architecture is applied. Known architecture identifiers are "x86", "x86-64", "x32", "arm" and the special identifier "native". The latter implicitly maps to the native architecture of the system (or more specifically, the architecture the system manager was compiled for). Set this setting to "native" to prohibit execution of any non-native binaries. When a binary executes a system call of an architecture that is not listed in this setting, it will be immediately terminated with the SIGSYS signal.
+
+   .. versionadded:: 209
+
+.. systemd:option:: DefaultSmackProcessLabel=
+   :group: config-directives
+
+   Takes a :systemd:option:`SMACK64` security label as the argument. The process executed by a unit will be started under this label if :systemd:var:`SmackProcessLabel=` is not set in the unit. See :ref:`systemd.exec(5)` for the details.
+
+   If the value is "/", only labels specified with :systemd:var:`SmackProcessLabel=` are assigned and the compile-time default is ignored.
+
+   .. versionadded:: 252
+
+.. systemd:option:: DefaultRestrictSUIDSGID=
+   :group: config-directives
+
+   Takes a boolean argument. This is used as a default for units which lack an explicit definition for :systemd:var:`RestrictSUIDSGID=`. See :ref:`systemd.exec(5)` for the details.
+
+   .. versionadded:: 258
+
+Timeouts and Rate Limits
+########################
+
+.. systemd:option:: DefaultTimeoutStartSec=, DefaultTimeoutStopSec=, DefaultTimeoutAbortSec=, DefaultRestartSec=
+   :group: config-directives
+
+   Configures the default timeouts for starting, stopping and aborting of units, as well as the default time to sleep between automatic restarts of units, as configured per-unit in :systemd:var:`TimeoutStartSec=`, :systemd:var:`TimeoutStopSec=`, :systemd:var:`TimeoutAbortSec=` and :systemd:var:`RestartSec=` (for services, see :ref:`systemd.service(5)` for details on the per-unit settings). For non-service units, :systemd:var:`DefaultTimeoutStartSec=` sets the default :systemd:var:`TimeoutSec=` value.
+
+   :systemd:var:`DefaultTimeoutStartSec=` and :systemd:var:`DefaultTimeoutStopSec=` default to \|DEFAULT_TIMEOUT_SEC| in the system manager and \|DEFAULT_USER_TIMEOUT_SEC| in the user manager. :systemd:var:`DefaultTimeoutAbortSec=` is not set by default so that all units fall back to :systemd:var:`TimeoutStopSec=`. :systemd:var:`DefaultRestartSec=` defaults to 100 ms.
+
+   .. versionadded:: 209
+
+.. systemd:option:: DefaultDeviceTimeoutSec=
+   :group: config-directives
+
+   Configures the default timeout for waiting for devices. It can be changed per device via the :systemd:var:`x-systemd.device-timeout=` option in :code:`/etc/fstab` and :code:`/etc/crypttab` (see :ref:`systemd.mount(5)`, :man-pages:`crypttab(5)`). Defaults to \|DEFAULT_TIMEOUT_SEC| in the system manager and \|DEFAULT_USER_TIMEOUT_SEC| in the user manager.
+
+   .. versionadded:: 252
+
+.. systemd:option:: DefaultStartLimitIntervalSec=, DefaultStartLimitBurst=
+   :group: config-directives
+
+   Configure the default unit start rate limiting, as configured per-service by :systemd:var:`StartLimitIntervalSec=` and :systemd:var:`StartLimitBurst=`. See :ref:`systemd.service(5)` for details on the per-service settings. :systemd:var:`DefaultStartLimitIntervalSec=` defaults to 10s. :systemd:var:`DefaultStartLimitBurst=` defaults to 5.
+
+   .. versionadded:: 209
+
+.. systemd:option:: ReloadLimitIntervalSec=, ReloadLimitBurst=
+   :group: config-directives
+
+   Rate limiting for daemon-reload and (since v256) daemon-reexec requests. The setting applies to both operations, but the rate limits are tracked separately. Defaults to unset, and any number of operations can be requested at any time. :systemd:var:`ReloadLimitIntervalSec=` takes a value in seconds to configure the rate limit window, and :systemd:var:`ReloadLimitBurst=` takes a positive integer to configure the maximum allowed number of operations within the configured time window.
+
+   .. versionadded:: 253
+
+Environment
+###########
+
+.. systemd:option:: DefaultEnvironment=
+   :group: config-directives
+
+   Configures environment variables passed to all executed processes. Takes a space-separated list of variable assignments. See :man-pages:`environ(7)` for details about environment variables. This environment block is internal, and changes are not reflected in the manager's :code:`/proc/PID/environ`.
+
+   Simple "%"-specifier expansion is supported, see below for a list of supported specifiers.
+
+   Example:
+
+     .. code-block:: sh
+
+        DefaultEnvironment="VAR1=word1 word2" VAR2=word3 "VAR3=word 5 6"
+
+   Sets three variables "VAR1", "VAR2", "VAR3".
+
+   .. versionadded:: 205
+
+.. systemd:option:: ManagerEnvironment=
+   :group: config-directives
+
+   Sets environment variables for the manager process itself. Takes a space-separated list of variable assignment in the same format as :systemd:var:`DefaultEnvironment=`, see above. These variables are merged into the existing environment block of the manager process. In particular, in case of the system manager, this block includes variables set by the kernel based on the kernel command line, and in case of the user manager, the variables passed by the system manager. After those variables have been merged, they will persist until overridden, even if the manager is reloaded or reexecuted. In case of the user manager, these variables are also inherited by processes spawned by the manager. As with :systemd:var:`DefaultEnvironment=`, this environment block is internal, and changes are not reflected in the manager's :code:`/proc/PID/environ`.
+
+   Setting environment variables for the manager process may be useful to modify its behaviour. See `Known Environment Variables <https://systemd.io/ENVIRONMENT>`_ for a description of some variables understood by :code:`systemd`.
+
+   Simple "%"-specifier expansion is supported, see below for a list of supported specifiers.
+
+   .. versionadded:: 248
+
+Specifiers
+##########
+
+Specifiers may be used in the :code:`DefaultEnvironment=` and :code:`ManagerEnvironment=` settings. The following expansions are understood:
+
+.. list-table:: Specifiers available
+   :header-rows: 1
+
+   * - Specifier
+     - Meaning
+     - Details
+   %% include="standard-specifiers.rst" id="a|" %%
+   %% include="standard-specifiers.rst" id="A|" %%
+   %% include="standard-specifiers.rst" id="b|" %%
+   %% include="standard-specifiers.rst" id="B|" %%
+   %% include="standard-specifiers.rst" id="H|" %%
+   %% include="standard-specifiers.rst" id="l|" %%
+   %% include="standard-specifiers.rst" id="m|" %%
+   %% include="standard-specifiers.rst" id="M|" %%
+   %% include="standard-specifiers.rst" id="o|" %%
+   %% include="standard-specifiers.rst" id="v|" %%
+   %% include="standard-specifiers.rst" id="w|" %%
+   %% include="standard-specifiers.rst" id="W|" %%
+   %% include="standard-specifiers.rst" id="T|" %%
+   %% include="standard-specifiers.rst" id="V|" %%
+   * - "%h"
+     - User home directory
+     - This is the home directory of the *user running the service manager instance*\..
+   * - "%u"
+     - Username
+     - This is the username of the *user running the service manager instance*\..
+   * - "%U"
+     - User id
+     - This is the user id of the *user running the service manager instance*\..
+   * - "%g"
+     - Primary group
+     - This is the primary group of the *user running the service manager instance*\..
+   * - "%G"
+     - Primary group id
+     - This is the primary group id of the *user running the service manager instance*\..
+   * - "%s"
+     - User shell
+     - This is the shell of the *user running the service manager instance*\..
+   %% include="standard-specifiers.rst" id="percent|" %%
+
+History
+#######
+
+.. systemd:option:: systemd 252
+
+   Option :code:`DefaultBlockIOAccounting=` was deprecated. Please switch to the unified cgroup hierarchy.
+
+.. systemd:option:: systemd 258
+
+   :code:`DefaultCPUAccounting=` setting is deprecated, because CPU accounting is always available on the unified cgroup hierarchy and such setting has no effect.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.directives(7)`, :ref:`systemd.exec(5)`, :ref:`systemd.service(5)`, :man-pages:`environ(7)`, :man-pages:`capabilities(7)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

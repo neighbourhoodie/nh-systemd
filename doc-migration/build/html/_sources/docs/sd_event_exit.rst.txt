@@ -1,0 +1,83 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_exit
+:manvolnum: 3
+:summary: Ask the event loop to exit
+:aliases: sd_event_get_exit_code
+
+.. _sd_event_exit(3):
+
+================
+sd_event_exit(3)
+================
+
+Name
+####
+
+sd_event_exit, sd_event_get_exit_code — Ask the event loop to exit
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   int sd_event_exit(sd_event *event,
+	int code); .. code-block::
+
+   int sd_event_get_exit_code(sd_event *event,
+	int *ret);
+
+Description
+###########
+
+:code:`sd_event_exit()` requests the event loop specified in the :code:`event` event loop object to exit. The :code:`code` parameter may be any integer value and is returned as-is by :ref:`sd_event_loop(3)` after the last event loop iteration. It may also be queried using :code:`sd_event_get_exit_code()`, see below.
+
+When exiting is requested the event loop will stop listening for and dispatching regular event sources. Instead it will proceed with executing only event sources registered with :ref:`sd_event_add_exit(3)` in the order defined by their priority. After all exit event sources have been dispatched the event loop is terminated.
+
+If :code:`sd_event_exit()` is invoked a second time while the event loop is still processing exit event sources, the exit code stored in the event loop object is updated, but otherwise no further operation is executed.
+
+:code:`sd_event_get_exit_code()` may be used to query the exit code passed to an earlier call of :code:`sd_event_exit()`. The return parameter :code:`ret` may be set to :code:`NULL`, in order to simply check if :code:`sd_event_exit()` has been called before (as :code:`sd_event_get_exit_code()` fails with :code:`-ENODATA` if that's not the case, see below).
+
+While the full positive and negative integer ranges may be used for the exit code, care should be taken not pick exit codes that conflict with regular exit codes returned by :code:`sd_event_loop()`, if these exit codes shall be distinguishable.
+
+Note that for most event source types passing the callback pointer as :code:`NULL` in the respective constructor call (i.e. in :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, …) has the effect of :code:`sd_event_exit()` being invoked once the event source triggers, with the specified userdata pointer cast to an integer as the exit code parameter. This is useful to automatically terminate an event loop after some condition, such as a timeout or reception of :code:`SIGTERM` or similar. See the documentation for the respective constructor call for details.
+
+Return Value
+############
+
+On success, :code:`sd_event_exit()` and :code:`sd_event_get_exit_code()` return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The event loop object or error code pointer are invalid.
+
+.. systemd:option:: -ECHILD
+
+   The event loop was created in a different process, library or module instance.
+
+.. systemd:option:: -ESTALE
+
+   The event loop has exited already and all exit handlers are already processed.
+
+.. systemd:option:: -ENODATA
+
+   Returned by :code:`sd_event_get_exit_code()` in case the event loop has not been requested to exit yet.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_exit()` and :code:`sd_event_get_exit_code()` were added in version 229.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_new(3)`, :ref:`sd_event_add_exit(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_add_inotify(3)`
+
+

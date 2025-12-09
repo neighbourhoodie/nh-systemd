@@ -1,0 +1,469 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.socket
+:manvolnum: 5
+:summary: Socket unit configuration
+
+.. _systemd.socket(5):
+
+=================
+systemd.socket(5)
+=================
+
+Name
+####
+
+systemd.socket — Socket unit configuration
+
+Synopsis
+########
+
+:code:`socket.socket`
+
+Description
+###########
+
+A unit configuration file whose name ends in ".socket" encodes information about an IPC or network socket or a file system FIFO controlled and supervised by systemd, for socket-based activation.
+
+This man page lists the configuration options specific to this unit type. See :ref:`systemd.unit(5)` for the common options of all unit configuration files. The common configuration items are configured in the generic \[Unit] and \[Install] sections. The socket specific configuration options are configured in the \[Socket] section.
+
+Additional options are listed in :ref:`systemd.exec(5)`, which define the execution environment the :code:`ExecStartPre=`, :code:`ExecStartPost=`, :code:`ExecStopPre=` and :code:`ExecStopPost=` commands are executed in, and in :ref:`systemd.kill(5)`, which define the way the processes are terminated, and in :ref:`systemd.resource-control(5)`, which configure resource control settings for the processes of the socket.
+
+For each socket unit, a matching service unit must exist, describing the service to start on incoming traffic on the socket (see :ref:`systemd.service(5)` for more information about .service units). The name of the .service unit is by default the same as the name of the .socket unit, but can be altered with the :code:`Service=` option described below. Depending on the setting of the :code:`Accept=` option described below, this .service unit must either be named like the .socket unit, but with the suffix replaced, unless overridden with :code:`Service=`; or it must be a template unit named the same way. Example: a socket file :code:`foo.socket` needs a matching service :code:`foo.service` if :code:`Accept=no` is set. If :code:`Accept=yes` is set, a service template :code:`foo@.service` must exist from which services are instantiated for each incoming connection.
+
+No implicit :code:`WantedBy=` or :code:`RequiredBy=` dependency from the socket to the service is added. This means that the service may be started without the socket, in which case it must be able to open sockets by itself. To prevent this, an explicit :code:`Requires=` dependency may be added.
+
+Socket units may be used to implement on-demand starting of services, as well as parallelized starting of services. See the blog stories linked at the end for an introduction.
+
+Note that the daemon software configured for socket activation with socket units needs to be able to accept sockets from systemd, either via systemd's native socket passing interface (see :ref:`sd_listen_fds(3)` for details about the precise protocol used and the order in which the file descriptors are passed) or via traditional :freebsd:`inetd(8)`-style socket passing (i.e. sockets passed in via standard input and output, using :code:`StandardInput=socket` in the service file).
+
+All network sockets allocated through :code:`.socket` units are allocated in the host's network namespace (see :man-pages:`network_namespaces(7)`). This does not mean however that the service activated by a configured socket unit has to be part of the host's network namespace as well. It is supported and even good practice to run services in their own network namespace (for example through :code:`PrivateNetwork=`, see :ref:`systemd.exec(5)`), receiving only the sockets configured through socket-activation from the host's namespace. In such a set-up communication within the host's network namespace is only permitted through the activation sockets passed in while all sockets allocated from the service code itself will be associated with the service's own namespace, and thus possibly subject to a restrictive configuration.
+
+Automatic Dependencies
+######################
+
+Implicit Dependencies
+#####################
+
+The following dependencies are implicitly added:
+
+*    Socket units automatically gain a :code:`Before=` dependency on the service units they activate.
+
+*    Socket units referring to file system paths (such as :code:`AF_UNIX` sockets or FIFOs) implicitly gain :code:`Requires=` and :code:`After=` dependencies on all mount units necessary to access those paths.
+
+*    Socket units using the :code:`BindToDevice=` setting automatically gain a :code:`BindsTo=` and :code:`After=` dependency on the device unit encapsulating the specified network interface.
+
+Additional implicit dependencies may be added as result of execution and resource control parameters as documented in :ref:`systemd.exec(5)` and :ref:`systemd.resource-control(5)`.
+
+Default Dependencies
+####################
+
+The following dependencies are added unless :code:`DefaultDependencies=no` is set:
+
+*    Socket units automatically gain a :code:`Before=` dependency on :code:`sockets.target`.
+
+*    Socket units automatically gain a pair of :code:`After=` and :code:`Requires=` dependency on :code:`sysinit.target`, and a pair of :code:`Before=` and :code:`Conflicts=` dependencies on :code:`shutdown.target`. These dependencies ensure that the socket unit is started before normal services at boot, and is stopped on shutdown. Only sockets involved with early boot or late system shutdown should disable :code:`DefaultDependencies=` option.
+
+Options
+#######
+
+Socket unit files may include \[Unit] and \[Install] sections, which are described in :ref:`systemd.unit(5)`.
+
+Socket unit files must include a \[Socket] section, which carries information about the socket or FIFO it supervises. A number of options that may be used in this section are shared with other unit types. These options are documented in :ref:`systemd.exec(5)`, :ref:`systemd.kill(5)` and :ref:`systemd.resource-control(5)`. The options specific to the \[Socket] section of socket units are the following:
+
+.. systemd:option:: ListenStream=, ListenDatagram=, ListenSequentialPacket=
+   :group: unit-directives
+
+   Specifies an address to listen on for a stream (:systemd:constant:`SOCK_STREAM`), datagram (:systemd:constant:`SOCK_DGRAM`), or sequential packet (:systemd:constant:`SOCK_SEQPACKET`) socket, respectively. The address can be written in various formats:
+
+   If the address starts with a slash ("/"), it is read as file system socket in the :systemd:constant:`AF_UNIX` socket family.
+
+   If the address starts with an at symbol ("@"), it is read as abstract namespace socket in the :systemd:constant:`AF_UNIX` family. The "@" is replaced with a :systemd:constant:`NUL` character before binding. For details, see :man-pages:`unix(7)`.
+
+   If the address string is a single number, it is read as port number to listen on via IPv6. Depending on the value of :systemd:var:`BindIPv6Only=` (see below) this might result in the service being available via both IPv6 and IPv4 (default) or just via IPv6.
+
+   If the address string is a string in the format ":emphasis:`v.w.x.y`::emphasis:`z`", it is interpreted as IPv4 address :emphasis:`v.w.x.y` and port :emphasis:`z`.
+
+   If the address string is a string in the format "[:emphasis:`x`]::emphasis:`y`", it is interpreted as IPv6 address :emphasis:`x` and port :emphasis:`y`. An optional interface scope (interface name or number) may be specified after a "%" symbol: "[:emphasis:`x`]::emphasis:`y`\%:emphasis:`dev`". Interface scopes are only useful with link-local addresses, because the kernel ignores them in other cases. Note that if an address is specified as IPv6, it might still make the service available via IPv4 too, depending on the :systemd:var:`BindIPv6Only=` setting (see below).
+
+   If the address string is a string in the format "vsock::emphasis:`x`::emphasis:`y`", it is read as CID :emphasis:`x` on a port :emphasis:`y` address in the :systemd:constant:`AF_VSOCK` family. The CID is a unique 32-bit integer identifier in :systemd:constant:`AF_VSOCK` analogous to an IP address. Specifying the CID is optional, and may be set to the empty string. "vsock" may be replaced with "vsock-stream", "vsock-dgram" or "vsock-seqpacket" to force usage of the corresponding socket type.
+
+   Note that :systemd:constant:`SOCK_SEQPACKET` (i.e. :systemd:var:`ListenSequentialPacket=`) is only available for :systemd:constant:`AF_UNIX` sockets. :systemd:constant:`SOCK_STREAM` (i.e. :systemd:var:`ListenStream=`) when used for IP sockets refers to TCP sockets, :systemd:constant:`SOCK_DGRAM` (i.e. :systemd:var:`ListenDatagram=`) to UDP.
+
+   These options may be specified more than once, in which case incoming traffic on any of the sockets will trigger service activation, and all listed sockets will be passed to the service, regardless of whether there is incoming traffic on them or not. If the empty string is assigned to any of these options, the list of addresses to listen on is reset, all prior uses of any of these options will have no effect.
+
+   It is also possible to have more than one socket unit for the same service when using :systemd:var:`Service=`, and the service will receive all the sockets configured in all the socket units. Sockets configured in one unit are passed in the order of configuration, but no ordering between socket units is specified.
+
+   If an IP address is used here, it is often desirable to listen on it before the interface it is configured on is up and running, and even regardless of whether it will be up and running at any point. To deal with this, it is recommended to set the :systemd:var:`FreeBind=` option described below.
+
+.. systemd:option:: ListenFIFO=
+   :group: unit-directives
+
+   Specifies a file system FIFO (see :man-pages:`fifo(7)` for details) to listen on. This expects an absolute file system path as argument. Behavior otherwise is very similar to the :systemd:var:`ListenDatagram=` directive above.
+
+.. systemd:option:: ListenSpecial=
+   :group: unit-directives
+
+   Specifies a special file in the file system to listen on. This expects an absolute file system path as argument. Behavior otherwise is very similar to the :systemd:var:`ListenFIFO=` directive above. Use this to open character device nodes as well as special files in :code:`/proc/` and :code:`/sys/`.
+
+.. systemd:option:: ListenNetlink=
+   :group: unit-directives
+
+   Specifies a Netlink family to create a socket for to listen on. This expects a short string referring to the :systemd:constant:`AF_NETLINK` family name (such as :systemd:var:`audit` or :systemd:var:`kobject-uevent`) as argument, optionally suffixed by a whitespace followed by a multicast group integer. Behavior otherwise is very similar to the :systemd:var:`ListenDatagram=` directive above.
+
+.. systemd:option:: ListenMessageQueue=
+   :group: unit-directives
+
+   Specifies a POSIX message queue name to listen on (see :man-pages:`mq_overview(7)` for details). This expects a valid message queue name (i.e. beginning with "/"). Behavior otherwise is very similar to the :systemd:var:`ListenFIFO=` directive above. On Linux message queue descriptors are actually file descriptors and can be inherited between processes.
+
+.. systemd:option:: ListenUSBFunction=
+   :group: unit-directives
+
+   Specifies a `USB FunctionFS <https://docs.kernel.org/usb/functionfs.html>`_ endpoints location to listen on, for implementation of USB gadget functions. This expects an absolute file system path of a FunctionFS mount point as the argument. Behavior otherwise is very similar to the :systemd:var:`ListenFIFO=` directive above. Use this to open the FunctionFS endpoint :code:`ep0`. When using this option, the activated service has to have the :systemd:var:`USBFunctionDescriptors=` and :systemd:var:`USBFunctionStrings=` options set.
+
+   .. versionadded:: 227
+
+.. systemd:option:: SocketProtocol=
+   :group: unit-directives
+
+   Takes one of :systemd:option:`udplite`, :systemd:option:`sctp` or :systemd:option:`mptcp`. The socket will use the UDP-Lite (:systemd:constant:`IPPROTO_UDPLITE`), SCTP (:systemd:constant:`IPPROTO_SCTP`) or MPTCP (:systemd:constant:`IPPROTO_MPTCP`) protocol, respectively.
+
+   .. versionadded:: 229
+
+.. systemd:option:: BindIPv6Only=
+   :group: unit-directives
+
+   Takes one of :systemd:option:`default`, :systemd:option:`both` or :systemd:option:`ipv6-only`. Controls the IPV6_V6ONLY socket option (see :die-net:`ipv6(7)` for details). If :systemd:option:`both`, IPv6 sockets bound will be accessible via both IPv4 and IPv6. If :systemd:option:`ipv6-only`, they will be accessible via IPv6 only. If :systemd:option:`default` (which is the default, surprise!), the system wide default setting is used, as controlled by :code:`/proc/sys/net/ipv6/bindv6only`, which in turn defaults to the equivalent of :systemd:option:`both`.
+
+.. systemd:option:: Backlog=
+   :group: unit-directives
+
+   Takes an unsigned 32-bit integer argument. Specifies the number of connections to queue that have not been accepted yet. This setting matters only for stream and sequential packet sockets. See :man-pages:`listen(2)` for details. Defaults to 4294967295. Note that this value is silently capped by the "net.core.somaxconn" sysctl, which typically defaults to 4096, so typically the sysctl is the setting that actually matters.
+
+.. systemd:option:: BindToDevice=
+   :group: unit-directives
+
+   Specifies a network interface name to bind this socket to. If set, traffic will only be accepted from the specified network interfaces. This controls the :systemd:constant:`SO_BINDTODEVICE` socket option (see :man-pages:`socket(7)` for details). If this option is used, an implicit dependency from this socket unit on the network interface device unit is created (see :ref:`systemd.device(5)`). Note that setting this parameter might result in additional dependencies to be added to the unit (see above).
+
+.. systemd:option:: SocketUser=, SocketGroup=
+   :group: unit-directives
+
+   Takes a UNIX user/group name. When specified, all :systemd:constant:`AF_UNIX` sockets, FIFO nodes, and message queues are owned by the specified user and group. If unset (the default), the nodes are owned by the root user/group (if run in system context) or the invoking user/group (if run in user context). If only a user is specified but no group, then the group is derived from the user's default group.
+
+   .. versionadded:: 214
+
+.. systemd:option:: SocketMode=
+   :group: unit-directives
+
+   If listening on a file system socket, FIFO, or message queue, this option specifies the file system access mode used when creating the file node. Takes an access mode in octal notation. Defaults to 0666.
+
+.. systemd:option:: DirectoryMode=
+   :group: unit-directives
+
+   If listening on a file system socket or FIFO, the parent directories are automatically created if needed. This option specifies the file system access mode used when creating these directories. Takes an access mode in octal notation. Defaults to 0755.
+
+.. systemd:option:: Accept=
+   :group: unit-directives
+
+   Takes a boolean argument. If yes, a service instance is spawned for each incoming connection and only the connection socket is passed to it. If no, all listening sockets themselves are passed to the started service unit, and only one service unit is spawned for all connections (also see above). This value is ignored for datagram sockets and FIFOs where a single service unit unconditionally handles all incoming traffic. Defaults to :systemd:option:`no`.
+
+   Typically, for performance sensitive services, a choice of :systemd:option:`Accept=no` is preferable, since that way only the first connection will have to pay the activation resource cost. On the other hand, for sporadically used services :systemd:option:`Accept=yes` can be preferable as it simplifies the implementation (as the service program code only has to process a single connection instead of handling multiple) and enables stronger security (since the various sandboxing options can be used to isolate parallel connections from each other, as each is serviced by a separate service instance and process).
+
+   A service listening on an :systemd:constant:`AF_UNIX` socket may, but does not need to, call :man-pages:`close(2)` on the received socket before exiting. However, it must not unlink the socket from a file system. It should not invoke :man-pages:`shutdown(2)` on sockets it got with :systemd:var:`Accept=no`, but it may do so for sockets it got with :systemd:var:`Accept=yes` set.
+
+   Setting :systemd:var:`Accept=yes` is in particular useful for allowing daemons designed for usage with :freebsd:`inetd(8)` to work unmodified with systemd socket activation.
+
+   Note that depending on this setting the services activated by units of this type are either regular services (in case of :systemd:var:`Accept=`:systemd:option:`no`) or instances of templated services (in case of :systemd:var:`Accept=`:systemd:option:`yes`). See the Description section above for a more detailed discussion of the naming rules of triggered services.
+
+   For IPv4 and IPv6 connections, the :systemd:var:`$REMOTE_ADDR` environment variable will contain the remote IP address, and :systemd:var:`$REMOTE_PORT` will contain the remote port number. These two variables correspond to those defined by the CGI interface for web services (see `RFC 3875 <https://datatracker.ietf.org/doc/html/rfc3875>`_).
+
+   For :systemd:constant:`AF_UNIX` socket connections, the :systemd:var:`$REMOTE_ADDR` environment variable will contain either the remote socket's file system path starting with a slash ("/") or its address in the abstract namespace starting with an at symbol ("@"). If the socket is unnamed, :systemd:var:`$REMOTE_ADDR` will not be set.
+
+   If :systemd:var:`Accept=yes` is used, the activated service process will have set the :systemd:var:`$SO_COOKIE` environment variable to the Linux socket cookie, formatted as decimal integer. The socket cookie can otherwise be acquired via :man-pages:`getsockopt(7)`.
+
+   It is recommended to set :systemd:var:`CollectMode=inactive-or-failed` for service instances activated via :systemd:var:`Accept=yes`, to ensure that failed connection services are cleaned up and released from memory, and do not accumulate.
+
+.. systemd:option:: Writable=
+   :group: unit-directives
+
+   Takes a boolean argument. May only be used in conjunction with :systemd:var:`ListenSpecial=`. If true, the specified special file is opened in read-write mode, if false, in read-only mode. Defaults to false.
+
+   .. versionadded:: 227
+
+.. systemd:option:: FlushPending=
+   :group: unit-directives
+
+   Takes a boolean argument. May only be used when :systemd:option:`Accept=no`. If yes, the socket's buffers are cleared after the triggered service exited. This causes any pending data to be flushed and any pending incoming connections to be rejected. If no, the socket's buffers will not be cleared, permitting the service to handle any pending connections after restart, which is the usually expected behaviour. Defaults to :systemd:option:`no`.
+
+   .. versionadded:: 247
+
+.. systemd:option:: MaxConnections=
+   :group: unit-directives
+
+   The maximum number of connections to simultaneously run services instances for, when :systemd:option:`Accept=yes` is set. If more concurrent connections are coming in, they will be refused until at least one existing connection is terminated. This setting has no effect on sockets configured with :systemd:option:`Accept=no` or datagram sockets. Defaults to 64.
+
+.. systemd:option:: MaxConnectionsPerSource=
+   :group: unit-directives
+
+   The maximum number of connections for a service per source IP address (in case of IPv4/IPv6), per source CID (in case of :systemd:constant:`AF_VSOCK`), or source UID (in case of :systemd:constant:`AF_UNIX`). This is very similar to the :systemd:var:`MaxConnections=` directive above. Defaults to 0, i.e. disabled.
+
+   .. versionadded:: 232
+
+.. systemd:option:: KeepAlive=
+   :group: unit-directives
+
+   Takes a boolean argument. If true, the TCP/IP stack will send a keep alive message after 2h (depending on the configuration of :code:`/proc/sys/net/ipv4/tcp_keepalive_time`) for all TCP streams accepted on this socket. This controls the :systemd:constant:`SO_KEEPALIVE` socket option (see :man-pages:`socket(7)` and the `TCP Keepalive HOWTO <http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/>`_ for details.) Defaults to :systemd:option:`false`.
+
+.. systemd:option:: KeepAliveTimeSec=
+   :group: unit-directives
+
+   Takes time (in seconds) as argument. The connection needs to remain idle before TCP starts sending keepalive probes. This controls the TCP_KEEPIDLE socket option (see :man-pages:`socket(7)` and the `TCP Keepalive HOWTO <http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/>`_ for details.) Default value is 7200 seconds (2 hours).
+
+   .. versionadded:: 216
+
+.. systemd:option:: KeepAliveIntervalSec=
+   :group: unit-directives
+
+   Takes time (in seconds) as argument between individual keepalive probes, if the socket option :systemd:constant:`SO_KEEPALIVE` has been set on this socket. This controls the :systemd:constant:`TCP_KEEPINTVL` socket option (see :man-pages:`socket(7)` and the `TCP Keepalive HOWTO <http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/>`_ for details.) Default value is 75 seconds.
+
+   .. versionadded:: 216
+
+.. systemd:option:: KeepAliveProbes=
+   :group: unit-directives
+
+   Takes an integer as argument. It is the number of unacknowledged probes to send before considering the connection dead and notifying the application layer. This controls the TCP_KEEPCNT socket option (see :man-pages:`socket(7)` and the `TCP Keepalive HOWTO <http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/>`_ for details.) Default value is 9.
+
+   .. versionadded:: 216
+
+.. systemd:option:: NoDelay=
+   :group: unit-directives
+
+   Takes a boolean argument. TCP Nagle's algorithm works by combining a number of small outgoing messages, and sending them all at once. This controls the TCP_NODELAY socket option (see :die-net:`tcp(7)`). Defaults to :systemd:option:`false`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: Priority=
+   :group: unit-directives
+
+   Takes an integer argument controlling the priority for all traffic sent from this socket. This controls the :systemd:constant:`SO_PRIORITY` socket option (see :man-pages:`socket(7)` for details.).
+
+.. systemd:option:: DeferAcceptSec=
+   :group: unit-directives
+
+   Takes time (in seconds) as argument. If set, the listening process will be awakened only when data arrives on the socket, and not immediately when connection is established. When this option is set, the :systemd:constant:`TCP_DEFER_ACCEPT` socket option will be used (see :die-net:`tcp(7)`), and the kernel will ignore initial ACK packets without any data. The argument specifies the approximate amount of time the kernel should wait for incoming data before falling back to the normal behavior of honoring empty ACK packets. This option is beneficial for protocols where the client sends the data first (e.g. HTTP, in contrast to SMTP), because the server process will not be woken up unnecessarily before it can take any action.
+
+   If the client also uses the :systemd:constant:`TCP_DEFER_ACCEPT` option, the latency of the initial connection may be reduced, because the kernel will send data in the final packet establishing the connection (the third packet in the "three-way handshake").
+
+   Disabled by default.
+
+   .. versionadded:: 216
+
+.. systemd:option:: ReceiveBuffer=, SendBuffer=
+   :group: unit-directives
+
+   Takes an integer argument controlling the receive or send buffer sizes of this socket, respectively. This controls the :systemd:constant:`SO_RCVBUF` and :systemd:constant:`SO_SNDBUF` socket options (see :man-pages:`socket(7)` for details.). The usual suffixes K, M, G are supported and are understood to the base of 1024.
+
+.. systemd:option:: IPTOS=
+   :group: unit-directives
+
+   Takes an integer argument controlling the IP Type-Of-Service field for packets generated from this socket. This controls the :systemd:constant:`IP_TOS` socket option (see :die-net:`ip(7)` for details.). Either a numeric string or one of :systemd:option:`low-delay`, :systemd:option:`throughput`, :systemd:option:`reliability` or :systemd:option:`low-cost` may be specified.
+
+.. systemd:option:: IPTTL=
+   :group: unit-directives
+
+   Takes an integer argument controlling the IPv4 Time-To-Live/IPv6 Hop-Count field for packets generated from this socket. This sets the :systemd:constant:`IP_TTL`/:systemd:constant:`IPV6_UNICAST_HOPS` socket options (see :die-net:`ip(7)` and :die-net:`ipv6(7)` for details.)
+
+.. systemd:option:: Mark=
+   :group: unit-directives
+
+   Takes an integer value. Controls the firewall mark of packets generated by this socket. This can be used in the firewall logic to filter packets from this socket. This sets the :systemd:constant:`SO_MARK` socket option. See :die-net:`iptables(8)` for details.
+
+.. systemd:option:: ReusePort=
+   :group: unit-directives
+
+   Takes a boolean value. If true, allows multiple :man-pages:`bind(2)`s to this TCP or UDP port. This controls the :systemd:constant:`SO_REUSEPORT` socket option. See :man-pages:`socket(7)` for details.
+
+   .. versionadded:: 206
+
+.. systemd:option:: SmackLabel=, SmackLabelIPIn=, SmackLabelIPOut=
+   :group: unit-directives
+
+   Takes a string value. Controls the extended attributes "security.SMACK64", "security.SMACK64IPIN" and "security.SMACK64IPOUT", respectively, i.e. the security label of the FIFO, or the security label for the incoming or outgoing connections of the socket, respectively. See `Smack <https://docs.kernel.org/admin-guide/LSM/Smack.html>`_ for details.
+
+   .. versionadded:: 196
+
+.. systemd:option:: SELinuxContextFromNet=
+   :group: unit-directives
+
+   Takes a boolean argument. When true, systemd will attempt to figure out the SELinux label used for the instantiated service from the information handed by the peer over the network. Note that only the security level is used from the information provided by the peer. Other parts of the resulting SELinux context originate from either the target binary that is effectively triggered by socket unit or from the value of the :systemd:var:`SELinuxContext=` option. This configuration option applies only when activated service is passed in single socket file descriptor, i.e. service instances that have standard input connected to a socket or services triggered by exactly one socket unit. Also note that this option is useful only when MLS/MCS SELinux policy is deployed. Defaults to "false".
+
+   .. versionadded:: 217
+
+.. systemd:option:: PipeSize=
+   :group: unit-directives
+
+   Takes a size in bytes. Controls the pipe buffer size of FIFOs configured in this socket unit. See :man-pages:`fcntl(2)` for details. The usual suffixes K, M, G are supported and are understood to the base of 1024.
+
+.. systemd:option:: MessageQueueMaxMessages=, MessageQueueMessageSize=
+   :group: unit-directives
+
+   These two settings take integer values and control the mq_maxmsg field or the mq_msgsize field, respectively, when creating the message queue. Note that either none or both of these variables need to be set. See :die-net:`mq_setattr(3)` for details.
+
+.. systemd:option:: FreeBind=
+   :group: unit-directives
+
+   Takes a boolean value. Controls whether the socket can be bound to non-local IP addresses. This is useful to configure sockets listening on specific IP addresses before those IP addresses are successfully configured on a network interface. This sets the :systemd:constant:`IP_FREEBIND`/:systemd:constant:`IPV6_FREEBIND` socket option. For robustness reasons it is recommended to use this option whenever you bind a socket to a specific IP address. Defaults to :systemd:option:`false`.
+
+.. systemd:option:: Transparent=
+   :group: unit-directives
+
+   Takes a boolean value. Controls the :systemd:constant:`IP_TRANSPARENT`/:systemd:constant:`IPV6_TRANSPARENT` socket option. Defaults to :systemd:option:`false`.
+
+.. systemd:option:: Broadcast=
+   :group: unit-directives
+
+   Takes a boolean value. This controls the :systemd:constant:`SO_BROADCAST` socket option, which allows broadcast datagrams to be sent from this socket. Defaults to :systemd:option:`false`.
+
+.. systemd:option:: PassCredentials=
+   :group: unit-directives
+
+   Takes a boolean value. This controls the :systemd:constant:`SO_PASSCRED` socket option, which allows :systemd:constant:`AF_UNIX` sockets to receive the credentials of the sending process in an ancillary message. Defaults to :systemd:option:`false`.
+
+.. systemd:option:: PassPIDFD=
+   :group: unit-directives
+
+   Takes a boolean value. This controls the :systemd:constant:`SO_PASSPIDFD` socket option, which allows :systemd:constant:`AF_UNIX` sockets to receive the pidfd of the sending process in an ancillary message. Defaults to :systemd:option:`false`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: PassSecurity=
+   :group: unit-directives
+
+   Takes a boolean value. This controls the :systemd:constant:`SO_PASSSEC` socket option, which allows :systemd:constant:`AF_UNIX` sockets to receive the security context of the sending process in an ancillary message. Defaults to :systemd:option:`false`.
+
+.. systemd:option:: PassPacketInfo=
+   :group: unit-directives
+
+   Takes a boolean value. This controls the :systemd:constant:`IP_PKTINFO`, :systemd:constant:`IPV6_RECVPKTINFO`, :systemd:constant:`NETLINK_PKTINFO` or :systemd:constant:`PACKET_AUXDATA` socket options, which enable reception of additional per-packet metadata as ancillary message, on :systemd:constant:`AF_INET`, :systemd:constant:`AF_INET6`, :systemd:constant:`AF_UNIX` and :systemd:constant:`AF_PACKET` sockets. Defaults to :systemd:option:`false`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: AcceptFileDescriptors=
+   :group: unit-directives
+
+   Takes a boolean value. This controls the :systemd:constant:`SO_PASSRIGHTS` socket option, which when disabled prohibits the peer from sending :systemd:constant:`SCM_RIGHTS` ancillary messages (aka file descriptors) via :systemd:constant:`AF_UNIX` sockets. Defaults to :systemd:option:`true`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: Timestamping=
+   :group: unit-directives
+
+   Takes one of "off", "us" (alias: "usec", "μs") or "ns" (alias: "nsec"). This controls the :systemd:constant:`SO_TIMESTAMP` or :systemd:constant:`SO_TIMESTAMPNS` socket options, and enables whether ingress network traffic shall carry timestamping metadata. Defaults to :systemd:option:`off`.
+
+   .. versionadded:: 247
+
+.. systemd:option:: TCPCongestion=
+   :group: unit-directives
+
+   Takes a string value. Controls the TCP congestion algorithm used by this socket. Should be one of "westwood", "reno", "cubic", "lp" or any other available algorithm supported by the IP stack. This setting applies only to stream sockets.
+
+.. systemd:option:: ExecStartPre=, ExecStartPost=
+   :group: unit-directives
+
+   Takes one or more command lines, which are executed before or after the listening sockets/FIFOs are created and bound, respectively. The first token of the command line must be an absolute filename, then followed by arguments for the process. Multiple command lines may be specified following the same scheme as used for :systemd:var:`ExecStartPre=` of service unit files.
+
+.. systemd:option:: ExecStopPre=, ExecStopPost=
+   :group: unit-directives
+
+   Additional commands that are executed before or after the listening sockets/FIFOs are closed and removed, respectively. Multiple command lines may be specified following the same scheme as used for :systemd:var:`ExecStartPre=` of service unit files.
+
+.. systemd:option:: TimeoutSec=
+   :group: unit-directives
+
+   Configures the time to wait for the commands specified in :systemd:var:`ExecStartPre=`, :systemd:var:`ExecStartPost=`, :systemd:var:`ExecStopPre=` and :systemd:var:`ExecStopPost=` to finish. If a command does not exit within the configured time, the socket will be considered failed and be shut down again. All commands still running will be terminated forcibly via :systemd:constant:`SIGTERM`, and after another delay of this time with :systemd:constant:`SIGKILL`. (See :systemd:option:`KillMode=` in :ref:`systemd.kill(5)`.) Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass "0" to disable the timeout logic. Defaults to :systemd:var:`DefaultTimeoutStartSec=` from the manager configuration file (see :ref:`systemd-system.conf(5)`).
+
+.. systemd:option:: Service=
+   :group: unit-directives
+
+   Specifies the service unit name to activate on incoming traffic. This setting is only allowed for sockets with :systemd:var:`Accept=no`. It defaults to the service that bears the same name as the socket (with the suffix replaced). In most cases, it should not be necessary to use this option. Note that setting this parameter might result in additional dependencies to be added to the unit (see above).
+
+.. systemd:option:: RemoveOnStop=
+   :group: unit-directives
+
+   Takes a boolean argument. If enabled, any file nodes created by this socket unit are removed when it is stopped. This applies to :systemd:constant:`AF_UNIX` sockets in the file system, POSIX message queues, FIFOs, as well as any symlinks to them configured with :systemd:var:`Symlinks=`. Normally, it should not be necessary to use this option, and is not recommended as services might continue to run after the socket unit has been terminated and it should still be possible to communicate with them via their file system node. Defaults to off.
+
+   .. versionadded:: 214
+
+.. systemd:option:: Symlinks=
+   :group: unit-directives
+
+   Takes a list of file system paths. The specified paths will be created as symlinks to the :systemd:constant:`AF_UNIX` socket path or FIFO path of this socket unit. If this setting is used, only one :systemd:constant:`AF_UNIX` socket in the file system or one FIFO may be configured for the socket unit. Use this option to manage one or more symlinked alias names for a socket, binding their lifecycle together. Note that if creation of a symlink fails this is not considered fatal for the socket unit, and the socket unit may still start. If an empty string is assigned, the list of paths is reset. Defaults to an empty list.
+
+   .. versionadded:: 214
+
+.. systemd:option:: FileDescriptorName=
+   :group: unit-directives
+
+   Assigns a name to all file descriptors this socket unit encapsulates. This is useful to help activated services identify specific file descriptors, if multiple fds are passed. Services may use the :ref:`sd_listen_fds_with_names(3)` call to acquire the names configured for the received file descriptors. Names may contain any ASCII character, but must exclude control characters and ":", and must be at most 255 characters in length. If this setting is not used, the file descriptor name defaults to the name of the socket unit (including its :code:`.socket` suffix) when :systemd:var:`Accept=no`, "connection" otherwise.
+
+   .. versionadded:: 227
+
+.. systemd:option:: TriggerLimitIntervalSec=, TriggerLimitBurst=
+   :group: unit-directives
+
+   Configures a limit on how often this socket unit may be activated within a specific time interval. The :systemd:var:`TriggerLimitIntervalSec=` setting may be used to configure the length of the time interval in the usual time units "us", "ms", "s", "min", "h", … and defaults to 2s (See :ref:`systemd.time(7)` for details on the various time units understood). The :systemd:var:`TriggerLimitBurst=` setting takes a positive integer value and specifies the number of permitted activations per time interval, and defaults to 200 for :systemd:var:`Accept=yes` sockets (thus by default permitting 200 activations per 2s), and 20 otherwise (20 activations per 2s). Set either to 0 to disable any form of trigger rate limiting.
+
+   If the limit is hit, the socket unit is placed into a failure mode, and will not be connectible anymore until restarted. Note that this limit is enforced before the service activation is enqueued.
+
+   Compare with :systemd:var:`PollLimitIntervalSec=`/:systemd:var:`PollLimitBurst=` described below, which implements a temporary slowdown if a socket unit is flooded with incoming traffic, as opposed to the permanent failure state :systemd:var:`TriggerLimitIntervalSec=`/:systemd:var:`TriggerLimitBurst=` results in.
+
+   .. versionadded:: 230
+
+.. systemd:option:: PollLimitIntervalSec=, PollLimitBurst=
+   :group: unit-directives
+
+   Configures a limit on how often polling events on the file descriptors backing this socket unit will be considered. This pair of settings is similar to :systemd:var:`TriggerLimitIntervalSec=`/:systemd:var:`TriggerLimitBurst=` but instead of putting a (fatal) limit on the activation frequency puts a (transient) limit on the polling frequency. The expected parameter syntax and range are identical to that of the aforementioned options, and can be disabled the same way.
+
+   If the polling limit is hit polling is temporarily disabled on it until the specified time window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger limit will not cause permanent failures. It's the recommended mechanism to deal with DoS attempts through packet flooding.
+
+   The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit which is enforced for the entire socket unit. This distinction matters for socket units that listen on multiple file descriptors (i.e. have multiple :systemd:var:`ListenXYZ=` stanzas).
+
+   These setting defaults to 150 (in case of :systemd:var:`Accept=yes`) and 15 (otherwise) polling events per 2s. This is considerably lower than the default values for the trigger limit (see above) and means that the polling limit should typically ensure the trigger limit is never hit, unless one of them is reconfigured or disabled.
+
+   .. versionadded:: 255
+
+.. systemd:option:: DeferTrigger=
+   :group: unit-directives
+
+   Takes a boolean argument, or "patient". May only be used when :systemd:var:`Accept=no`. If enabled, job mode "lenient" instead of "replace" is used when triggering the service, which means currently activating/running units that conflict with the service won't be disturbed/brought down. Furthermore, if a conflict exists, the socket unit will wait for current job queue to complete and potentially defer the activation by then. An upper limit of total time to wait can be configured via :systemd:var:`DeferTriggerMaxSec=`. If set to :systemd:option:`yes`, the socket unit will fail if all jobs have finished or the timeout has been reached but the conflict remains. If :systemd:option:`patient`, always wait until :systemd:var:`DeferTriggerMaxSec=` elapses. Defaults to no.
+
+   This setting is particularly useful if the socket unit should stay active across switch-root/soft-reboot operations while the triggered service is stopped.
+
+   .. versionadded:: 258
+
+.. systemd:option:: DeferTriggerMaxSec=
+   :group: unit-directives
+
+   Configures the maximum time to defer the triggering when :systemd:var:`DeferTrigger=` is enabled. If the service cannot be activated within the specified time, the socket will be considered failed and get terminated. Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass "0" or "infinity" to disable the timeout logic (the default).
+
+   .. versionadded:: 258
+
+.. systemd:option:: PassFileDescriptorsToExec=
+   :group: unit-directives
+
+   Takes a boolean argument. Defaults to off. If enabled, file descriptors created by the socket unit are passed to :systemd:var:`ExecStartPost=`, :systemd:var:`ExecStopPre=`, and :systemd:var:`ExecStopPost=` commands from the socket unit. The passed file descriptors can be accessed with :ref:`sd_listen_fds(3)` as if the commands were invoked from the associated service units. Note that :systemd:var:`ExecStartPre=` command cannot access socket file descriptors.
+
+   .. versionadded:: 256
+
+.. include:: systemd.service.rst
+    :start-after: .. inclusion-marker-do-not-remove shared-unit-options|
+    :end-before: .. inclusion-end-marker-do-not-remove shared-unit-options|
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd-system.conf(5)`, :ref:`systemd.unit(5)`, :ref:`systemd.exec(5)`, :ref:`systemd.kill(5)`, :ref:`systemd.resource-control(5)`, :ref:`systemd.service(5)`, :ref:`systemd.directives(7)`, :ref:`sd_listen_fds(3)`, :ref:`sd_listen_fds_with_names(3)`
+
+For more extensive descriptions see the "systemd for Developers" series: `Socket Activation <https://0pointer.de/blog/projects/socket-activation.html>`_, `Socket Activation, part II <https://0pointer.de/blog/projects/socket-activation2.html>`_, `Converting inetd Services <https://0pointer.de/blog/projects/inetd.html>`_, `Socket Activated Internet Services and OS Containers <https://0pointer.de/blog/projects/socket-activated-containers.html>`_.
+
+

@@ -1,0 +1,119 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: user@.service
+:manvolnum: 5
+:summary: System units to start the user manager
+:aliases: user-runtime-dir@.service, systemd-user-runtime-dir
+
+.. _user@.service(5):
+
+================
+user@.service(5)
+================
+
+Name
+####
+
+user@.service, user-runtime-dir@.service, systemd-user-runtime-dir — System units to start the user manager
+
+Synopsis
+########
+
+:code:`user@UID.service`
+
+:code:`user-runtime-dir@UID.service`
+
+:code:`/usr/lib/systemd/systemd-user-runtime-dir`
+
+:code:`user-UID.slice`
+
+Description
+###########
+
+The :ref:`systemd(1)` system manager (PID 1) starts user manager instances as :code:`user@UID.service`, with the user's numerical UID used as the instance identifier. These instances use the same executable as the system manager, but running in a mode where it starts a different set of units. Each :code:`systemd --user` instance manages a hierarchy of units specific to that user. See :ref:`systemd(1)` for a discussion of units and :ref:`systemd.special(7)` for a list of units that form the basis of the unit hierarchies of system and user units.
+
+:code:`user@UID.service` is accompanied by the system unit :code:`user-runtime-dir@UID.service`, which creates the user's runtime directory :code:`/run/user/UID` when started, and removes it when it is stopped. It also might apply runtime quota settings on :code:`/tmp/` and/or :code:`/dev/shm/` for the user. :code:`user-runtime-dir@UID.service` executes the :code:`systemd-user-runtime-dir` binary to do the actual work.
+
+User processes may be started by the :code:`user@.service` instance, in which case they will be part of that unit in the system hierarchy. They may also be started elsewhere, for example by :man-pages:`sshd(8)` or a display manager like :code:`gdm`, in which case they form a .scope unit (see :ref:`systemd.scope(5)`). Both :code:`user@UID.service` and the scope units are collected under the :code:`user-UID.slice`.
+
+Individual :code:`user-UID.slice` slices are collected under :code:`user.slice`, see :ref:`systemd.special(7)`.
+
+Controlling resources for logged-in users
+#########################################
+
+Options that control resources available to logged-in users can be configured at a few different levels. As described in the previous section, :code:`user.slice` contains processes of all users, so any resource limits on that slice apply to all users together. The usual way to configure them would be through drop-ins, e.g. :code:`/etc/systemd/system/user.slice.d/resources.conf`.
+
+The processes of a single user are collected under :code:`user-UID.slice`. Resource limits for that user can be configured through drop-ins for that unit, e.g. :code:`/etc/systemd/system/user-1000.slice.d/resources.conf`. If the limits should apply to all users instead, they may be configured through drop-ins for the truncated unit name, :code:`user-.slice`. For example, configuration in :code:`/etc/systemd/system/user-.slice.d/resources.conf` is included in all :code:`user-UID.slice` units, see :ref:`systemd.unit(5)` for a discussion of the drop-in mechanism.
+
+When a user logs in and a .scope unit is created for the session (see previous section), the creation of the scope may be managed through :man-pages:`pam_systemd(8)`. This PAM module communicates with :ref:`systemd-logind(8)` to create the session scope and provide access to hardware resources. Resource limits for the scope may be configured through the PAM module configuration, see :man-pages:`pam_systemd(8)`. Configuring them through the normal unit configuration is also possible, but since the name of the slice unit is generally unpredictable, this is less useful.
+
+In general any resources that apply to units may be set for :code:`user@UID.service` and the slice units discussed above, see :ref:`systemd.resource-control(5)` for an overview.
+
+Examples
+########
+
+Hierarchy of control groups with two logged in users
+----------------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-cgls
+   Control group /:
+   -.slice
+   ├─user.slice
+   │ ├─user-1000.slice
+   │ │ ├─user@1000.service
+   │ │ │ ├─pulseaudio.service
+   │ │ │ │ └─2386 /usr/bin/pulseaudio --daemonize=no
+   │ │ │ └─gnome-terminal-server.service
+   │ │ │   └─init.scope
+   │ │ │     ├─ 4127 /usr/libexec/gnome-terminal-server
+   │ │ │     └─ 4198 zsh
+   │ │ …
+   │ │ └─session-4.scope
+   │ │   ├─ 1264 gdm-session-worker [pam/gdm-password]
+   │ │   ├─ 2339 /usr/bin/gnome-shell
+   │ │   …
+   │ │ ├─session-19.scope
+   │ │   ├─6497 sshd: zbyszek [priv]
+   │ │   ├─6502 sshd: zbyszek@pts/6
+   │ │   ├─6509 -zsh
+   │ │   └─6602 systemd-cgls --no-pager
+   │ …
+   │ └─user-1001.slice
+   │   ├─session-20.scope
+   │   │ ├─6675 sshd: guest [priv]
+   │   │ ├─6708 sshd: guest@pts/6
+   │   │ └─6717 -bash
+   │   └─user@1001.service
+   │     ├─init.scope
+   │     │ ├─6680 /usr/lib/systemd/systemd --user
+   │     │ └─6688 (sd-pam)
+   │     └─sleep.service
+   │       └─6706 /usr/bin/sleep 30
+   …
+
+User with UID 1000 is logged in using :code:`gdm` (:code:`session-4.scope`) and :man-pages:`ssh(1)` (:code:`session-19.scope`), and also has a user manager instance running (:code:`user@1000.service`). User with UID 1001 is logged in using :code:`ssh` (:code:`session-20.scope`) and also has a user manager instance running (:code:`user@1001.service`). Those are all (leaf) system units, and form part of the slice hierarchy, with :code:`user-1000.slice` and :code:`user-1001.slice` below :code:`user.slice`. User units are visible below the :code:`user@.service` instances (:code:`pulseaudio.service`, :code:`gnome-terminal-server.service`, :code:`init.scope`, :code:`sleep.service`).
+
+Default user resource limits
+----------------------------
+
+.. code-block:: sh
+
+   $ systemctl cat user-1000.slice
+   # /usr/lib/systemd/system/user-.slice.d/10-defaults.conf
+   # …
+   [Unit]
+   Description=User Slice of UID %j
+   After=systemd-user-sessions.service
+   [Slice]
+   TasksMax=33%
+
+The :code:`user-UID.slice` units by default do not have a unit file. The resource limits are set through a drop-in, which can be easily replaced or extended following standard drop-in mechanisms discussed in the first section.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.service(5)`, :ref:`systemd.slice(5)`, :ref:`systemd.resource-control(5)`, :ref:`systemd.exec(5)`, :ref:`systemd.special(7)`, :man-pages:`capsule@.service(5)`, :man-pages:`pam(8)`
+
+

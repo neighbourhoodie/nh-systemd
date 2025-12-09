@@ -1,0 +1,234 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_creds_get_pid
+:manvolnum: 3
+:summary: Retrieve fields from a credentials object
+:aliases: sd_bus_creds_get_pidfd_dup, sd_bus_creds_get_ppid, sd_bus_creds_get_tid, sd_bus_creds_get_uid, sd_bus_creds_get_euid, sd_bus_creds_get_suid, sd_bus_creds_get_fsuid, sd_bus_creds_get_gid, sd_bus_creds_get_egid, sd_bus_creds_get_sgid, sd_bus_creds_get_fsgid, sd_bus_creds_get_supplementary_gids, sd_bus_creds_get_comm, sd_bus_creds_get_tid_comm, sd_bus_creds_get_exe, sd_bus_creds_get_cmdline, sd_bus_creds_get_cgroup, sd_bus_creds_get_unit, sd_bus_creds_get_slice, sd_bus_creds_get_user_unit, sd_bus_creds_get_user_slice, sd_bus_creds_get_session, sd_bus_creds_get_owner_uid, sd_bus_creds_has_effective_cap, sd_bus_creds_has_permitted_cap, sd_bus_creds_has_inheritable_cap, sd_bus_creds_has_bounding_cap, sd_bus_creds_get_selinux_context, sd_bus_creds_get_audit_session_id, sd_bus_creds_get_audit_login_uid, sd_bus_creds_get_tty, sd_bus_creds_get_unique_name, sd_bus_creds_get_well_known_names, sd_bus_creds_get_description
+
+.. _sd_bus_creds_get_pid(3):
+
+=======================
+sd_bus_creds_get_pid(3)
+=======================
+
+Name
+####
+
+sd_bus_creds_get_pid, sd_bus_creds_get_pidfd_dup, sd_bus_creds_get_ppid, sd_bus_creds_get_tid, sd_bus_creds_get_uid, sd_bus_creds_get_euid, sd_bus_creds_get_suid, sd_bus_creds_get_fsuid, sd_bus_creds_get_gid, sd_bus_creds_get_egid, sd_bus_creds_get_sgid, sd_bus_creds_get_fsgid, sd_bus_creds_get_supplementary_gids, sd_bus_creds_get_comm, sd_bus_creds_get_tid_comm, sd_bus_creds_get_exe, sd_bus_creds_get_cmdline, sd_bus_creds_get_cgroup, sd_bus_creds_get_unit, sd_bus_creds_get_slice, sd_bus_creds_get_user_unit, sd_bus_creds_get_user_slice, sd_bus_creds_get_session, sd_bus_creds_get_owner_uid, sd_bus_creds_has_effective_cap, sd_bus_creds_has_permitted_cap, sd_bus_creds_has_inheritable_cap, sd_bus_creds_has_bounding_cap, sd_bus_creds_get_selinux_context, sd_bus_creds_get_audit_session_id, sd_bus_creds_get_audit_login_uid, sd_bus_creds_get_tty, sd_bus_creds_get_unique_name, sd_bus_creds_get_well_known_names, sd_bus_creds_get_description — Retrieve fields from a credentials object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_creds_get_pid(sd_bus_creds *c,
+	pid_t *pid); .. code-block::
+
+   int sd_bus_creds_get_pidfd_dup(sd_bus_creds *c,
+	int *ret_fd); .. code-block::
+
+   int sd_bus_creds_get_ppid(sd_bus_creds *c,
+	pid_t *ppid); .. code-block::
+
+   int sd_bus_creds_get_tid(sd_bus_creds *c,
+	pid_t *tid); .. code-block::
+
+   int sd_bus_creds_get_uid(sd_bus_creds *c,
+	uid_t *uid); .. code-block::
+
+   int sd_bus_creds_get_euid(sd_bus_creds *c,
+	uid_t *uid); .. code-block::
+
+   int sd_bus_creds_get_suid(sd_bus_creds *c,
+	uid_t *uid); .. code-block::
+
+   int sd_bus_creds_get_fsuid(sd_bus_creds *c,
+	uid_t *uid); .. code-block::
+
+   int sd_bus_creds_get_gid(sd_bus_creds *c,
+	gid_t *gid); .. code-block::
+
+   int sd_bus_creds_get_egid(sd_bus_creds *c,
+	gid_t *gid); .. code-block::
+
+   int sd_bus_creds_get_sgid(sd_bus_creds *c,
+	gid_t *gid); .. code-block::
+
+   int sd_bus_creds_get_fsgid(sd_bus_creds *c,
+	gid_t *gid); .. code-block::
+
+   int sd_bus_creds_get_supplementary_gids(sd_bus_creds *c,
+	const gid_t **gids); .. code-block::
+
+   int sd_bus_creds_get_comm(sd_bus_creds *c,
+	const char **comm); .. code-block::
+
+   int sd_bus_creds_get_tid_comm(sd_bus_creds *c,
+	const char **comm); .. code-block::
+
+   int sd_bus_creds_get_exe(sd_bus_creds *c,
+	const char **exe); .. code-block::
+
+   int sd_bus_creds_get_cmdline(sd_bus_creds *c,
+	char ***cmdline); .. code-block::
+
+   int sd_bus_creds_get_cgroup(sd_bus_creds *c,
+	const char **cgroup); .. code-block::
+
+   int sd_bus_creds_get_unit(sd_bus_creds *c,
+	const char **unit); .. code-block::
+
+   int sd_bus_creds_get_slice(sd_bus_creds *c,
+	const char **slice); .. code-block::
+
+   int sd_bus_creds_get_user_unit(sd_bus_creds *c,
+	const char **unit); .. code-block::
+
+   int sd_bus_creds_get_user_slice(sd_bus_creds *c,
+	const char **slice); .. code-block::
+
+   int sd_bus_creds_get_session(sd_bus_creds *c,
+	const char **slice); .. code-block::
+
+   int sd_bus_creds_get_owner_uid(sd_bus_creds *c,
+	uid_t *uid); .. code-block::
+
+   int sd_bus_creds_has_effective_cap(sd_bus_creds *c,
+	int capability); .. code-block::
+
+   int sd_bus_creds_has_permitted_cap(sd_bus_creds *c,
+	int capability); .. code-block::
+
+   int sd_bus_creds_has_inheritable_cap(sd_bus_creds *c,
+	int capability); .. code-block::
+
+   int sd_bus_creds_has_bounding_cap(sd_bus_creds *c,
+	int capability); .. code-block::
+
+   int sd_bus_creds_get_selinux_context(sd_bus_creds *c,
+	const char **context); .. code-block::
+
+   int sd_bus_creds_get_audit_session_id(sd_bus_creds *c,
+	uint32_t *sessionid); .. code-block::
+
+   int sd_bus_creds_get_audit_login_uid(sd_bus_creds *c,
+	uid_t *loginuid); .. code-block::
+
+   int sd_bus_creds_get_tty(sd_bus_creds *c,
+	const char **tty); .. code-block::
+
+   int sd_bus_creds_get_unique_name(sd_bus_creds *c,
+	const char **name); .. code-block::
+
+   int sd_bus_creds_get_well_known_names(sd_bus_creds *c,
+	char ***name); .. code-block::
+
+   int sd_bus_creds_get_description(sd_bus_creds *c,
+	const char **name);
+
+Description
+###########
+
+These functions return credential information from an :code:`sd_bus_creds` object. Credential objects may be created with :ref:`sd_bus_creds_new_from_pid(3)`, in which case they describe the credentials of the process identified by the specified PID, with :ref:`sd_bus_get_name_creds(3)`, in which case they describe the credentials of a bus peer identified by the specified bus name, with :ref:`sd_bus_get_owner_creds(3)`, in which case they describe the credentials of the creator of a bus, or with :ref:`sd_bus_message_get_creds(3)`, in which case they describe the credentials of the sender of the message.
+
+Not all credential fields are part of every "sd_bus_creds" object. Use :ref:`sd_bus_creds_get_mask(3)` to determine the mask of fields available.
+
+:code:`sd_bus_creds_get_pid()` will retrieve the PID (process identifier). Similarly, :code:`sd_bus_creds_get_ppid()` will retrieve the parent PID. Note that PID 1 has no parent process, in which case -ENXIO is returned.
+
+:code:`sd_bus_creds_get_pidfd_dup()` will retrieve the PID file descriptor (pidfd), see :man-pages:`pidfd_open(2)` for details. The file descriptor is duplicated and thus must be closed by the caller.
+
+:code:`sd_bus_creds_get_tid()` will retrieve the TID (thread identifier).
+
+:code:`sd_bus_creds_get_uid()` will retrieve the numeric UID (user identifier). Similarly, :code:`sd_bus_creds_get_euid()` returns the effective UID, :code:`sd_bus_creds_get_suid()` the saved UID and :code:`sd_bus_creds_get_fsuid()` the file system UID.
+
+:code:`sd_bus_creds_get_gid()` will retrieve the numeric GID (group identifier). Similarly, :code:`sd_bus_creds_get_egid()` returns the effective GID, :code:`sd_bus_creds_get_sgid()` the saved GID and :code:`sd_bus_creds_get_fsgid()` the file system GID.
+
+:code:`sd_bus_creds_get_supplementary_gids()` will retrieve the supplementary GIDs list.
+
+:code:`sd_bus_creds_get_comm()` will retrieve the comm field (truncated name of the executable, as stored in :code:`/proc/pid/comm`).
+
+:code:`sd_bus_creds_get_tid_comm()` will retrieve the comm field of the thread (as stored in :code:`/proc/pid/task/tid/comm`).
+
+:code:`sd_bus_creds_get_exe()` will retrieve the path to the program executable (as stored in the :code:`/proc/pid/exe` link, but with the "(deleted)" suffix removed). Note that kernel threads do not have an executable path, in which case -ENXIO is returned. Note that this property should not be used for more than explanatory information, in particular it should not be used for security-relevant decisions. That's because the executable might have been replaced or removed by the time the value can be processed. Moreover, the kernel exports this information in an ambiguous way (i.e. a deleted executable cannot be safely distinguished from one whose name suffix is "(deleted)").
+
+:code:`sd_bus_creds_get_cmdline()` will retrieve an array of command line arguments (as stored in :code:`/proc/pid/cmdline`). Note that kernel threads do not have a command line, in which case -ENXIO is returned.
+
+:code:`sd_bus_creds_get_cgroup()` will retrieve the control group path. See `Control Groups v2 <https://docs.kernel.org/admin-guide/cgroup-v2.html>`_.
+
+:code:`sd_bus_creds_get_unit()` will retrieve the systemd unit name (in the system instance of systemd) that the process is a part of. See :ref:`systemd.unit(5)`. For processes that are not part of a unit, returns -ENXIO.
+
+:code:`sd_bus_creds_get_user_unit()` will retrieve the systemd unit name (in the user instance of systemd) that the process is a part of. See :ref:`systemd.unit(5)`. For processes that are not part of a user unit, returns -ENXIO.
+
+:code:`sd_bus_creds_get_slice()` will retrieve the systemd slice (a unit in the system instance of systemd) that the process is a part of. See :ref:`systemd.slice(5)`. Similarly, :code:`sd_bus_creds_get_user_slice()` retrieves the systemd slice of the process, in the user instance of systemd.
+
+:code:`sd_bus_creds_get_session()` will retrieve the identifier of the login session that the process is a part of. Please note the login session may be limited to a stub process or two. User processes may instead be started from their systemd user manager, e.g. GUI applications started using DBus activation, as well as service processes which are shared between multiple logins of the same user. For processes that are not part of a session, returns -ENXIO.
+
+:code:`sd_bus_creds_get_owner_uid()` will retrieve the numeric UID (user identifier) of the user who owns the user unit or login session that the process is a part of. See :ref:`systemd-logind.service(8)`. For processes that are not part of a user unit or session, returns -ENXIO.
+
+:code:`sd_bus_creds_has_effective_cap()` will check whether the capability specified by :code:`capability` was set in the effective capabilities mask. A positive return value means that it was set, zero means that it was not set, and a negative return value indicates an error. See :man-pages:`capabilities(7)` and the :code:`AmbientCapabilities=` and :code:`CapabilityBoundingSet=` settings in :ref:`systemd.exec(5)`.
+
+:code:`sd_bus_creds_has_permitted_cap()` is similar to :code:`sd_bus_creds_has_effective_cap()`, but will check the permitted capabilities mask.
+
+:code:`sd_bus_creds_has_inheritable_cap()` is similar to :code:`sd_bus_creds_has_effective_cap()`, but will check the inheritable capabilities mask.
+
+:code:`sd_bus_creds_has_bounding_cap()` is similar to :code:`sd_bus_creds_has_effective_cap()`, but will check the bounding capabilities mask.
+
+:code:`sd_bus_creds_get_selinux_context()` will retrieve the SELinux security context (label) of the process.
+
+:code:`sd_bus_creds_get_audit_session_id()` will retrieve the audit session identifier of the process. Returns -ENXIO for processes that are not part of an audit session.
+
+:code:`sd_bus_creds_get_audit_login_uid()` will retrieve the audit user login identifier (the identifier of the user who is "responsible" for the session). Returns -ENXIO for processes that are not part of an audit session.
+
+:code:`sd_bus_creds_get_tty()` will retrieve the controlling TTY, without the prefixing "/dev/". Returns -ENXIO for processes that have no controlling TTY.
+
+:code:`sd_bus_creds_get_unique_name()` will retrieve the D-Bus unique name. See `The D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names-bus>`_.
+
+:code:`sd_bus_creds_get_well_known_names()` will retrieve the set of D-Bus well-known names. See `The D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names-bus>`_.
+
+:code:`sd_bus_creds_get_description()` will retrieve a descriptive name of the bus connection of the peer. This name is useful to discern multiple bus connections by the same peer, and may be altered by the peer with the :ref:`sd_bus_set_description(3)` call.
+
+All functions that take a :code:`const char**` parameter will store the answer there as an address of a :code:`NUL`-terminated string. It will be valid as long as :code:`c` remains valid, and should not be freed or modified by the caller.
+
+All functions that take a :code:`char***` parameter will store the answer there as an address of an array of strings. Each individual string is :code:`NUL`-terminated, and the array is :code:`NULL`-terminated as a whole. It will be valid as long as :code:`c` remains valid, and should not be freed or modified by the caller.
+
+Return Value
+############
+
+On success, these calls return 0 or a positive integer. On failure, these calls return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENODATA
+
+   The given field is not available in the credentials object :code:`c`.
+
+.. systemd:option:: -ENXIO
+
+   The given field is not specified for the described process or peer. This will be returned by :code:`sd_bus_creds_get_unit()`, :code:`sd_bus_creds_get_slice()`, :code:`sd_bus_creds_get_user_unit()`, :code:`sd_bus_creds_get_user_slice()`, and :code:`sd_bus_creds_get_session()` if the process is not part of a systemd system unit, systemd user unit, systemd slice, or logind session. It will be returned by :code:`sd_bus_creds_get_owner_uid()` if the process is not part of a systemd user unit or logind session. It will also be returned by :code:`sd_bus_creds_get_exe()` and :code:`sd_bus_creds_get_cmdline()` for kernel threads (since these are not started from an executable binary, nor have a command line), and by :code:`sd_bus_creds_get_audit_session_id()` and :code:`sd_bus_creds_get_audit_login_uid()` when the process is not part of an audit session, and :code:`sd_bus_creds_get_tty()` if the process has no controlling TTY.
+
+.. systemd:option:: -EINVAL
+
+   Specified pointer parameter is :code:`NULL`.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_creds_get_pid()`, :code:`sd_bus_creds_get_tid()`, :code:`sd_bus_creds_get_gid()`, :code:`sd_bus_creds_get_comm()`, :code:`sd_bus_creds_get_tid_comm()`, :code:`sd_bus_creds_get_exe()`, :code:`sd_bus_creds_get_cmdline()`, :code:`sd_bus_creds_get_cgroup()`, :code:`sd_bus_creds_get_unit()`, :code:`sd_bus_creds_get_user_unit()`, :code:`sd_bus_creds_get_slice()`, :code:`sd_bus_creds_get_session()`, :code:`sd_bus_creds_get_owner_uid()`, :code:`sd_bus_creds_has_effective_cap()`, :code:`sd_bus_creds_has_permitted_cap()`, :code:`sd_bus_creds_has_inheritable_cap()`, :code:`sd_bus_creds_has_bounding_cap()`, :code:`sd_bus_creds_get_selinux_context()`, :code:`sd_bus_creds_get_audit_session_id()`, :code:`sd_bus_creds_get_audit_login_uid()`, :code:`sd_bus_creds_get_unique_name()`, :code:`sd_bus_creds_get_well_known_names()`, :code:`sd_bus_creds_get_ppid()`, :code:`sd_bus_creds_get_uid()`, :code:`sd_bus_creds_get_euid()`, :code:`sd_bus_creds_get_suid()`, :code:`sd_bus_creds_get_fsuid()`, :code:`sd_bus_creds_get_egid()`, :code:`sd_bus_creds_get_sgid()`, :code:`sd_bus_creds_get_fsgid()`, :code:`sd_bus_creds_get_supplementary_gids()`, :code:`sd_bus_creds_get_tty()`, :code:`sd_bus_creds_get_description()`, and :code:`sd_bus_creds_get_user_slice()` were added in version 221.
+
+:code:`sd_bus_creds_get_pidfd_dup()` was added in version 256.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_creds_new_from_pid(3)`, :man-pages:`fork(2)`, :man-pages:`execve(2)`, :man-pages:`credentials(7)`, :man-pages:`free(3)`, :man-pages:`proc(5)`, :ref:`systemd.journal-fields(7)`
+
+

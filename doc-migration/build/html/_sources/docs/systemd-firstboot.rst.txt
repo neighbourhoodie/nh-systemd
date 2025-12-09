@@ -1,0 +1,272 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-firstboot
+:manvolnum: 1
+:summary: Initialize basic system settings on or before the first boot-up of a system
+:aliases: systemd-firstboot.service
+
+.. _systemd-firstboot(1):
+
+====================
+systemd-firstboot(1)
+====================
+
+Name
+####
+
+systemd-firstboot, systemd-firstboot.service — Initialize basic system settings on or before the first boot-up of a system
+
+Synopsis
+########
+
+:code:`systemd-firstboot [OPTIONS...]`
+
+:code:`systemd-firstboot.service`
+
+Description
+###########
+
+The :code:`systemd-firstboot.service` unit is one of the units which are used to initialize the machine configuration during "First Boot", i.e. when the system is freshly installed or after a factory reset. The :ref:`systemd(1)` manager itself will initialize :man-pages:`machine-id(5)` and preset all units, enabling or disabling them according to the :ref:`systemd.preset(5)` settings. :code:`systemd-firstboot.service` is started later to interactively initialize basic system configuration. It is started only if :code:`ConditionFirstBoot=yes` is met, which essentially means that :code:`/etc/` is unpopulated, see :ref:`systemd.unit(5)` for details. System credentials may be used to inject configuration; those settings are not queried interactively.
+
+The :code:`systemd-firstboot` command can also be used to non-interactively initialize an offline system image.
+
+The following settings may be configured:
+
+*    The machine ID of the system
+
+*    The system locale, more specifically the two locale variables :code:`LANG=` and :code:`LC_MESSAGES`
+
+*    The system keyboard map
+
+*    The system time zone
+
+*    The system hostname
+
+*    The kernel command line used when installing kernel images
+
+*    The root user's password and shell
+
+Each of the fields may either be queried interactively by users, set non-interactively on the tool's command line, or be copied from a host system that is used to set up the system image.
+
+If a setting is already initialized, it will not be overwritten and the user will not be prompted for the setting.
+
+Note that this tool operates directly on the file system and does not involve any running system services, unlike :man-pages:`localectl(1)`, :man-pages:`timedatectl(1)` or :man-pages:`hostnamectl(1)`. This allows :code:`systemd-firstboot` to operate on mounted but not booted disk images and in early boot. It is not recommended to use :code:`systemd-firstboot` on the running system after it has been set up.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --root=root
+
+   Takes a directory path as an argument. All paths will be prefixed with the given alternate :emphasis:`root` path, including config search paths. This is useful to operate on a system image mounted to the specified directory instead of the host system itself.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --image=path
+
+   Takes a path to a disk image file or block device node. If specified all operations are applied to file system in the indicated disk image. This is similar to :code:`--root=` but operates on file systems stored in disk images or block devices. The disk image should either contain just a file system or a set of file systems within a GPT partition table, following the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_. For further information on supported disk images, see :ref:`systemd-nspawn(1)`'s switch of the same name.
+
+   .. versionadded:: 246
+
+.. systemd:option:: --locale=LOCALE, --locale-messages=LOCALE
+
+   Sets the system locale, more specifically the :code:`LANG=` and :code:`LC_MESSAGES` settings. The argument should be a valid locale identifier, such as "de_DE.UTF-8". This controls the :man-pages:`locale.conf(5)` configuration file.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --keymap=KEYMAP
+
+   Sets the system keyboard layout. The argument should be a valid keyboard map, such as "de-latin1". This controls the "KEYMAP" entry in the :man-pages:`vconsole.conf(5)` configuration file.
+
+   .. versionadded:: 236
+
+.. systemd:option:: --timezone=TIMEZONE
+
+   Sets the system time zone. The argument should be a valid time zone identifier, such as "Europe/Berlin". This controls the :man-pages:`localtime(5)` symlink.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --hostname=HOSTNAME
+
+   Sets the system hostname. The argument should be a hostname, compatible with DNS. This controls the :man-pages:`hostname(5)` configuration file.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --setup-machine-id
+
+   Initialize the system's machine ID to a random ID. This controls the :man-pages:`machine-id(5)` file.
+
+   This option only works in combination with :code:`--root=` or :code:`--image=`. On a running system, :code:`machine-id` is written by the manager with help from :ref:`systemd-machine-id-commit.service(8)`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --machine-id=ID
+
+   Set the system's machine ID to the specified value. The same restrictions apply as to :code:`--setup-machine-id`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --root-password=PASSWORD, --root-password-file=PATH, --root-password-hashed=HASHED_PASSWORD
+
+   Sets the password of the system's root user. This creates/modifies the :die-net:`passwd(5)` and :die-net:`shadow(5)` files. This setting exists in three forms: :code:`--root-password=` accepts the password to set directly on the command line, :code:`--root-password-file=` reads it from a file and :code:`--root-password-hashed=` accepts an already hashed password on the command line. See :die-net:`shadow(5)` for more information on the format of the hashed password. Note that it is not recommended to specify plaintext passwords on the command line, as other users might be able to see them simply by invoking :die-net:`ps(1)`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --root-shell=SHELL
+
+   Sets the shell of the system's root user. This creates/modifies the :die-net:`passwd(5)` file.
+
+   .. versionadded:: 246
+
+.. systemd:option:: --kernel-command-line=CMDLINE
+
+   Sets the system's kernel command line. This controls the :code:`/etc/kernel/cmdline` file which is used by :man-pages:`kernel-install(8)`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: --prompt-locale, --prompt-keymap, --prompt-timezone, --prompt-hostname, --prompt-root-password, --prompt-root-shell
+
+   Prompt the user interactively for a specific basic setting. Note that any explicit configuration settings specified on the command line take precedence, and the user is not prompted for it.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --prompt
+
+   Query the user for locale, keymap, timezone, hostname, root's password, and root's shell. This is equivalent to specifying :code:`--prompt-locale`, :code:`--prompt-keymap`, :code:`--prompt-timezone`, :code:`--prompt-hostname`, :code:`--prompt-root-password`, :code:`--prompt-root-shell` in combination.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --prompt-keymap-auto
+
+   If invoked from a virtual terminal TTY equivalent to :code:`--prompt-keymap`, otherwise has no effect. Or in other words, only prompts interactively for a keymap if a local keyboard is used for interactivity that requires it.
+
+   .. versionadded:: 259
+
+.. systemd:option:: --copy-locale, --copy-keymap, --copy-timezone, --copy-root-password, --copy-root-shell
+
+   Copy a specific basic setting from the host. This only works in combination with :code:`--root=` or :code:`--image=`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --copy
+
+   Copy locale, keymap, time zone, root password and shell from the host. This is equivalent to specifying :code:`--copy-locale`, :code:`--copy-keymap`, :code:`--copy-timezone`, :code:`--copy-root-password`, :code:`--copy-root-shell` in combination.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --force
+
+   Write configuration even if the relevant files already exist. Without this option, :code:`systemd-firstboot` does not modify or replace existing files. Note that when configuring the root account, even with this option, :code:`systemd-firstboot` only modifies the entry of the "root" user, leaving other entries in :code:`/etc/passwd` and :code:`/etc/shadow` intact.
+
+   .. versionadded:: 246
+
+.. systemd:option:: --reset
+
+   If specified, all existing files that are configured by :code:`systemd-firstboot` are removed. Note that the files are removed regardless of whether they'll be configured with a new value or not. This operation ensures that the next boot of the image will be considered a first boot, and :code:`systemd-firstboot` will prompt again to configure each of the removed files.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --delete-root-password
+
+   Removes the password of the system's root user, enabling login as root without a password unless the root account is locked. Note that this is extremely insecure and hence this option should not be used lightly.
+
+   .. versionadded:: 246
+
+.. systemd:option:: --welcome=
+
+   Takes a boolean argument. By default, when prompting the user for configuration options a brief welcome text is shown before the first question is asked. Pass false to this option to turn off the welcome text.
+
+   .. versionadded:: 246
+
+.. systemd:option:: --chrome=
+
+   Takes a boolean argument. By default the initial setup screen will show reverse color "chrome" bars at the top and and the bottom of the terminal screen, which may be disabled by setting this option to false.
+
+   .. versionadded:: 259
+
+.. systemd:option:: --mute-console=
+
+   Takes a boolean argument. If true kernel log output and service manager status output to the system console is temporarily disabled while :code:`systemd-firstboot` is running, so that its own output is not interrupted. Defaults to false.
+
+   .. versionadded:: 259
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Credentials
+###########
+
+:code:`systemd-firstboot` supports the service credentials logic as implemented by :code:`ImportCredential=`/:code:`LoadCredential=`/:code:`SetCredential=` (see :ref:`systemd.exec(5)` for details). The following credentials are used when passed in:
+
+.. systemd:option:: passwd.hashed-password.root, passwd.plaintext-password.root
+   :group: system-credentials
+
+   A hashed or plaintext version of the root password to use, in place of prompting the user. These credentials are equivalent to the same ones defined for the :ref:`systemd-sysusers.service(8)` service.
+
+   .. versionadded:: 249
+
+.. systemd:option:: passwd.shell.root
+   :group: system-credentials
+
+   Specifies the shell binary to use for the specified account. Equivalent to the credential of the same name defined for the :ref:`systemd-sysusers.service(8)` service.
+
+   .. versionadded:: 249
+
+.. systemd:option:: firstboot.locale, firstboot.locale-messages
+   :group: system-credentials
+
+   These credentials specify the locale settings to set during first boot, in place of prompting the user.
+
+   .. versionadded:: 249
+
+.. systemd:option:: firstboot.keymap
+   :group: system-credentials
+
+   This credential specifies the keyboard setting to set during first boot, in place of prompting the user.
+
+   Note the relationship to the :systemd:var:`vconsole.keymap` credential understood by :ref:`systemd-vconsole-setup.service(8)`: both ultimately affect the same setting, but :systemd:var:`firstboot.keymap` is written into :code:`/etc/vconsole.conf` on first boot (if not already configured), and then read from there by :code:`systemd-vconsole-setup`, while :systemd:var:`vconsole.keymap` is read on every boot, and is not persisted to disk (but any configuration in :code:`vconsole.conf` will take precedence if present).
+
+   .. versionadded:: 249
+
+.. systemd:option:: firstboot.timezone
+   :group: system-credentials
+
+   This credential specifies the system timezone setting to set during first boot, in place of prompting the user.
+
+   .. versionadded:: 249
+
+Note that by default the :code:`systemd-firstboot.service` unit file is set up to inherit the listed credentials from the service manager. Thus, when invoking a container with an unpopulated :code:`/etc/` for the first time it is possible to configure the root user's password to be "systemd" like this:
+
+.. code-block:: sh
+
+   # systemd-nspawn --image=… --set-credential=firstboot.locale:de_DE.UTF-8 …
+
+Note that these credentials are only read and applied during the first boot. Once they are applied they remain applied for subsequent boots, and the credentials are not considered anymore.
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+Kernel Command Line
+###################
+
+.. systemd:option:: systemd.firstboot=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument, defaults to on. If off, :code:`systemd-firstboot.service` will not interactively query the user for basic settings at first boot, even if those settings are not initialized yet.
+
+   .. versionadded:: 233
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`locale.conf(5)`, :man-pages:`vconsole.conf(5)`, :man-pages:`localtime(5)`, :man-pages:`hostname(5)`, :man-pages:`machine-id(5)`, :die-net:`shadow(5)`, :ref:`systemd-machine-id-setup(1)`, :man-pages:`localectl(1)`, :man-pages:`timedatectl(1)`, :man-pages:`hostnamectl(1)`
+
+

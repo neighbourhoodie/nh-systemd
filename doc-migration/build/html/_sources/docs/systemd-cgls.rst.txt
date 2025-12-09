@@ -1,0 +1,103 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-cgls
+:manvolnum: 1
+:summary: Recursively show control group contents
+
+.. _systemd-cgls(1):
+
+===============
+systemd-cgls(1)
+===============
+
+Name
+####
+
+systemd-cgls — Recursively show control group contents
+
+Synopsis
+########
+
+:code:`systemd-cgls [OPTIONS...] [CGROUP...]`
+
+:code:`systemd-cgls [OPTIONS...] \--unit|\--user-unit [UNIT...]`
+
+Description
+###########
+
+:code:`systemd-cgls` recursively shows the contents of the selected Linux control group hierarchy in a tree. If arguments are specified, shows all member processes of the specified control groups plus all their subgroups and their members. The control groups may either be specified by their full file paths or are assumed in the systemd control group hierarchy. If no argument is specified and the current working directory is beneath the control group mount point :code:`/sys/fs/cgroup/`, shows the contents of the control group the working directory refers to. Otherwise, the full systemd control group hierarchy is shown.
+
+By default, empty control groups are not shown.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --all
+
+   Do not hide empty control groups in the output.
+
+.. systemd:option:: -l, --full
+
+   Do not ellipsize process tree members.
+
+   .. versionadded:: 198
+
+.. systemd:option:: -u, --unit
+
+   Show cgroup subtrees for the specified units.
+
+   .. versionadded:: 233
+
+.. systemd:option:: --user-unit
+
+   Show cgroup subtrees for the specified user units.
+
+   .. versionadded:: 233
+
+.. systemd:option:: -k
+
+   Include kernel threads in output.
+
+.. systemd:option:: -M MACHINE, --machine=MACHINE
+
+   Limit control groups shown to the part corresponding to the container :emphasis:`MACHINE`.
+
+   .. versionadded:: 203
+
+.. systemd:option:: -x, --xattr=
+
+   Controls whether to include information about extended attributes of the listed control groups in the output. With the long option, expects a boolean value. Defaults to no.
+
+   .. versionadded:: 250
+
+.. systemd:option:: -c, --cgroup-id=
+
+   Controls whether to include the numeric ID of the listed control groups in the output. With the long option, expects a boolean value. Defaults to no.
+
+   .. versionadded:: 250
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd-cgtop(1)`, :ref:`systemd-nspawn(1)`, :man-pages:`ps(1)`
+
+

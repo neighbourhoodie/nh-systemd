@@ -1,0 +1,83 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_varlink_push_fd
+:manvolnum: 3
+:summary: Submit a file descriptor to send along with the next outgoing Varlink message
+:aliases: sd_varlink_push_dup_fd
+
+.. _sd_varlink_push_fd(3):
+
+=====================
+sd_varlink_push_fd(3)
+=====================
+
+Name
+####
+
+sd_varlink_push_fd, sd_varlink_push_dup_fd — Submit a file descriptor to send along with the next outgoing Varlink message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-varlink.h>` .. code-block::
+
+   int sd_varlink_push_fd(sd_varlink *link,
+	int fd); .. code-block::
+
+   int sd_varlink_push_dup_fd(sd_varlink *link,
+	int fd);
+
+Description
+###########
+
+:code:`sd_varlink_push_fd()` submits a file descriptor to send along with the next outgoing Varlink message. Takes a Varlink connection object and a file descriptor as parameter. The file descriptor is not duplicated, and hence ownership of the file descriptor is passed to the Varlink connection object (only on success; on failure the caller retains ownership). Once the file descriptor has been written to the underlying transport socket it is automatically closed. The calling application code should not touch the file descriptor or close it on its own, otherwise it will interfere with the Varlink protocol implementation. This call is only supported if the backing transport supports file descriptor passing (effectively this means the functionality is supported on local :code:`AF_UNIX` only), and the concept is not part of the Varlink protocol, but simply a feature of the underlying transport.
+
+:code:`sd_varlink_push_dup_fd()` is identical to :code:`sd_varlink_push_fd()`, except that the file descriptor is duplicated automatically, and the calling application code hence retains ownership of the provided file descriptor, and must close it on its own.
+
+Note that file descriptor passing is only permitted after a call to :code:`sd_varlink_set_allow_fd_passing_output()` that enables it, otherwise these calls will fail with :code:`-EPERM`.
+
+Note that on Linux a maximum of 253 file descriptors may be enqueued on :code:`AF_UNIX` sockets at once. Attempting to enqueue more on a single Varlink message will fail with :code:`-ENOBUFS`.
+
+Return Value
+############
+
+On success, :code:`sd_varlink_push_fd()` and :code:`sd_varlink_push_dup_fd()` return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An argument is invalid.
+
+.. systemd:option:: -EBADF
+
+   The provided file descriptor is not valid.
+
+.. systemd:option:: -EPERM
+
+   File descriptor passing has not been enabled via :code:`sd_varlink_set_allow_fd_passing_output()`.
+
+.. systemd:option:: -ENOBUFS
+
+   The maximum of 253 file descriptors have already been submitted for the next outgoing Varlink message, no further descriptors may be enqueued for this message.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_varlink_push_fd()` and :code:`sd_varlink_push_dup_fd()` were added in version 257.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-varlink(3)`
+
+

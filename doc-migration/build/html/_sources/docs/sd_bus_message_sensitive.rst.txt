@@ -1,0 +1,60 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_sensitive
+:manvolnum: 3
+:summary: Mark a message object as containing sensitive data
+
+.. _sd_bus_message_sensitive(3):
+
+===========================
+sd_bus_message_sensitive(3)
+===========================
+
+Name
+####
+
+sd_bus_message_sensitive — Mark a message object as containing sensitive data
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_sensitive(sd_bus_message *message);
+
+Description
+###########
+
+:code:`sd_bus_message_sensitive()` marks an allocated bus message as containing sensitive data. This ensures that the message data is carefully removed from memory (specifically, overwritten with zero bytes) when released. It is recommended to mark all incoming and outgoing messages like this that contain security credentials and similar data that should be dealt with carefully. Note that it is not possible to unmark messages like this, it is a one way operation. If a message is already marked sensitive and then marked sensitive a second time the message remains marked so and no further operation is executed.
+
+As a safety precaution all messages that are created as reply to messages that are marked sensitive are also implicitly marked so.
+
+Return Value
+############
+
+On success, this functions return 0 or a positive integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`message` parameter is :code:`NULL`.
+
+   .. versionadded:: 245
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_sensitive()` was added in version 245.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_new_method_call(3)`
+
+

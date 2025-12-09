@@ -1,0 +1,38 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-sysupdated.service
+:manvolnum: 8
+:summary: System Update Service
+:aliases: systemd-sysupdated
+
+.. _systemd-sysupdated.service(8):
+
+=============================
+systemd-sysupdated.service(8)
+=============================
+
+Name
+####
+
+systemd-sysupdated.service, systemd-sysupdated — System Update Service
+
+Synopsis
+########
+
+:code:`systemd-sysupdated.service`
+
+:code:`/usr/lib/systemd/systemd-sysupdated`
+
+Description
+###########
+
+:code:`systemd-sysupdated` is a system service that allows unprivileged clients to update the system. It works by scanning the system for updateable "targets" (i.e. portable services, sysexts, sysupdate components, etc.) and exposing them on the bus. Each target then has methods that translate directly into invocations of :ref:`systemd-sysupdate(8)`.
+
+See :man-pages:`org.freedesktop.sysupdate1(5)` and :man-pages:`org.freedesktop.LogControl1(5)` for a description of the D-Bus API.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-sysupdate(8)`, :man-pages:`updatectl(1)`, :man-pages:`org.freedesktop.sysupdate1(5)`
+
+

@@ -1,0 +1,73 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_get_signature
+:manvolnum: 3
+:summary: Query bus message signature
+:aliases: sd_bus_message_is_empty, sd_bus_message_has_signature
+
+.. _sd_bus_message_get_signature(3):
+
+===============================
+sd_bus_message_get_signature(3)
+===============================
+
+Name
+####
+
+sd_bus_message_get_signature, sd_bus_message_is_empty, sd_bus_message_has_signature — Query bus message signature
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   const char* sd_bus_message_get_signature(sd_bus_message *message,
+	int complete); .. code-block::
+
+   int sd_bus_message_is_empty(sd_bus_message *message); .. code-block::
+
+   int sd_bus_message_has_signature(sd_bus_message *message,
+	const char *signature);
+
+Description
+###########
+
+:code:`sd_bus_message_get_signature()` returns the signature of message :code:`message`. If :code:`complete` is true, the signature of the whole message is returned, and just the signature of the currently open container otherwise.
+
+:code:`sd_bus_message_is_empty()` returns true if the message is empty, i.e. when its signature is empty.
+
+:code:`sd_bus_message_has_signature()` returns true if the signature of the message :code:`message` matches given :code:`signature`. Parameter :code:`signature` may be :code:`NULL`, this is treated the same as an empty string, which is equivalent to calling :code:`sd_bus_message_is_empty()`.
+
+Return Value
+############
+
+On success, :code:`sd_bus_message_get_signature()` returns the signature, and :code:`NULL` on error.
+
+The other functions return 0 or a positive integer on success. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`message` parameter is :code:`NULL`.
+
+.. systemd:constant:: NULL
+
+   The :code:`message` parameter is :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_get_signature()`, :code:`sd_bus_message_is_empty()`, and :code:`sd_bus_message_has_signature()` were added in version 240.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_new(3)`
+
+

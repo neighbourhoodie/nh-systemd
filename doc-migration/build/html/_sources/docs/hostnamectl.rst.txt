@@ -1,0 +1,132 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: hostnamectl
+:manvolnum: 1
+:summary: Control the system hostname
+
+.. _hostnamectl(1):
+
+==============
+hostnamectl(1)
+==============
+
+Name
+####
+
+hostnamectl — Control the system hostname
+
+Synopsis
+########
+
+:code:`hostnamectl [OPTIONS...] {COMMAND}`
+
+Description
+###########
+
+:code:`hostnamectl` may be used to query and change the system hostname and related settings.
+
+:ref:`systemd-hostnamed.service(8)` and this tool distinguish three different hostnames: the high-level "pretty" hostname which might include all kinds of special characters (e.g. "Lennart's Laptop"), the "static" hostname which is the user-configured hostname (e.g. "lennarts-laptop"), and the transient hostname which is a fallback value received from network configuration (e.g. "node12345678"). If a static hostname is set to a valid value, then the transient hostname is not used.
+
+Note that the pretty hostname has little restrictions on the characters and length used, while the static and transient hostnames are limited to the usually accepted characters of Internet domain names, and 64 characters at maximum (the latter being a Linux limitation).
+
+Use :ref:`systemd-firstboot(1)` to initialize the system hostname for mounted (but not booted) system images.
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: status
+
+   Show system hostname and related information. If no command is specified, this is the implied default.
+
+   .. versionadded:: 195
+
+.. systemd:option:: hostname [NAME]
+
+   If no argument is given, print the system hostname. If an optional argument :emphasis:`NAME` is provided then the command changes the system hostname to :emphasis:`NAME`. By default, this will alter the pretty, the static, and the transient hostname alike; however, if one or more of :code:`--static`, :code:`--transient`, :code:`--pretty` are used, only the selected hostnames are changed. If the pretty hostname is being set, and static or transient are being set as well, the specified hostname will be simplified in regards to the character set used before the latter are updated. This is done by removing special characters and spaces. This ensures that the pretty and the static hostname are always closely related while still following the validity rules of the specific name. This simplification of the hostname string is not done if only the transient and/or static hostnames are set, and the pretty hostname is left untouched.
+
+   The static and transient hostnames must each be either a single DNS label (a string composed of 7-bit ASCII lower-case characters and no spaces or dots, limited to the format allowed for DNS domain name labels), or a sequence of such labels separated by single dots that forms a valid DNS FQDN. The hostname must be at most 64 characters, which is a Linux limitation (DNS allows longer names).
+
+   .. include:: hostname.rst
+       :start-after: .. inclusion-marker-do-not-remove question-mark-hostname-pattern|
+       :end-before: .. inclusion-end-marker-do-not-remove question-mark-hostname-pattern|
+
+   .. versionadded:: 249
+
+.. systemd:option:: icon-name [NAME]
+
+   If no argument is given, print the icon name of the system. If an optional argument :emphasis:`NAME` is provided then the command changes the icon name to :emphasis:`NAME`. The icon name is used by some graphical applications to visualize this host. The icon name should follow the `Icon Naming Specification <https://specifications.freedesktop.org/icon-naming/latest>`_.
+
+   .. versionadded:: 249
+
+.. systemd:option:: chassis [TYPE]
+
+   If no argument is given, print the chassis type. If an optional argument :emphasis:`TYPE` is provided then the command changes the chassis type to :emphasis:`TYPE`. The chassis type is used by some graphical applications to visualize the host or alter user interaction. Currently, the following chassis types are defined: "desktop", "laptop", "convertible", "server", "tablet", "handset", "watch", "embedded", as well as the special chassis types "vm" and "container" for virtualized systems that lack an immediate physical chassis.
+
+   .. versionadded:: 249
+
+.. systemd:option:: deployment [ENVIRONMENT]
+
+   If no argument is given, print the deployment environment. If an optional argument :emphasis:`ENVIRONMENT` is provided then the command changes the deployment environment to :emphasis:`ENVIRONMENT`. Argument :emphasis:`ENVIRONMENT` must be a single word without any control characters. One of the following is suggested: "development", "integration", "staging", "production".
+
+   .. versionadded:: 249
+
+.. systemd:option:: location [LOCATION]
+
+   If no argument is given, print the location string for the system. If an optional argument :emphasis:`LOCATION` is provided then the command changes the location string for the system to :emphasis:`LOCATION`. Argument :emphasis:`LOCATION` should be a human-friendly, free-form string describing the physical location of the system, if it is known and applicable. This may be as generic as "Berlin, Germany" or as specific as "Left Rack, 2nd Shelf".
+
+   .. versionadded:: 249
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --static, --transient, --pretty
+
+   If :code:`status` is invoked (or no explicit command is given) and one of these switches is specified, :code:`hostnamectl` will print out just this selected hostname.
+
+   If used with :code:`hostname`, only the selected hostnames will be updated. When more than one of these switches are specified, all the specified hostnames will be updated.
+
+   .. versionadded:: 195
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove machine|
+    :end-before: .. inclusion-end-marker-do-not-remove machine|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove j|
+    :end-before: .. inclusion-end-marker-do-not-remove j|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`hostname(1)`, :man-pages:`hostname(5)`, :man-pages:`machine-info(5)`, :man-pages:`systemctl(1)`, :ref:`systemd-hostnamed.service(8)`, :ref:`systemd-firstboot(1)`
+
+

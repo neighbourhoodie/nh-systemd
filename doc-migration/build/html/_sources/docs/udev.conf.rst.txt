@@ -1,0 +1,99 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udev.conf
+:manvolnum: 5
+:summary: Configuration for device event managing daemon
+:aliases: udev.conf.d
+
+.. _udev.conf(5):
+
+============
+udev.conf(5)
+============
+
+Name
+####
+
+udev.conf, udev.conf.d — Configuration for device event managing daemon
+
+Synopsis
+########
+
+| :code:`/etc/udev/udev.conf`
+| :code:`/run/udev/udev.conf`
+| :code:`/usr/local/lib/udev/udev.conf`
+| :code:`/usr/lib/udev/udev.conf`
+| :code:`/etc/udev/udev.conf.d/\*.conf`
+| :code:`/run/udev/udev.conf.d/\*.conf`
+| :code:`/usr/local/lib/udev/udev.conf.d/\*.conf`
+| :code:`/usr/lib/udev/udev.conf.d/\*.conf`
+
+Description
+###########
+
+These files contain configuration options for :ref:`systemd-udevd(8)`. The syntax of these files is very simple: a list of assignments, one per line. All empty lines or lines beginning with "#" are ignored.
+
+The following options can be set:
+
+.. systemd:option:: udev_log=
+   :group: config-directives
+
+   The log level. Valid values are the numerical syslog priorities or their textual representations: :systemd:option:`err`, :systemd:option:`info` and :systemd:option:`debug`.
+
+   .. note::
+
+      This option is also honored by :man-pages:`udevadm(8)`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: children_max=
+   :group: config-directives
+
+   An integer. The maximum number of events executed in parallel. When unspecified or 0 is specified, the maximum is determined based on the system resources.
+
+   This is the same as the :systemd:option:`--children-max=` option.
+
+   .. versionadded:: 240
+
+.. systemd:option:: exec_delay=
+   :group: config-directives
+
+   An integer. Delay the execution of each :systemd:var:`RUN{:emphasis:`program`}` parameter by the given number of seconds. This option might be useful when debugging system crashes during coldplug caused by loading non-working kernel modules.
+
+   This is the same as the :systemd:option:`--exec-delay=` option.
+
+   .. versionadded:: 240
+
+.. systemd:option:: event_timeout=
+   :group: config-directives
+
+   An integer. The number of seconds to wait for events to finish. After this time, the event will be terminated. The default is 180 seconds.
+
+   This is the same as the :systemd:option:`--event-timeout=` option.
+
+   .. versionadded:: 240
+
+.. systemd:option:: resolve_names=
+   :group: config-directives
+
+   Specifies when systemd-udevd should resolve names of users and groups. When set to :systemd:option:`early` (the default), names will be resolved when the rules are parsed. When set to :systemd:option:`late`, names will be resolved for every event. When set to :systemd:option:`never`, names will never be resolved and all devices will be owned by root.
+
+   This is the same as the :systemd:option:`--resolve-names=` option.
+
+   .. versionadded:: 240
+
+.. systemd:option:: timeout_signal=
+   :group: config-directives
+
+   Specifies a signal that :code:`systemd-udevd` will send on worker timeouts. Note that both workers and spawned processes will be killed using this signal. Defaults to :systemd:option:`SIGKILL`.
+
+   .. versionadded:: 246
+
+In addition, :code:`systemd-udevd` can be configured by command line options and the kernel command line (see :ref:`systemd-udevd(8)`).
+
+See Also
+########
+
+:ref:`systemd-udevd(8)`, :man-pages:`udev(7)`, :man-pages:`udevadm(8)`
+
+

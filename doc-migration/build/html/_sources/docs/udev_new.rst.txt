@@ -1,0 +1,50 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udev_new
+:manvolnum: 3
+:summary: Create, acquire and release a udev context object
+:aliases: udev_ref, udev_unref
+
+.. _udev_new(3):
+
+===========
+udev_new(3)
+===========
+
+Name
+####
+
+udev_new, udev_ref, udev_unref — Create, acquire and release a udev context object
+
+Synopsis
+########
+
+:code:`#include <libudev.h>` .. code-block::
+
+   struct udev *udev_new(void); .. code-block::
+
+   struct udev *udev_ref(struct udev *udev); .. code-block::
+
+   struct udev *udev_unref(struct udev *udev);
+
+Description
+###########
+
+:code:`udev_new()` allocates a new udev context object and returns a pointer to it. This object is opaque and must not be accessed by the caller via different means than functions provided by libudev. Initially, the reference count of the context is 1. You can acquire further references, and drop gained references via :code:`udev_ref()` and :code:`udev_unref()`. Once the reference count hits 0, the context object is destroyed and freed.
+
+Return Value
+############
+
+On success, :code:`udev_new()` returns a pointer to the allocated udev context. On failure, :code:`NULL` is returned. :code:`udev_ref()` returns the argument that it was passed, unmodified. :code:`udev_unref()` always returns :code:`NULL`.
+
+History
+#######
+
+:code:`udev_new()`, :code:`udev_ref()`, and :code:`udev_unref()` were added in version 221.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-udevd.service(8)`
+
+

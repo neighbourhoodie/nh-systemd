@@ -1,0 +1,57 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_journal_get_usage
+:manvolnum: 3
+:summary: Journal disk usage
+
+.. _sd_journal_get_usage(3):
+
+=======================
+sd_journal_get_usage(3)
+=======================
+
+Name
+####
+
+sd_journal_get_usage — Journal disk usage
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>` .. code-block::
+
+   int sd_journal_get_usage(sd_journal *j,
+	uint64_t *bytes);
+
+Description
+###########
+
+:code:`sd_journal_get_usage()` determines the total disk space currently used by journal files (in bytes). If :code:`SD_JOURNAL_LOCAL_ONLY` was passed when opening the journal, this value will only reflect the size of journal files of the local host, otherwise of all hosts.
+
+Return Value
+############
+
+:code:`sd_journal_get_usage()` returns 0 on success or a negative errno-style error code.
+
+Notes
+#####
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove strict|
+    :end-before: .. inclusion-end-marker-do-not-remove strict|
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+History
+#######
+
+:code:`sd_journal_get_usage()` was added in version 190.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-journal(3)`, :ref:`sd_journal_open(3)`
+
+

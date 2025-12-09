@@ -1,0 +1,74 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_add_object_manager
+:manvolnum: 3
+:summary: Add a D-Bus object manager for a D-Bus object sub-tree
+
+.. _sd_bus_add_object_manager(3):
+
+============================
+sd_bus_add_object_manager(3)
+============================
+
+Name
+####
+
+sd_bus_add_object_manager — Add a D-Bus object manager for a D-Bus object sub-tree
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_add_object_manager(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *path);
+
+Description
+###########
+
+:code:`sd_bus_add_object_manager()` installs a handler for the given path that implements the :code:`GetManagedObjects()` method of the :code:`org.freedesktop.DBus.ObjectManager` interface. See `org.freedesktop.DBus.ObjectManager <https://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager>`_ for more information.
+
+To implement the :code:`InterfacesAdded` and :code:`InterfacesRemoved` signals of the :code:`org.freedesktop.DBus.ObjectManager` interface, call :ref:`sd_bus_emit_interfaces_added(3)` and :ref:`sd_bus_emit_interfaces_removed(3)` whenever interfaces are added or removed from the sub-tree, respectively.
+
+When :code:`sd_bus_add_object_manager()` succeeds, a slot is created internally. If the output parameter :emphasis:`slot` is :code:`NULL`, a "floating" slot object is created, see :ref:`sd_bus_slot_set_floating(3)`. Otherwise, a pointer to the slot object is returned. In that case, the reference to the slot object should be dropped when the object manager is not needed anymore, see :ref:`sd_bus_slot_unref(3)`.
+
+Return Value
+############
+
+On success, :code:`sd_bus_add_object_manager()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   One of the required parameters is :code:`NULL` or :code:`path` is not a valid object path.
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+.. systemd:option:: -ECHILD
+
+   The bus was created in a different process, library or module instance.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_add_object_manager()` was added in version 221.
+
+See Also
+########
+
+:ref:`sd-bus(3)`, :man-pages:`busctl(1)`, :ref:`sd_bus_add_object_vtable(3)`, :ref:`sd_bus_emit_interfaces_added(3)`, :ref:`sd_bus_slot_unref(3)`
+
+

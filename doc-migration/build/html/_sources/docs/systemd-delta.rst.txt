@@ -1,0 +1,118 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-delta
+:manvolnum: 1
+:summary: Find overridden configuration files
+
+.. _systemd-delta(1):
+
+================
+systemd-delta(1)
+================
+
+Name
+####
+
+systemd-delta — Find overridden configuration files
+
+Synopsis
+########
+
+:code:`systemd-delta [OPTIONS...] [PREFIX PREFIX/SUFFIX SUFFIX]`
+
+Description
+###########
+
+:code:`systemd-delta` may be used to identify and compare configuration files that override other configuration files. Files in :code:`/etc/` have highest priority, files in :code:`/run/` have the second highest priority, …, files in :code:`/usr/lib/` have lowest priority. Files in a directory with higher priority override files with the same name in directories of lower priority. In addition, certain configuration files can have ".d" directories which contain "drop-in" files with configuration snippets which augment the main configuration file. "Drop-in" files can be overridden in the same way by placing files with the same name in a directory of higher priority (except that, in case of "drop-in" files, both the "drop-in" file name and the name of the containing directory, which corresponds to the name of the main configuration file, must match). For a fuller explanation, see :ref:`systemd.unit(5)`.
+
+The command line argument will be split into a prefix and a suffix. Either is optional. The prefix must be one of the directories containing configuration files (:code:`/etc/`, :code:`/run/`, :code:`/usr/lib/`, …). If it is given, only overriding files contained in this directory will be shown. Otherwise, all overriding files will be shown. The suffix must be a name of a subdirectory containing configuration files like :code:`tmpfiles.d`, :code:`sysctl.d` or :code:`systemd/system`. If it is given, only configuration files in this subdirectory (across all configuration paths) will be analyzed. Otherwise, all configuration files will be analyzed. If the command line argument is not given at all, all configuration files will be analyzed. See below for some examples.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: -t, --type=
+
+   When listing the differences, only list those that are asked for. The list itself is a comma-separated list of desired difference types.
+
+   Recognized types are: .. systemd:option:: masked
+
+         Show masked files
+
+   .. systemd:option:: equivalent
+
+         Show overridden files that while overridden, do not differ in content.
+
+   .. systemd:option:: redirected
+
+         Show files that are redirected to another.
+
+   .. systemd:option:: overridden
+
+         Show overridden, and changed files.
+
+   .. systemd:option:: extended
+
+         Show :code:`*.conf` files in drop-in directories for units.
+
+         .. versionadded:: 205
+
+   .. systemd:option:: unchanged
+
+         Show unmodified files too.
+
+.. systemd:option:: --diff=
+
+   When showing modified files, when a file is overridden show a diff as well. This option takes a boolean argument. If omitted, it defaults to :code:`true`.
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+Examples
+########
+
+To see all local configuration:
+
+.. code-block:: sh
+
+   systemd-delta
+
+To see all runtime configuration:
+
+.. code-block:: sh
+
+   systemd-delta /run
+
+To see all system unit configuration changes:
+
+.. code-block:: sh
+
+   systemd-delta systemd/system
+
+To see all runtime "drop-in" changes for system units:
+
+.. code-block:: sh
+
+   systemd-delta --type=extended /run/systemd/system
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.unit(5)`
+
+

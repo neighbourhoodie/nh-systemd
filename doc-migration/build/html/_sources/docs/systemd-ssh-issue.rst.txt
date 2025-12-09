@@ -1,0 +1,71 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-ssh-issue
+:manvolnum: 1
+:summary: Generator for SSH login prompt drop-ins
+
+.. _systemd-ssh-issue(1):
+
+====================
+systemd-ssh-issue(1)
+====================
+
+Name
+####
+
+systemd-ssh-issue — Generator for SSH login prompt drop-ins
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/systemd-ssh-issue :code:`--make-vsock` /usr/lib/systemd/systemd-ssh-issue :code:`--rm-vsock``
+
+Description
+###########
+
+:code:`systemd-ssh-issue` is a small tool that generates a :code:`/run/issue.d/50-ssh-vsock.issue` drop-in file in case :code:`AF_VSOCK` support is available in the kernel and the VM environment. The file contains brief information about how to contact the local system via SSH-over-:code:`AF_VSOCK`, in particular it reports the system's :code:`AF_VSOCK` CID. The file is typically read and displayed by :man-pages:`agetty(8)` on console or serial login prompts.
+
+This tool is automatically used by :ref:`systemd-ssh-generator(8)` in the :code:`AF_VSOCK` socket units it generates.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --make-vsock
+
+   Generates the issue file. This command has no effect if called on systems lacking :code:`AF_VSOCK` support.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --rm-vsock
+
+   Removes the issue file if it exists.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --issue-path=
+
+   Changes the path to the issue file to write to/remove. If not specified, defaults to :code:`/run/issue.d/50-ssh-vsock.issue`. If specified as empty string or "-" writes the issue file contents to standard output.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-ssh-generator(8)`, :man-pages:`vsock(7)`, :man-pages:`ssh(1)`, :man-pages:`sshd(8)`, :man-pages:`agetty(8)`
+
+

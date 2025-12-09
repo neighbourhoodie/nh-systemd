@@ -1,0 +1,97 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_new_method_error
+:manvolnum: 3
+:summary: Create an error reply for a method call
+:aliases: sd_bus_message_new_method_errorf, sd_bus_message_new_method_errno, sd_bus_message_new_method_errnof
+
+.. _sd_bus_message_new_method_error(3):
+
+==================================
+sd_bus_message_new_method_error(3)
+==================================
+
+Name
+####
+
+sd_bus_message_new_method_error, sd_bus_message_new_method_errorf, sd_bus_message_new_method_errno, sd_bus_message_new_method_errnof — Create an error reply for a method call
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_new_method_error(sd_bus_message *call,
+	sd_bus_message **m,
+	const sd_bus_error *e); .. code-block::
+
+   int sd_bus_message_new_method_errorf(sd_bus_message *call,
+	sd_bus_message **m,
+	const char *name,
+	const char *format,
+	…); .. code-block::
+
+   int sd_bus_message_new_method_errno(sd_bus_message *call,
+	sd_bus_message **m,
+	int error,
+	const sd_bus_error *p); .. code-block::
+
+   int sd_bus_message_new_method_errnof(sd_bus_message *call,
+	sd_bus_message **m,
+	int error,
+	const char *format,
+	…);
+
+Description
+###########
+
+The :code:`sd_bus_message_new_method_error()` function creates a new bus message object that is an error reply to the :code:`call` message, and returns it in the :code:`m` output parameter. The error information from error :code:`e` is appended: the :code:`name` field of :code:`e` is used as the error identifier in the reply header (for example an error name such as "org.freedesktop.DBus.Error.NotSupported" or the equivalent symbolic :code:`SD_BUS_ERROR_NOT_SUPPORTED`), and the :code:`message` field is set as the human-readable error message string if present. The error :code:`e` must have the :code:`name` field set, see :ref:`sd_bus_error_is_set(3)`.
+
+The :code:`sd_bus_message_new_method_errorf()` function creates an error reply similarly to :code:`sd_bus_message_new_method_error()`, but instead of a ready error structure, it takes an error identifier string :code:`name`, plus a :man-pages:`printf(3)` format string :code:`format` and corresponding arguments. An error reply is sent with the error identifier :code:`name` and the formatted string as the message. :code:`name` and :code:`format` must not be :code:`NULL`.
+
+The :code:`sd_bus_message_new_method_errno()` function creates an error reply similarly to :code:`sd_bus_message_new_method_error()`, but in addition to the error structure :code:`p`, it takes an :man-pages:`errno(3)` error value in parameter :code:`error`. If the error :code:`p` is set (see :ref:`sd_bus_error_is_set(3)`), it is used in the reply. Otherwise, :code:`error` is translated to an error identifier and used to create a new error structure using :ref:`sd_bus_error_set_errno(3)` and that is used in the reply. (If :code:`error` is zero, no error is actually set, and an error reply with no information is created.)
+
+The :code:`sd_bus_message_new_method_errnof()` function creates an error reply similarly to :code:`sd_bus_message_new_method_error()`. It takes an :man-pages:`errno(3)` error value in parameter :code:`error`, plus a :man-pages:`printf(3)` format string :code:`format` and corresponding arguments. "%m" may be used in the format string to refer to the error string corresponding to the specified errno code. The error message is initialized using the error identifier generated from :code:`error` and the formatted string. (If :code:`error` is zero, no error is actually set, and an error reply with no information is created.)
+
+Return Value
+############
+
+These functions return 0 if the error reply was successfully created, and a negative errno-style error code otherwise.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The call message :code:`call` or the output parameter :code:`m` are :code:`NULL`.
+
+   Message :code:`call` is not a method call message.
+
+   The error :code:`e` parameter to :code:`sd_bus_message_new_method_error()` is not set, see :ref:`sd_bus_error_is_set(3)`.
+
+.. systemd:option:: -EPERM
+
+   Message :code:`call` has been sealed.
+
+.. systemd:option:: -ENOTCONN
+
+   The bus to which message :code:`call` is attached is not connected.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`
+
+

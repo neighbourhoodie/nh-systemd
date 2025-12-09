@@ -1,0 +1,134 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_journal_get_fd
+:manvolnum: 3
+:summary: Journal change notification interface
+:aliases: sd_journal_get_events, sd_journal_get_timeout, sd_journal_process, sd_journal_wait, sd_journal_reliable_fd, SD_JOURNAL_NOP, SD_JOURNAL_APPEND, SD_JOURNAL_INVALIDATE
+
+.. _sd_journal_get_fd(3):
+
+====================
+sd_journal_get_fd(3)
+====================
+
+Name
+####
+
+sd_journal_get_fd, sd_journal_get_events, sd_journal_get_timeout, sd_journal_process, sd_journal_wait, sd_journal_reliable_fd, SD_JOURNAL_NOP, SD_JOURNAL_APPEND, SD_JOURNAL_INVALIDATE — Journal change notification interface
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>` .. code-block::
+
+   int sd_journal_get_fd(sd_journal *j); .. code-block::
+
+   int sd_journal_get_events(sd_journal *j); .. code-block::
+
+   int sd_journal_get_timeout(sd_journal *j,
+	uint64_t *timeout_usec); .. code-block::
+
+   int sd_journal_process(sd_journal *j); .. code-block::
+
+   int sd_journal_wait(sd_journal *j,
+	uint64_t timeout_usec); .. code-block::
+
+   int sd_journal_reliable_fd(sd_journal *j);
+
+Description
+###########
+
+:code:`sd_journal_get_fd()` returns a file descriptor that may be asynchronously polled in an external event loop and is signaled as soon as the journal changes, because new entries or files were added, rotation took place, or files have been deleted, and similar. The file descriptor is suitable for usage in :man-pages:`poll(2)`. Use :code:`sd_journal_get_events()` for an events mask to watch for. The call takes one argument: the journal context object. Note that not all file systems are capable of generating the necessary events for wakeups from this file descriptor for changes to be noticed immediately. In particular network files systems do not generate suitable file change events in all cases. Cases like this can be detected with :code:`sd_journal_reliable_fd()`, below. :code:`sd_journal_get_timeout()` will ensure in these cases that wake-ups happen frequently enough for changes to be noticed, although with a certain latency.
+
+:code:`sd_journal_get_events()` will return the :code:`poll()` mask to wait for. This function will return a combination of :code:`POLLIN` and :code:`POLLOUT` and similar to fill into the ".events" field of :code:`struct pollfd`.
+
+:code:`sd_journal_get_timeout()` will return a timeout value for usage in :code:`poll()`. This returns a value in microseconds since the epoch of :code:`CLOCK_MONOTONIC` for timing out :code:`poll()` in :code:`timeout_usec`. See :man-pages:`clock_gettime(2)` for details about :code:`CLOCK_MONOTONIC`. If there is no timeout to wait for, this will fill in :code:`(uint64_t) -1` instead. Note that :code:`poll()` takes a relative timeout in milliseconds rather than an absolute timeout in microseconds. To convert the absolute 'us' timeout into relative 'ms', use code like the following:
+
+.. code-block:: sh
+
+   uint64_t t;
+   int msec;
+   sd_journal_get_timeout(m, &t);
+   if (t == (uint64_t) -1)
+     msec = -1;
+   else {
+     struct timespec ts;
+     uint64_t n;
+     clock_gettime(CLOCK_MONOTONIC, &ts);
+     n = (uint64_t) ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
+     msec = t > n ? (int) ((t - n + 999) / 1000) : 0;
+   }
+
+The code above does not do any error checking for brevity's sake. The calculated :code:`msec` integer can be passed directly as :code:`poll()`'s timeout parameter.
+
+After each :code:`poll()` wake-up :code:`sd_journal_process()` needs to be called to process events. This call will also indicate what kind of change has been detected (see below; note that spurious wake-ups are possible).
+
+A synchronous alternative for using :code:`sd_journal_get_fd()`, :code:`sd_journal_get_events()`, :code:`sd_journal_get_timeout()` and :code:`sd_journal_process()` is :code:`sd_journal_wait()`. It will synchronously wait until the journal gets changed. The maximum time this call sleeps may be controlled with the :code:`timeout_usec` parameter. Pass :code:`(uint64_t) -1` to wait indefinitely. Internally this call simply combines :code:`sd_journal_get_fd()`, :code:`sd_journal_get_events()`, :code:`sd_journal_get_timeout()`, :code:`poll()` and :code:`sd_journal_process()` into one.
+
+:code:`sd_journal_reliable_fd()` may be used to check whether the wake-up events from the file descriptor returned by :code:`sd_journal_get_fd()` are known to be quickly triggered. On certain file systems where file change events from the OS are not available (such as NFS) changes need to be polled for repeatedly, and hence are detected only with a considerable latency. This call will return a positive value if the journal changes are detected quickly and zero when they need to be polled for. Note that there is usually no need to invoke this function directly as :code:`sd_journal_get_timeout()` will request appropriate timeouts anyway.
+
+Note that all of the above change notification interfaces do not report changes instantly. Latencies are introduced for multiple reasons: as mentioned certain storage backends require time-based polling, in other cases wake-ups are optimized by coalescing events, and the OS introduces additional IO/CPU scheduling latencies.
+
+Return Value
+############
+
+:code:`sd_journal_get_fd()` returns a valid file descriptor on success or a negative errno-style error code.
+
+:code:`sd_journal_get_events()` returns a combination of :code:`POLLIN`, :code:`POLLOUT` and suchlike on success or a negative errno-style error code.
+
+:code:`sd_journal_reliable_fd()` returns a positive integer if the file descriptor returned by :code:`sd_journal_get_fd()` will generate wake-ups immediately for all journal changes. Returns 0 if there might be a latency involved.
+
+:code:`sd_journal_process()` and :code:`sd_journal_wait()` return a negative errno-style error code, or one of :code:`SD_JOURNAL_NOP`, :code:`SD_JOURNAL_APPEND` or :code:`SD_JOURNAL_INVALIDATE` on success:
+
+*    If :code:`SD_JOURNAL_NOP` is returned, the journal did not change since the last invocation.
+
+*    If :code:`SD_JOURNAL_APPEND` is returned, new entries have been appended to the end of the journal. In this case, it is sufficient to simply continue reading at the previous end location of the journal, to read the newly added entries.
+
+*    If :code:`SD_JOURNAL_INVALIDATE`, journal files were added to or removed from the set of journal files watched (e.g. due to rotation or vacuuming), and thus entries might have appeared or disappeared at arbitrary places in the log stream, possibly before or after the previous end of the log stream. If :code:`SD_JOURNAL_INVALIDATE` is returned, live-view UIs that want to reflect on screen the precise state of the log data on disk should probably refresh their entire display (relative to the cursor of the log entry on the top of the screen). Programs only interested in a strictly sequential stream of log data may treat :code:`SD_JOURNAL_INVALIDATE` the same way as :code:`SD_JOURNAL_APPEND`, thus ignoring any changes to the log view earlier than the old end of the log stream.
+
+Signal safety
+#############
+
+In general, :code:`sd_journal_get_fd()`, :code:`sd_journal_get_events()`, and :code:`sd_journal_get_timeout()` are *not* "async signal safe" in the meaning of "async signal safe" in the meaning of :man-pages:`signal-safety(7)`. Nevertheless, only the first call to any of those three functions performs unsafe operations, so subsequent calls *are* safe. safe.
+
+:code:`sd_journal_process()` and :code:`sd_journal_wait()` are not safe. :code:`sd_journal_reliable_fd()` is safe.
+
+Notes
+#####
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove strict|
+    :end-before: .. inclusion-end-marker-do-not-remove strict|
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+Examples
+########
+
+Iterating through the journal, in a live view tracking all changes:
+
+.. literalinclude:: /code-examples/c/journal-iterate-wait.c
+    :language: c
+
+Waiting with :code:`poll()` (this example lacks all error checking for the sake of simplicity):
+
+.. literalinclude:: /code-examples/c/journal-iterate-poll.c
+    :language: c
+
+History
+#######
+
+:code:`sd_journal_get_fd()`, :code:`sd_journal_process()`, and :code:`sd_journal_wait()` were added in version 187.
+
+:code:`sd_journal_reliable_fd()` was added in version 196.
+
+:code:`sd_journal_get_events()` and :code:`sd_journal_get_timeout()` were added in version 201.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-journal(3)`, :ref:`sd_journal_open(3)`, :ref:`sd_journal_next(3)`, :man-pages:`poll(2)`, :man-pages:`clock_gettime(2)`
+
+

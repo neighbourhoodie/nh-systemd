@@ -1,0 +1,354 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.journal-fields
+:manvolnum: 7
+:summary: Special journal fields
+
+.. _systemd.journal-fields(7):
+
+=========================
+systemd.journal-fields(7)
+=========================
+
+Name
+####
+
+systemd.journal-fields — Special journal fields
+
+Description
+###########
+
+Entries in the journal (as written by :ref:`systemd-journald.service(8)`) resemble a UNIX process environment block in syntax but with field values that may include binary data, and with non-unique field names permitted. Primarily, field values are formatted UTF-8 text strings — binary encoding is used only where formatting as UTF-8 text strings makes little sense. New fields may freely be defined by applications, but a few fields have special meanings, which are listed below. Typically, fields may only appear once per log entry, however there are special exceptions: some fields may appear more than once per entry, in which case this is explicitly mentioned below. Even though the logging subsystem makes no restrictions on which fields to accept non-unique values for, it is strongly recommended to avoid relying on this for the fields listed below (except where listed otherwise, as mentioned) in order to avoid unnecessary incompatibilities with other applications.
+
+User Journal Fields
+###################
+
+User fields are fields that are directly passed from clients and stored in the journal.
+
+.. systemd:option:: MESSAGE=
+   :group: journal-directives
+
+   The human-readable message string for this entry. This is supposed to be the primary text shown to the user. It is usually not translated (but might be in some cases), and is not supposed to be parsed for metadata. In order to encode multiple lines in a single log entry, separate them by newline characters (ASCII code 10), but encode them as a single :systemd:var:`MESSAGE=` field. Do not add multiple values of this field type to the same entry (also see above), as consuming applications generally do not expect this and are unlikely to show all values in that case.
+
+.. systemd:option:: MESSAGE_ID=
+   :group: journal-directives
+
+   A 128-bit message identifier ID for recognizing certain message types, if this is desirable. This should contain a 128-bit ID formatted as a lower-case hexadecimal string, without any separating dashes or suchlike. This is recommended to be a UUID-compatible ID, but this is not enforced, and formatted differently. Developers can generate a new ID for this purpose with :code:`systemd-id128 new`.
+
+.. systemd:option:: PRIORITY=
+   :group: journal-directives
+
+   A priority value between 0 ("emerg") and 7 ("debug") formatted as a decimal string. This field is compatible with syslog's priority concept.
+
+.. systemd:option:: CODE_FILE=, CODE_LINE=, CODE_FUNC=
+   :group: journal-directives
+
+   The code location generating this message, if known. Contains the source filename, the line number and the function name.
+
+.. systemd:option:: ERRNO=
+   :group: journal-directives
+
+   The low-level Unix error number causing this entry, if any. Contains the numeric value of :man-pages:`errno(3)` formatted as a decimal string.
+
+   .. versionadded:: 188
+
+.. systemd:option:: INVOCATION_ID=, USER_INVOCATION_ID=
+   :group: journal-directives
+
+   A randomized, unique 128-bit ID identifying each runtime cycle of the unit. This is different from :systemd:var:`_SYSTEMD_INVOCATION_ID` in that it is only used for messages coming from systemd code (e.g. logs from the system/user manager or from forked processes performing systemd-related setup).
+
+   .. versionadded:: 245
+
+.. systemd:option:: SYSLOG_FACILITY=, SYSLOG_IDENTIFIER=, SYSLOG_PID=, SYSLOG_TIMESTAMP=
+   :group: journal-directives
+
+   Syslog compatibility fields containing the facility (formatted as decimal string), the identifier string (i.e. "tag"), the client PID, and the timestamp as specified in the original datagram. (Note that the tag is usually derived from glibc's :systemd:var:`program_invocation_short_name` variable, see :die-net:`program_invocation_short_name(3)`.)
+
+   Note that the journal service does not validate the values of any structured journal fields whose name is not prefixed with an underscore, and this includes any syslog related fields such as these. Hence, applications that supply a facility, PID, or log level are expected to do so properly formatted, i.e. as integers formatted as decimals.
+
+.. systemd:option:: SYSLOG_RAW=
+   :group: journal-directives
+
+   The original contents of the syslog line as received in the syslog datagram. This field is only included if the :systemd:var:`MESSAGE=` field was modified compared to the original payload or the timestamp could not be located properly and is not included in :systemd:var:`SYSLOG_TIMESTAMP=`. Message truncation occurs when the message contains leading or trailing whitespace (trailing and leading whitespace is stripped), or it contains an embedded :systemd:constant:`NUL` byte (the :systemd:constant:`NUL` byte and anything after it is not included). Thus, the original syslog line is either stored as :systemd:var:`SYSLOG_RAW=` or it can be recreated based on the stored priority and facility, timestamp, identifier, and the message payload in :systemd:var:`MESSAGE=`.
+
+   .. versionadded:: 240
+
+.. systemd:option:: DOCUMENTATION=
+   :group: journal-directives
+
+   A documentation URL with further information about the topic of the log message. Tools such as :code:`journalctl` will include a hyperlink to a URL specified this way in their output. Should be an "http://", "https://", "file:/", "man:" or "info:" URL.
+
+   .. versionadded:: 246
+
+.. systemd:option:: TID=
+   :group: journal-directives
+
+   The numeric thread ID (TID) the log message originates from.
+
+   .. versionadded:: 247
+
+.. systemd:option:: UNIT=, USER_UNIT=
+   :group: journal-directives
+
+   The name of a unit. Used by the system and user managers when logging about specific units.
+
+   When :systemd:option:`--unit=:emphasis:`name`` or :systemd:option:`--user-unit=:emphasis:`name`` are used with :man-pages:`journalctl(1)`, a match pattern that includes "UNIT=:emphasis:`name`.service" or "USER_UNIT=:emphasis:`name`.service" will be generated.
+
+   .. versionadded:: 251
+
+Trusted Journal Fields
+######################
+
+Fields prefixed with an underscore are trusted fields, i.e. fields that are implicitly added by the journal and cannot be altered by client code.
+
+.. systemd:option:: _PID=, _UID=, _GID=
+   :group: journal-directives
+
+   The process number, user number, and group number of the process the journal entry originates from formatted as decimals. Note that entries obtained via "stdout" or "stderr" of forked processes will contain credentials valid for a parent process (that initiated the connection to :code:`systemd-journald`).
+
+.. systemd:option:: _COMM=, _EXE=, _CMDLINE=
+   :group: journal-directives
+
+   The name, the executable path, and the command line of the process the journal entry originates from.
+
+.. systemd:option:: _CAP_EFFECTIVE=
+   :group: journal-directives
+
+   The effective :man-pages:`capabilities(7)` of the process the journal entry originates from.
+
+   .. versionadded:: 206
+
+.. systemd:option:: _AUDIT_SESSION=, _AUDIT_LOGINUID=
+   :group: journal-directives
+
+   The session and login UID of the process the journal entry originates from, as maintained by the kernel audit subsystem.
+
+.. systemd:option:: _SYSTEMD_CGROUP=, _SYSTEMD_SLICE=, _SYSTEMD_UNIT=, _SYSTEMD_USER_UNIT=, _SYSTEMD_USER_SLICE=, _SYSTEMD_SESSION=, _SYSTEMD_OWNER_UID=
+   :group: journal-directives
+
+   The control group path in the systemd hierarchy, the systemd slice unit name, the systemd unit name, the unit name in the systemd user manager (if any), the systemd session ID (if any), and the owner UID of the systemd user unit or systemd session (if any) of the process the journal entry originates from.
+
+.. systemd:option:: _SELINUX_CONTEXT=
+   :group: journal-directives
+
+   The SELinux security context (label) of the process the journal entry originates from.
+
+.. systemd:option:: _SOURCE_REALTIME_TIMESTAMP=
+   :group: journal-directives
+
+   The earliest trusted timestamp of the message, if any is known that is different from the reception time of the journal. The timestamp is the :systemd:constant:`CLOCK_REALTIME` time in microseconds, formatted as a decimal.
+
+.. systemd:option:: _SOURCE_BOOTTIME_TIMESTAMP=
+   :group: journal-directives
+
+   The earliest trusted timestamp of the message in the :systemd:constant:`CLOCK_BOOTTIME` time, in the same format as :systemd:var:`_SOURCE_REALTIME_TIMESTAMP=`.
+
+   .. versionadded:: 257
+
+.. systemd:option:: _BOOT_ID=
+   :group: journal-directives
+
+   The kernel boot ID for the boot the message was generated in, formatted as a 128-bit hexadecimal string.
+
+.. systemd:option:: _MACHINE_ID=
+   :group: journal-directives
+
+   The machine ID of the originating host, as described in :man-pages:`machine-id(5)`.
+
+.. systemd:option:: _SYSTEMD_INVOCATION_ID=
+   :group: journal-directives
+
+   The invocation ID for the runtime cycle of the unit the message was generated in, as available to processes of the unit in :systemd:var:`$INVOCATION_ID` (see :ref:`systemd.exec(5)`).
+
+   .. versionadded:: 233
+
+.. systemd:option:: _HOSTNAME=
+   :group: journal-directives
+
+   The hostname of the originating host.
+
+.. systemd:option:: _TRANSPORT=
+   :group: journal-directives
+
+   How the entry was received by the journal service. Valid transports are:
+
+   .. systemd:option:: audit
+      :group: journal-directives
+
+         for those read from the kernel audit subsystem
+
+         .. versionadded:: 227
+
+   .. systemd:option:: driver
+      :group: journal-directives
+
+         for internally generated messages
+
+         .. versionadded:: 205
+
+   .. systemd:option:: syslog
+      :group: journal-directives
+
+         for those received via the local syslog socket with the syslog protocol
+
+         .. versionadded:: 205
+
+   .. systemd:option:: journal
+      :group: journal-directives
+
+         for those received via the native journal protocol
+
+         .. versionadded:: 205
+
+   .. systemd:option:: stdout
+      :group: journal-directives
+
+         for those read from a service's standard output or error output
+
+         .. versionadded:: 205
+
+   .. systemd:option:: kernel
+      :group: journal-directives
+
+         for those read from the kernel
+
+         .. versionadded:: 205
+
+.. systemd:option:: _STREAM_ID=
+   :group: journal-directives
+
+   Only applies to "_TRANSPORT=stdout" records: specifies a randomized 128-bit ID assigned to the stream connection when it was first created. This ID is useful to reconstruct individual log streams from the log records: all log records carrying the same stream ID originate from the same stream.
+
+   .. versionadded:: 235
+
+.. systemd:option:: _LINE_BREAK=
+   :group: journal-directives
+
+   Only applies to "_TRANSPORT=stdout" records: indicates that the log message in the standard output/error stream was not terminated with a normal newline character ("\\n", i.e. ASCII 10). Specifically, when set this field is one of :systemd:option:`nul` (in case the line was terminated by a :systemd:constant:`NUL` byte), :systemd:option:`line-max` (in case the maximum log line length was reached, as configured with :systemd:var:`LineMax=` in :man-pages:`journald.conf(5)`), :systemd:option:`eof` (if this was the last log record of a stream and the stream ended without a final newline character), or :systemd:option:`pid-change` (if the process which generated the log output changed in the middle of a line). Note that this record is not generated when a normal newline character was used for marking the log line end.
+
+   .. versionadded:: 235
+
+.. systemd:option:: _NAMESPACE=
+   :group: journal-directives
+
+   If this file was written by a :code:`systemd-journald` instance managing a journal namespace that is not the default, this field contains the namespace identifier. See :ref:`systemd-journald.service(8)` for details about journal namespaces.
+
+   .. versionadded:: 245
+
+.. systemd:option:: _RUNTIME_SCOPE=
+   :group: journal-directives
+
+   A string field that specifies the runtime scope in which the message was logged. If "initrd", the log message was processed while the system was running inside the initrd. If "system", the log message was generated after the system switched execution to the host root filesystem.
+
+   .. versionadded:: 252
+
+Kernel Journal Fields
+#####################
+
+Kernel fields are fields that are used by messages originating in the kernel and stored in the journal.
+
+.. systemd:option:: _KERNEL_DEVICE=
+   :group: journal-directives
+
+   The kernel device name. If the entry is associated to a block device, contains the major and minor numbers of the device node, separated by ":" and prefixed by "b". Similarly for character devices, but prefixed by "c". For network devices, this is the interface index prefixed by "n". For all other devices, this is the subsystem name prefixed by "+", followed by ":", followed by the kernel device name.
+
+   .. versionadded:: 189
+
+.. systemd:option:: _KERNEL_SUBSYSTEM=
+   :group: journal-directives
+
+   The kernel subsystem name.
+
+   .. versionadded:: 189
+
+.. systemd:option:: _UDEV_SYSNAME=
+   :group: journal-directives
+
+   The kernel device name as it shows up in the device tree below :code:`/sys/`.
+
+   .. versionadded:: 189
+
+.. systemd:option:: _UDEV_DEVNODE=
+   :group: journal-directives
+
+   The device node path of this device in :code:`/dev/`.
+
+   .. versionadded:: 189
+
+.. systemd:option:: _UDEV_DEVLINK=
+   :group: journal-directives
+
+   Additional symlink names pointing to the device node in :code:`/dev/`. This field is frequently set more than once per entry.
+
+   .. versionadded:: 189
+
+Fields to log on behalf of a different program
+##############################################
+
+Fields in this section are used by programs to specify that they are logging on behalf of another program or unit.
+
+Fields used by the :code:`systemd-coredump` coredump kernel helper:
+
+.. systemd:option:: COREDUMP_UNIT=, COREDUMP_USER_UNIT=
+   :group: journal-directives
+
+   Used to annotate messages containing coredumps from system and session units. See :man-pages:`coredumpctl(1)`.
+
+   .. versionadded:: 198
+
+Privileged programs (currently UID 0) may attach :code:`OBJECT_PID=` to a message. This will instruct :code:`systemd-journald` to attach additional fields on behalf of the caller:
+
+.. systemd:constant:: OBJECT_PID=PID
+   :group: journal-directives
+
+   PID of the program that this message pertains to.
+
+   .. versionadded:: 205
+
+.. systemd:option:: OBJECT_UID=, OBJECT_GID=, OBJECT_COMM=, OBJECT_EXE=, OBJECT_CMDLINE=, OBJECT_AUDIT_SESSION=, OBJECT_AUDIT_LOGINUID=, OBJECT_SYSTEMD_CGROUP=, OBJECT_SYSTEMD_SESSION=, OBJECT_SYSTEMD_OWNER_UID=, OBJECT_SYSTEMD_UNIT=, OBJECT_SYSTEMD_USER_UNIT=
+   :group: journal-directives
+
+   These are additional fields added automatically by :code:`systemd-journald`. Their meaning is the same as :systemd:var:`_UID=`, :systemd:var:`_GID=`, :systemd:var:`_COMM=`, :systemd:var:`_EXE=`, :systemd:var:`_CMDLINE=`, :systemd:var:`_AUDIT_SESSION=`, :systemd:var:`_AUDIT_LOGINUID=`, :systemd:var:`_SYSTEMD_CGROUP=`, :systemd:var:`_SYSTEMD_SESSION=`, :systemd:var:`_SYSTEMD_UNIT=`, :systemd:var:`_SYSTEMD_USER_UNIT=`, and :systemd:var:`_SYSTEMD_OWNER_UID=` as described above, except that the process identified by :emphasis:`PID` is described, instead of the process which logged the message.
+
+   .. versionadded:: 205
+
+.. systemd:option:: OBJECT_SYSTEMD_INVOCATION_ID=
+   :group: journal-directives
+
+   An additional field added automatically by :code:`systemd-journald`. The meaning is mostly the same as :systemd:var:`_SYSTEMD_INVOCATION_ID=`, with the difference described above.
+
+   .. versionadded:: 235
+
+Address Fields
+##############
+
+During serialization into external formats, such as the `Journal Export Format <https://systemd.io/JOURNAL_EXPORT_FORMATS#journal-export-format>`_ or the `Journal JSON Format <https://systemd.io/JOURNAL_EXPORT_FORMATS#journal-json-format>`_, the addresses of journal entries are serialized into fields prefixed with double underscores. Note that these are not proper fields when stored in the journal but for addressing metadata of entries. They cannot be written as part of structured log entries via calls such as :ref:`sd_journal_send(3)`. They may also not be used as matches for :ref:`sd_journal_add_match(3)`.
+
+.. systemd:option:: __CURSOR=
+   :group: journal-directives
+
+   The cursor for the entry. A cursor is an opaque text string that uniquely describes the position of an entry in the journal and is portable across machines, platforms and journal files.
+
+.. systemd:option:: __REALTIME_TIMESTAMP=
+   :group: journal-directives
+
+   The wallclock time (:systemd:constant:`CLOCK_REALTIME`) at the point in time the entry was received by the journal, in microseconds since the epoch UTC, formatted as a decimal. This has different properties from "_SOURCE_REALTIME_TIMESTAMP=", as it is usually a bit later but more likely to be monotonic.
+
+.. systemd:option:: __MONOTONIC_TIMESTAMP=
+   :group: journal-directives
+
+   The monotonic time (:systemd:constant:`CLOCK_MONOTONIC`) at the point in time the entry was received by the journal in microseconds, formatted as a decimal. To be useful as an address for the entry, this should be combined with the boot ID in "_BOOT_ID=".
+
+.. systemd:option:: __SEQNUM=, __SEQNUM_ID=
+   :group: journal-directives
+
+   The sequence number (and associated sequence number ID) of this journal entry in the journal file it originates from. See :ref:`sd_journal_get_seqnum(3)` for details.
+
+   .. versionadded:: 254
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-journald.service(8)`, :man-pages:`journalctl(1)`, :man-pages:`journald.conf(5)`, :ref:`sd-journal(3)`, :man-pages:`coredumpctl(1)`, :ref:`systemd.directives(7)`
+
+

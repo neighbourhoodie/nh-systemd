@@ -1,0 +1,66 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-hibernate-resume-generator
+:manvolnum: 8
+:summary: Unit generator for resume= kernel parameter
+
+.. _systemd-hibernate-resume-generator(8):
+
+=====================================
+systemd-hibernate-resume-generator(8)
+=====================================
+
+Name
+####
+
+systemd-hibernate-resume-generator — Unit generator for resume= kernel parameter
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-hibernate-resume-generator`
+
+Description
+###########
+
+:code:`systemd-hibernate-resume-generator` is a generator that initiates the procedure to resume the system from hibernation. When :code:`resume=` kernel command line option or :code:`HibernateLocation` EFI variable is detected, it enables the :ref:`systemd-hibernate-resume.service(8)` unit, which will instruct the kernel to resume the system from the hibernation image.
+
+Kernel Command Line
+###################
+
+:code:`systemd-hibernate-resume-generator` understands the following kernel command line parameters:
+
+.. systemd:option:: resume=
+   :group: kernel-commandline-options
+
+   Takes a path to the resume device. Both persistent block device paths like :code:`/dev/disk/by-foo/bar` and :man-pages:`fstab(5)`-style specifiers like "FOO=bar" are supported.
+
+   .. versionadded:: 217
+
+.. systemd:option:: resume_offset=
+   :group: kernel-commandline-options
+
+   Takes the page offset of the swap space from the resume device. Defaults to "0".
+
+   .. versionadded:: 254
+
+.. systemd:option:: resumeflags=
+   :group: kernel-commandline-options
+
+   Takes the resume device mount options to use. Defaults :systemd:var:`rootflags=` if not specified.
+
+   .. versionadded:: 243
+
+.. systemd:option:: noresume
+   :group: kernel-commandline-options
+
+   Do not try to resume from hibernation. If this parameter is present, :systemd:var:`resume=` is ignored.
+
+   .. versionadded:: 240
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-hibernate-resume.service(8)`, :man-pages:`kernel-command-line(7)`
+
+

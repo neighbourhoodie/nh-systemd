@@ -1,0 +1,1380 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="systemd-boot-check-no-failures.service(8)" href="systemd-boot-check-no-failures.service.html"><link rel="prev" title="systemd-bless-boot.service(8)" href="systemd-bless-boot.service.html">
+        <link rel="prefetch" href="../_static/systemd-logo.svg" as="image">
+        <link rel="prefetch" href="../_static/systemd-logo-dark.svg" as="image">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>systemd-boot(7)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6e47b7e0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #35a764;
+  --color-brand-content: #35a764;
+  --color-brand-visited: #197b43;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">systemd</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/systemd-logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/systemd-logo-dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">B</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="binfmt.d.html">binfmt.d(5) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootctl.html">bootctl(1) — Control EFI firmware boot settings and manage boot loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootup.html">bootup(7) — System bootup process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="busctl.html">busctl(1) — Introspect the bus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capsule%40.service.html">capsule@.service(5) — System unit for the capsule service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredump.conf.html">coredump.conf(5) — Core dump storage configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredumpctl.html">coredumpctl(1) — Retrieve and process saved core dumps and metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypttab.html">crypttab(5) — Configuration for encrypted block devices</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">D</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daemon.html">daemon(7) — Writing and packaging system daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dnssec-trust-anchors.d.html">dnssec-trust-anchors.d(5) — DNSSEC trust anchor configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">E</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment.d.html">environment.d(5) — Definition of user service environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">F</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-hierarchy.html">file-hierarchy(7) — File system hierarchy overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">H</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="homectl.html">homectl(1) — Create, remove, change or inspect home directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homed.conf.html">homed.conf(5) — Home area/user account manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostname.html">hostname(5) — Local hostname configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostnamectl.html">hostnamectl(1) — Control the system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hwdb.html">hwdb(7) — Hardware Database</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">I</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="importctl.html">importctl(1) — Download, import or export disk images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integritytab.html">integritytab(5) — Configuration for integrity block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocost.conf.html">iocost.conf(5) — Configuration files for the iocost solution manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">J</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="journal-remote.conf.html">journal-remote.conf(5) — Configuration files for the service accepting remote journal uploads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal-upload.conf.html">journal-upload.conf(5) — Configuration files for the journal upload service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journalctl.html">journalctl(1) — Print log entries from the systemd journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journald.conf.html">journald.conf(5) — Journal service configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">K</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kernel-command-line.html">kernel-command-line(7) — Kernel command line parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-install.html">kernel-install(8) — Add and remove kernel and initrd images to and from the boot partition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">L</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libsystemd.html">libsystemd(3) — Functions for implementing services and interacting with systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libudev.html">libudev(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.conf.html">loader.conf(5) — Configuration file for systemd-boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locale.conf.html">locale.conf(5) — Configuration file for locale settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localectl.html">localectl(1) — Control the system locale and keyboard layout settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localtime.html">localtime(5) — Local timezone configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loginctl.html">loginctl(1) — Control the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logind.conf.html">logind.conf(5) — Login manager configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">M</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="machine-id.html">machine-id(5) — Local machine ID configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machine-info.html">machine-info(5) — Local machine information file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machinectl.html">machinectl(1) — Control the systemd machine manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules-load.d.html">modules-load.d(5) — Configure kernel modules to load at boot</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">N</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="networkctl.html">networkctl(1) — Query or modify the status of network links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networkd.conf.html">networkd.conf(5) — Global Network configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-myhostname.html">nss-myhostname(8) — Hostname resolution for the locally configured system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-mymachines.html">nss-mymachines(8) — Hostname resolution for local container instances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-resolve.html">nss-resolve(8) — Hostname resolution via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-systemd.html">nss-systemd(8) — UNIX user and group name resolution for user/group lookup via Varlink</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">O</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oomctl.html">oomctl(1) — Analyze the state stored in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oomd.conf.html">oomd.conf(5) — Global</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.home1.html">org.freedesktop.home1(5) — The D-Bus interface of systemd-homed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.hostname1.html">org.freedesktop.hostname1(5) — The D-Bus interface of systemd-hostnamed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.import1.html">org.freedesktop.import1(5) — The D-Bus interface of systemd-importd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.locale1.html">org.freedesktop.locale1(5) — The D-Bus interface of systemd-localed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.LogControl1.html">org.freedesktop.LogControl1(5) — D-Bus interface to query and set logging configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.login1.html">org.freedesktop.login1(5) — The D-Bus interface of systemd-logind</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.machine1.html">org.freedesktop.machine1(5) — The D-Bus interface of systemd-machined</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.network1.html">org.freedesktop.network1(5) — The D-Bus interface of systemd-networkd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.oom1.html">org.freedesktop.oom1(5) — The D-Bus interface of systemd-oomd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.portable1.html">org.freedesktop.portable1(5) — The D-Bus interface of systemd-portabled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.resolve1.html">org.freedesktop.resolve1(5) — The D-Bus interface of systemd-resolved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.systemd1.html">org.freedesktop.systemd1(5) — The D-Bus interface of systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.sysupdate1.html">org.freedesktop.sysupdate1(5) — The D-Bus interface of systemd-sysupdated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timedate1.html">org.freedesktop.timedate1(5) — The D-Bus interface of systemd-timedated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timesync1.html">org.freedesktop.timesync1(5) — The D-Bus interface of systemd-timesyncd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="os-release.html">os-release(5) — Operating system identification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">P</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd.html">pam_systemd(8) — Register user sessions in the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_home.html">pam_systemd_home(8) — Authenticate users and mount home directories via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_loadkey.html">pam_systemd_loadkey(8) — Read password from kernel keyring and set it as PAM authtok</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portablectl.html">portablectl(1) — Attach, detach or inspect portable service images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="poweroff.html">poweroff(8) — Power off, reboot, or halt the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pstore.conf.html">pstore.conf(5) — PStore configuration file</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">R</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="repart.d.html">repart.d(5) — Partition Definition Files for Automatic Boot-Time Repartitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolvectl.html">resolvectl(1) — Resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services; introspect and reconfigure the DNS resolver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolved.conf.html">resolved.conf(5) — Network Name Resolution configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run0.html">run0(1) — Elevate privileges</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">S</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="sd-bus.html">sd-bus(3) — A lightweight D-Bus IPC client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus-errors.html">sd-bus-errors(3) — Standard D-Bus error names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-daemon.html">sd-daemon(3) — APIs for new-style daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-device.html">sd-device(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-event.html">sd-event(3) — A generic event loop implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-hwdb.html">sd-hwdb(3) — Read-only access to the hardware description database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-id128.html">sd-id128(3) — APIs for processing 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-journal.html">sd-journal(3) — APIs for submitting and querying log entries to and from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-json.html">sd-json(3) — APIs for Dealing with JSON Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-login.html">sd-login(3) — APIs for tracking logins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-path.html">sd-path(3) — APIs to query file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-varlink.html">sd-varlink(3) — APIs for Varlink IPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_booted.html">sd_booted(3) — Test whether the system is running the systemd init system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_match.html">sd_bus_add_match(3) — Add a match rule for incoming message dispatching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_node_enumerator.html">sd_bus_add_node_enumerator(3) — Add a node enumerator for a D-Bus object path prefix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object.html">sd_bus_add_object(3) — Declare properties and methods for a D-Bus path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object_manager.html">sd_bus_add_object_manager(3) — Add a D-Bus object manager for a D-Bus object sub-tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_attach_event.html">sd_bus_attach_event(3) — Attach a bus connection object to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call.html">sd_bus_call(3) — Invoke a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call_method.html">sd_bus_call_method(3) — Initialize a bus message object and invoke the corresponding D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_can_send.html">sd_bus_can_send(3) — Check which types can be sent over a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_close.html">sd_bus_close(3) — Close and flush a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_get_pid.html">sd_bus_creds_get_pid(3) — Retrieve fields from a credentials object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_new_from_pid.html">sd_bus_creds_new_from_pid(3) — Retrieve credentials object for the specified PID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_default.html">sd_bus_default(3) — Acquire a connection to a system or user bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_emit_signal.html">sd_bus_emit_signal(3) — Convenience functions for emitting (standard) D-Bus signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_enqueue_for_read.html">sd_bus_enqueue_for_read(3) — Re-enqueue a bus message on a bus connection, for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error.html">sd_bus_error(3) — sd-bus error handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error_add_map.html">sd_bus_error_add_map(3) — Additional sd-dbus error mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_current_handler.html">sd_bus_get_current_handler(3) — Query information of the callback a bus object is currently running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_fd.html">sd_bus_get_fd(3) — Get the file descriptor, I/O events and timeout to wait for from a message bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_n_queued_read.html">sd_bus_get_n_queued_read(3) — Get the number of pending bus messages in the read and write queues of a bus connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_creds.html">sd_bus_get_name_creds(3) — Query bus client credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_machine_id.html">sd_bus_get_name_machine_id(3) — Retrieve a bus client's machine identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_interface_name_is_valid.html">sd_bus_interface_name_is_valid(3) — Check if a string is a valid bus name or object path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_is_open.html">sd_bus_is_open(3) — Check whether the bus connection is open or ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_list_names.html">sd_bus_list_names(3) — Retrieve information about registered names on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append.html">sd_bus_message_append(3) — Attach fields to a D-Bus message based on a type string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_array.html">sd_bus_message_append_array(3) — Append an array of fields to a D-Bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_basic.html">sd_bus_message_append_basic(3) — Attach a single field to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_string_memfd.html">sd_bus_message_append_string_memfd(3) — Attach a string to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_strv.html">sd_bus_message_append_strv(3) — Attach an array of strings to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_at_end.html">sd_bus_message_at_end(3) — Check if a message has been fully read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_copy.html">sd_bus_message_copy(3) — Copy the contents of one message to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_dump.html">sd_bus_message_dump(3) — Produce a string representation of a message for debugging purposes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_cookie.html">sd_bus_message_get_cookie(3) — Returns the transaction cookie of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_monotonic_usec.html">sd_bus_message_get_monotonic_usec(3) — Retrieve the sender timestamps and sequence number of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_signature.html">sd_bus_message_get_signature(3) — Query bus message signature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_type.html">sd_bus_message_get_type(3) — Query bus message addressing/credentials metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new.html">sd_bus_message_new(3) — Create a new bus message object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_call.html">sd_bus_message_new_method_call(3) — Create a method call message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_error.html">sd_bus_message_new_method_error(3) — Create an error reply for a method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_signal.html">sd_bus_message_new_signal(3) — Create a signal message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_open_container.html">sd_bus_message_open_container(3) — Create and move between containers in D-Bus messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read.html">sd_bus_message_read(3) — Read a sequence of values from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_array.html">sd_bus_message_read_array(3) — Access an array of elements in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_basic.html">sd_bus_message_read_basic(3) — Read a basic type from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_strv.html">sd_bus_message_read_strv(3) — Access an array of strings in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_rewind.html">sd_bus_message_rewind(3) — Return to beginning of message or current container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_seal.html">sd_bus_message_seal(3) — Prepare a D-Bus message for transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_sensitive.html">sd_bus_message_sensitive(3) — Mark a message object as containing sensitive data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_destination.html">sd_bus_message_set_destination(3) — Set and query bus message addressing information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_expect_reply.html">sd_bus_message_set_expect_reply(3) — Set and query bus message metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_skip.html">sd_bus_message_skip(3) — Skip elements in a bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_verify_type.html">sd_bus_message_verify_type(3) — Check if the message has specified type at the current location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_negotiate_fds.html">sd_bus_negotiate_fds(3) — Control feature negotiation on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_new.html">sd_bus_new(3) — Create a new bus object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_path_encode.html">sd_bus_path_encode(3) — Convert an external identifier into an object path and back</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_pending_method_calls.html">sd_bus_pending_method_calls(3) — Return the number of currently pending, outgoing method calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_process.html">sd_bus_process(3) — Drive the connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_query_sender_creds.html">sd_bus_query_sender_creds(3) — Query bus message sender credentials/privileges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_error.html">sd_bus_reply_method_error(3) — Reply with an error to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_return.html">sd_bus_reply_method_return(3) — Reply to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_request_name.html">sd_bus_request_name(3) — Request or release a well-known service name on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_send.html">sd_bus_send(3) — Queue a D-Bus message for transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_address.html">sd_bus_set_address(3) — Set or query the address of the bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_close_on_exit.html">sd_bus_set_close_on_exit(3) — Control whether to close the bus connection during the event loop exit phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_connected_signal.html">sd_bus_set_connected_signal(3) — Control emission of local connection establishment signal on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_description.html">sd_bus_set_description(3) — Set or query properties of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_exit_on_disconnect.html">sd_bus_set_exit_on_disconnect(3) — Control the exit behavior when the bus object disconnects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_fd.html">sd_bus_set_fd(3) — Set the file descriptors to use for bus communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_method_call_timeout.html">sd_bus_set_method_call_timeout(3) — Set or query the default D-Bus method call timeout of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_property.html">sd_bus_set_property(3) — Set or query D-Bus service properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_sender.html">sd_bus_set_sender(3) — Configure default sender for outgoing messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_server.html">sd_bus_set_server(3) — Configure connection mode for a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_watch_bind.html">sd_bus_set_watch_bind(3) — Control socket binding watching on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_get_bus.html">sd_bus_slot_get_bus(3) — Query information attached to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_ref.html">sd_bus_slot_ref(3) — Create and destroy references to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_description.html">sd_bus_slot_set_description(3) — Set or query the description of bus slot objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_destroy_callback.html">sd_bus_slot_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_floating.html">sd_bus_slot_set_floating(3) — Control whether a bus slot object is "floating"</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_userdata.html">sd_bus_slot_set_userdata(3) — Set and query the value in the "userdata" field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_start.html">sd_bus_start(3) — Initiate a bus connection to the D-bus broker daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_add_name.html">sd_bus_track_add_name(3) — Add, remove and retrieve bus peers tracked in a bus peer tracking object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_new.html">sd_bus_track_new(3) — Track bus peers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_wait.html">sd_bus_wait(3) — Wait for I/O on a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_add_match_parent.html">sd_device_enumerator_add_match_parent(3) — Add a filter to the device enumerator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_get_device_first.html">sd_device_enumerator_get_device_first(3) — Enumerates devices and get the first or next device.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_new.html">sd_device_enumerator_new(3) — Create, reference, and release a device enumerator object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_get_syspath.html">sd_device_get_syspath(3) — Returns various fields of device objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_ref.html">sd_device_ref(3) — Create or destroy references to a device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_child.html">sd_event_add_child(3) — Add a child process state change event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_defer.html">sd_event_add_defer(3) — Add static event sources to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_inotify.html">sd_event_add_inotify(3) — Add an "inotify" file system inode event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_io.html">sd_event_add_io(3) — Add an I/O event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_memory_pressure.html">sd_event_add_memory_pressure(3) — Add and configure an event source run as result of memory pressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_signal.html">sd_event_add_signal(3) — Add a UNIX process signal event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_time.html">sd_event_add_time(3) — Add a timer event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_exit.html">sd_event_exit(3) — Ask the event loop to exit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_get_fd.html">sd_event_get_fd(3) — Obtain a file descriptor to poll for event loop events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_new.html">sd_event_new(3) — Acquire and release an event loop object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_now.html">sd_event_now(3) — Retrieve current event loop iteration timestamp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_run.html">sd_event_run(3) — Run an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_exit_on_idle.html">sd_event_set_exit_on_idle(3) — Enable event loop exit-on-idle support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_signal_exit.html">sd_event_set_signal_exit(3) — Automatically leave event loop on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_watchdog.html">sd_event_set_watchdog(3) — Enable event loop watchdog support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_event.html">sd_event_source_get_event(3) — Retrieve the event loop of an event source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_pending.html">sd_event_source_get_pending(3) — Determine pending state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_description.html">sd_event_source_set_description(3) — Set or retrieve descriptive names of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_destroy_callback.html">sd_event_source_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_enabled.html">sd_event_source_set_enabled(3) — Enable or disable event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_exit_on_failure.html">sd_event_source_set_exit_on_failure(3) — Set or retrieve the exit-on-failure feature of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_floating.html">sd_event_source_set_floating(3) — Set or retrieve 'floating' state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_prepare.html">sd_event_source_set_prepare(3) — Set a preparation callback for event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_priority.html">sd_event_source_set_priority(3) — Set or retrieve the priority of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_ratelimit.html">sd_event_source_set_ratelimit(3) — Configure rate limiting on event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_userdata.html">sd_event_source_set_userdata(3) — Set or retrieve user data pointer of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_unref.html">sd_event_source_unref(3) — Increase or decrease event source reference counters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_wait.html">sd_event_wait(3) — Low-level event loop operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_get_seats.html">sd_get_seats(3) — Determine available seats, sessions, logged in users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_get.html">sd_hwdb_get(3) — Seek to a location in hwdb or access entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_new.html">sd_hwdb_new(3) — Create a new hwdb object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_get_machine.html">sd_id128_get_machine(3) — Retrieve 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_randomize.html">sd_id128_randomize(3) — Generate 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_to_string.html">sd_id128_to_string(3) — Format or parse 128-bit IDs as strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_is_fifo.html">sd_is_fifo(3) — Check the type of a file descriptor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_add_match.html">sd_journal_add_match(3) — Add or remove entry matches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_enumerate_fields.html">sd_journal_enumerate_fields(3) — Read used field names from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_catalog.html">sd_journal_get_catalog(3) — Retrieve message catalog entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cursor.html">sd_journal_get_cursor(3) — Get cursor string for or test cursor string against the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cutoff_realtime_usec.html">sd_journal_get_cutoff_realtime_usec(3) — Read cut-off timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_data.html">sd_journal_get_data(3) — Read data fields from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_fd.html">sd_journal_get_fd(3) — Journal change notification interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_realtime_usec.html">sd_journal_get_realtime_usec(3) — Read timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_seqnum.html">sd_journal_get_seqnum(3) — Read sequence number from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_usage.html">sd_journal_get_usage(3) — Journal disk usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_has_runtime_files.html">sd_journal_has_runtime_files(3) — Query availability of runtime or persistent journal files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_next.html">sd_journal_next(3) — Advance or set back the read pointer in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_open.html">sd_journal_open(3) — Open the system journal for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_print.html">sd_journal_print(3) — Submit log entries to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_query_unique.html">sd_journal_query_unique(3) — Read unique data fields from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_seek_head.html">sd_journal_seek_head(3) — Seek to a position in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_stream_fd.html">sd_journal_stream_fd(3) — Create log stream file descriptor to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_json_dispatch_string.html">sd_json_dispatch_string(3) — Decode JSON variant values and write them to the specified memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_listen_fds.html">sd_listen_fds(3) — Check for file descriptors passed by the system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_login_monitor_new.html">sd_login_monitor_new(3) — Monitor login sessions, seats, users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_machine_get_class.html">sd_machine_get_class(3) — Determine the class and network interface indices of a locally running virtual machine or container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_notify.html">sd_notify(3) — Notify service manager about start-up completion and other service status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_path_lookup.html">sd_path_lookup(3) — Query well-known file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pid_get_owner_uid.html">sd_pid_get_owner_uid(3) — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pidfd_get_inode_id.html">sd_pidfd_get_inode_id(3) — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_seat_get_active.html">sd_seat_get_active(3) — Determine state of a specific seat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_session_is_active.html">sd_session_is_active(3) — Determine state of a specific session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_uid_get_state.html">sd_uid_get_state(3) — Determine login state of a specific Unix user ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_is_connected.html">sd_varlink_is_connected(3) — Query if a Varlink connection object is currently connected or idle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_push_fd.html">sd_varlink_push_fd(3) — Submit a file descriptor to send along with the next outgoing Varlink message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_send.html">sd_varlink_send(3) — Enqueues a Varlink method call, not expecting a reply</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_server_new.html">sd_varlink_server_new(3) — Allocate Varlink server object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_description.html">sd_varlink_set_description(3) — Set or query description of a Varlink connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_relative_timeout.html">sd_varlink_set_relative_timeout(3) — Set method call time-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_watchdog_enabled.html">sd_watchdog_enabled(3) — Check whether the service manager expects watchdog keep-alive notifications from a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shutdown.html">shutdown(8) — Halt, power off or reboot the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smbios-type-11.html">smbios-type-11(7) — SMBIOS Type 11 strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysctl.d.html">sysctl.d(5) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysext.conf.html">sysext.conf(5) — Configuration files for systemd-sysext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemctl.html">systemctl(1) — Control the systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.html">systemd(1) — systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ac-power.html">systemd-ac-power(1) — Report whether we are connected to an external power source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-analyze.html">systemd-analyze(1) — Analyze and debug system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password.html">systemd-ask-password(1) — Query the user for a system password</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password-console.service.html">systemd-ask-password-console.service(8) — Query the user for system passwords on the console and via wall</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-backlight%40.service.html">systemd-backlight@.service(8) — Load and save the display backlight brightness at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-battery-check.service.html">systemd-battery-check.service(8) — Check battery level whether there's enough charge, and power off if not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-binfmt.service.html">systemd-binfmt.service(8) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot-generator.html">systemd-bless-boot-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot.service.html">systemd-bless-boot.service(8) — Mark current boot process as successful</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">systemd-boot(7) — A simple UEFI boot manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-check-no-failures.service.html">systemd-boot-check-no-failures.service(8) — verify that the system booted up cleanly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-clear-sysfail.service.html">systemd-boot-clear-sysfail.service(8) — Clear LoaderEntrySysFail entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-random-seed.service.html">systemd-boot-random-seed.service(8) — Refresh boot loader random seed at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bsod.service.html">systemd-bsod.service(8) — Displays boot-time emergency log message in full screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cat.html">systemd-cat(1) — Connect a pipeline or program's output with the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgls.html">systemd-cgls(1) — Recursively show control group contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgtop.html">systemd-cgtop(1) — Show top control groups by their resource usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-coredump.html">systemd-coredump(8) — Acquire, save and process core dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-creds.html">systemd-creds(1) — Lists, shows, encrypts and decrypts service credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptenroll.html">systemd-cryptenroll(1) — Enroll PKCS#11, FIDO2, TPM2 token/devices to LUKS2 encrypted volumes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup.html">systemd-cryptsetup(8) — Full disk decryption logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup-generator.html">systemd-cryptsetup-generator(8) — Unit generator for</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-debug-generator.html">systemd-debug-generator(8) — Generator for enabling a runtime debug shell and masking specific units at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-delta.html">systemd-delta(1) — Find overridden configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-detect-virt.html">systemd-detect-virt(1) — Detect execution in a virtualized environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-dissect.html">systemd-dissect(1) — Dissect Discoverable Disk Images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-environment-d-generator.html">systemd-environment-d-generator(8) — Load variables specified by</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-escape.html">systemd-escape(1) — Escape strings for usage in systemd unit names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset.html">systemd-factory-reset(8) — Request or complete a factory reset operation, or query current factory reset mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset-generator.html">systemd-factory-reset-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-firstboot.html">systemd-firstboot(1) — Initialize basic system settings on or before the first boot-up of a system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fsck%40.service.html">systemd-fsck@.service(8) — File system checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fstab-generator.html">systemd-fstab-generator(8) — Unit generator for /etc/fstab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-getty-generator.html">systemd-getty-generator(8) — Generator for enabling getty instances on the console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-gpt-auto-generator.html">systemd-gpt-auto-generator(8) — Generator for automatically discovering and mounting root,</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume-generator.html">systemd-hibernate-resume-generator(8) — Unit generator for resume= kernel parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume.service.html">systemd-hibernate-resume.service(8) — Resume from hibernation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-homed.service.html">systemd-homed.service(8) — Home Area/User Account Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hostnamed.service.html">systemd-hostnamed.service(8) — Daemon to control system hostname from programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hwdb.html">systemd-hwdb(8) — hardware database management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-id128.html">systemd-id128(1) — Generate and print sd-128 identifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-import-generator.html">systemd-import-generator(8) — Generator for automatically downloading disk images at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-importd.service.html">systemd-importd.service(8) — VM and container image import and export service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-inhibit.html">systemd-inhibit(1) — Execute a program with an inhibition lock taken</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup-generator.html">systemd-integritysetup-generator(8) — Unit generator for integrity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup%40.service.html">systemd-integritysetup@.service(8) — Disk integrity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-gatewayd.service.html">systemd-journal-gatewayd.service(8) — HTTP server for journal events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-remote.service.html">systemd-journal-remote.service(8) — Receive journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-upload.service.html">systemd-journal-upload.service(8) — Send journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journald.service.html">systemd-journald.service(8) — Journal service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-keyutil.html">systemd-keyutil(1) — Perform various operations on private keys and X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-localed.service.html">systemd-localed.service(8) — Locale bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-logind.service.html">systemd-logind.service(8) — Login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-loop%40.service.html">systemd-loop@.service(8) — Attach a loopback block device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-commit.service.html">systemd-machine-id-commit.service(8) — Commit a transient machine ID to disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-setup.html">systemd-machine-id-setup(1) — Initialize the machine ID in /etc/machine-id</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machined.service.html">systemd-machined.service(8) — Virtual machine and container registration manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-makefs%40.service.html">systemd-makefs@.service(8) — Creating and growing file systems on demand</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-measure.html">systemd-measure(1) — Pre-calculate and sign expected TPM2 PCR 11 values for booted unified kernel images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-modules-load.service.html">systemd-modules-load.service(8) — Load kernel modules at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mount.html">systemd-mount(1) — Establish and destroy transient mount or auto-mount points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mountfsd.service.html">systemd-mountfsd.service(8) — Disk Image File System Mount Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mute-console.html">systemd-mute-console(1) — Temporarily mute kernel log output and service manager status output to the system console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-network-generator.service.html">systemd-network-generator.service(8) — Generate network configuration from the kernel command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd-wait-online.service.html">systemd-networkd-wait-online.service(8) — Wait for network to come online</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd.service.html">systemd-networkd.service(8) — Network manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-notify.html">systemd-notify(1) — Notify service manager about start-up completion and other daemon status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nspawn.html">systemd-nspawn(1) — Spawn a command or OS in a lightweight container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nsresourced.service.html">systemd-nsresourced.service(8) — User Namespace Resource Delegation Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-oomd.service.html">systemd-oomd.service(8) — A userspace out-of-memory (OOM) killer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-path.html">systemd-path(1) — List and query system and user paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrlock.html">systemd-pcrlock(8) — Analyze and predict TPM2 PCR states and generate an access policy from the prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrphase.service.html">systemd-pcrphase.service(8) — Measure boot phases, machine ID, product UUID and file system identity into TPM PCRs and NvPCRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-portabled.service.html">systemd-portabled.service(8) — Portable service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-poweroff.service.html">systemd-poweroff.service(8) — System shutdown logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pstore.service.html">systemd-pstore.service(8) — A service to archive contents of pstore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pty-forward.html">systemd-pty-forward(1) — Run a command with a custom terminal background color or title</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-quotacheck%40.service.html">systemd-quotacheck@.service(8) — File system quota checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-random-seed.service.html">systemd-random-seed.service(8) — Load and save the OS system random seed at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rc-local-generator.html">systemd-rc-local-generator(8) — Compatibility generator and service to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-remount-fs.service.html">systemd-remount-fs.service(8) — Remount root and kernel file systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-repart.html">systemd-repart(8) — Automatically grow and add partitions, and generate disk images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-resolved.service.html">systemd-resolved.service(8) — Network Name Resolution manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rfkill.service.html">systemd-rfkill.service(8) — Load and save the RF kill switch state at boot and change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run.html">systemd-run(1) — Run programs in transient scope units, service units, or path-, socket-, or timer-triggered service units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run-generator.html">systemd-run-generator(8) — Generator for invoking commands specified on the kernel command line as system service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sbsign.html">systemd-sbsign(1) — Sign PE binaries for EFI Secure Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sleep.conf.html">systemd-sleep.conf(5) — Suspend and hibernation configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-activate.html">systemd-socket-activate(1) — Test socket activation of daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-proxyd.html">systemd-socket-proxyd(8) — Bidirectionally proxy local sockets to another (possibly remote) socket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-soft-reboot.service.html">systemd-soft-reboot.service(8) — Userspace reboot operation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-generator.html">systemd-ssh-generator(8) — Generator for binding a socket-activated SSH server to local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-issue.html">systemd-ssh-issue(1) — Generator for SSH login prompt drop-ins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-proxy.html">systemd-ssh-proxy(1) — SSH client plugin for connecting to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stdio-bridge.html">systemd-stdio-bridge(1) — D-Bus proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-storagetm.service.html">systemd-storagetm.service(8) — Exposes all local block devices as NVMe-TCP mass storage devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stub.html">systemd-stub(7) — A simple UEFI kernel boot stub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-suspend.service.html">systemd-suspend.service(8) — System sleep state logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysctl.service.html">systemd-sysctl.service(8) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysext.html">systemd-sysext(8) — Activates System Extension Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system-update-generator.html">systemd-system-update-generator(8) — Generator for redirecting boot to offline update mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system.conf.html">systemd-system.conf(5) — System and session service manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdate.html">systemd-sysupdate(8) — Automatically Update OS or Other Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdated.service.html">systemd-sysupdated.service(8) — System Update Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysusers.html">systemd-sysusers(8) — Allocate system users and groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysv-generator.html">systemd-sysv-generator(8) — Unit generator for SysV init scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-time-wait-sync.service.html">systemd-time-wait-sync.service(8) — Wait until kernel time is synchronized</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timedated.service.html">systemd-timedated.service(8) — Time and date bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timesyncd.service.html">systemd-timesyncd.service(8) — Network Time Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tmpfiles.html">systemd-tmpfiles(8) — Create, delete, and clean up files and directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-clear.service.html">systemd-tpm2-clear.service(8) — Request that the TPM security chip is cleared on next boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-generator.html">systemd-tpm2-generator(8) — Generator for inserting TPM2 synchronization point in the boot process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-setup.service.html">systemd-tpm2-setup.service(8) — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tty-ask-password-agent.html">systemd-tty-ask-password-agent(1) — List or process pending systemd password requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udev-settle.service.html">systemd-udev-settle.service(8) — Wait for all pending udev events to be handled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udevd.service.html">systemd-udevd.service(8) — Device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-done.service.html">systemd-update-done.service(8) — Mark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-utmp.service.html">systemd-update-utmp.service(8) — Write audit and utmp updates at bootup and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-user-sessions.service.html">systemd-user-sessions.service(8) — Permit user logins after boot, prohibit user logins at shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-userdbd.service.html">systemd-userdbd.service(8) — JSON User/Group Record Query Multiplexer/NSS Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-validatefs%40.service.html">systemd-validatefs@.service(8) — Validate File System Mount Constraint Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vconsole-setup.service.html">systemd-vconsole-setup.service(8) — Configure the virtual consoles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup-generator.html">systemd-veritysetup-generator(8) — Unit generator for verity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup%40.service.html">systemd-veritysetup@.service(8) — Disk verity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vmspawn.html">systemd-vmspawn(1) — Spawn an OS in a virtual machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-volatile-root.service.html">systemd-volatile-root.service(8) — Make the root file system volatile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vpick.html">systemd-vpick(1) — Resolve paths to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-xdg-autostart-generator.html">systemd-xdg-autostart-generator(8) — User unit generator for XDG autostart files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.automount.html">systemd.automount(5) — Automount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.device.html">systemd.device(5) — Device unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dns-delegate.html">systemd.dns-delegate(5) — DNS Server Delegation Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dnssd.html">systemd.dnssd(5) — DNS-SD configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.environment-generator.html">systemd.environment-generator(7) — systemd environment file generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.exec.html">systemd.exec(5) — Execution environment configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.generator.html">systemd.generator(7) — systemd unit generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-filter.html">systemd.image-filter(7) — Disk Image Dissection Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-policy.html">systemd.image-policy(7) — Disk Image Dissection Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.journal-fields.html">systemd.journal-fields(7) — Special journal fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.kill.html">systemd.kill(5) — Process killing procedure configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.link.html">systemd.link(5) — Network device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.mount.html">systemd.mount(5) — Mount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.net-naming-scheme.html">systemd.net-naming-scheme(7) — Network device naming schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.netdev.html">systemd.netdev(5) — Virtual Network Device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.network.html">systemd.network(5) — Network configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.nspawn.html">systemd.nspawn(5) — Container settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.offline-updates.html">systemd.offline-updates(7) — Implementation of offline updates in systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.path.html">systemd.path(5) — Path unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.pcrlock.html">systemd.pcrlock(5) — PCR measurement prediction files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.preset.html">systemd.preset(5) — Service enablement presets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.resource-control.html">systemd.resource-control(5) — Resource control unit settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.scope.html">systemd.scope(5) — Scope unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.service.html">systemd.service(5) — Service unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.slice.html">systemd.slice(5) — Slice unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.socket.html">systemd.socket(5) — Socket unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.special.html">systemd.special(7) — Special systemd units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.swap.html">systemd.swap(5) — Swap unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.syntax.html">systemd.syntax(7) — General syntax of systemd configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.system-credentials.html">systemd.system-credentials(7) — System Credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.target.html">systemd.target(5) — Target unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.time.html">systemd.time(7) — Time and date specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.timer.html">systemd.timer(5) — Timer unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.unit.html">systemd.unit(5) — Unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.v.html">systemd.v(7) — Directory with Versioned Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.d.html">sysupdate.d(5) — Transfer Definition Files for Automatic Updates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.features.html">sysupdate.features(5) — Definition Files for Optional Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysusers.d.html">sysusers.d(5) — Declarative allocation of system users and groups</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">T</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timedatectl.html">timedatectl(1) — Control the system time and date</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesyncd.conf.html">timesyncd.conf(5) — Network Time Synchronization configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tmpfiles.d.html">tmpfiles.d(5) — Configuration for creation, deletion, and cleaning of files and directories</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">U</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="udev.html">udev(7) — Dynamic device management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev.conf.html">udev.conf(5) — Configuration for device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_get_syspath.html">udev_device_get_syspath(3) — Query device properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_has_tag.html">udev_device_has_tag(3) — Retrieve or set device attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_new_from_syspath.html">udev_device_new_from_syspath(3) — Create, acquire and release a udev device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_add_match_subsystem.html">udev_enumerate_add_match_subsystem(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_new.html">udev_enumerate_new(3) — Create, acquire and release a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_scan_devices.html">udev_enumerate_scan_devices(3) — Query or modify a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_list_entry.html">udev_list_entry(3) — Iterate and access udev lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_filter_update.html">udev_monitor_filter_update(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_new_from_netlink.html">udev_monitor_new_from_netlink(3) — Create, acquire and release a udev monitor object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_receive_device.html">udev_monitor_receive_device(3) — Query and modify device monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_new.html">udev_new(3) — Create, acquire and release a udev context object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udevadm.html">udevadm(8) — udev management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ukify.html">ukify(1) — Combine components into a signed Unified Kernel Image for UEFI systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updatectl.html">updatectl(1) — Control the system update service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user%40.service.html">user@.service(5) — System units to start the user manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="userdbctl.html">userdbctl(1) — Inspect users, groups and group memberships</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">V</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="varlinkctl.html">varlinkctl(1) — Introspect with and invoke Varlink services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vconsole.conf.html">vconsole.conf(5) — Configuration file for the virtual console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="veritytab.html">veritytab(5) — Configuration for verity block devices</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/blob/man_pages_in_sphinx/doc-migration/source/docs/systemd-boot.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/edit/man_pages_in_sphinx/doc-migration/source/docs/systemd-boot.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="systemd-boot-7">
+<span id="id1"></span><h1>systemd-boot(7)<a class="headerlink" href="#systemd-boot-7" title="Link to this heading">¶</a></h1>
+<section id="name">
+<h2>Name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
+<p>systemd-boot, sd-boot — A simple UEFI boot manager</p>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> (short: <code class="code docutils literal notranslate"><span class="pre">sd-boot</span></code>) is a simple UEFI boot manager. It provides a textual menu to select the entry to boot and an editor for the kernel command line. <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> supports systems with UEFI firmware only.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> loads boot entry information from the EFI system partition (ESP), usually mounted at <code class="code docutils literal notranslate"><span class="pre">/efi/</span></code>, <code class="code docutils literal notranslate"><span class="pre">/boot/</span></code>, or <code class="code docutils literal notranslate"><span class="pre">/boot/efi/</span></code> during OS runtime, as well as from the Extended Boot Loader partition (XBOOTLDR) if it exists (usually mounted to <code class="code docutils literal notranslate"><span class="pre">/boot/</span></code>). Configuration file fragments, kernels, initrds and other EFI images to boot generally need to reside on the ESP or the Extended Boot Loader partition. Linux kernels must be built with <code class="code docutils literal notranslate"><span class="pre">CONFIG_EFI_STUB</span></code> to be able to be directly executed as an EFI image. During boot <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> automatically assembles a list of boot entries from the following sources:</p>
+<ul class="simple">
+<li><p>Boot entries defined with <a class="reference external" href="https://uapi-group.org/specifications/specs/boot_loader_specification">Boot Loader Specification</a> Type #1 description files located in <code class="code docutils literal notranslate"><span class="pre">/loader/entries/</span></code> on the ESP and the Extended Boot Loader Partition. These usually describe Linux kernel images with associated initrd images, but alternatively may also describe other arbitrary EFI executables.</p></li>
+<li><p>Unified kernel images, <a class="reference external" href="https://uapi-group.org/specifications/specs/boot_loader_specification">Boot Loader Specification</a> Type #2, which are executable EFI binaries in <code class="code docutils literal notranslate"><span class="pre">/EFI/Linux/</span></code> on the ESP and the Extended Boot Loader Partition.</p></li>
+<li><p>The Microsoft Windows EFI boot manager, if installed.</p></li>
+<li><p>The Apple macOS boot manager, if installed.</p></li>
+<li><p>The EFI Shell binary, if installed.</p></li>
+<li><p>A “Reboot Into Firmware Interface” option, if supported by the UEFI firmware.</p></li>
+<li><p>Secure Boot variables enrollment if the UEFI firmware is in setup-mode and files are provided on the ESP.</p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> supports the following features:</p>
+<ul class="simple">
+<li><p>Basic boot manager configuration changes (such as timeout configuration, default boot entry selection, …) may be made directly from the boot loader UI at boot-time, as well as during system runtime with EFI variables.</p></li>
+<li><p>The boot manager integrates with the <code class="code docutils literal notranslate"><span class="pre">systemctl</span></code> command to implement features such as <code class="code docutils literal notranslate"><span class="pre">systemctl</span> <span class="pre">reboot</span> <span class="pre">--boot-loader-entry=…</span></code> (for rebooting into a specific boot menu entry, i.e. “reboot into Windows”) and <code class="code docutils literal notranslate"><span class="pre">systemctl</span> <span class="pre">reboot</span> <span class="pre">--boot-loader-menu=…</span></code> (for rebooting into the boot loader menu), by implementing the <a class="reference external" href="https://systemd.io/BOOT_LOADER_INTERFACE">Boot Loader Interface</a>. See <a class="reference external" href="https://man7.org/linux/man-pages/man1/systemctl.1.html">systemctl(1)</a> for details.</p></li>
+<li><p>An EFI variable set by the boot loader informs the OS about the EFI System Partition used during boot. This is then used to automatically mount the correct EFI System Partition to <code class="code docutils literal notranslate"><span class="pre">/efi/</span></code> or <code class="code docutils literal notranslate"><span class="pre">/boot/</span></code> during OS runtime. See <a class="reference internal" href="systemd-gpt-auto-generator.html#systemd-gpt-auto-generator-8"><span class="std std-ref">systemd-gpt-auto-generator(8)</span></a> for details.</p></li>
+<li><p>The boot manager provides information about the boot time spent in UEFI firmware using the <a class="reference external" href="https://systemd.io/BOOT_LOADER_INTERFACE">Boot Loader Interface</a>. This information can be displayed using <a class="reference internal" href="systemd-analyze.html#systemd-analyze-1"><span class="std std-ref">systemd-analyze(1)</span></a>.</p></li>
+<li><p>The boot manager implements boot counting and automatic fallback to older, working boot entries on failure. See <a class="reference external" href="https://systemd.io/AUTOMATIC_BOOT_ASSESSMENT">Automatic Boot Assessment</a>.</p></li>
+<li><p>The boot manager optionally reads a random seed from the ESP partition, combines it with a ‘system token’ stored in a persistent EFI variable and derives a random seed to use by the OS as entropy pool initialization, providing a full entropy pool during early boot.</p></li>
+<li><p>The boot manager allows for Secure Boot variables to be enrolled if the UEFI firmware is in setup-mode. Additionally, variables can be automatically enrolled if configured.</p></li>
+</ul>
+<p><a class="reference external" href="https://man7.org/linux/man-pages/man1/bootctl.1.html">bootctl(1)</a> may be used from a running system to locate the ESP and the Extended Boot Loader Partition, list available entries, and install <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> itself.</p>
+<p><a class="reference external" href="https://man7.org/linux/man-pages/man8/kernel-install.8.html">kernel-install(8)</a> may be used to copy kernel images onto the ESP or the Extended Boot Loader Partition and to generate description files compliant with the Boot Loader Specification.</p>
+<p><a class="reference internal" href="systemd-stub.html#systemd-stub-7"><span class="std std-ref">systemd-stub(7)</span></a> may be used as UEFI boot stub for executed kernels, which is useful to show graphical boot splashes before transitioning into the Linux world. It is also capable of automatically picking up auxiliary credential files (for boot parameterization) and system extension images, as companion files to the booted kernel images.</p>
+</section>
+<section id="key-bindings">
+<h2>Key bindings<a class="headerlink" href="#key-bindings" title="Link to this heading">¶</a></h2>
+<p>The following keys may be used in the boot menu:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-up">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">↑</span></kbd> <span class="pre">(Up)</span></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-up" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-down">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">↓</span></kbd> <span class="pre">(Down)</span></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-down" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-j">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">j</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-j" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-k">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">k</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-k" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-pageup">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">PageUp</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-pageup" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-pagedown">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">PageDown</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-pagedown" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-home">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Home</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-home" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-end">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">End</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-end" title="Link to this definition">¶</a></dt>
+<dd><p>Navigate up/down in the entry list</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-enter">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">↵</span></kbd> <span class="pre">(Enter)</span></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-enter" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-right">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">→</span></kbd> <span class="pre">(Right)</span></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-right" title="Link to this definition">¶</a></dt>
+<dd><p>Boot selected entry</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-d">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">d</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-d" title="Link to this definition">¶</a></dt>
+<dd><p>Make selected entry the default</p>
+<p>An EFI variable is set to allow this setting to persist.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-e">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">e</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-e" title="Link to this definition">¶</a></dt>
+<dd><p>Edit the kernel command line for selected entry</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">+</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-t">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">t</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-t" title="Link to this definition">¶</a></dt>
+<dd><p>Increase the timeout before default entry is booted</p>
+<p>An EFI variable is set to allow this setting to persist.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-2">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">-</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-t-2">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">T</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-t-2" title="Link to this definition">¶</a></dt>
+<dd><p>Decrease the timeout</p>
+<p>An EFI variable is set to allow this setting to persist.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-r">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">r</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-r" title="Link to this definition">¶</a></dt>
+<dd><p>Change screen resolution, skipping any unsupported modes.</p>
+<p>An EFI variable is set to allow this setting to persist.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-r-2">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">R</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-r-2" title="Link to this definition">¶</a></dt>
+<dd><p>Reset screen resolution to firmware or configuration file default.</p>
+<p>An EFI variable is set to allow this setting to persist.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-p">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">p</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-p" title="Link to this definition">¶</a></dt>
+<dd><p>Print status</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-h">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">h</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-h" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-3">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">?</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-f1">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">F1</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-f1" title="Link to this definition">¶</a></dt>
+<dd><p>Show a help screen</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-f">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">f</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-f" title="Link to this definition">¶</a></dt>
+<dd><p>Reboot into firmware interface.</p>
+<p>For compatibility with the keybindings of several firmware implementations this operation may also be reached with <kbd class="kbd docutils literal notranslate">F2</kbd>, <kbd class="kbd docutils literal notranslate">F10</kbd>, <kbd class="kbd docutils literal notranslate">Del</kbd> and <kbd class="kbd docutils literal notranslate">Esc</kbd>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-shift-kbd-o">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Shift</span></kbd> <span class="pre">+</span> <kbd class="kbd docutils literal notranslate"><span class="pre">o</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-shift-kbd-o" title="Link to this definition">¶</a></dt>
+<dd><p>Power off the system.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-shift-kbd-b">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Shift</span></kbd> <span class="pre">+</span> <kbd class="kbd docutils literal notranslate"><span class="pre">b</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-shift-kbd-b" title="Link to this definition">¶</a></dt>
+<dd><p>Reboot the system.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<p>The following keys may be pressed during bootup or in the boot menu to directly boot a specific entry:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-l">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">l</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-l" title="Link to this definition">¶</a></dt>
+<dd><p>Linux</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-w">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">w</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-w" title="Link to this definition">¶</a></dt>
+<dd><p>Windows</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-a">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">a</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-a" title="Link to this definition">¶</a></dt>
+<dd><p>macOS</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-s">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">s</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-s" title="Link to this definition">¶</a></dt>
+<dd><p>EFI shell</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-1">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">1</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-1" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-2">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">2</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-3">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">3</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-4">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">4</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-4" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-5">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">5</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-5" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-6">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">6</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-6" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-7">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">7</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-7" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-8">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">8</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-8" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-9">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">9</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-9" title="Link to this definition">¶</a></dt>
+<dd><p>Boot entry number 1 … 9</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<p>The boot menu is shown when a non-zero menu timeout has been configured. If the menu timeout has been set to zero, hold down a key (<kbd class="kbd docutils literal notranslate">space</kbd> is recommended) before the boot loader initializes to bring up the boot menu. Note that depending on the firmware implementation the time window where key presses are accepted before the boot loader initializes might be short. If the window is missed, reboot and try again, possibly repeatedly pressing a suitable key; on most systems it should be possible to hit the time window after a few attempts. Keys other than the space bar may be used, except for the keys listed above. If showing the menu on demand doesn’t work well, consider setting a non-zero timeout to show the boot menu unconditionally. Some desktop environments might offer an option to boot directly into the boot menu, which also avoids the problem altogether. Alternatively, use the command line <code class="code docutils literal notranslate"><span class="pre">systemctl</span> <span class="pre">reboot</span> <span class="pre">--boot-loader-menu=</span></code> with a non-zero value from the shell.</p>
+<p>In the editor, most keys simply insert themselves, but the following keys may be used to perform additional actions:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-left">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">←</span></kbd> <span class="pre">(Left)</span></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-left" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-right-2">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">→</span></kbd> <span class="pre">(Right)</span></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-right-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-home-2">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Home</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-home-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-end-2">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">End</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-end-2" title="Link to this definition">¶</a></dt>
+<dd><p>Navigate left/right</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-esc">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Esc</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-esc" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-ctrl-kbd-c">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Ctrl</span></kbd> <span class="pre">+</span> <kbd class="kbd docutils literal notranslate"><span class="pre">c</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-ctrl-kbd-c" title="Link to this definition">¶</a></dt>
+<dd><p>Abort the edit and quit the editor</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-ctrl-kbd-k">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Ctrl</span></kbd> <span class="pre">+</span> <kbd class="kbd docutils literal notranslate"><span class="pre">k</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-ctrl-kbd-k" title="Link to this definition">¶</a></dt>
+<dd><p>Clear the command line forwards</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-ctrl-kbd-w">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Ctrl</span></kbd> <span class="pre">+</span> <kbd class="kbd docutils literal notranslate"><span class="pre">w</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-ctrl-kbd-w" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-alt-kbd-backspace">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Alt</span></kbd> <span class="pre">+</span> <kbd class="kbd docutils literal notranslate"><span class="pre">Backspace</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-alt-kbd-backspace" title="Link to this definition">¶</a></dt>
+<dd><p>Delete word backwards</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-ctrl-kbd-del">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Ctrl</span></kbd> <span class="pre">+</span> <kbd class="kbd docutils literal notranslate"><span class="pre">Del</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-ctrl-kbd-del" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-alt-kbd-d">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">Alt</span></kbd> <span class="pre">+</span> <kbd class="kbd docutils literal notranslate"><span class="pre">d</span></kbd></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-alt-kbd-d" title="Link to this definition">¶</a></dt>
+<dd><p>Delete word forwards</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-kbd-enter-2">
+<span class="sig-name descname"><kbd class="kbd docutils literal notranslate"><span class="pre">↵</span></kbd> <span class="pre">(Enter)</span></span><a class="headerlink" href="#systemd-option-systemd-boot-kbd-enter-2" title="Link to this definition">¶</a></dt>
+<dd><p>Boot entry with the edited command line</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 239.</span></p>
+</div>
+</dd></dl>
+
+<p>Note that unless configured otherwise in the UEFI firmware, systemd-boot will use the US keyboard layout, so key labels might not match for keys like +/-.</p>
+</section>
+<section id="files">
+<h2>Files<a class="headerlink" href="#files" title="Link to this heading">¶</a></h2>
+<p>The files <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> processes generally reside on the UEFI ESP which is usually mounted to <code class="code docutils literal notranslate"><span class="pre">/efi/</span></code>, <code class="code docutils literal notranslate"><span class="pre">/boot/</span></code> or <code class="code docutils literal notranslate"><span class="pre">/boot/efi/</span></code> during OS runtime. It also processes files on the Extended Boot Loader partition which is typically mounted to <code class="code docutils literal notranslate"><span class="pre">/boot/</span></code>, if it exists.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> reads runtime configuration such as the boot timeout and default entry from <code class="code docutils literal notranslate"><span class="pre">/loader/loader.conf</span></code> on the ESP (in combination with data read from EFI variables). See <a class="reference external" href="https://man7.org/linux/man-pages/man5/loader.conf.5.html">loader.conf(5)</a>.</p>
+<p>Boot entry description files following the <a class="reference external" href="https://uapi-group.org/specifications/specs/boot_loader_specification">Boot Loader Specification</a> are read from <code class="code docutils literal notranslate"><span class="pre">/loader/entries/</span></code> on the ESP and the Extended Boot Loader partition.</p>
+<p>Unified kernel boot entries following the <a class="reference external" href="https://uapi-group.org/specifications/specs/boot_loader_specification">Boot Loader Specification</a> are read from <code class="code docutils literal notranslate"><span class="pre">/EFI/Linux/</span></code> on the ESP and the Extended Boot Loader partition.</p>
+<p>Optionally, a random seed for early boot entropy pool provisioning is stored in <code class="code docutils literal notranslate"><span class="pre">/loader/random-seed</span></code> in the ESP.</p>
+<p>During initialization, <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> automatically loads all driver files placed in the <code class="code docutils literal notranslate"><span class="pre">/EFI/systemd/drivers/</span></code> directory of the ESP. The files placed there must have an extension of the EFI architecture ID followed by <code class="code docutils literal notranslate"><span class="pre">.efi</span></code> (e.g. for x86-64 this means a suffix of <code class="code docutils literal notranslate"><span class="pre">x64.efi</span></code>). This may be used to automatically load file system drivers and similar, to extend the native firmware support.</p>
+<p>Enrollment of Secure Boot variables can be performed manually or automatically if files are available under <code class="code docutils literal notranslate"><span class="pre">/loader/keys/NAME/{db,dbx,KEK,PK}.auth</span></code>, <em>NAME</em> being the display name for the set of variables in the menu. If one of the sets is named <code class="code docutils literal notranslate"><span class="pre">auto</span></code> then it might be enrolled automatically depending on whether “secure-boot-enroll” is set to force or not.</p>
+</section>
+<section id="efi-variables">
+<h2>EFI Variables<a class="headerlink" href="#efi-variables" title="Link to this heading">¶</a></h2>
+<p>The following EFI variables are defined, and may be set or read by <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> for communication between the boot loader and the OS. The vendor UUID “4a67b082-0a4c-41cf-b6c7-440b29bb8c4f” is used in all cases.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderbootcountpath">
+<span class="sig-name descname"><span class="pre">LoaderBootCountPath</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderbootcountpath" title="Link to this definition">¶</a></dt>
+<dd><p>If boot counting is enabled, contains the path to the file in whose name the boot counters are encoded. Set by the boot loader. <a class="reference internal" href="systemd-bless-boot.service.html#systemd-bless-boot-service-8"><span class="std std-ref">systemd-bless-boot.service(8)</span></a> uses this information to mark a boot as successful as determined by the successful activation of the <code class="code docutils literal notranslate"><span class="pre">boot-complete.target</span></code> target unit.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderconfigtimeout">
+<span class="sig-name descname"><span class="pre">LoaderConfigTimeout</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderconfigtimeout" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderconfigtimeoutoneshot">
+<span class="sig-name descname"><span class="pre">LoaderConfigTimeoutOneShot</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderconfigtimeoutoneshot" title="Link to this definition">¶</a></dt>
+<dd><p>The menu timeout in seconds. Read by the boot loader. <a class="reference internal" href="#systemd-option-systemd-boot-loaderconfigtimeout"><code class="docutils literal notranslate"><span class="pre">LoaderConfigTimeout</span></code></a> is maintained persistently, while <a class="reference internal" href="#systemd-option-systemd-boot-loaderconfigtimeoutoneshot"><code class="docutils literal notranslate"><span class="pre">LoaderConfigTimeoutOneShot</span></code></a> is a one-time override which is read once (in which case it takes precedence over <a class="reference internal" href="#systemd-option-systemd-boot-loaderconfigtimeout"><code class="docutils literal notranslate"><span class="pre">LoaderConfigTimeout</span></code></a>) and then removed. <a class="reference internal" href="#systemd-option-systemd-boot-loaderconfigtimeout"><code class="docutils literal notranslate"><span class="pre">LoaderConfigTimeout</span></code></a> may be manipulated with the <kbd class="kbd docutils literal notranslate">t</kbd>/<kbd class="kbd docutils literal notranslate">T</kbd> keys, see above.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderconfigconsolemode">
+<span class="sig-name descname"><span class="pre">LoaderConfigConsoleMode</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderconfigconsolemode" title="Link to this definition">¶</a></dt>
+<dd><p>The numerical menu console mode. Read by the boot loader. <a class="reference internal" href="#systemd-option-systemd-boot-loaderconfigconsolemode"><code class="docutils literal notranslate"><span class="pre">LoaderConfigConsoleMode</span></code></a> is maintained persistently. <a class="reference internal" href="#systemd-option-systemd-boot-loaderconfigconsolemode"><code class="docutils literal notranslate"><span class="pre">LoaderConfigConsoleMode</span></code></a> may be manipulated with the <kbd class="kbd docutils literal notranslate">r</kbd>/<kbd class="kbd docutils literal notranslate">R</kbd> keys, see above.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderdevicepartuuid">
+<span class="sig-name descname"><span class="pre">LoaderDevicePartUUID</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderdevicepartuuid" title="Link to this definition">¶</a></dt>
+<dd><p>Contains the partition UUID of the partition the boot loader has been started from on the current boot (usually an EFI System Partition). Set by the boot loader. (Note that <a class="reference internal" href="systemd-stub.html#systemd-stub-7"><span class="std std-ref">systemd-stub(7)</span></a> will set this too, if not set yet, to support systems that boot directly into a unified kernel image, bypassing any boot loader.) <a class="reference internal" href="systemd-gpt-auto-generator.html#systemd-gpt-auto-generator-8"><span class="std std-ref">systemd-gpt-auto-generator(8)</span></a> uses this information to automatically find the disk booted from, in order to discover various other partitions on the same disk automatically.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 220.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderdeviceurl">
+<span class="sig-name descname"><span class="pre">LoaderDeviceURL</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderdeviceurl" title="Link to this definition">¶</a></dt>
+<dd><p>If the boot loader has been invoked via network booting this variable contains the originating URL. This may be used to automatically acquire additional resources from the same source.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderentries">
+<span class="sig-name descname"><span class="pre">LoaderEntries</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderentries" title="Link to this definition">¶</a></dt>
+<dd><p>A list of the identifiers of all discovered boot loader entries. Set by the boot loader.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderentrydefault">
+<span class="sig-name descname"><span class="pre">LoaderEntryDefault</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderentrydefault" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderentrysysfail">
+<span class="sig-name descname"><span class="pre">LoaderEntrySysFail</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderentrysysfail" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderentryoneshot">
+<span class="sig-name descname"><span class="pre">LoaderEntryOneShot</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderentryoneshot" title="Link to this definition">¶</a></dt>
+<dd><p>The identifier of the default boot loader entry. Can be set in the OS and the boot loader. <a class="reference internal" href="#systemd-option-systemd-boot-loaderentryoneshot"><code class="docutils literal notranslate"><span class="pre">LoaderEntryOneShot</span></code></a> sets the default entry for the next boot only, while <a class="reference internal" href="#systemd-option-systemd-boot-loaderentrydefault"><code class="docutils literal notranslate"><span class="pre">LoaderEntryDefault</span></code></a> sets it persistently for all future boots. <a class="reference external" href="https://man7.org/linux/man-pages/man1/bootctl.1.html">bootctl(1)</a>’s <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">set-default</span></code> and <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">set-oneshot</span></code> commands make use of these variables. The boot loader modifies <a class="reference internal" href="#systemd-option-systemd-boot-loaderentrydefault"><code class="docutils literal notranslate"><span class="pre">LoaderEntryDefault</span></code></a> on request, when the <kbd class="kbd docutils literal notranslate">d</kbd> key is used, see above.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderentrylastbooted">
+<span class="sig-name descname"><span class="pre">LoaderEntryLastBooted</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderentrylastbooted" title="Link to this definition">¶</a></dt>
+<dd><p>The identifier of the boot loader entry last attempted. Set and read by the boot loader, only when <code class="code docutils literal notranslate"><span class="pre">/loader/loader.conf</span></code> has default set to “&#64;saved”. See <a class="reference external" href="https://man7.org/linux/man-pages/man5/loader.conf.5.html">loader.conf(5)</a>.</p>
+<p>The boot loader will ensure <a class="reference internal" href="#systemd-option-systemd-boot-loaderentrylastbooted"><code class="docutils literal notranslate"><span class="pre">LoaderEntryLastBooted</span></code></a> is up-to date for every boot, updating it as needed and will omit changing it all together when <a class="reference internal" href="#systemd-option-systemd-boot-loaderentryoneshot"><code class="docutils literal notranslate"><span class="pre">LoaderEntryOneShot</span></code></a> is set.</p>
+<p>The boot loader reads the variable, which takes higher priority than <a class="reference internal" href="#systemd-option-systemd-boot-loaderentrydefault"><code class="docutils literal notranslate"><span class="pre">LoaderEntryDefault</span></code></a>. The variable is ignored when <a class="reference internal" href="#systemd-option-systemd-boot-loaderentryoneshot"><code class="docutils literal notranslate"><span class="pre">LoaderEntryOneShot</span></code></a> is set.</p>
+<p><a class="reference internal" href="#systemd-option-systemd-boot-loaderentrylastbooted"><code class="docutils literal notranslate"><span class="pre">LoaderEntryLastBooted</span></code></a> cannot be used as indication that the last boot was successful or not.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderentryselected">
+<span class="sig-name descname"><span class="pre">LoaderEntrySelected</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderentryselected" title="Link to this definition">¶</a></dt>
+<dd><p>The identifier of the boot loader entry currently being booted. Set by the boot loader.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderfeatures">
+<span class="sig-name descname"><span class="pre">LoaderFeatures</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderfeatures" title="Link to this definition">¶</a></dt>
+<dd><p>A set of flags indicating the features the boot loader supports. Set by the boot loader. Use <a class="reference external" href="https://man7.org/linux/man-pages/man1/bootctl.1.html">bootctl(1)</a> to view this data.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderfirmwareinfo">
+<span class="sig-name descname"><span class="pre">LoaderFirmwareInfo</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderfirmwareinfo" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderfirmwaretype">
+<span class="sig-name descname"><span class="pre">LoaderFirmwareType</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderfirmwaretype" title="Link to this definition">¶</a></dt>
+<dd><p>Brief firmware information. Set by the boot loader. Use <a class="reference external" href="https://man7.org/linux/man-pages/man1/bootctl.1.html">bootctl(1)</a> to view this data.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loadertpm2activepcrbanks">
+<span class="sig-name descname"><span class="pre">LoaderTpm2ActivePcrBanks</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loadertpm2activepcrbanks" title="Link to this definition">¶</a></dt>
+<dd><p>Hexadecimal string representation of a bitmask with values defined by the TCG EFI Protocol Specification for TPM 2.0 as EFI_TCG2_BOOT_HASH_ALG_*. If no TPM2 support or no active banks were detected, will be set to <a class="reference internal" href="loader.conf.html#systemd-option-loader-conf-0"><code class="docutils literal notranslate"><span class="pre">0</span></code></a>. Set by the boot loader. Use <a class="reference internal" href="systemd-analyze.html#systemd-analyze-1"><span class="std std-ref">systemd-analyze(1)</span></a> to view this data.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderimageidentifier">
+<span class="sig-name descname"><span class="pre">LoaderImageIdentifier</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderimageidentifier" title="Link to this definition">¶</a></dt>
+<dd><p>The file system path to the EFI executable of the boot loader for the current boot, relative to the partition’s root directory (i.e. relative to the partition indicated by <a class="reference internal" href="#systemd-option-systemd-boot-loaderdevicepartuuid"><code class="docutils literal notranslate"><span class="pre">LoaderDevicePartUUID</span></code></a>, see above). Set by the boot loader. (Note that <code class="code docutils literal notranslate"><span class="pre">systemd-stub</span></code> will set this too, if not set yet, to support systems that directly boot into a unified kernel image, bypassing any boot loader.) Use <a class="reference external" href="https://man7.org/linux/man-pages/man1/bootctl.1.html">bootctl(1)</a> to view this data.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 220.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loaderinfo">
+<span class="sig-name descname"><span class="pre">LoaderInfo</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loaderinfo" title="Link to this definition">¶</a></dt>
+<dd><p>Brief information about the boot loader. Set by the boot loader. Use <a class="reference external" href="https://man7.org/linux/man-pages/man1/bootctl.1.html">bootctl(1)</a> to view this data.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loadertimeexecusec">
+<span class="sig-name descname"><span class="pre">LoaderTimeExecUSec</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loadertimeexecusec" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loadertimeinitusec">
+<span class="sig-name descname"><span class="pre">LoaderTimeInitUSec</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loadertimeinitusec" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loadertimemenuusec">
+<span class="sig-name descname"><span class="pre">LoaderTimeMenuUsec</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loadertimemenuusec" title="Link to this definition">¶</a></dt>
+<dd><p>Information about the time spent in various parts of the boot loader. Set by the boot loader. Use <a class="reference internal" href="systemd-analyze.html#systemd-analyze-1"><span class="std std-ref">systemd-analyze(1)</span></a> to view this data.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 240.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-loadersystemtoken">
+<span class="sig-name descname"><span class="pre">LoaderSystemToken</span></span><a class="headerlink" href="#systemd-option-systemd-boot-loadersystemtoken" title="Link to this definition">¶</a></dt>
+<dd><p>A binary random data field, that is used for generating the random seed to pass to the OS (see above). Note that this random data is generally only generated once, during OS installation, and is then never updated again.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 243.</span></p>
+</div>
+</dd></dl>
+
+<p>Many of these variables are defined by the <a class="reference external" href="https://systemd.io/BOOT_LOADER_INTERFACE">Boot Loader Interface</a>.</p>
+</section>
+<section id="smbios-type-11-strings">
+<h2>SMBIOS Type 11 Strings<a class="headerlink" href="#smbios-type-11-strings" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> can be configured using SMBIOS Type 11 strings. Applicable strings consist of a name, followed by “=”, followed by the value. Unless <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> detects it is running inside a confidential computing environment, <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> will search the table for a string with a specific name, and if found, use its value. The following strings are read:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-io-systemd-boot-kernel-cmdline-extra">
+<span class="sig-name descname"><span class="pre">io.systemd.boot.kernel-cmdline-extra</span></span><a class="headerlink" href="#systemd-option-systemd-boot-io-systemd-boot-kernel-cmdline-extra" title="Link to this definition">¶</a></dt>
+<dd><p>If set, the value of this string is added to the list of kernel command line arguments for Boot Loader Specification Type 1 entries that are measured in PCR12 and passed to the kernel.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-io-systemd-boot-entries-extra-id-definition">
+<span class="sig-name descname"><span class="pre">io.systemd.boot-entries.extra:ID=DEFINITION</span></span><a class="headerlink" href="#systemd-option-systemd-boot-io-systemd-boot-entries-extra-id-definition" title="Link to this definition">¶</a></dt>
+<dd><p>This allows inserting additional entries into the <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> menu. Take a pair of menu entry identifier and menu entry definition string. The former should be suitable for use as a filename of a Boot Loader Specification Type #1 entry filename (note that it is used for identification purposes only, no file of this name is actually accessed), the latter shall follow the syntax of the contents of a Type #1 entry. Any menu entry defined this way is processed and shown in pretty much the same way as a Type #1 entry read from the ESP or XBOOTLDR partition. Example:</p>
+<blockquote>
+<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>io.systemd.boot-entries.extra:fooos-current.conf<span class="o">=</span>title<span class="w"> </span>FooOS<span class="w"> </span><span class="o">(</span>Current<span class="o">)</span>
+uki-url<span class="w"> </span>http://example.com/somedir/fooos.efi
+</pre></div>
+</div>
+</div></blockquote>
+<p>Note that this example contains a newline character. When generating this string from a shell care must be taken to encode it correctly.</p>
+<p>Pass multiple strings formatted this way to generate multiple menu entries.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-boot-io-systemd-boot-loglevel">
+<span class="sig-name descname"><span class="pre">io.systemd.boot.loglevel</span></span><a class="headerlink" href="#systemd-option-systemd-boot-io-systemd-boot-loglevel" title="Link to this definition">¶</a></dt>
+<dd><p>If set, the value of this string is used as log level. Valid values (from most to least critical) are “emerg”, “alert”, “crit”, “err”, “warning”, “notice”, “info”, and “debug”.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 259.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="boot-counting">
+<h2>Boot Counting<a class="headerlink" href="#boot-counting" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> implements a simple boot counting mechanism on top of the <a class="reference external" href="https://uapi-group.org/specifications/specs/boot_loader_specification">Boot Loader Specification</a>, for automatic and unattended fallback to older kernel versions/boot loader entries when a specific entry continuously fails. Any boot loader entry file and unified kernel image file that contains a “+” followed by one or two numbers (if two they need to be separated by a “-“), before the <code class="code docutils literal notranslate"><span class="pre">.conf</span></code> or <code class="code docutils literal notranslate"><span class="pre">.efi</span></code> suffix is subject to boot counting: the first of the two numbers (‘tries left’) is decreased by one on every boot attempt, the second of the two numbers (‘tries done’) is increased by one (if ‘tries done’ is absent it is considered equivalent to 0). Depending on the current value of these two counters the boot entry is considered to be in one of three states:</p>
+<ol class="arabic simple">
+<li><p>If the ‘tries left’ counter of an entry is greater than zero the entry is considered to be in ‘indeterminate’ state. This means the entry has not completed booting successfully yet, but also has not been determined not to work.</p></li>
+<li><p>If the ‘tries left’ counter of an entry is zero it is considered to be in ‘bad’ state. This means no further attempts to boot this item will be made (that is, unless all other boot entries are also in ‘bad’ state), as all attempts to boot this entry have not completed successfully.</p></li>
+<li><p>If the ‘tries left’ and ‘tries done’ counters of an entry are absent it is considered to be in ‘good’ state. This means further boot counting for the entry is turned off, as it successfully booted at least once. The <a class="reference internal" href="systemd-bless-boot.service.html#systemd-bless-boot-service-8"><span class="std std-ref">systemd-bless-boot.service(8)</span></a> service moves the currently booted entry from ‘indeterminate’ into ‘good’ state when a boot attempt completed successfully.</p></li>
+</ol>
+<p>Generally, when new entries are added to the boot loader, they first start out in ‘indeterminate’ state, i.e. with a ‘tries left’ counter greater than zero. The boot entry remains in this state until either it managed to complete a full boot successfully at least once (in which case it will be in ‘good’ state) — or the ‘tries left’ counter reaches zero (in which case it will be in ‘bad’ state).</p>
+<p>Example: let’s say a boot loader entry file <code class="code docutils literal notranslate"><span class="pre">foo.conf</span></code> is set up for 3 boot tries. The installer will hence create it under the name <code class="code docutils literal notranslate"><span class="pre">foo+3.conf</span></code>. On first boot, the boot loader will rename it to <code class="code docutils literal notranslate"><span class="pre">foo+2-1.conf</span></code>. If that boot does not complete successfully, the boot loader will rename it to <code class="code docutils literal notranslate"><span class="pre">foo+1-2.conf</span></code> on the following boot. If that fails too, it will finally be renamed <code class="code docutils literal notranslate"><span class="pre">foo+0-3.conf</span></code> by the boot loader on next boot, after which it will be considered ‘bad’. If the boot succeeds however the entry file will be renamed to <code class="code docutils literal notranslate"><span class="pre">foo.conf</span></code> by the OS, so that it is considered ‘good’ from then on.</p>
+<p>The boot menu takes the ‘tries left’ counter into account when sorting the menu entries: entries in ‘bad’ state are ordered at the beginning of the list, and entries in ‘good’ or ‘indeterminate’ at the end. The user can freely choose to boot any entry of the menu, including those already marked ‘bad’. If the menu entry to boot is automatically determined, this means that ‘good’ or ‘indeterminate’ entries are generally preferred (as the bottom item of the menu is the one booted by default), and ‘bad’ entries will only be considered if there are no ‘good’ or ‘indeterminate’ entries left.</p>
+<p>The <a class="reference external" href="https://man7.org/linux/man-pages/man8/kernel-install.8.html">kernel-install(8)</a> kernel install framework optionally sets the initial ‘tries left’ counter to the value specified in <code class="code docutils literal notranslate"><span class="pre">/etc/kernel/tries</span></code> when a boot loader entry is first created.</p>
+</section>
+<section id="using-systemd-boot-in-virtual-machines">
+<h2>Using <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> in virtual machines<a class="headerlink" href="#using-systemd-boot-in-virtual-machines" title="Link to this heading">¶</a></h2>
+<p>When using <a class="reference external" href="https://www.qemu.org/docs/master/">qemu</a> with <a class="reference external" href="https://www.linux-kvm.org/downloads/lersek/ovmf-whitepaper-c770f8c.txt">OVMF</a> (UEFI Firmware for virtual machines) the <code class="code docutils literal notranslate"><span class="pre">-kernel</span></code> switch works not only for linux kernels, but for any EFI binary, including <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> and unified linux kernels (UKIs). Example command line for loading <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> on x64:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">qemu-system-x86_64</span> <span class="pre">-drive</span> <span class="pre">if=pflash,format=qcow2,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE_4M.qcow2</span> <span class="pre">-kernel</span> <span class="pre">/usr/lib/systemd/boot/efi/systemd-bootx64.efi</span> <span class="pre">-drive</span> <span class="pre">file=...</span> <span class="pre">[</span> <span class="pre">...</span> <span class="pre">]</span></code></p>
+<p>(The path to the firmware file might need to be adjusted depending on the distribution.) <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> will detect that it was started directly instead of being loaded from ESP and will search for the ESP in that case, taking into account boot order information from the hypervisor (if available). Note that for this to yield a useful result, another <code class="code docutils literal notranslate"><span class="pre">-drive</span></code> argument needs to be used to attach an actual disk image with an ESP.</p>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://man7.org/linux/man-pages/man1/bootctl.1.html">bootctl(1)</a>, <a class="reference external" href="https://man7.org/linux/man-pages/man5/loader.conf.5.html">loader.conf(5)</a>, <a class="reference internal" href="systemd-bless-boot.service.html#systemd-bless-boot-service-8"><span class="std std-ref">systemd-bless-boot.service(8)</span></a>, <a class="reference internal" href="systemd-boot-random-seed.service.html#systemd-boot-random-seed-service-8"><span class="std std-ref">systemd-boot-random-seed.service(8)</span></a>, <a class="reference external" href="https://man7.org/linux/man-pages/man8/kernel-install.8.html">kernel-install(8)</a>, <a class="reference internal" href="systemd-stub.html#systemd-stub-7"><span class="std std-ref">systemd-stub(7)</span></a>, <a class="reference external" href="https://uapi-group.org/specifications/specs/boot_loader_specification">Boot Loader Specification</a>, <a class="reference external" href="https://systemd.io/BOOT_LOADER_INTERFACE">Boot Loader Interface</a>, <a class="reference external" href="https://systemd.io/TPM2_PCR_MEASUREMENTS">TPM2 PCR Measurements Made by systemd</a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="systemd-boot-check-no-failures.service.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">systemd-boot-check-no-failures.service(8)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="systemd-bless-boot.service.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">systemd-bless-boot.service(8)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, systemd
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">systemd-boot(7)</a><ul>
+<li><a class="reference internal" href="#name">Name</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#key-bindings">Key bindings</a></li>
+<li><a class="reference internal" href="#files">Files</a></li>
+<li><a class="reference internal" href="#efi-variables">EFI Variables</a></li>
+<li><a class="reference internal" href="#smbios-type-11-strings">SMBIOS Type 11 Strings</a></li>
+<li><a class="reference internal" href="#boot-counting">Boot Counting</a></li>
+<li><a class="reference internal" href="#using-systemd-boot-in-virtual-machines">Using <code class="code docutils literal notranslate"><span class="pre">systemd-boot</span></code> in virtual machines</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/js/custom.js?v=abe08e2c"></script>
+    </body>
+</html>

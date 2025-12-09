@@ -1,0 +1,86 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_watchdog_enabled
+:manvolnum: 3
+:summary: Check whether the service manager expects watchdog keep-alive notifications from a service
+
+.. _sd_watchdog_enabled(3):
+
+======================
+sd_watchdog_enabled(3)
+======================
+
+Name
+####
+
+sd_watchdog_enabled — Check whether the service manager expects watchdog keep-alive notifications from a service
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-daemon.h>` .. code-block::
+
+   int sd_watchdog_enabled(int unset_environment,
+	uint64_t *usec);
+
+Description
+###########
+
+:code:`sd_watchdog_enabled()` may be called by a service to detect whether the service manager expects regular keep-alive watchdog notification events from it, and the timeout after which the manager will act on the service if it did not get such a notification.
+
+If the :code:`$WATCHDOG_USEC` environment variable is set, and the :code:`$WATCHDOG_PID` variable is unset or set to the PID of the current process, the service manager expects notifications from this process. The manager will usually terminate a service when it does not get a notification message within the specified time after startup and after each previous message. It is recommended that a daemon sends a keep-alive notification message to the service manager every half of the time returned here. Notification messages may be sent with :ref:`sd_notify(3)` with a message string of "WATCHDOG=1".
+
+If the :code:`unset_environment` parameter is non-zero, :code:`sd_watchdog_enabled()` will unset the :code:`$WATCHDOG_USEC` and :code:`$WATCHDOG_PID` environment variables before returning (regardless of whether the function call itself succeeded or not). Those variables are no longer inherited by child processes. Further calls to :code:`sd_watchdog_enabled()` will also return with zero.
+
+If the :code:`usec` parameter is non-:code:`NULL`, :code:`sd_watchdog_enabled()` will write the timeout in μs for the watchdog logic to it.
+
+To enable service supervision with the watchdog logic, use :code:`WatchdogSec=` in service files. See :ref:`systemd.service(5)` for details.
+
+Use :ref:`sd_event_set_watchdog(3)` to enable automatic watchdog support in :ref:`sd-event(3)`-based event loops.
+
+Return Value
+############
+
+On failure, this call returns a negative errno-style error code. If the service manager expects watchdog keep-alive notification messages to be sent, > 0 is returned, otherwise 0 is returned. Only if the return value is > 0, the :code:`usec` parameter is valid after the call.
+
+Notes
+#####
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove getenv|
+    :end-before: .. inclusion-end-marker-do-not-remove getenv|
+
+Internally, this function parses the :code:`$WATCHDOG_PID` and :code:`$WATCHDOG_USEC` environment variable. The call will ignore these variables if :code:`$WATCHDOG_PID` does not contain the PID of the current process, under the assumption that in that case, the variables were set for a different process further up the process tree.
+
+Environment
+###########
+
+.. systemd:var:: $WATCHDOG_PID
+   :group: environment-variables
+
+   Set by the system manager for supervised process for which watchdog support is enabled, and contains the PID of that process. See above for details.
+
+   .. versionadded:: 209
+
+.. systemd:var:: $WATCHDOG_USEC
+   :group: environment-variables
+
+   Set by the system manager for supervised process for which watchdog support is enabled, and contains the watchdog timeout in μs. See above for details.
+
+   .. versionadded:: 209
+
+History
+#######
+
+:code:`sd_watchdog_enabled()` was added in version 209.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-daemon(3)`, :man-pages:`daemon(7)`, :ref:`systemd.service(5)`, :ref:`sd_notify(3)`, :ref:`sd_event_set_watchdog(3)`
+
+

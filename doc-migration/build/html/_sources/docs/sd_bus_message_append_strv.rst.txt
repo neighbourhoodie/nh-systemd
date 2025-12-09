@@ -1,0 +1,49 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_append_strv
+:manvolnum: 3
+:summary: Attach an array of strings to a message
+
+.. _sd_bus_message_append_strv(3):
+
+=============================
+sd_bus_message_append_strv(3)
+=============================
+
+Name
+####
+
+sd_bus_message_append_strv — Attach an array of strings to a message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_append_strv(sd_bus_message *m,
+	char **l);
+
+Description
+###########
+
+The :code:`sd_bus_message_append()` function can be used to append an array of strings to message :code:`m`. The parameter :code:`l` shall point to a :code:`NULL`-terminated array of pointers to :code:`NUL`-terminated strings. Each string must satisfy the same constraints as described for the "s" type in :ref:`sd_bus_message_append_basic(3)`.
+
+The memory pointed at by :code:`p` and the contents of the strings themselves are copied into the memory area containing the message and may be changed after this call. Note that the signature of :code:`l` parameter is to be treated as const char \*const *, and the contents will not be modified.
+
+Return Value
+############
+
+On success, this call returns 0 or a positive integer. On failure, a negative errno-style error code is returned.
+
+.. include:: sd_bus_message_append_basic.rst
+    :start-after: .. inclusion-marker-do-not-remove errors|
+    :end-before: .. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_append(3)`, :ref:`sd_bus_message_append_array(3)`, `The D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_
+
+

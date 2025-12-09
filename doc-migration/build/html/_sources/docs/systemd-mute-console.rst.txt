@@ -1,0 +1,59 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-mute-console
+:manvolnum: 1
+:summary: Temporarily mute kernel log output and service manager status output to the system console
+:aliases: systemd-mute-console@.service, systemd-mute-console.socket
+
+.. _systemd-mute-console(1):
+
+=======================
+systemd-mute-console(1)
+=======================
+
+Name
+####
+
+systemd-mute-console, systemd-mute-console@.service, systemd-mute-console.socket — Temporarily mute kernel log output and service manager status output to the system console
+
+Synopsis
+########
+
+:code:`systemd-mute-console [OPTIONS...]`
+
+:code:`systemd-mute-console@.service`
+
+:code:`systemd-mute-console.socket`
+
+Description
+###########
+
+The :code:`systemd-mute-console` tool and service may be used to temporarily mute the log output of the kernel as well as the status output of the service manager to the system console. It may be used by tools running on the console to ensure their terminal output is not interrupted by unrelated messages.
+
+The tool can be invoked directly in which case it will mute the two outputs and then issue an :ref:`sd_notify(3)` "READY=1" notification once that is completed. On :code:`SIGINT` or :code:`SIGTERM` output is unmuted again. Alternatively it can be invoked via Varlink IPC.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --kernel=bool, --pid1=bool
+
+   Individually controls which output to mute. If true is specified the respective output is muted, if false the output is left as is. Defaults to true.
+
+   .. versionadded:: 259
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-firstboot(1)`
+
+

@@ -1,0 +1,57 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd-json
+:manvolnum: 3
+:summary: APIs for Dealing with JSON Objects
+
+.. _sd-json(3):
+
+==========
+sd-json(3)
+==========
+
+Name
+####
+
+sd-json — APIs for Dealing with JSON Objects
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-json.h>`
+
+:code:`pkg-config --cflags --libs libsystemd`
+
+Description
+###########
+
+:code:`sd-json.h` is part of :man-pages:`libsystemd(3)` and provides APIs to parse, generate, format and otherwise operate with JSON objects.
+
+The API's central data structure is JsonVariant which encapsulates a JSON object, array, string, boolean, number or null value. These data structures are mostly considered immutable after construction (i.e. their contents will not change, but some meta-data might, such as reference counters).
+
+The APIs broadly fall into five categories:
+
+*    APIs to directly operate with JsonVariant objects, in the :code:`sd_json_variant*` namespace.
+
+*    APIs to construct complex JSON objects, in the :code:`sd_json_build*` namespace.
+
+*    APIs to map JsonVariant objects and their fields to matching fields in C structures, in the :code:`sd_json_dispatch*` namespace.
+
+*    APIs to convert a string representation of a JSON object into a JsonVariant object, in the :code:`sd_json_parse*` namespace.
+
+*    APIs to convert an JsonVariant object into its string representation, in the :code:`sd_json_format*` namespace.
+
+This JSON library will internally encode JSON integer numbers in the range :code:`INT64_MIN`\…:code:`UINT64_MAX` into native 64bit signed or unsigned integers, and will reproduce them without loss of precision. Non-integer numbers are stored in 64bit IEEE floating point numbers.
+
+If the functions return string arrays, these are generally :code:`NULL` terminated and need to be freed by the caller with the libc :man-pages:`free(3)` call after use, including the strings referenced therein. Similarly, individual strings returned need to be freed, as well.
+
+As a special exception, instead of an empty string array :code:`NULL` may be returned, which should be treated equivalent to an empty string array.
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-varlink(3)`, :die-net:`pkg-config(1)`
+
+

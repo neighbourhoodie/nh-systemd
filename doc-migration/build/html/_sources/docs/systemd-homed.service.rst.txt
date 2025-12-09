@@ -1,0 +1,80 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-homed.service
+:manvolnum: 8
+:summary: Home Area/User Account Manager
+:aliases: systemd-homed
+
+.. _systemd-homed.service(8):
+
+========================
+systemd-homed.service(8)
+========================
+
+Name
+####
+
+systemd-homed.service, systemd-homed — Home Area/User Account Manager
+
+Synopsis
+########
+
+:code:`systemd-homed.service`
+
+:code:`/usr/lib/systemd/systemd-homed`
+
+Description
+###########
+
+:code:`systemd-homed` is a system service that may be used to create, remove, change or inspect home areas (directories and network mounts and real or loopback block devices with a filesystem, optionally encrypted).
+
+Most of :code:`systemd-homed`'s functionality is accessible through the :man-pages:`homectl(1)` command.
+
+See the `Home Directories <https://systemd.io/HOME_DIRECTORY>`_ documentation for details about the format and design of home areas managed by :code:`systemd-homed.service`.
+
+Each home directory managed by :code:`systemd-homed.service` synthesizes a local user and group. These are made available to the system using the `User/Group Record Lookup API via Varlink <https://systemd.io/USER_GROUP_API>`_, and thus may be browsed with :man-pages:`userdbctl(1)`.
+
+:code:`systemd-homed.service` also manages blob directories for each home directory it manages. See `User Record Blob Directories <https://systemd.io/USER_RECORD_BLOB_DIRS>`_ for more details.
+
+Key Management
+##############
+
+User records are cryptographically signed with a public/private key pair (the signature is part of the JSON record itself). For a user to be permitted to log in locally the public key matching the signature of their user record must be installed. For a user record to be modified locally the private key matching the signature must be installed locally, too. The keys are stored in the :code:`/var/lib/systemd/home/` directory:
+
+.. systemd:option:: /var/lib/systemd/home/local.private
+
+   The private key of the public/private key pair used for local records. Currently, only a single such key may be installed.
+
+   .. versionadded:: 246
+
+.. systemd:option:: /var/lib/systemd/home/local.public
+
+   The public key of the public/private key pair used for local records. Currently, only a single such key may be installed.
+
+   .. versionadded:: 246
+
+.. systemd:option:: /var/lib/systemd/home/\*.public
+
+   Additional public keys. Any users whose user records are signed with any of these keys are permitted to log in locally. An arbitrary number of keys may be installed this way.
+
+   .. versionadded:: 246
+
+All key files listed above are in PEM format.
+
+In order to migrate a home directory from a host "foobar" to another host "quux" it is hence sufficient to copy :code:`/var/lib/systemd/home/local.public` from the host "foobar" to "quux", maybe calling the file on the destination :code:`/var/lib/systemd/home/foobar.public`, reflecting the origin of the key. If the user record should be modifiable on "quux" the pair :code:`/var/lib/systemd/home/local.public` and :code:`/var/lib/systemd/home/local.private` need to be copied from "foobar" to "quux", and placed under the identical paths there, as currently only a single private key is supported per host. Note of course that the latter means that user records generated/signed before the key pair is copied in, lose their validity.
+
+Signals
+#######
+
+.. systemd:constant:: SIGUSR1
+
+   Upon reception of the :code:`SIGUSR1` process signal :code:`systemd-homed` will reestablish its file watches on :code:`/home/` and rescan the directory for home directories.
+
+   .. versionadded:: 258
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`homed.conf(5)`, :man-pages:`homectl(1)`, :man-pages:`pam_systemd_home(8)`, :man-pages:`userdbctl(1)`, :man-pages:`org.freedesktop.home1(5)`
+
+

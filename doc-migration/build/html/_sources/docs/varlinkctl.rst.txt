@@ -1,0 +1,294 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: varlinkctl
+:manvolnum: 1
+:summary: Introspect with and invoke Varlink services
+
+.. _varlinkctl(1):
+
+=============
+varlinkctl(1)
+=============
+
+Name
+####
+
+varlinkctl — Introspect with and invoke Varlink services
+
+Synopsis
+########
+
+:code:`varlinkctl [OPTIONS...] info ADDRESS`
+
+:code:`varlinkctl [OPTIONS...] list-interfaces ADDRESS`
+
+:code:`varlinkctl [OPTIONS...] list-methods ADDRESS [<INTERFACE>...]`
+
+:code:`varlinkctl [OPTIONS...] introspect ADDRESS [<INTERFACE>...]`
+
+:code:`varlinkctl [OPTIONS...] call ADDRESS METHOD [<ARGUMENTS>]`
+
+:code:`varlinkctl [OPTIONS...] --exec call call ADDRESS METHOD ARGUMENTS -- CMDLINE`
+
+:code:`varlinkctl [OPTIONS...] validate-idl [<FILE>]`
+
+Description
+###########
+
+:code:`varlinkctl` may be used to introspect and invoke `Varlink <https://varlink.org/>`_ services.
+
+Services are referenced by one of the following:
+
+*    A Varlink service reference starting with the "unix:" string, followed by an absolute :code:`AF_UNIX` socket path, or by "@" and an arbitrary string (the latter for referencing sockets in the abstract namespace). In this case, a stream socket connection is made to the specified socket.
+
+*    A Varlink service reference starting with the "exec:" string, followed by an absolute path of a binary to execute. In this case, the specified process is forked off locally, with a connected stream socket passed in.
+
+*    A Varlink service reference starting with the "ssh-unix:" string, followed by an SSH host specification, followed by ":", followed by an absolute :code:`AF_UNIX` socket path. (This requires OpenSSH 9.4 or newer on the server side, and abstract namespace sockets are not supported.)
+
+*    A Varlink service reference starting with the "ssh-exec:" string, followed by an SSH host specification, followed by ":", followed by a command line. In this case, the command is invoked and the Varlink protocol is spoken on the standard input and output of the invoked command.
+
+For convenience, these two simpler (redundant) service address syntaxes are also supported:
+
+*    A file system path to an :code:`AF_UNIX` socket, either absolute (i.e. begins with "/") or relative (in which case it must begin with "./").
+
+*    A file system path to an executable, either absolute or relative (as above, must begin with "/" or "./", respectively).
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: info ADDRESS
+
+   Shows brief information about the specified service, including vendor name and list of implemented interfaces. Expects a service address in one of the formats described above.
+
+   .. versionadded:: 255
+
+.. systemd:option:: list-interfaces ADDRESS
+
+   Shows a list of interfaces implemented by the specified service. Expects a service address in one of the formats described above.
+
+   .. versionadded:: 255
+
+.. systemd:option:: list-methods ADDRESS [INTERFACE…]
+
+   Shows a list of methods implemented by the specified service. Expects a service address in one of the formats described above as well as one or more interface names. If no interface name is specified, lists all methods of all interfaces implemented by the service, otherwise just the methods in the specified interfaces.
+
+   .. versionadded:: 257
+
+.. systemd:option:: introspect ADDRESS [INTERFACE…]
+
+   Shows the interface definitions of the specified interfaces provided by the specified service. Expects a service address in one of the formats described above and optionally one or more Varlink interface names. If no interface names are specified, shows all provided interfaces by the service.
+
+   .. versionadded:: 255
+
+.. systemd:option:: call ADDRESS METHOD [ARGUMENTS]
+
+   Calls the specified method of the specified service. Expects a service address in the format described above, a fully qualified Varlink method name, and a JSON arguments object. If the arguments object is not specified, it is read from STDIN instead. To pass an empty list of parameters, specify the empty object "{}".
+
+   The reply parameters are written as JSON objects to STDOUT.
+
+   .. versionadded:: 255
+
+.. systemd:option:: validate-idl [FILE]
+
+   Reads a Varlink interface definition file, parses and validates it, then outputs it with syntax highlighting. This checks for syntax and internal consistency of the interface. Expects a file name to read the interface definition from. If omitted, reads the interface definition from STDIN.
+
+   .. versionadded:: 255
+
+.. systemd:option:: help
+
+   Shows command syntax help.
+
+   .. versionadded:: 255
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --more
+
+   When used with :code:`call`: expect multiple method replies. If this flag is set, the method call is sent with the :code:`more` flag set, which tells the service to generate multiple replies, if needed. The command remains running until the service sends a reply message that indicates it is the last in the series (or if the configured timeout is reached, see below). This flag should be set only for method calls that support this mechanism.
+
+   If this mode is enabled, output is automatically switched to JSON-SEQ mode, so that individual reply objects can be easily discerned.
+
+   This switch has no effect on the method call timeout applied by default. Regardless of whether :code:`--more` is specified or not, the default timeout will be 45s. Use :code:`--timeout=` (see below) to change or disable the timeout. When invoking a method call that continuously returns updates, it is typically desirable to disable the timeout with :code:`--timeout=infinity`. On the other hand, when invoking a :code:`--more` method call for the purpose of enumerating objects (which likely will complete quickly), it is typically beneficial to leave the timeout logic enabled, for robustness reasons.
+
+   .. versionadded:: 255
+
+.. systemd:option:: -E
+
+   A shortcut for :code:`--more --timeout=infinity`. This switch is useful for method calls that implement subscription to a continuous stream of updates.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --collect
+
+   This is similar to :code:`--more`, but collects all responses in a JSON array, and prints it, rather than in JSON-SEQ mode.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --oneway
+
+   When used with :code:`call`: do not expect a method reply. If this flag is set, the method call is sent with the :code:`oneway` flag set (the command exits immediately after), which tells the service not to generate a reply.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --json=MODE
+
+   Selects the JSON output formatting, either "pretty" for nicely indented, colorized output, or "short" for terse output with minimal whitespace and no newlines. Defaults to "short".
+
+   .. versionadded:: 255
+
+.. systemd:option:: -j
+
+   Equivalent to :code:`--json=pretty` when invoked interactively from a terminal. Otherwise, it is equivalent to :code:`--json=short`, in particular when the output is piped to some other program.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --quiet, -q
+
+   Suppress output of method call replies.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --graceful=
+
+   Takes a qualified Varlink error name, i.e. an interface name, suffixed by an error name, separated by a dot, e.g. "org.varlink.service.InvalidParameter". Ensures that, if a method call fails with the specified error, this will be treated as success, i.e. will cause the :code:`varlinkctl` invocation to exit with a zero exit status. This option may be used more than once in order to treat multiple different errors as successes.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --timeout=
+
+   Expects a timeout in seconds as parameter. By default, a timeout of 45s is enforced. To turn off the timeout, specify "infinity" or an empty string.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --exec
+
+   Once the method call issued via :code:`call` completed successfully, chainload the specified command line, with the method call output parameters serialized to JSON passed into standard input (and standard output and standard error inherited from the invoking process). Moreover any file descriptors passed back on the underlying communication socket are passed to the invoked process via the usual :code:`$LISTEN_FDS` protocol. This functionality may be used to consume replies that come with associated file descriptors in a reasonable way.
+
+   Now that if :code:`--exec` is specified the the third parameter to :code:`call` is not optional (i.e. the method call parameters).
+
+   .. versionadded:: 258
+
+.. systemd:option:: --push-fd=
+
+   Takes a numeric file descriptor number as parameter. May be used to pass a file descriptor along with the method call, if the underlying transport supports this. May be used multiple times to pass multiple file descriptors, retaining the order in which they are specified. The specified file descriptors must be passed to the :code:`varlinkctl` invocation. Optionally, in place of a numeric file descriptor number an absolute or relative file system path (the latter must be prefixed with "./") may be specified, which is opened in read-only mode.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Examples
+########
+
+Investigating a Service
+-----------------------
+
+The following three commands inspect the "io.systemd.Resolve" service implemented by :ref:`systemd-resolved.service(8)`, listing general service information and implemented interfaces, and then displaying the interface definition of its primary interface:
+
+.. code-block:: sh
+
+   $ varlinkctl info /run/systemd/resolve/io.systemd.Resolve
+       Vendor: The systemd Project
+      Product: systemd (systemd-resolved)
+      Version: 254 (254-1522-g4790521^)
+          URL: https://systemd.io/
+   Interfaces: io.systemd
+               io.systemd.Resolve
+               org.varlink.service
+   $ varlinkctl list-interfaces /run/systemd/resolve/io.systemd.Resolve
+   io.systemd
+   io.systemd.Resolve
+   org.varlink.service
+   $ varlinkctl introspect /run/systemd/resolve/io.systemd.Resolve io.systemd.Resolve
+   interface io.systemd.Resolve
+   type ResolvedAddress(
+           ifindex: ?int,
+           …
+
+(Interface definition has been truncated in the example above, in the interest of brevity.)
+
+Invoking a Method
+-----------------
+
+The following command resolves a hostname via :ref:`systemd-resolved.service(8)`'s :code:`ResolveHostname` method call.
+
+.. code-block:: sh
+
+   $ varlinkctl call /run/systemd/resolve/io.systemd.Resolve io.systemd.Resolve.ResolveHostname '{"name":"systemd.io","family":2}' -j
+   {
+           "addresses" : [
+                   {
+                           "ifindex" : 2,
+                           "family" : 2,
+                           "address" : [
+                                   185,
+                                   199,
+                                   111,
+                                   153
+                           ]
+                   }
+           ],
+           "name" : "systemd.io",
+           "flags" : 1048577
+   }
+
+Investigating a Service Executable
+----------------------------------
+
+The following command inspects the :code:`/usr/lib/systemd/systemd-pcrextend` executable and the IPC APIs it provides. It then invokes a method on it:
+
+.. code-block:: sh
+
+   # varlinkctl info /usr/lib/systemd/systemd-pcrextend
+       Vendor: The systemd Project
+      Product: systemd (systemd-pcrextend)
+      Version: 254 (254-1536-g97734fb)
+          URL: https://systemd.io/
+   Interfaces: io.systemd
+               io.systemd.PCRExtend
+               org.varlink.service
+   # varlinkctl introspect /usr/lib/systemd/systemd-pcrextend io.systemd.PCRExtend
+   interface io.systemd.PCRExtend
+   method Extend(
+           pcr: int,
+           text: ?string,
+           data: ?string
+   ) -> ()
+   # varlinkctl call /usr/lib/systemd/systemd-pcrextend io.systemd.PCRExtend.Extend '{"pcr":15,"text":"foobar"}'
+   {}
+
+Invoking a method remotely via SSH
+----------------------------------
+
+The following command acquires a report about the identity of a remote host "somehost" from :ref:`systemd-hostnamed.service(8)` by connecting via SSH to the :code:`AF_UNIX` socket the service listens on:
+
+.. code-block:: sh
+
+   # varlinkctl call ssh-unix:somehost:/run/systemd/io.systemd.Hostname io.systemd.Hostname.Describe '{}'
+
+To invoke a Varlink service binary directly on the remote host, rather than talking to a service via :code:`AF_UNIX` can be done like this:
+
+.. code-block:: sh
+
+   # varlinkctl call ssh-exec:somehost:systemd-creds org.varlink.service.GetInfo '{}'
+
+See Also
+########
+
+:man-pages:`busctl(1)`, `Varlink <https://varlink.org/>`_
+
+

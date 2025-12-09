@@ -1,0 +1,60 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_slot_ref
+:manvolnum: 3
+:summary: Create and destroy references to a bus slot object
+:aliases: sd_bus_slot_unref, sd_bus_slot_unrefp
+
+.. _sd_bus_slot_ref(3):
+
+==================
+sd_bus_slot_ref(3)
+==================
+
+Name
+####
+
+sd_bus_slot_ref, sd_bus_slot_unref, sd_bus_slot_unrefp — Create and destroy references to a bus slot object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   sd_bus_slot *sd_bus_slot_ref(sd_bus_slot *slot); .. code-block::
+
+   sd_bus_slot *sd_bus_slot_unref(sd_bus_slot *slot); .. code-block::
+
+   void sd_bus_slot_unrefp(sd_bus_slot **slotp);
+
+Description
+###########
+
+:code:`sd_bus_slot_ref()` increases the internal reference counter of :code:`slot` by one.
+
+:code:`sd_bus_slot_unref()` decreases the internal reference counter of :code:`slot` by one. Once the reference count has dropped to zero, slot object is destroyed and cannot be used anymore, so further calls to :code:`sd_bus_slot_ref()` or :code:`sd_bus_slot_unref()` are illegal.
+
+:code:`sd_bus_slot_unrefp()` is similar to :code:`sd_bus_slot_unref()` but takes a pointer to a pointer to an sd_bus_slot object. This call is useful in conjunction with GCC's and LLVM's `Clean-up Variable Attribute <https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html>`_. See :ref:`sd_bus_new(3)` for an example how to use the cleanup attribute.
+
+:code:`sd_bus_slot_ref()` and :code:`sd_bus_slot_unref()` execute no operation if the passed in bus object address is :code:`NULL`. :code:`sd_bus_slot_unrefp()` will first dereference its argument, which must not be :code:`NULL`, and will execute no operation if *that* is is :code:`NULL`.
+
+Return Value
+############
+
+:code:`sd_bus_slot_ref()` always returns the argument.
+
+:code:`sd_bus_slot_unref()` always returns :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_slot_ref()`, :code:`sd_bus_slot_unref()`, and :code:`sd_bus_slot_unrefp()` were added in version 240.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_new(3)`, :ref:`sd_bus_message_new(3)`, :ref:`sd_bus_call_method_async(3)`
+
+

@@ -1,0 +1,278 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: importctl
+:manvolnum: 1
+:summary: Download, import or export disk images
+
+.. _importctl(1):
+
+============
+importctl(1)
+============
+
+Name
+####
+
+importctl — Download, import or export disk images
+
+Synopsis
+########
+
+:code:`importctl [OPTIONS...] {COMMAND} [NAME...]`
+
+Description
+###########
+
+:code:`importctl` may be used to download, import, and export disk images via :ref:`systemd-importd.service(8)`.
+
+:code:`importctl` operates both on block-level disk images (such as DDIs) as well as file-system-level images (tarballs). It supports disk images in one of the four following classes:
+
+*    VM images or full OS container images, that may be run via :ref:`systemd-vmspawn(1)` or :ref:`systemd-nspawn(1)`, and managed via :man-pages:`machinectl(1)`.
+
+*    Portable service images, that may be attached and managed via :man-pages:`portablectl(1)`.
+
+*    System extension (sysext) images, that may be activated via :ref:`systemd-sysext(8)`.
+
+*    Configuration extension (confext) images, that may be activated via :ref:`systemd-confext(8)`.
+
+When images are downloaded or imported they are placed in the following directories, depending on the :code:`--class=` parameter:
+
+.. list-table:: Classes and Directories
+   :header-rows: 1
+
+   * - Class
+     - Directory
+   * - "machine"
+     - :code:`/var/lib/machines/`
+   * - "portable"
+     - :code:`/var/lib/portables/`
+   * - "sysext"
+     - :code:`/var/lib/extensions/`
+   * - "confext"
+     - :code:`/var/lib/confexts/`
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: pull-tar URL [NAME]
+
+   Downloads a :code:`.tar` image from the specified URL, and makes it available under the specified local name in the image directory for the selected :code:`--class=`. The URL must be of type "http://" or "https://", and must refer to a :code:`.tar`, :code:`.tar.gz`, :code:`.tar.xz` or :code:`.tar.bz2` archive file. If the local image name is omitted, it is automatically derived from the last component of the URL, with its suffix removed.
+
+   The image is verified before it is made available, unless :code:`--verify=no` is specified. Verification is done either via a file with the name of the image and the suffix :code:`.sha256` and a detached :code:`.sha256.asc` or :code:`.sha256.gpg` signature or via separate :code:`SHA256SUMS` and :code:`SHA256SUMS.asc` or :code:`SHA256SUMS.gpg` files. The signature files need to be made available on the same web server, under the same URL as the :code:`.tar` file. With :code:`--verify=checksum`, only the SHA256 checksum for the file is verified, based on the :code:`.sha256` suffixed file or the :code:`SHA256SUMS` file. With :code:`--verify=signature`, the sha checksum file is first verified with the detached GPG signature of :code:`.sha256` or :code:`SHA256SUMS`. The public key for this verification step needs to be available in :code:`/usr/lib/systemd/import-pubring.pgp` or :code:`/etc/systemd/import-pubring.pgp`.
+
+   If :code:`-keep-download=yes` is specified the image will be downloaded and stored in a read-only subvolume/directory in the image directory that is named after the specified URL and its HTTP etag (see `HTTP ETag <https://en.wikipedia.org/wiki/HTTP_ETag>`_ for more information). A writable snapshot is then taken from this subvolume, and named after the specified local name. This behavior ensures that creating multiple instances of the same URL is efficient, as multiple downloads are not necessary. In order to create only the read-only image, and avoid creating its writable snapshot, specify "-" as local name.
+
+   Note that pressing Control-c during execution of this command will not abort the download. Use :code:`cancel-transfer`, described below.
+
+   .. versionadded:: 256
+
+.. systemd:option:: pull-raw URL [NAME]
+
+   Downloads a :code:`.raw` disk image from the specified URL, and makes it available under the specified local name in the image directory for the selected :code:`--class=`. The URL must be of type "http://" or "https://". The image must either be a qcow2 or raw disk image, optionally compressed as :code:`.gz`, :code:`.xz`, or :code:`.bz2`. If the local name is omitted, it is automatically derived from the last component of the URL, with its suffix removed.
+
+   Image verification is identical for raw and tar images (see above).
+
+   If the downloaded image is in qcow2 format it is converted into a raw image file before it is made available.
+
+   If :code:`-keep-download=yes` is specified the image will be downloaded and stored in a read-only file in the image directory that is named after the specified URL and its HTTP etag. A writable copy is then made from this file, and named after the specified local name. This behavior ensures that creating multiple instances of the same URL is efficient, as multiple downloads are not necessary. In order to create only the read-only image, and avoid creating its writable copy, specify "-" as local name.
+
+   Note that pressing Control-c during execution of this command will not abort the download. Use :code:`cancel-transfer`, described below.
+
+   .. versionadded:: 256
+
+.. systemd:option:: import-tar FILE [NAME], import-raw FILE [NAME]
+
+   Imports a TAR or RAW image, and places it under the specified name in the image directory for the image class selected via :code:`--class=`. When :code:`import-tar` is used, the file specified as the first argument should be a :die-net:`tar(1)` archive, possibly compressed with :die-net:`xz(1)`, :die-net:`gzip(1)`, :die-net:`zstd(1)`, or :die-net:`bzip2(1)`. It will then be unpacked into its own subvolume/directory. When :code:`import-raw` is used, the file should be a qcow2 or raw disk image, possibly compressed with xz, gzip, zstd or bzip2. If the second argument (the resulting image name) is not specified, it is automatically derived from the file name. If the filename is passed as "-", the image is read from standard input, in which case the second argument is mandatory.
+
+   No cryptographic validation is done when importing the images.
+
+   Much like image downloads, ongoing imports may be listed with :code:`list` and aborted with :code:`cancel-transfer`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: import-fs DIRECTORY [NAME]
+
+   Imports an image stored in a local directory into the image directory for the image class selected via :code:`--class=` and operates similarly to :code:`import-tar` or :code:`import-raw`, but the first argument is the source directory. If supported, this command will create a `btrfs(8) <https://btrfs.readthedocs.io/en/latest/btrfs.html>`_ snapshot or subvolume for the new image.
+
+   .. versionadded:: 256
+
+.. systemd:option:: export-tar NAME [FILE], export-raw NAME [FILE]
+
+   Exports a TAR or RAW image and stores it in the specified file. The first parameter should be an image name. The second parameter should be a file path the TAR or RAW image is written to. If the path ends in ".gz", the file is compressed with :die-net:`gzip(1)`, if it ends in ".xz", with :die-net:`xz(1)`, if it ends in ".zst", with :die-net:`zstd(1)`, and if it ends in ".bz2", with :die-net:`bzip2(1)`. If the path ends in neither, the file is left uncompressed. If the second argument is missing, the image is written to standard output. The compression may also be explicitly selected with the :code:`--format=` switch. This is in particular useful if the second parameter is left unspecified.
+
+   Much like image downloads and imports, ongoing exports may be listed with :code:`list` and aborted with :code:`cancel-transfer`.
+
+   Note that, currently, only directory and subvolume images may be exported as TAR images, and only raw disk images as RAW images.
+
+   .. versionadded:: 256
+
+.. systemd:option:: list-transfer
+
+   Shows a list of image downloads, imports and exports that are currently in progress.
+
+   .. versionadded:: 256
+
+.. systemd:option:: cancel-transfer ID…
+
+   Aborts a download, import or export of the image with the specified ID. To list ongoing transfers and their IDs, use :code:`list`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: list-images
+
+   Shows a list of already downloaded/imported images.
+
+   .. versionadded:: 256
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --read-only
+
+   When used with :code:`pull-raw`, :code:`pull-tar`, :code:`import-raw`, :code:`import-tar` or :code:`import-fs` a read-only image is created.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --verify=
+
+   When downloading an image, specify whether the image shall be verified before it is made available. Takes one of "no", "checksum" and "signature". If "no", no verification is done. If "checksum" is specified, the download is checked for integrity after the transfer is complete, but no signatures are verified. If "signature" is specified, the checksum is verified and the image's signature is checked against a local keyring of trustable vendors. It is strongly recommended to set this option to "signature" if the server and protocol support this. Defaults to "signature".
+
+   .. versionadded:: 256
+
+.. systemd:option:: --force
+
+   When downloading an image, and a local copy by the specified local name already exists, delete it first and replace it by the newly downloaded image.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --format=
+
+   When used with the :code:`export-tar` or :code:`export-raw` commands, specifies the compression format to use for the resulting file. Takes one of "uncompressed", "xz", "gzip", "zst", "bzip2". By default, the format is determined automatically from the output image file name passed.
+
+   .. versionadded:: 256
+
+.. systemd:option:: -q, --quiet
+
+   Suppresses additional informational output while running.
+
+   .. versionadded:: 256
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. systemd:option:: -M, --machine=
+
+   Connect to :ref:`systemd-importd.service(8)` running in a local container, to perform the specified operation within the container.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --class=, -m, -P, -S, -C
+
+   Selects the image class for the downloaded images. This primarily selects the directory to download into. The :code:`--class=` switch takes "machine", "portable", "sysext" or "confext" as argument. The short options :code:`-m`, :code:`-P`, :code:`-S`, :code:`-C` are shortcuts for :code:`--class=machine`, :code:`--class=portable`, :code:`--class=sysext`, :code:`--class=confext`.
+
+   Note that :code:`--keep-download=` defaults to true for :code:`--class=machine` and false otherwise, see below.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --keep-download=, -N
+
+   Takes a boolean argument. When specified with :code:`pull-raw` or :code:`pull-tar`, selects whether to download directly into the specified local image name, or whether to download into a read-only copy first of which to make a writable copy after the download is completed. Defaults to true for :code:`--class=machine`, false otherwise.
+
+   The :code:`-N` switch is a shortcut for :code:`--keep-download=no`.
+
+   .. versionadded:: 256
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove j|
+    :end-before: .. inclusion-end-marker-do-not-remove j|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Examples
+########
+
+.. inclusion-marker-do-not-remove example-import-tar|
+
+Download an Ubuntu TAR image and open a shell in it
+---------------------------------------------------
+
+.. code-block:: sh
+
+   # importctl pull-tar -mN https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-root.tar.xz
+   # systemd-nspawn -M jammy-server-cloudimg-amd64-root
+
+This downloads and verifies the specified :code:`.tar` image, and then uses :ref:`systemd-nspawn(1)` to open a shell in it.
+
+.. inclusion-end-marker-do-not-remove example-import-tar|
+
+.. inclusion-marker-do-not-remove example-import-raw|
+
+Download an Ubuntu RAW image, set a root password in it, start it as a service
+------------------------------------------------------------------------------
+
+.. code-block:: sh
+
+   # importctl pull-raw -mN \
+         https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img \
+         jammy
+   # systemd-firstboot --image=/var/lib/machines/jammy.raw --prompt-root-password --force
+   # machinectl start jammy
+   # machinectl login jammy
+
+This downloads the specified :code:`.raw` image and makes it available under the local name "jammy". Then, a root password is set with :ref:`systemd-firstboot(1)`. Afterwards the machine is started as system service. With the last command a login prompt into the container is requested.
+
+.. inclusion-end-marker-do-not-remove example-import-raw|
+
+.. inclusion-marker-do-not-remove example-export-tar|
+
+Exports a container image as tar file
+-------------------------------------
+
+.. code-block:: sh
+
+   # importctl export-tar -m fedora myfedora.tar.xz
+
+Exports the container "fedora" as an xz-compressed tar file :code:`myfedora.tar.xz` into the current directory.
+
+.. inclusion-end-marker-do-not-remove example-export-tar|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+.. include:: common-variables.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-importd.service(8)`, :ref:`systemd-nspawn(1)`, :ref:`systemd-vmspawn(1)`, :man-pages:`machinectl(1)`, :man-pages:`portablectl(1)`, :ref:`systemd-sysext(8)`, :ref:`systemd-confext(8)`, :die-net:`tar(1)`, :die-net:`xz(1)`, :die-net:`gzip(1)`, :die-net:`zstd(1)`, :die-net:`bzip2(1)`
+
+

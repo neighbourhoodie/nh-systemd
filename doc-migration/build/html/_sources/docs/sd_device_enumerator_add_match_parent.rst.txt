@@ -1,0 +1,123 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_device_enumerator_add_match_parent
+:manvolnum: 3
+:summary: Add a filter to the device enumerator
+:aliases: sd_device_enumerator_add_match_property, sd_device_enumerator_add_match_property_required, sd_device_enumerator_add_match_subsystem, sd_device_enumerator_add_match_sysattr, sd_device_enumerator_add_match_sysname, sd_device_enumerator_add_nomatch_sysname, sd_device_enumerator_add_match_tag, sd_device_enumerator_allow_uninitialized, sd_device_enumerator_add_all_parents
+
+.. _sd_device_enumerator_add_match_parent(3):
+
+========================================
+sd_device_enumerator_add_match_parent(3)
+========================================
+
+Name
+####
+
+sd_device_enumerator_add_match_parent, sd_device_enumerator_add_match_property, sd_device_enumerator_add_match_property_required, sd_device_enumerator_add_match_subsystem, sd_device_enumerator_add_match_sysattr, sd_device_enumerator_add_match_sysname, sd_device_enumerator_add_nomatch_sysname, sd_device_enumerator_add_match_tag, sd_device_enumerator_allow_uninitialized, sd_device_enumerator_add_all_parents — Add a filter to the device enumerator
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-device.h>` .. code-block::
+
+   int sd_device_enumerator_add_match_parent(sd_device_enumerator *enumerator,
+	sd_device *parent); .. code-block::
+
+   int sd_device_enumerator_add_match_property(sd_device_enumerator *enumerator,
+	const char *property,
+	const char *value); .. code-block::
+
+   int sd_device_enumerator_add_match_property_required(sd_device_enumerator *enumerator,
+	const char *property,
+	const char *value); .. code-block::
+
+   int sd_device_enumerator_add_match_subsystem(sd_device_enumerator *enumerator,
+	const char *subsystem,
+	int match); .. code-block::
+
+   int sd_device_enumerator_add_match_sysattr(sd_device_enumerator *enumerator,
+	const char *sysattr,
+	const char *value,
+	int match); .. code-block::
+
+   int sd_device_enumerator_add_match_sysname(sd_device_enumerator *enumerator,
+	const char *sysname); .. code-block::
+
+   int sd_device_enumerator_add_nomatch_sysname(sd_device_enumerator *enumerator,
+	const char *sysname); .. code-block::
+
+   int sd_device_enumerator_add_match_tag(sd_device_enumerator *enumerator,
+	const char *tag); .. code-block::
+
+   int sd_device_enumerator_allow_uninitialized(sd_device_enumerator *enumerator); .. code-block::
+
+   int sd_device_enumerator_add_all_parents(sd_device_enumerator *enumerator);
+
+Description
+###########
+
+The :code:`sd_device_enumerator_add_match_parent()` function adds a filter to the :code:`enumerator` so that only devices under the tree of the specified :code:`parent` device are enumerated. If this is called multiple times the previously set :code:`parent` device is cleared and only the last call takes an effect.
+
+The :code:`sd_device_enumerator_add_match_property()` function adds a filter to the :code:`enumerator` so that only devices with the specified :code:`property` equals to the :code:`value` are enumerated. Both :code:`property` and :code:`value` can be a glob pattern. When this is called multiple times, devices that have at least one of the specified properties with matching values are enumerated. That is, filters are ORed.
+
+The :code:`sd_device_enumerator_add_match_property_required()` function adds a filter to the :code:`enumerator` so that only devices with the specified :code:`property` equals to the :code:`value` are enumerated. This function is similar to :code:`sd_device_enumerator_add_match_property()`, but when this is called multiple times, devices that have *all* specified properties with matching values are enumerated. That is, filters are ANDed. specified properties with matching values are enumerated. That is, filters are ANDed.
+
+The :code:`sd_device_enumerator_add_match_subsystem()` function adds a filter to the :code:`enumerator` so that all devices in the specified :code:`subsystem`, when :code:`match` is :code:`true`. When :code:`match` is :code:`false`, then all devices except those in the specified :code:`subsystem` are enumerated. When called multiple times, positive filters are ORed, and negative ones are ANDed.
+
+The :code:`sd_device_enumerator_add_match_sysattr()` function adds a filter on the sysfs attribute :code:`sysattr` matching :code:`value`. :code:`value` can be a glob pattern. If :code:`value` is :code:`NULL`, devices that either have (if :code:`match` is :code:`true`) or do not have (if :code:`match` is :code:`false`) the specified :code:`sysattr` are included, regardless of its value. That is, :code:`NULL` is mostly equivalent to "*". When this function is called multiple times, only devices that match all specified :code:`sysattr` filters are enumerated. That is, these filters are ANDed.
+
+The :code:`sd_device_enumerator_add_match_sysname()` function adds a filter so that only devices whose sysname equals to :code:`sysname` are enumerated. :code:`sysname` can be a glob pattern. When called multiple times, filters are ORed.
+
+The :code:`sd_device_enumerator_add_nomatch_sysname()` function adds a filter so that devices whose sysname equals to :code:`sysname` are excluded from the enumeration. This is useful for excluding specific devices from the enumeration process. When called multiple times, features are ANDed.
+
+The :code:`sd_device_enumerator_add_match_tag()` function adds a filter so that only devices tagged with :code:`tag` are enumerated. When called multiple times, filters are ORed.
+
+The :code:`sd_device_enumerator_allow_uninitialized()` function allows devices that have not yet been initialized by udev to be included in the enumeration.
+
+The :code:`sd_device_enumerator_add_all_parents()` function enumerates all parent devices of the matching devices. This is useful for cases where you want to include all parent devices in the enumeration, such as when you are interested in the entire device tree leading up to a specific device.
+
+Return Value
+############
+
+All functions return :code:`0` or a positive integer on success, or a negative errno-style error code on failure.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. systemd:option:: -EINVAL
+
+   One of the arguments is invalid.
+
+Examples
+########
+
+Detect Removable USB Devices (Using Match and Exclude)
+------------------------------------------------------
+
+.. literalinclude:: /code-examples/c/sd_device_enumerator_add_match_parent-example.c
+    :language: c
+
+History
+#######
+
+:code:`sd_device_enumerator_add_match_parent()`, :code:`sd_device_enumerator_add_match_property()`, :code:`sd_device_enumerator_add_match_subsystem()`, :code:`sd_device_enumerator_add_match_sysattr()`, :code:`sd_device_enumerator_add_match_sysname()`, :code:`sd_device_enumerator_add_match_tag()`, and :code:`sd_device_enumerator_allow_uninitialized()` were added in version 240.
+
+:code:`sd_device_enumerator_add_nomatch_sysname()` was added in version 251.
+
+:code:`sd_device_enumerator_add_match_property_required()` was added in version 255.
+
+:code:`sd_device_enumerator_add_all_parents()` was added in version 258.
+
+See Also
+########
+
+:ref:`sd_device_ref(3)`, :ref:`sd_device_enumerator_new(3)`, :ref:`sd_device_enumerator_get_device_first(3)`
+
+

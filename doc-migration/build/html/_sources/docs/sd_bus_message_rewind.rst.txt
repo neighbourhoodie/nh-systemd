@@ -1,0 +1,61 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_rewind
+:manvolnum: 3
+:summary: Return to beginning of message or current container
+
+.. _sd_bus_message_rewind(3):
+
+========================
+sd_bus_message_rewind(3)
+========================
+
+Name
+####
+
+sd_bus_message_rewind — Return to beginning of message or current container
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_rewind(sd_bus_message *m,
+	int complete);
+
+Description
+###########
+
+:code:`sd_bus_message_rewind()` moves the "read pointer" in the message :code:`m` to either the beginning of the message (if :code:`complete` is true) or to the beginning of the currently open container. If no container is open, :code:`complete` has no effect.
+
+Return Value
+############
+
+On success, this function returns 0 or a positive integer. The value is zero if the current container or whole message in case no container is open is empty, and positive otherwise. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`m` parameter is :code:`NULL`.
+
+.. systemd:option:: -EPERM
+
+   The message :code:`m` has not been sealed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_rewind()` was added in version 240.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_read(3)`
+
+

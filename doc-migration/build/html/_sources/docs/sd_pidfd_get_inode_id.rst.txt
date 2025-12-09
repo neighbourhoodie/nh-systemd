@@ -1,0 +1,70 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_pidfd_get_inode_id
+:manvolnum: 3
+:summary: Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)
+
+.. _sd_pidfd_get_inode_id(3):
+
+========================
+sd_pidfd_get_inode_id(3)
+========================
+
+Name
+####
+
+sd_pidfd_get_inode_id — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-daemon.h>` .. code-block::
+
+   int sd_pidfd_get_inode_id(int pidfd,
+	uint64_t *ret);
+
+Description
+###########
+
+:code:`sd_pidfd_get_inode_id()` may be invoked to acquire the 64-bit inode ID of a PID file descriptor (PIDFD), which can be used to reliably identify a process for the current boot.
+
+As a typical example, the service manager sets :code:`$MAINPIDFDID` and :code:`$MANAGERPIDFDID` environment variables to the inode IDs of the service main process and the service manager itself, respectively, if such functionality is supported by the kernel.
+
+On 64-bit architectures, the inode ID can be directly obtained via a call to :man-pages:`fstat(2)` on a given pidfd. However, on 32-bit architectures struct stat's .st_ino field is also 32-bit, which similar to PIDs is subject to reuse. Therefore, a second mechanism leveraging :man-pages:`name_to_handle_at(2)` has been added to kernel in v6.14. This helper is added to simplify downstream handling of pidfd/pidfs internals.
+
+Return Value
+############
+
+On success, the function returns 0 or a positive integer. On failure, a negative errno-style error code is returned.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EOPNOTSUPP
+
+   The stable PIDFD inode ID is not supported by the running kernel, or the system is 32-bit and :code:`name_to_handle_at()` is unavailable.
+
+.. systemd:option:: -EBADF
+
+   The specified file descriptor is invalid, or is not a PIDFD.
+
+Notes
+#####
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+History
+#######
+
+:code:`sd_pidfd_get_inode_id()` was added in version 258.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-daemon(3)`, :ref:`sd_notify(3)`, :ref:`systemd.exec(5)`
+
+

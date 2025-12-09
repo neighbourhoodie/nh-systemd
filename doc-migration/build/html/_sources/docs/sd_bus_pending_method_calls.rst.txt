@@ -1,0 +1,58 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_pending_method_calls
+:manvolnum: 3
+:summary: Return the number of currently pending, outgoing method calls
+
+.. _sd_bus_pending_method_calls(3):
+
+==============================
+sd_bus_pending_method_calls(3)
+==============================
+
+Name
+####
+
+sd_bus_pending_method_calls — Return the number of currently pending, outgoing method calls
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_pending_method_calls(sd_bus *bus);
+
+Description
+###########
+
+:code:`sd_bus_pending_method_calls()` returns the number of currently pending outgoing method calls, i.e. method calls enqueued with :ref:`sd_bus_call_async(3)` for which no reply has been received yet, and which have not reached a timeout yet.
+
+The :code:`bus` argument may be :code:`NULL`, in which case zero is returned.
+
+Return Value
+############
+
+This function returns 0 if there are no pending method calls, or a :code:`NULL` bus object was specified. On failure, a negative errno-style error code is returned.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ECHILD
+
+   The bus connection has been created in a different process, library or module instance.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_pending_method_calls()` was added in version 257.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_call_async(3)`
+
+

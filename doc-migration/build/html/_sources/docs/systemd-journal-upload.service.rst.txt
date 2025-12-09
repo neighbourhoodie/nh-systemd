@@ -1,0 +1,180 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-journal-upload.service
+:manvolnum: 8
+:summary: Send journal messages over the network
+:aliases: systemd-journal-upload
+
+.. _systemd-journal-upload.service(8):
+
+=================================
+systemd-journal-upload.service(8)
+=================================
+
+Name
+####
+
+systemd-journal-upload.service, systemd-journal-upload — Send journal messages over the network
+
+Synopsis
+########
+
+:code:`systemd-journal-upload.service`
+
+:code:`/usr/lib/systemd/systemd-journal-upload [OPTIONS...] [-u/--url=<URL>] [SOURCES...]`
+
+Description
+###########
+
+:code:`systemd-journal-upload` will upload journal entries to the URL specified with :code:`--url=`. This program reads journal entries from one or more journal files, similarly to :man-pages:`journalctl(1)`. Unless limited by one of the options specified below, all journal entries accessible to the user the program is running as will be uploaded, and then the program will wait and send new entries as they become available.
+
+:code:`systemd-journal-upload` transfers the raw content of journal file and uses HTTP as a transport protocol.
+
+:code:`systemd-journal-upload.service` is a system service that uses :code:`systemd-journal-upload` to upload journal entries to a server. It uses the configuration in :man-pages:`journal-upload.conf(5)`. At least the :code:`URL=` option must be specified.
+
+Options
+#######
+
+.. systemd:option:: -u, --url=[https://]URL[:PORT], --url=[http://]URL[:PORT]
+
+   Upload to the specified address. :emphasis:`URL` may specify either just the hostname or both the protocol and hostname. :code:`https` is the default. The port number may be specified after a colon (":"), otherwise :code:`19532` will be used by default.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --system, --user
+
+   Limit uploaded entries to entries from system services and the kernel, or to entries from services of current user. This has the same meaning as :code:`--system` and :code:`--user` options for :man-pages:`journalctl(1)`. If neither is specified, all accessible entries are uploaded.
+
+   .. versionadded:: 239
+
+.. systemd:option:: -m, --merge
+
+   Upload entries interleaved from all available journals, including other machines. This has the same meaning as :code:`--merge` option for :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --namespace=NAMESPACE
+
+   Takes a journal namespace identifier string as argument. Upload entries from the specified journal namespace :emphasis:`NAMESPACE` instead of the default namespace. This has the same meaning as :code:`--namespace=` option for :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 254
+
+.. systemd:option:: -D, --directory=DIR
+
+   Takes a directory path as argument. Upload entries from the specified journal directory :emphasis:`DIR` instead of the default runtime and system journal paths. This has the same meaning as :code:`--directory=` option for :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --file=GLOB
+
+   Takes a file glob as an argument. Upload entries from the specified journal files matching :emphasis:`GLOB` instead of the default runtime and system journal paths. May be specified multiple times, in which case files will be suitably interleaved. This has the same meaning as :code:`--file=` option for :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --cursor=
+
+   Upload entries from the location in the journal specified by the passed cursor. This has the same meaning as :code:`--cursor=` option for :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --after-cursor=
+
+   Upload entries from the location in the journal *after* the location specified by the this cursor. This has the same meaning as the location specified by the this cursor. This has the same meaning as :code:`--after-cursor=` option for :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --save-state[=PATH]
+
+   Upload entries from the location in the journal *after* the location specified by the cursor saved in file at the location specified by the cursor saved in file at :emphasis:`PATH` (:code:`/var/lib/systemd/journal-upload/state` by default). After an entry is successfully uploaded, update this file with the cursor of that entry.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --follow[=BOOL]
+
+   If set to yes, then :code:`systemd-journal-upload` waits for input.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --key=
+
+   Takes a path to a SSL key file in PEM format, or :code:`-`. If :code:`-` is set, then client certificate authentication checking will be disabled. Defaults to :code:`|CERTIFICATE_ROOT|/private/journal-upload.pem`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --cert=
+
+   Takes a path to a SSL certificate file in PEM format, or :code:`-`. If :code:`-` is set, then client certificate authentication checking will be disabled. Defaults to :code:`|CERTIFICATE_ROOT|/certs/journal-upload.pem`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --trust=
+
+   Takes a path to a SSL CA certificate file in PEM format, or :code:`-`/:code:`all`. If :code:`-`/:code:`all` is set, then certificate checking will be disabled. Defaults to :code:`|CERTIFICATE_ROOT|/ca/trusted.pem`.
+
+   .. versionadded:: 239
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned; otherwise, a non-zero failure code is returned.
+
+Examples
+########
+
+Setting up certificates for authentication
+------------------------------------------
+
+Certificates signed by a trusted authority are used to verify that the server to which messages are uploaded is legitimate, and vice versa, that the client is trusted.
+
+A suitable set of certificates can be generated with :code:`openssl`. Note, 2048 bits of key length is minimally recommended to use for security reasons:
+
+.. code-block:: sh
+
+   openssl req -newkey rsa:2048 -days 3650 -x509 -nodes \
+         -out ca.pem -keyout ca.key -subj '/CN=Certificate authority/'
+   cat >ca.conf <<EOF
+   [ ca ]
+   default_ca = this
+   [ this ]
+   new_certs_dir = .
+   certificate = ca.pem
+   database = ./index
+   private_key = ca.key
+   serial = ./serial
+   default_days = 3650
+   default_md = default
+   policy = policy_anything
+   [ policy_anything ]
+   countryName             = optional
+   stateOrProvinceName     = optional
+   localityName            = optional
+   organizationName        = optional
+   organizationalUnitName  = optional
+   commonName              = supplied
+   emailAddress            = optional
+   EOF
+   touch index
+   echo 0001 >serial
+   SERVER=server
+   CLIENT=client
+   openssl req -newkey rsa:2048 -nodes -out $SERVER.csr -keyout $SERVER.key -subj "/CN=$SERVER/"
+   openssl ca -batch -config ca.conf -notext -in $SERVER.csr -out $SERVER.pem
+   openssl req -newkey rsa:2048 -nodes -out $CLIENT.csr -keyout $CLIENT.key -subj "/CN=$CLIENT/"
+   openssl ca -batch -config ca.conf -notext -in $CLIENT.csr -out $CLIENT.pem
+
+Generated files :code:`ca.pem`, :code:`server.pem`, and :code:`server.key` should be installed on server, and :code:`ca.pem`, :code:`client.pem`, and :code:`client.key` on the client. The location of those files can be specified using :code:`TrustedCertificateFile=`, :code:`ServerCertificateFile=`, and :code:`ServerKeyFile=` in :code:`/etc/systemd/journal-remote.conf` and :code:`/etc/systemd/journal-upload.conf`, respectively. The default locations can be queried by using :code:`systemd-journal-remote --help` and :code:`systemd-journal-upload --help`.
+
+See Also
+########
+
+:man-pages:`journal-upload.conf(5)`, :ref:`systemd-journal-remote.service(8)`, :man-pages:`journalctl(1)`, :ref:`systemd-journald.service(8)`, :ref:`systemd-journal-gatewayd.service(8)`
+
+

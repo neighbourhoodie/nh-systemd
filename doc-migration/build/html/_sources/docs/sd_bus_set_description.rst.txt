@@ -1,0 +1,137 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_set_description
+:manvolnum: 3
+:summary: Set or query properties of a bus object
+:aliases: sd_bus_get_description, sd_bus_set_anonymous, sd_bus_is_anonymous, sd_bus_set_trusted, sd_bus_is_trusted, sd_bus_set_allow_interactive_authorization, sd_bus_get_allow_interactive_authorization, sd_bus_get_scope, sd_bus_get_tid, sd_bus_get_unique_name
+
+.. _sd_bus_set_description(3):
+
+=========================
+sd_bus_set_description(3)
+=========================
+
+Name
+####
+
+sd_bus_set_description, sd_bus_get_description, sd_bus_set_anonymous, sd_bus_is_anonymous, sd_bus_set_trusted, sd_bus_is_trusted, sd_bus_set_allow_interactive_authorization, sd_bus_get_allow_interactive_authorization, sd_bus_get_scope, sd_bus_get_tid, sd_bus_get_unique_name — Set or query properties of a bus object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_set_description(sd_bus *bus,
+	const char *description); .. code-block::
+
+   int sd_bus_get_description(sd_bus *bus,
+	const char **description); .. code-block::
+
+   int sd_bus_set_anonymous(sd_bus *bus,
+	int b); .. code-block::
+
+   int sd_bus_is_anonymous(sd_bus *bus); .. code-block::
+
+   int sd_bus_set_trusted(sd_bus *bus,
+	int b); .. code-block::
+
+   int sd_bus_is_trusted(sd_bus *bus); .. code-block::
+
+   int sd_bus_set_allow_interactive_authorization(sd_bus *bus,
+	int b); .. code-block::
+
+   int sd_bus_get_allow_interactive_authorization(sd_bus *bus); .. code-block::
+
+   int sd_bus_get_scope(sd_bus *bus,
+	const char **scope); .. code-block::
+
+   int sd_bus_get_tid(sd_bus *bus,
+	pid_t *tid); .. code-block::
+
+   int sd_bus_get_unique_name(sd_bus *bus,
+	const char **unique);
+
+Description
+###########
+
+:code:`sd_bus_set_description()` sets the description string that is used in logging to the specified string. The string is copied internally and freed when the bus object is deallocated. The :code:`description` argument may be :code:`NULL`, in which case the description is unset. This function must be called before the bus is started.
+
+:code:`sd_bus_get_description()` returns a description string in :code:`description`. This string may have been previously set with :code:`sd_bus_set_description()` or :ref:`sd_bus_open_with_description(3)` or similar. If not set this way, a default string like "system" or "user" will be returned for the system or user buses, and :code:`-ENXIO` otherwise.
+
+:code:`sd_bus_set_anonymous()` enables or disables "anonymous authentication", i.e. lack of authentication, of the bus peer. This function must be called before the bus is started. See the `D-Bus Authentication Mechanisms <view-source:https://dbus.freedesktop.org/doc/dbus-specification.html#auth-mechanisms>`_ section of the D-Bus specification for details.
+
+:code:`sd_bus_is_anonymous()` returns true if the bus connection allows anonymous authentication (in the sense described in previous paragraph).
+
+:code:`sd_bus_set_trusted()` sets the "trusted" state on the :code:`bus` object. If true, all connections on the bus are trusted and access to all privileged and unprivileged methods is granted. This function must be called before the bus is started.
+
+:code:`sd_bus_is_trusted()` returns true if the bus connection is trusted (in the sense described in previous paragraph).
+
+:code:`sd_bus_set_allow_interactive_authorization()` enables or disables interactive authorization for method calls. If true, messages are marked with the :code:`ALLOW_INTERACTIVE_AUTHORIZATION` flag specified by the `D-Bus <view-source:https://dbus.freedesktop.org/doc/dbus-specification.html>`_ specification, informing the receiving side that the caller is prepared to wait for interactive authorization, which might take a considerable time to complete. If this flag is set, the user may be queried for passwords or confirmation via `polkit <https://www.freedesktop.org/wiki/Software/polkit>`_ or a similar framework.
+
+:code:`sd_bus_get_allow_interactive_authorization()` returns true if interactive authorization is allowed and false if not.
+
+:code:`sd_bus_get_scope()` stores the scope of the given bus object in :code:`scope`. The scope of the system bus is "system". The scope of a user session bus is "user". If the given bus object is not the system or a user session bus, :code:`sd_bus_get_scope()` returns an error.
+
+:code:`sd_bus_get_tid()` stores the kernel thread id of the thread associated with the given bus object in :code:`tid`. If :code:`bus` is a default bus object obtained by calling one of the functions of the :ref:`sd_bus_default(3)` family of functions, it stores the thread id of the thread the bus object was created in. Otherwise, if the bus object is attached to an event loop, it stores the thread id of the thread the event loop object was created in. If :code:`bus` is not a default bus object and is not attached to an event loop, :code:`sd_bus_get_tid()` returns an error.
+
+:code:`sd_bus_get_unique_name()` stores the unique name of the bus object on the bus in :code:`unique`. See `The D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names-bus>`_ for more information on bus names. Note that the caller does not own the string stored in :code:`unique` and should not free it.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An argument is invalid.
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+.. systemd:option:: -EPERM
+
+   The bus has already been started.
+
+.. systemd:option:: -ECHILD
+
+   The bus was created in a different process, library or module instance.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. systemd:option:: -ENODATA
+
+   The bus object passed to :code:`sd_bus_get_scope()` was not a system or user session bus.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENXIO
+
+   The bus object passed to :code:`sd_bus_get_tid()` was not a default bus object and is not attached to an event loop.
+
+   The bus object passed to :code:`sd_bus_get_description()` did not have a :code:`description`.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_set_description()`, :code:`sd_bus_get_description()`, :code:`sd_bus_set_anonymous()`, :code:`sd_bus_set_trusted()`, :code:`sd_bus_set_allow_interactive_authorization()`, and :code:`sd_bus_get_allow_interactive_authorization()` were added in version 240.
+
+:code:`sd_bus_is_anonymous()`, :code:`sd_bus_is_trusted()`, :code:`sd_bus_get_scope()`, :code:`sd_bus_get_tid()`, and :code:`sd_bus_get_unique_name()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_default_user(3)`, :ref:`sd_bus_default_system(3)`, :ref:`sd_bus_open_user(3)`, :ref:`sd_bus_open_system(3)`
+
+

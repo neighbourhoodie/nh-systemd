@@ -1,0 +1,70 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-timedated.service
+:manvolnum: 8
+:summary: Time and date bus mechanism
+:aliases: systemd-timedated
+
+.. _systemd-timedated.service(8):
+
+============================
+systemd-timedated.service(8)
+============================
+
+Name
+####
+
+systemd-timedated.service, systemd-timedated — Time and date bus mechanism
+
+Synopsis
+########
+
+:code:`systemd-timedated.service`
+
+:code:`/usr/lib/systemd/systemd-timedated`
+
+Description
+###########
+
+:code:`systemd-timedated.service` is a system service that may be used as a mechanism to change the system clock and timezone, as well as to enable/disable network time synchronization. :code:`systemd-timedated` is automatically activated on request and terminates itself when it is unused.
+
+The tool :man-pages:`timedatectl(1)` is a command line client to this service.
+
+:code:`systemd-timedated` currently offers access to the following four settings: *    The system time
+
+*    The system timezone
+
+*    A boolean controlling whether the system RTC is in local or UTC timezone
+
+*    Whether the time synchronization service is enabled/started or disabled/stopped, see next section.
+
+See :man-pages:`org.freedesktop.timedate1(5)` and :man-pages:`org.freedesktop.LogControl1(5)` for information about the D-Bus API.
+
+List of network time synchronization services
+#############################################
+
+:code:`systemd-timedated` will look for files with a ".list" extension in :code:`ntp-units.d/` directories. Each file is parsed as a list of unit names, one per line. Empty lines and lines with comments ("#") are ignored. Files are read from :code:`/usr/lib/systemd/ntp-units.d/` and the corresponding directories under :code:`/etc/`, :code:`/run/`, :code:`/usr/local/lib/`. Files in :code:`/etc/` override files with the same name in :code:`/run/`, :code:`/usr/local/lib/`, and :code:`/usr/lib/`. Files in :code:`/run/` override files with the same name under :code:`/usr/`. Packages should install their configuration files in :code:`/usr/lib/` (distribution packages) or :code:`/usr/local/lib/` (local installs).
+
+:code:`ntp-units.d/` entry for :code:`systemd-timesyncd`
+--------------------------------------------------------
+
+.. code-block:: sh
+
+   # /usr/lib/systemd/ntp-units.d/80-systemd-timesync.list
+   systemd-timesyncd.service
+
+If the environment variable :code:`$SYSTEMD_TIMEDATED_NTP_SERVICES` is set, :code:`systemd-timedated` will parse the contents of that variable as a colon-separated list of unit names. When set, this variable overrides the file-based list described above.
+
+An override that specifies that :code:`chronyd` should be used if available
+---------------------------------------------------------------------------
+
+.. code-block:: sh
+
+   SYSTEMD_TIMEDATED_NTP_SERVICES=chronyd.service:systemd-timesyncd.service
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`timedatectl(1)`, :man-pages:`localtime(5)`, :man-pages:`hwclock(8)`, :ref:`systemd-timesyncd(8)`, :man-pages:`org.freedesktop.timedate1(5)`
+
+

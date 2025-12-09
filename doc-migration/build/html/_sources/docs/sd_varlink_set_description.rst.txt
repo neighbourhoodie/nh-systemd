@@ -1,0 +1,68 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_varlink_set_description
+:manvolnum: 3
+:summary: Set or query description of a Varlink connection object
+:aliases: sd_varlink_get_description
+
+.. _sd_varlink_set_description(3):
+
+=============================
+sd_varlink_set_description(3)
+=============================
+
+Name
+####
+
+sd_varlink_set_description, sd_varlink_get_description — Set or query description of a Varlink connection object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-varlink.h>` .. code-block::
+
+   int sd_varlink_set_description(sd_varlink *link,
+	const char *description); .. code-block::
+
+   const char* sd_varlink_get_description(sd_varlink *link);
+
+Description
+###########
+
+:code:`sd_varlink_set_description()` sets the description string that is used in logging to the specified string. The string is copied internally and freed when the Varlink connection object is deallocated. The :code:`description` argument may be :code:`NULL`, in which case the description is unset.
+
+:code:`sd_varlink_get_description()` returns a description string for the specified Varlink connection. This string may have been previously set with :code:`sd_varlink_set_description()`. If not set this way, a default string or :code:`NULL` may be returned, depending how the connection was allocated and set up.
+
+Return Value
+############
+
+On success, :code:`sd_varlink_set_description()` returns a non-negative integer. On failure, it returns a negative errno-style error code. :code:`sd_varlink_get_description()` returns either :code:`NULL` or a pointer to the description string.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An argument is invalid.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_varlink_set_description()` was added in version 257.
+
+:code:`sd_varlink_get_description()` was added in version 258.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-varlink(3)`
+
+

@@ -1,0 +1,89 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_varlink_send
+:manvolnum: 3
+:summary: Enqueues a Varlink method call, not expecting a reply
+:aliases: sd_varlink_sendb, sd_varlink_sendbo
+
+.. _sd_varlink_send(3):
+
+==================
+sd_varlink_send(3)
+==================
+
+Name
+####
+
+sd_varlink_send, sd_varlink_sendb, sd_varlink_sendbo — Enqueues a Varlink method call, not expecting a reply
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-varlink.h>` .. code-block::
+
+   int sd_varlink_send(sd_varlink *link,
+	const char *method,
+	sd_json_variant *parameters); .. code-block::
+
+   int sd_varlink_sendb(sd_varlink *link,
+	const char *method,
+	…); .. code-block::
+
+   int sd_varlink_sendbo(sd_varlink *link,
+	const char *method,
+	…);
+
+Description
+###########
+
+:code:`sd_varlink_send()` submits a method call via a Varlink connection. It takes the Varlink connection object, a method name as string parameter, and a JSON object containing the parameters to pass as function parameters. This call is asynchronous: the message will not be delivered immediately but only once :ref:`sd_varlink_process(3)` is invoked (which will happen automatically in one of the following event loop iterations if the Varlink connection is attached to an even loop).
+
+:code:`sd_varlink_sendb()` is similar to :code:`sd_varlink_send()`, but instead of expecting a fully constructed sd_json_variant object carrying the parameters, this object is constructed on-the-fly directly from the parameter list, in a style identical to :ref:`sd_json_build(3)`.
+
+:code:`sd_varlink_sendbo()` is identical to :code:`sd_varlink_sendb()`, but an enclosing object is implicitly added, so that the parameter list is expected to consist of field pairs only. For details about the expected argument list, see :ref:`sd_json_buildo(3)`.
+
+Use :code:`sd_varlink_send()`, :code:`sd_varlink_sendb()` and :code:`sd_varlink_sendbo()` only if no method call results are required, as they neither provide return parameters nor success/failure information. Use :ref:`sd_varlink_call(3)` (and related calls) to submit a method call synchronously, returning the server's response.
+
+Return Value
+############
+
+On success, :code:`sd_varlink_send()`, :code:`sd_varlink_sendb()` and :code:`sd_varlink_sendbo()` return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An argument is invalid.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. systemd:option:: -ENOTCONN
+
+   The Varlink connection object is not connected.
+
+.. systemd:option:: -EBUSY
+
+   The Varlink connection object is already used for other purposes, i.e. executing a method call or similar.
+
+.. systemd:option:: -ENOBUFS
+
+   The internal limit of queued messages for the Varlink connection has been reached. This limit is set very high, and hitting it typically indicates that the Varlink connection object is stalled — possibly because :code:`sd_varlink_process()` has not been called regularly enough, or because the peer is not processing any queued messages. This limit is a safety precaution to ensure a stalled peer will not result in unbounded memory allocations on the client side.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_varlink_send()`, :code:`sd_varlink_sendb()`, :code:`sd_varlink_sendbo()` were added in version 257.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-varlink(3)`, :ref:`sd_varlink_call(3)`, :ref:`sd_varlink_build(3)`
+
+

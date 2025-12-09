@@ -1,0 +1,70 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-hwdb
+:manvolnum: 8
+:summary: hardware database management tool
+
+.. _systemd-hwdb(8):
+
+===============
+systemd-hwdb(8)
+===============
+
+Name
+####
+
+systemd-hwdb — hardware database management tool
+
+Synopsis
+########
+
+:code:`systemd-hwdb [options] update`
+
+:code:`systemd-hwdb [options] query modalias`
+
+Description
+###########
+
+:code:`systemd-hwdb` expects a command and command specific arguments. It manages the binary hardware database.
+
+Options
+#######
+
+.. systemd:option:: --usr
+
+   Generate in /usr/lib/udev instead of /etc/udev.
+
+   .. versionadded:: 219
+
+.. systemd:option:: -r, --root=PATH
+
+   Alternate root path in the filesystem.
+
+   .. versionadded:: 219
+
+.. systemd:option:: -s, --strict
+
+   When updating, return non-zero exit value on any parsing error.
+
+   .. versionadded:: 239
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+systemd-hwdb [:emphasis:`options`] update
+#########################################
+
+Update the binary database.
+
+systemd-hwdb [:emphasis:`options`] query :emphasis:`MODALIAS`
+#############################################################
+
+Query database and print result.
+
+See Also
+########
+
+:ref:`systemd(1)` :man-pages:`hwdb(7)`
+
+

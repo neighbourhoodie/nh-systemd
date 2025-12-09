@@ -1,0 +1,58 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: modules-load.d
+:manvolnum: 5
+:summary: Configure kernel modules to load at boot
+
+.. _modules-load.d(5):
+
+=================
+modules-load.d(5)
+=================
+
+Name
+####
+
+modules-load.d — Configure kernel modules to load at boot
+
+Synopsis
+########
+
+| :code:`/etc/modules-load.d/\*.conf`
+| :code:`/run/modules-load.d/\*.conf`
+| :code:`/usr/local/lib/modules-load.d/\*.conf`
+| :code:`/usr/lib/modules-load.d/\*.conf`
+
+Description
+###########
+
+:ref:`systemd-modules-load.service(8)` reads files from the above directories which contain kernel modules to load during boot in a static list. Each configuration file is named in the style of :code:`/etc/modules-load.d/program.conf`. Note that it is usually a better idea to rely on the automatic module loading by PCI IDs, USB IDs, DMI IDs or similar triggers encoded in the kernel modules themselves instead of static configuration like this. In fact, most modern kernel modules are prepared for automatic loading already.
+
+Configuration Format
+####################
+
+The configuration files should simply contain a list of kernel module names to load, separated by newlines. Empty lines and lines whose first non-whitespace character is # or ; are ignored.
+
+%% include="standard-conf.rst" id="confd|" %%
+
+Example
+#######
+
+/etc/modules-load.d/virtio-net.conf example:
+--------------------------------------------
+
+.. code-block:: sh
+
+   # Load virtio-net.ko at boot
+   virtio-net
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-modules-load.service(8)`, :ref:`systemd-delta(1)`, :man-pages:`modprobe(8)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

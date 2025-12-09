@@ -1,0 +1,205 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_read
+:manvolnum: 3
+:summary: Read a sequence of values from a message
+:aliases: sd_bus_message_readv, sd_bus_message_peek_type
+
+.. _sd_bus_message_read(3):
+
+======================
+sd_bus_message_read(3)
+======================
+
+Name
+####
+
+sd_bus_message_read, sd_bus_message_readv, sd_bus_message_peek_type — Read a sequence of values from a message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_read(sd_bus_message *m,
+	const char *types,
+	...); .. code-block::
+
+   int sd_bus_message_readv(sd_bus_message *m,
+	const char *types,
+	va_list ap); .. code-block::
+
+   int sd_bus_message_peek_type(sd_bus_message *m,
+	char *type,
+	const char **contents);
+
+Description
+###########
+
+:code:`sd_bus_message_read()` reads a sequence of fields from the D-Bus message object :code:`m` and advances the read position in the message. The type string :code:`types` describes the types of items expected in the message and the field arguments that follow. The type string may be :code:`NULL` or empty, in which case nothing is read.
+
+The type string is composed of the elements described in :ref:`sd_bus_message_append(3)`, i.e. basic and container types. It must contain zero or more single "complete types". The type string is :code:`NUL`-terminated.
+
+For each type specified in the type string, one or more arguments need to be specified after the :code:`types` parameter, in the same order. The arguments must be pointers to appropriate types (a pointer to int8_t for a "y" in the type string, a pointer to int32_t for an "i", a pointer to const char* for an "s", ...) which are set based on the values in the message. As an exception, in case of array and variant types, the first argument is an "input" argument that further specifies how the message should be read. See the table below for a complete list of allowed arguments and their types. Note that, if the basic type is a pointer (e.g., const char * in the case of a string), the argument is a pointer to a pointer, and also the pointer value that is written is only borrowed and the contents must be copied if they are to be used after the end of the message's lifetime. If the type is "h" (UNIX file descriptor), the descriptor is not duplicated by this call and the returned descriptor remains in possession of the message object, and needs to be duplicated by the caller in order to keep an open reference to it after the message object is freed.
+
+Each argument may also be :code:`NULL`, in which case the value is read and ignored.
+
+.. list-table:: Item type specifiers
+   :header-rows: 1
+
+   * - Specifier
+     - Constant
+     - Description
+     - Type of the first argument
+     - Types of the subsequent arguments, if any
+   %% include="sd_bus_message_read_basic.rst" id="id(//table[@id='format-specifiers']//tbody/*)|" %%
+   * - "a"
+     - :code:`SD_BUS_TYPE_ARRAY`
+     - array
+     - int, which specifies the expected length :code:`n` of the array
+     - :code:`n` sets of arguments appropriate for the array element type
+   * - "v"
+     - :code:`SD_BUS_TYPE_VARIANT`
+     - variant
+     - signature string
+     - arguments appropriate for the types specified by the signature
+   * - "("
+     - :code:`SD_BUS_TYPE_STRUCT_BEGIN`
+     - array start
+     - arguments appropriate for the structure elements
+     -
+   * - ")"
+     - :code:`SD_BUS_TYPE_STRUCT_END`
+     - array end
+     -
+     -
+   * - "{"
+     - :code:`SD_BUS_TYPE_DICT_ENTRY_BEGIN`
+     - dictionary entry start
+     - arguments appropriate for the first type in the pair
+     - arguments appropriate for the second type in the pair
+   * - "}"
+     - :code:`SD_BUS_TYPE_DICT_ENTRY_END`
+     - dictionary entry end
+     -
+     -
+
+If objects of the specified types are not present at the current position in the message, an error is returned.
+
+The :code:`sd_bus_message_readv()` is equivalent to the :code:`sd_bus_message_read()`, except that it is called with a "va_list" instead of a variable number of arguments. This function does not call the :code:`va_end()` macro. Because it invokes the :code:`va_arg()` macro, the value of :code:`ap` is undefined after the call.
+
+:code:`sd_bus_message_peek_type()` determines the type of the next element in :code:`m` to be read by :code:`sd_bus_message_read()` or similar functions. On success, the type is stored in :code:`type`, if it is not :code:`NULL`. If the type is a container type, the type of its elements is stored in :code:`contents`, if it is not :code:`NULL`. If this function successfully determines the type of the next element in :code:`m`, it returns a positive integer. If there are no more elements to be read, it returns zero.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. include:: sd_bus_message_read_basic.rst
+    :start-after: .. inclusion-marker-do-not-remove errors-einval|
+    :end-before: .. inclusion-end-marker-do-not-remove errors-einval|
+
+.. include:: sd_bus_message_read_basic.rst
+    :start-after: .. inclusion-marker-do-not-remove errors-enxio|
+    :end-before: .. inclusion-end-marker-do-not-remove errors-enxio|
+
+.. include:: sd_bus_message_read_basic.rst
+    :start-after: .. inclusion-marker-do-not-remove errors-ebadmsg|
+    :end-before: .. inclusion-end-marker-do-not-remove errors-ebadmsg|
+
+.. systemd:option:: -EBUSY
+
+   When reading from a container, this error will be returned if unread elements are left in the container.
+
+   .. versionadded:: 251
+
+.. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+Examples
+########
+
+Read a single basic type (a 64-bit integer):
+
+.. code-block:: sh
+
+   sd_bus_message *m;
+   int64_t x;
+   sd_bus_message_read(m, "x", &x);
+
+Read a boolean value:
+
+.. code-block:: sh
+
+   sd_bus_message *m;
+   int x; /* Do not use C99 "bool" type here, it is typically smaller
+             in memory and would cause memory corruption */
+   sd_bus_message_read(m, "b", &x);
+
+Read all types of integers:
+
+.. code-block:: sh
+
+   uint8_t y;
+   int16_t n;
+   uint16_t q;
+   int32_t i;
+   uint32_t u;
+   int64_t x;
+   uint64_t t;
+   double d;
+   sd_bus_message_read(m, "ynqiuxtd", &y, &n, &q, &i, &u, &x, &t, &d);
+
+Read a structure composed of a string and a D-Bus path:
+
+.. code-block:: sh
+
+   const char *s, *p;
+   sd_bus_message_read(m, "(so)", &s, &p);
+
+Read a variant, with the real type "gt" (signature, unsigned integer):
+
+.. code-block:: sh
+
+   const char *s;
+   uint64_t *v;
+   sd_bus_message_read(m, "v", "gt", &s, &v);
+
+Read a dictionary containing three pairs of type {integer=>string}:
+
+.. code-block:: sh
+
+   int i, j, k;
+   const char *s, *t, *u;
+   sd_bus_message_read(m, "a{is}", 3, &i, &s, &j, &t, &k, &u);
+
+Read a single file descriptor, and duplicate it in order to keep it open after the message is freed.
+
+.. code-block:: sh
+
+   sd_bus_message *m;
+   int fd, fd_copy;
+   sd_bus_message_read(m, "h", &fd);
+   fd_copy = fcntl(fd, FD_DUPFD_CLOEXEC, 3);
+
+History
+#######
+
+:code:`sd_bus_message_read()` and :code:`sd_bus_message_readv()` were added in version 240.
+
+:code:`sd_bus_message_peek_type()` was added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_read_basic(3)`, :ref:`sd_bus_message_skip(3)`, :ref:`sd_bus_message_append(3)`, :ref:`sd_bus_message_enter_container(3)`
+
+

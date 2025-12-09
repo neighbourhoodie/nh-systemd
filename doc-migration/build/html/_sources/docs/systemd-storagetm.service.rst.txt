@@ -1,0 +1,75 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-storagetm.service
+:manvolnum: 8
+:summary: Exposes all local block devices as NVMe-TCP mass storage devices
+:aliases: systemd-storagetm
+
+.. _systemd-storagetm.service(8):
+
+============================
+systemd-storagetm.service(8)
+============================
+
+Name
+####
+
+systemd-storagetm.service, systemd-storagetm — Exposes all local block devices as NVMe-TCP mass storage devices
+
+Synopsis
+########
+
+:code:`systemd-storagetm.service`
+
+:code:`/usr/lib/systemd/systemd-storagetm [OPTIONS...] [<DEVICE>]`
+
+Description
+###########
+
+:code:`systemd-storagetm.service` is a service that exposes all local block devices as NVMe-TCP mass storage devices. Its primary use-case is to be invoked by the :code:`storage-target-mode.target` unit that can be booted into.
+
+.. warning::
+
+The NVMe disks are currently exposed without authentication or encryption, in read/write mode. This means network peers may read from and write to the device without any restrictions. This functionality should hence only be used in a local setup.
+
+Note that to function properly networking must be configured too. The recommended mechanism to boot into a storage target mode is by adding "rd.systemd.unit=storage-target-mode.target ip=link-local" on the kernel command line. Note that "ip=link-local" only configures link-local IP, i.e. IPv4LL and IPv6LL, which means non-routable addresses. This is done for security reasons, so that only systems on the local link can access the devices. Use "ip=dhcp" to assign routable addresses too. For further details see :ref:`systemd-network-generator.service(8)`.
+
+Unless the :code:`--all` switch is used expects one or more block devices or regular files to expose via NVMe-TCP as argument.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --nqn=
+
+   Takes a string. If specified configures the NVMe Qualified Name to use for the exposed NVMe-TCP mass storage devices. The NQN should follow the syntax described in `NVM Express Base Specification 2.0c <https://nvmexpress.org/wp-content/uploads/NVM-Express-Base-Specification-2.0c-2022.10.04-Ratified.pdf>`_, section 4.5 "NVMe Qualified Names". Note that the NQN specified here will be suffixed with a dot and the block device name before it is exposed on the NVMe target. If not specified, defaults to "nqn.2023-10.io.systemd:storagetm.:emphasis:`ID`", where ID is replaced by a 128bit ID derived from :man-pages:`machine-id(5)`.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --all, -a
+
+   If specified exposes all local block devices via NVMe-TCP, current and future (i.e. it watches block devices come and go and updates the NVMe-TCP list as needed). Note that by default any block devices that originate on the same block device as the block device backing the current root file system are excluded. If the switch is specified twice this safety mechanism is disabled.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --list-devices
+
+   Show a list of candidate block devices this command may operate on. Specifically, this enumerates block devices currently present, and shows their device node paths along with any of their symlinks.
+
+   .. versionadded:: 257
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.special(7)`
+
+

@@ -1,0 +1,73 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_copy
+:manvolnum: 3
+:summary: Copy the contents of one message to another
+
+.. _sd_bus_message_copy(3):
+
+======================
+sd_bus_message_copy(3)
+======================
+
+Name
+####
+
+sd_bus_message_copy — Copy the contents of one message to another
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_copy(sd_bus_message *m,
+	sd_bus_message *source,
+	int all);
+
+Description
+###########
+
+:code:`sd_bus_message_copy()` copies the contents from message :code:`source` to :code:`m`. If :code:`all` is false, a single complete type is copied (basic or container). If :code:`all` is true, the contents are copied until the end of the currently open container or the end of :code:`source`.
+
+Return Value
+############
+
+On success, this call returns true if anything was copied, and false if there was nothing to copy. On failure, it returns a negative errno-style error code.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   :code:`source` or :code:`m` are :code:`NULL`.
+
+.. systemd:option:: -EPERM
+
+   Message :code:`m` has been sealed or :code:`source` has *not* been sealed. been sealed.
+
+.. systemd:option:: -ESTALE
+
+   Destination message is in invalid state.
+
+.. systemd:option:: -ENXIO
+
+   Destination message cannot be appended to.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_append(3)`
+
+

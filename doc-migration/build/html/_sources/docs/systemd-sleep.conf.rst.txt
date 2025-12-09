@@ -1,0 +1,155 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-sleep.conf
+:manvolnum: 5
+:summary: Suspend and hibernation configuration file
+:aliases: sleep.conf.d
+
+.. _systemd-sleep.conf(5):
+
+=====================
+systemd-sleep.conf(5)
+=====================
+
+Name
+####
+
+systemd-sleep.conf, sleep.conf.d — Suspend and hibernation configuration file
+
+Synopsis
+########
+
+| :code:`/etc/systemd/sleep.conf`
+| :code:`/run/systemd/sleep.conf`
+| :code:`/usr/lib/systemd/sleep.conf`
+| :code:`/etc/systemd/sleep.conf.d/\*.conf`
+| :code:`/run/systemd/sleep.conf.d/\*.conf`
+| :code:`/usr/lib/systemd/sleep.conf.d/\*.conf`
+
+Description
+###########
+
+:code:`systemd` supports four general power-saving modes:
+
+.. systemd:option:: suspend
+
+   a low-power state where execution of the OS is paused, and complete power loss might result in lost data, and which is fast to enter and exit. This corresponds to suspend, standby, or freeze states as understood by the kernel.
+
+   .. versionadded:: 203
+
+.. systemd:option:: hibernate
+
+   a low-power state where execution of the OS is paused, and complete power loss does not result in lost data, and which might be slow to enter and exit. This corresponds to the hibernation as understood by the kernel.
+
+   .. versionadded:: 203
+
+.. systemd:option:: hybrid-sleep
+
+   a low-power state where execution of the OS is paused, which might be slow to enter, and on complete power loss does not result in lost data but might be slower to exit in that case. This mode is called suspend-to-both by the kernel.
+
+   .. versionadded:: 203
+
+.. systemd:option:: suspend-then-hibernate
+
+   A low power state where the system is initially suspended (the state is stored in RAM). When the battery level is too low (less than 5%) or a certain timespan has passed, whichever happens first, the system is automatically woken up and then hibernated. This establishes a balance between speed and safety.
+
+   If the system has no battery, it would be hibernated after :code:`HibernateDelaySec=` has passed. If not set, then defaults to "2h".
+
+   If the system has battery and :code:`HibernateDelaySec=` is not set, low-battery alarms (ACPI _BTP) are tried first for detecting battery percentage and wake up the system for hibernation. If not available, or :code:`HibernateDelaySec=` is set, the system would regularly wake up to check the time and detect the battery percentage/discharging rate. The rate is used to schedule the next detection. If that is also not available, :code:`SuspendEstimationSec=` is used as last resort.
+
+   .. versionadded:: 239
+
+Settings in these files determine what strings will be written to :code:`/sys/power/disk` and :code:`/sys/power/state` by :ref:`systemd-sleep(8)` when :ref:`systemd(1)` attempts to suspend or hibernate the machine. See :ref:`systemd.syntax(7)` for a general description of the syntax.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+The following options can be configured in the \[Sleep] section of :code:`/etc/systemd/sleep.conf` or a :code:`sleep.conf.d` file:
+
+.. systemd:option:: AllowSuspend=, AllowHibernation=, AllowHybridSleep=, AllowSuspendThenHibernate=
+   :group: config-directives
+
+   By default, any power-saving mode is advertised if possible (i.e. the kernel supports that mode, the necessary resources are available). Those switches can be used to disable specific modes.
+
+   If :systemd:var:`AllowHibernation=no` or :systemd:var:`AllowSuspend=no` is used, this implies :systemd:var:`AllowSuspendThenHibernate=no` and :systemd:var:`AllowHybridSleep=no`, since those methods use both suspend and hibernation internally. :systemd:var:`AllowSuspendThenHibernate=yes` and :systemd:var:`AllowHybridSleep=yes` can be used to override and enable those specific modes.
+
+   .. versionadded:: 240
+
+.. systemd:option:: SuspendState=
+   :group: config-directives
+
+   The string to be written to :code:`/sys/power/state` by :ref:`systemd-suspend.service(8)`. More than one value can be specified by separating multiple values with whitespace. They will be tried in turn, until one is written without error. If none of the writes succeed, the operation will be aborted.
+
+   The allowed set of values is determined by the kernel and is shown in the file itself (use :code:`cat /sys/power/state` to display). See `Basic sysfs Interfaces for System Suspend and Hibernation <https://docs.kernel.org/admin-guide/pm/sleep-states.html#basic-sysfs-interfaces-for-system-suspend-and-hibernation>`_ for more details.
+
+   :ref:`systemd-suspend-then-hibernate.service(8)` uses this value when suspending.
+
+   .. versionadded:: 203
+
+.. systemd:option:: HibernateMode=
+   :group: config-directives
+
+   The string to be written to :code:`/sys/power/disk` by :ref:`systemd-hibernate.service(8)`. More than one value can be specified by separating multiple values with whitespace. They will be tried in turn, until one is written without error. If none of the writes succeed, the operation will be aborted.
+
+   The allowed set of values is determined by the kernel and is shown in the file itself (use :code:`cat /sys/power/disk` to display). See the kernel documentation page `Basic sysfs Interfaces for System Suspend and Hibernation <https://docs.kernel.org/admin-guide/pm/sleep-states.html#basic-sysfs-interfaces-for-system-suspend-and-hibernation>`_ for more details.
+
+   :ref:`systemd-suspend-then-hibernate.service(8)` uses the value of :systemd:var:`HibernateMode=` when hibernating.
+
+   .. versionadded:: 203
+
+.. systemd:option:: MemorySleepMode=
+   :group: config-directives
+
+   The string to be written to :code:`/sys/power/mem_sleep` when :systemd:option:`SuspendState=mem` or :code:`hybrid-sleep` is used. More than one value can be specified by separating multiple values with whitespace. They will be tried in turn, until one is written without error. If none of the writes succeed, the operation will be aborted. Defaults to empty, i.e. the kernel default or kernel command line option :systemd:var:`mem_sleep_default=` is respected.
+
+   The allowed set of values is determined by the kernel and is shown in the file itself (use :code:`cat /sys/power/mem_sleep` to display). See the kernel documentation page `Basic sysfs Interfaces for System Suspend and Hibernation <https://docs.kernel.org/admin-guide/pm/sleep-states.html#basic-sysfs-interfaces-for-system-suspend-and-hibernation>`_ for more details.
+
+   .. versionadded:: 256
+
+.. systemd:option:: HibernateDelaySec=
+   :group: config-directives
+
+   The amount of time the system spends in suspend mode before the system is automatically put into hibernate mode. Only used by :ref:`systemd-suspend-then-hibernate.service(8)`. Refer to :code:`suspend-then-hibernate` for details on how this option interacts with other options/system battery state.
+
+   .. versionadded:: 239
+
+.. systemd:option:: HibernateOnACPower=
+   :group: config-directives
+
+   Whether to allow hibernation when the system has AC power. Only used by :ref:`systemd-suspend-then-hibernate.service(8)` when :systemd:var:`HibernateDelaySec=` is set.
+
+   If this option is disabled, the countdown of :systemd:var:`HibernateDelaySec=` starts only after AC power is disconnected, keeping the system in the suspend state otherwise.
+
+   This option is only effective on systems with a battery.
+
+   .. versionadded:: 257
+
+.. systemd:option:: SuspendEstimationSec=
+   :group: config-directives
+
+   The RTC alarm will wake the system after the specified timespan to measure the system battery capacity level and estimate battery discharging rate. Only used by :ref:`systemd-suspend-then-hibernate.service(8)`. Refer to :code:`suspend-then-hibernate` for details on how this option interacts with other options/system battery state.
+
+   .. versionadded:: 253
+
+Example: freeze
+###############
+
+Example: to exploit the “freeze” mode added in Linux 3.9, one can use :code:`systemctl suspend` with
+
+.. code-block:: sh
+
+   [Sleep]
+   SuspendState=freeze
+
+See Also
+########
+
+:ref:`systemd-sleep(8)`, :ref:`systemd-suspend.service(8)`, :ref:`systemd-hibernate.service(8)`, :ref:`systemd-hybrid-sleep.service(8)`, :ref:`systemd-suspend-then-hibernate.service(8)`, :ref:`systemd(1)`, :ref:`systemd.directives(7)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

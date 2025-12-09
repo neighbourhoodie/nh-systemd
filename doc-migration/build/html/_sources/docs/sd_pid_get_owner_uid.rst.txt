@@ -1,0 +1,172 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_pid_get_owner_uid
+:manvolnum: 3
+:summary: Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to
+:aliases: sd_pid_get_session, sd_pid_get_user_unit, sd_pid_get_unit, sd_pid_get_machine_name, sd_pid_get_slice, sd_pid_get_user_slice, sd_pid_get_cgroup, sd_pidfd_get_owner_uid, sd_pidfd_get_session, sd_pidfd_get_user_unit, sd_pidfd_get_unit, sd_pidfd_get_machine_name, sd_pidfd_get_slice, sd_pidfd_get_user_slice, sd_pidfd_get_cgroup, sd_peer_get_owner_uid, sd_peer_get_session, sd_peer_get_user_unit, sd_peer_get_unit, sd_peer_get_machine_name, sd_peer_get_slice, sd_peer_get_user_slice, sd_peer_get_cgroup
+
+.. _sd_pid_get_owner_uid(3):
+
+=======================
+sd_pid_get_owner_uid(3)
+=======================
+
+Name
+####
+
+sd_pid_get_owner_uid, sd_pid_get_session, sd_pid_get_user_unit, sd_pid_get_unit, sd_pid_get_machine_name, sd_pid_get_slice, sd_pid_get_user_slice, sd_pid_get_cgroup, sd_pidfd_get_owner_uid, sd_pidfd_get_session, sd_pidfd_get_user_unit, sd_pidfd_get_unit, sd_pidfd_get_machine_name, sd_pidfd_get_slice, sd_pidfd_get_user_slice, sd_pidfd_get_cgroup, sd_peer_get_owner_uid, sd_peer_get_session, sd_peer_get_user_unit, sd_peer_get_unit, sd_peer_get_machine_name, sd_peer_get_slice, sd_peer_get_user_slice, sd_peer_get_cgroup — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-login.h>` .. code-block::
+
+   int sd_pid_get_owner_uid(pid_t pid,
+	uid_t *uid); .. code-block::
+
+   int sd_pid_get_session(pid_t pid,
+	char **session); .. code-block::
+
+   int sd_pid_get_user_unit(pid_t pid,
+	char **unit); .. code-block::
+
+   int sd_pid_get_unit(pid_t pid,
+	char **unit); .. code-block::
+
+   int sd_pid_get_machine_name(pid_t pid,
+	char **name); .. code-block::
+
+   int sd_pid_get_slice(pid_t pid,
+	char **slice); .. code-block::
+
+   int sd_pid_get_user_slice(pid_t pid,
+	char **slice); .. code-block::
+
+   int sd_pid_get_cgroup(pid_t pid,
+	char **cgroup); .. code-block::
+
+   int sd_pidfd_get_owner_uid(int pidfd,
+	uid_t *uid); .. code-block::
+
+   int sd_pidfd_get_session(int pidfd,
+	char **session); .. code-block::
+
+   int sd_pidfd_get_user_unit(int pidfd,
+	char **unit); .. code-block::
+
+   int sd_pidfd_get_unit(int pidfd,
+	char **unit); .. code-block::
+
+   int sd_pidfd_get_machine_name(int pidfd,
+	char **name); .. code-block::
+
+   int sd_pidfd_get_slice(int pidfd,
+	char **slice); .. code-block::
+
+   int sd_pidfd_get_user_slice(int pidfd,
+	char **slice); .. code-block::
+
+   int sd_pidfd_get_cgroup(int pidfd,
+	char **cgroup); .. code-block::
+
+   int sd_peer_get_owner_uid(int fd,
+	uid_t *uid); .. code-block::
+
+   int sd_peer_get_session(int fd,
+	char **session); .. code-block::
+
+   int sd_peer_get_user_unit(int fd,
+	char **unit); .. code-block::
+
+   int sd_peer_get_unit(int fd,
+	char **unit); .. code-block::
+
+   int sd_peer_get_machine_name(int fd,
+	char **name); .. code-block::
+
+   int sd_peer_get_slice(int fd,
+	char **slice); .. code-block::
+
+   int sd_peer_get_user_slice(int fd,
+	char **slice); .. code-block::
+
+   int sd_peer_get_cgroup(int fd,
+	char **cgroup);
+
+Description
+###########
+
+:code:`sd_pid_get_owner_uid()` may be used to determine the Unix UID (user identifier) which owns the login session or systemd user unit of a process identified by the specified PID. For processes which are not part of a login session and not managed by a user manager, this function will fail with :code:`-ENODATA`.
+
+:code:`sd_pid_get_session()` may be used to determine the login session identifier of a process identified by the specified process identifier. The session identifier is a short string, suitable for usage in file system paths. Please note the login session may be limited to a stub process or two. User processes may instead be started from their systemd user manager, e.g. GUI applications started using DBus activation, as well as service processes which are shared between multiple logins of the same user. For processes which are not part of a login session, this function will fail with :code:`-ENODATA`. The returned string needs to be freed with the libc :man-pages:`free(3)` call after use.
+
+:code:`sd_pid_get_user_unit()` may be used to determine the systemd user unit (i.e. user service or scope unit) identifier of a process identified by the specified PID. The unit name is a short string, suitable for usage in file system paths. For processes which are not managed by a user manager, this function will fail with :code:`-ENODATA`. The returned string needs to be freed with the libc :man-pages:`free(3)` call after use.
+
+:code:`sd_pid_get_unit()` may be used to determine the systemd system unit (i.e. system service or scope unit) identifier of a process identified by the specified PID. The unit name is a short string, suitable for usage in file system paths. Note that not all processes are part of a system unit/service. For processes not being part of a systemd system unit, this function will fail with :code:`-ENODATA`. (More specifically, this call will not work for kernel threads.) The returned string needs to be freed with the libc :man-pages:`free(3)` call after use.
+
+:code:`sd_pid_get_machine_name()` may be used to determine the name of the VM or container is a member of. The machine name is a short string, suitable for usage in file system paths. The returned string needs to be freed with the libc :man-pages:`free(3)` call after use. For processes not part of a VM or container, this function fails with :code:`-ENODATA`.
+
+:code:`sd_pid_get_slice()` may be used to determine the slice unit the process is a member of. See :ref:`systemd.slice(5)` for details about slices. The returned string needs to be freed with the libc :man-pages:`free(3)` call after use.
+
+Similarly, :code:`sd_pid_get_user_slice()` returns the user slice (as managed by the user's systemd instance) of a process.
+
+:code:`sd_pid_get_cgroup()` returns the control group path of the specified process, relative to the root of the hierarchy. Returns the path without trailing slash, except for processes located in the root control group, where "/" is returned. To find the actual control group path in the file system, the returned path needs to be prefixed with :code:`/sys/fs/cgroup/`.
+
+If the :code:`pid` parameter of any of these functions is passed as 0, the operation is executed for the calling process.
+
+The :code:`sd_pidfd_get_owner_uid()`, :code:`sd_pidfd_get_session()`, :code:`sd_pidfd_get_user_unit()`, :code:`sd_pidfd_get_unit()`, :code:`sd_pidfd_get_machine_name()`, :code:`sd_pidfd_get_slice()`, :code:`sd_pidfd_get_user_slice()` and :code:`sd_pidfd_get_cgroup()` calls operate similarly to their PID counterparts, but accept a :code:`PIDFD` instead of a :code:`PID`, which means they are not subject to recycle race conditions as the process is pinned by the file descriptor during the whole duration of the invocation. Note that these require a kernel that supports :code:`PIDFD`. A suitable file descriptor may be acquired via :man-pages:`pidfd_open(2)`.
+
+The :code:`sd_peer_get_owner_uid()`, :code:`sd_peer_get_session()`, :code:`sd_peer_get_user_unit()`, :code:`sd_peer_get_unit()`, :code:`sd_peer_get_machine_name()`, :code:`sd_peer_get_slice()`, :code:`sd_peer_get_user_slice()` and :code:`sd_peer_get_cgroup()` calls operate similarly to their PID counterparts, but accept a connected :code:`AF_UNIX` socket and retrieve information about the connected peer process. Note that these fields are retrieved via :code:`/proc/`, and hence are not suitable for authorization purposes, as they are subject to races.
+
+Return Value
+############
+
+On success, these calls return 0 or a positive integer. On failure, these calls return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ESRCH
+
+   The specified PID does not refer to a running process.
+
+.. systemd:option:: -EBADF
+
+   The specified file descriptor is invalid.
+
+.. systemd:option:: -ENODATA
+
+   The given field is not specified for the described process or peer.
+
+.. systemd:option:: -EINVAL
+
+   An input parameter was invalid (out of range, or :code:`NULL`, where that is not accepted).
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+Notes
+#####
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+Note that the login session identifier as returned by :code:`sd_pid_get_session()` is completely unrelated to the process session identifier as returned by :man-pages:`getsid(2)`.
+
+History
+#######
+
+:code:`sd_peer_get_cgroup()`, :code:`sd_peer_get_machine_name()`, :code:`sd_peer_get_owner_uid()`, :code:`sd_peer_get_session()`, :code:`sd_peer_get_slice()`, :code:`sd_peer_get_unit()`, :code:`sd_peer_get_user_slice()`, :code:`sd_peer_get_user_unit()`, :code:`sd_pid_get_cgroup()`, :code:`sd_pid_get_machine_name()`, :code:`sd_pid_get_owner_uid()`, :code:`sd_pid_get_session()`, :code:`sd_pid_get_slice()`, :code:`sd_pid_get_unit()`, :code:`sd_pid_get_user_slice()`, and :code:`sd_pid_get_user_unit()` were added in version 236.
+
+:code:`sd_pidfd_get_owner_uid()`, :code:`sd_pidfd_get_session()`, :code:`sd_pidfd_get_user_unit()`, :code:`sd_pidfd_get_unit()`, :code:`sd_pidfd_get_machine_name()`, :code:`sd_pidfd_get_slice()`, :code:`sd_pidfd_get_user_slice()`, and :code:`sd_pidfd_get_cgroup()` were added in version 253.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-login(3)`, :ref:`sd_session_is_active(3)`, :man-pages:`getsid(2)`, :ref:`systemd.slice(5)`, :ref:`systemd-machined.service(8)`
+
+

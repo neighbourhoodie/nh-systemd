@@ -1,0 +1,86 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_reply_method_return
+:manvolnum: 3
+:summary: Reply to a D-Bus method call
+:aliases: sd_bus_reply_method_returnv
+
+.. _sd_bus_reply_method_return(3):
+
+=============================
+sd_bus_reply_method_return(3)
+=============================
+
+Name
+####
+
+sd_bus_reply_method_return, sd_bus_reply_method_returnv — Reply to a D-Bus method call
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_reply_method_return(sd_bus_message *call,
+	const char *types,
+	...); .. code-block::
+
+   int sd_bus_reply_method_returnv(sd_bus_message *call,
+	const char *types,
+	va_list ap);
+
+Description
+###########
+
+:code:`sd_bus_reply_method_return()` sends a reply to the :code:`call` message. The type string :code:`types` and the arguments that follow it must adhere to the format described in :ref:`sd_bus_message_append(3)`. If no reply is expected to :code:`call`, this function succeeds without sending a reply.
+
+Return Value
+############
+
+On success, this function returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The input parameter :code:`call` is :code:`NULL`.
+
+   Message :code:`call` is not a method call message.
+
+   Message :code:`call` is not attached to a bus.
+
+   Message :code:`m` is not a method reply message.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EPERM
+
+   Message :code:`call` has been sealed.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOTCONN
+
+   The bus to which message :code:`call` is attached is not connected.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+   .. versionadded:: 246
+
+In addition, any error returned by :ref:`sd_bus_send(3)` may be returned.
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_new_method_return(3)`
+
+

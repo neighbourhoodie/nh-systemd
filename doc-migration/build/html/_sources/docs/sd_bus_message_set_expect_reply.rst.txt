@@ -1,0 +1,100 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_set_expect_reply
+:manvolnum: 3
+:summary: Set and query bus message metadata
+:aliases: sd_bus_message_get_expect_reply, sd_bus_message_set_auto_start, sd_bus_message_get_auto_start, sd_bus_message_set_allow_interactive_authorization, sd_bus_message_get_allow_interactive_authorization
+
+.. _sd_bus_message_set_expect_reply(3):
+
+==================================
+sd_bus_message_set_expect_reply(3)
+==================================
+
+Name
+####
+
+sd_bus_message_set_expect_reply, sd_bus_message_get_expect_reply, sd_bus_message_set_auto_start, sd_bus_message_get_auto_start, sd_bus_message_set_allow_interactive_authorization, sd_bus_message_get_allow_interactive_authorization — Set and query bus message metadata
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_set_expect_reply(sd_bus_message *message,
+	int b); .. code-block::
+
+   int sd_bus_message_get_expect_reply(sd_bus_message *message); .. code-block::
+
+   int sd_bus_message_set_auto_start(sd_bus_message *message,
+	int b); .. code-block::
+
+   int sd_bus_message_get_auto_start(sd_bus_message *message); .. code-block::
+
+   int sd_bus_message_set_allow_interactive_authorization(sd_bus_message *message,
+	int b); .. code-block::
+
+   int sd_bus_message_get_allow_interactive_authorization(sd_bus_message *message);
+
+Description
+###########
+
+:code:`sd_bus_message_set_expect_reply()` sets or clears the :code:`NO_REPLY_EXPECTED` flag on the message :code:`m`. This flag matters only for method call messages and is used to specify that no method return or error reply is expected. It is ignored for other types. Thus, for a method call message, calling
+
+.. code-block:: sh
+
+   sd_bus_message_set_expect_reply(…, 0)
+
+sets the flag and suppresses the reply.
+
+:code:`sd_bus_message_get_expect_reply()` checks if the :code:`NO_REPLY_EXPECTED` flag is set on the message :code:`m`. It will return positive if it is not set, and zero if it is.
+
+:code:`sd_bus_message_set_auto_start()` sets or clears the :code:`NO_AUTO_START` flag on the message :code:`m`. When the flag is set, the bus must not launch an owner for the destination name in response to this message. Calling
+
+.. code-block:: sh
+
+   sd_bus_message_set_auto_start(…, 0)
+
+sets the flag.
+
+:code:`sd_bus_message_get_auto_start()` checks if the :code:`NO_AUTO_START` flag is set on the message :code:`m`. It will return positive if it is not set, and zero if it is.
+
+:code:`sd_bus_message_set_allow_interactive_authorization()` sets or clears the :code:`ALLOW_INTERACTIVE_AUTHORIZATION` flag on the message :code:`m`. Setting this flag informs the receiver that the caller is prepared to wait for interactive authorization via polkit or a similar framework. Note that setting this flag does not guarantee that the receiver will actually perform interactive authorization. Also, make sure to set a suitable message timeout when using this flag since interactive authorization could potentially take a long time as it depends on user input. If :code:`b` is non-zero, the flag is set.
+
+:code:`sd_bus_message_get_allow_interactive_authorization()` checks if the :code:`ALLOW_INTERACTIVE_AUTHORIZATION` flag is set on the message :code:`m`. It will return a positive integer if the flag is set. Otherwise, it returns zero.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`message` parameter is :code:`NULL`.
+
+.. systemd:option:: -EPERM
+
+   The message :code:`message` is sealed when trying to set a flag.
+
+   The message :code:`message` has wrong type.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_set_expect_reply()`, :code:`sd_bus_message_get_expect_reply()`, :code:`sd_bus_message_set_auto_start()`, and :code:`sd_bus_message_get_auto_start()` were added in version 240.
+
+:code:`sd_bus_message_set_allow_interactive_authorization()` and :code:`sd_bus_message_get_allow_interactive_authorization()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_set_description(3)`
+
+

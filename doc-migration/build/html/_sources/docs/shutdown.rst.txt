@@ -1,0 +1,96 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: shutdown
+:manvolnum: 8
+:summary: Halt, power off or reboot the machine
+
+.. _shutdown(8):
+
+===========
+shutdown(8)
+===========
+
+Name
+####
+
+shutdown — Halt, power off or reboot the machine
+
+Synopsis
+########
+
+:code:`shutdown [OPTIONS...] [TIME] [WALL...]`
+
+Description
+###########
+
+:code:`shutdown` may be used to halt, power off, or reboot the machine.
+
+The first argument may be a time string (which is usually "now"). Optionally, this may be followed by a wall message to be sent to all logged-in users before going down.
+
+The time string may either be in the format "hh:mm" for hour/minutes specifying the time to execute the shutdown at, specified in 24h clock format. Alternatively it may be in the syntax "+m" referring to the specified number of minutes m from now. "now" is an alias for "+0", i.e. for triggering an immediate shutdown. If no time argument is specified, "+1" is implied.
+
+Note that to specify a wall message you must specify a time argument, too.
+
+If the time argument is used, 5 minutes before the system goes down the :code:`/run/nologin` file is created to ensure that further logins shall not be allowed.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --help
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help-text|
+    :end-before: .. inclusion-end-marker-do-not-remove help-text|
+
+.. systemd:option:: -H, --halt
+
+   Halt the machine.
+
+.. systemd:option:: -P, --poweroff
+
+   Power the machine off (the default).
+
+.. systemd:option:: -r, --reboot
+
+   Reboot the machine.
+
+.. systemd:option:: -h
+
+   The same as :code:`--poweroff`, but does not override the action to take if it is "halt". E.g. :code:`shutdown --reboot -h` means "poweroff", but :code:`shutdown --halt -h` means "halt".
+
+.. systemd:option:: -k
+
+   Do not halt, power off, or reboot, but just write the wall message.
+
+.. systemd:option:: --no-wall
+
+   Do not send wall message before halt, power off, or reboot.
+
+.. systemd:option:: -c
+
+   Cancel a pending shutdown. This may be used to cancel the effect of an invocation of :code:`shutdown` with a time argument that is not "+0" or "now".
+
+.. systemd:option:: --show
+
+   Show a pending shutdown action and time if there is any.
+
+   .. versionadded:: 250
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+Compatibility
+#############
+
+The :code:`shutdown` command in previous init systems (including sysvinit) defaulted to single-user mode instead of powering off the machine. To change into single-user mode, use :code:`systemctl rescue` instead.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :man-pages:`halt(8)`, :man-pages:`wall(1)`
+
+

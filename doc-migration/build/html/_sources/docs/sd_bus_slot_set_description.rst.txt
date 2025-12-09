@@ -1,0 +1,71 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_slot_set_description
+:manvolnum: 3
+:summary: Set or query the description of bus slot objects
+:aliases: sd_bus_slot_get_description
+
+.. _sd_bus_slot_set_description(3):
+
+==============================
+sd_bus_slot_set_description(3)
+==============================
+
+Name
+####
+
+sd_bus_slot_set_description, sd_bus_slot_get_description — Set or query the description of bus slot objects
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_slot_set_description(sd_bus_slot* slot,
+	const char *description); .. code-block::
+
+   int sd_bus_slot_get_description(sd_bus_slot* bus,
+	const char **description);
+
+Description
+###########
+
+:code:`sd_bus_slot_set_description()` sets the description string that is used in logging to the specified string. The string is copied internally and freed when the bus slot object is deallocated. The :code:`description` argument may be :code:`NULL`, in which case the description is unset.
+
+:code:`sd_bus_slot_get_description()` returns a description string in :code:`description`. If the string is not set, e.g. with :code:`sd_bus_slot_set_description()`, and the slot is a bus match callback slot, the match string will be returned. Otherwise, :code:`-ENXIO` is returned.
+
+Return Value
+############
+
+On success, these functions return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An required argument is :code:`NULL`.
+
+.. systemd:option:: -ENXIO
+
+   The bus slot object has no description.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_slot_set_description()` and :code:`sd_bus_slot_get_description()` were added in version 240.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_slot_ref(3)`, :ref:`sd_bus_slot_set_userdata(3)`
+
+

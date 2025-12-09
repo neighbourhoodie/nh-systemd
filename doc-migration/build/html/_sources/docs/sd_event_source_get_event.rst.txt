@@ -1,0 +1,47 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_source_get_event
+:manvolnum: 3
+:summary: Retrieve the event loop of an event source
+
+.. _sd_event_source_get_event(3):
+
+============================
+sd_event_source_get_event(3)
+============================
+
+Name
+####
+
+sd_event_source_get_event — Retrieve the event loop of an event source
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   sd_event* sd_event_source_get_event(sd_event_source *source);
+
+Description
+###########
+
+:code:`sd_event_source_get_event()` may be used to retrieve the event loop object the event source object specified as :code:`source` is associated with. The event loop object is specified when creating an event source object with calls such as :ref:`sd_event_add_io(3)` or :ref:`sd_event_add_time(3)`.
+
+Return Value
+############
+
+On success, :code:`sd_event_source_get_event()` returns the associated event loop object. On failure, it returns :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_source_get_event()` was added in version 229.
+
+See Also
+########
+
+:ref:`sd-event(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_source_set_userdata(3)`
+
+

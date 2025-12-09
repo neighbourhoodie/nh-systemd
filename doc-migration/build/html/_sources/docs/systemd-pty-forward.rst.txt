@@ -1,0 +1,67 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-pty-forward
+:manvolnum: 1
+:summary: Run a command with a custom terminal background color or title
+
+.. _systemd-pty-forward(1):
+
+======================
+systemd-pty-forward(1)
+======================
+
+Name
+####
+
+systemd-pty-forward — Run a command with a custom terminal background color or title
+
+Synopsis
+########
+
+:code:`systemd-pty-forward [OPTIONS...] {COMMAND}`
+
+Description
+###########
+
+:code:`systemd-pty-forward` can be used to run a command with a custom terminal background color or title.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --background=COLOR
+
+   Change the terminal background color to the specified ANSI color as long as the command runs. The color specified should be an ANSI X3.64 SGR background color, i.e. strings such as "40", "41", …, "47", "48;2;…", "48;5;…". See `ANSI Escape Code (Wikipedia) <https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters>`_ for details.
+
+   Example: "--background=44" for a blue background.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --title=TITLE
+
+   Change the terminal title to the specified string as long as the command runs.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --quiet, -q
+
+   Suppresses additional informational output while running.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --read-only
+
+   Do not accept any user input on standard input.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+

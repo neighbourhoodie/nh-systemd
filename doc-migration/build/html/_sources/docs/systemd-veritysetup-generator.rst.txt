@@ -1,0 +1,84 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-veritysetup-generator
+:manvolnum: 8
+:summary: Unit generator for verity protected block devices
+
+.. _systemd-veritysetup-generator(8):
+
+================================
+systemd-veritysetup-generator(8)
+================================
+
+Name
+####
+
+systemd-veritysetup-generator — Unit generator for verity protected block devices
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-veritysetup-generator`
+
+Description
+###########
+
+:code:`systemd-veritysetup-generator` is a generator that translates kernel command line options configuring verity protected block devices into native systemd units early at boot and when configuration of the system manager is reloaded. This will create :ref:`systemd-veritysetup@.service(8)` units as necessary.
+
+Currently, only two verity devices may be set up with this generator, backing the root and :code:`/usr` file systems of the OS.
+
+:code:`systemd-veritysetup-generator` implements :ref:`systemd.generator(7)`.
+
+Kernel Command Line
+###################
+
+:code:`systemd-veritysetup-generator` understands the following kernel command line parameters:
+
+.. systemd:option:: systemd.verity=, rd.systemd.verity=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. Defaults to "yes". If "no", disables the generator entirely. :systemd:var:`rd.systemd.verity=` is honored only in the initrd while :systemd:var:`systemd.verity=` is honored by both the main system and in the initrd.
+
+   .. versionadded:: 233
+
+.. systemd:option:: veritytab=, rd.veritytab=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. Defaults to "yes". If "no", causes the generator to ignore any devices configured in :code:`/etc/veritytab`. :systemd:var:`rd.veritytab=` is honored only in the initrd while :systemd:var:`veritytab=` is honored by both the main system and in the initrd.
+
+   .. versionadded:: 248
+
+.. systemd:option:: roothash=
+   :group: kernel-commandline-options
+
+   Takes a root hash value for the root file system. Expects a hash value formatted in hexadecimal characters of the appropriate length (i.e. most likely 256 bit/64 characters, or longer). If not specified via :systemd:var:`systemd.verity_root_data=` and :systemd:var:`systemd.verity_root_hash=`, the hash and data devices to use are automatically derived from the specified hash value. Specifically, the data partition device is looked for under a GPT partition UUID derived from the first 128-bit of the root hash, the hash partition device is looked for under a GPT partition UUID derived from the last 128-bit of the root hash. Hence it is usually sufficient to specify the root hash to boot from a verity protected root file system, as device paths are automatically determined from it — as long as the partition table is properly set up.
+
+   .. versionadded:: 233
+
+.. systemd:option:: systemd.verity_root_data=, systemd.verity_root_hash=
+   :group: kernel-commandline-options
+
+   These two settings take block device paths as arguments and may be used to explicitly configure the data partition and hash partition to use for setting up the verity protection for the root file system. If not specified, these paths are automatically derived from the :systemd:var:`roothash=` argument (see above).
+
+   .. versionadded:: 233
+
+.. systemd:option:: systemd.verity_root_options=
+   :group: kernel-commandline-options
+
+   Takes a comma-separated list of dm-verity options. Expects the following options :systemd:option:`superblock=:emphasis:`BOOLEAN``, :systemd:option:`format=:emphasis:`NUMBER``, :systemd:option:`data-block-size=:emphasis:`BYTES``, :systemd:option:`hash-block-size=:emphasis:`BYTES``, :systemd:option:`data-blocks=:emphasis:`BLOCKS``, :systemd:option:`hash-offset=:emphasis:`BYTES``, :systemd:option:`salt=:emphasis:`HEX``, :systemd:option:`uuid=:emphasis:`UUID``, :systemd:option:`ignore-corruption`, :systemd:option:`restart-on-corruption`, :systemd:option:`ignore-zero-blocks`, :systemd:option:`check-at-most-once`, :systemd:option:`panic-on-corruption`, :systemd:option:`hash=:emphasis:`HASH``, :systemd:option:`fec-device=:emphasis:`PATH``, :systemd:option:`fec-offset=:emphasis:`BYTES``, :systemd:option:`fec-roots=:emphasis:`NUM`` and :systemd:option:`root-hash-signature=:emphasis:`PATH`\|base64::emphasis:`HEX``. See :man-pages:`veritysetup(8)` for more details.
+
+   .. versionadded:: 248
+
+.. systemd:option:: usrhash=, systemd.verity_usr_data=, systemd.verity_usr_hash=, systemd.verity_usr_options=
+   :group: kernel-commandline-options
+
+   Equivalent to their counterparts for the root file system as described above, but apply to the :code:`/usr/` file system instead.
+
+   .. versionadded:: 250
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-veritysetup@.service(8)`, :man-pages:`veritysetup(8)`, :ref:`systemd-fstab-generator(8)`
+
+

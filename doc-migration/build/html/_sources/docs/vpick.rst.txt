@@ -1,0 +1,23 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+.. inclusion-marker-do-not-remove image|
+
+.. inclusion-marker-do-not-remove image|
+
+In place of the image path a ".v/" versioned directory may be specified, see :ref:`systemd.v(7)` for details.
+
+.. inclusion-end-marker-do-not-remove image|
+
+.. inclusion-end-marker-do-not-remove image|
+
+.. inclusion-marker-do-not-remove directory|
+
+.. inclusion-marker-do-not-remove directory|
+
+In place of the directory path a ".v/" versioned directory may be specified, see :ref:`systemd.v(7)` for details.
+
+.. inclusion-end-marker-do-not-remove directory|
+
+.. inclusion-end-marker-do-not-remove directory|
+
+

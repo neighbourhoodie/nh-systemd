@@ -1,0 +1,385 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-dissect
+:manvolnum: 1
+:summary: Dissect Discoverable Disk Images (DDIs)
+:aliases: mount.ddi
+
+.. _systemd-dissect(1):
+
+==================
+systemd-dissect(1)
+==================
+
+Name
+####
+
+systemd-dissect, mount.ddi — Dissect Discoverable Disk Images (DDIs)
+
+Synopsis
+########
+
+:code:`systemd-dissect [OPTIONS...] IMAGE`
+
+:code:`systemd-dissect [OPTIONS...] [--mount] IMAGE PATH`
+
+:code:`systemd-dissect [OPTIONS...] [--umount] PATH`
+
+:code:`systemd-dissect [OPTIONS...] [--attach] IMAGE`
+
+:code:`systemd-dissect [OPTIONS...] [--detach] PATH`
+
+:code:`systemd-dissect [OPTIONS...] [--list] IMAGE`
+
+:code:`systemd-dissect [OPTIONS...] [--mtree] IMAGE`
+
+:code:`systemd-dissect [OPTIONS...] [--with] IMAGE [<COMMAND>...]`
+
+:code:`systemd-dissect [OPTIONS...] [--copy-from] IMAGE PATH [<TARGET>]`
+
+:code:`systemd-dissect [OPTIONS...] [--copy-to] IMAGE [<SOURCE>] PATH`
+
+:code:`systemd-dissect [OPTIONS...] [--make-archive] IMAGE [<TARGET>]`
+
+:code:`systemd-dissect [OPTIONS...] [--discover]`
+
+:code:`systemd-dissect [OPTIONS...] [--validate] IMAGE`
+
+:code:`systemd-dissect [OPTIONS...] [--shift] IMAGE UIDBASE`
+
+Description
+###########
+
+:code:`systemd-dissect` is a tool for introspecting and interacting with file system OS disk images, specifically Discoverable Disk Images (DDIs). It supports four different operations:
+
+1.    Show general OS image information, including the image's :man-pages:`os-release(5)` data, machine ID, partition information and more.
+
+2.    Mount an OS image to a local directory. In this mode it will dissect the OS image and mount the included partitions according to their designation onto a directory and possibly sub-directories.
+
+3.    Unmount an OS image from a local directory. In this mode it will recursively unmount the mounted partitions and remove the underlying loop device, including all the partition sub-devices.
+
+4.    Copy files and directories in and out of an OS image.
+
+The tool may operate on three types of OS images:
+
+1.    OS disk images containing a GPT partition table envelope, with partitions marked according to the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_.
+
+2.    OS disk images containing just a plain file-system without an enveloping partition table. (This file system is assumed to be the root file system of the OS.)
+
+3.    OS disk images containing a GPT or MBR partition table, with a single partition only. (This partition is assumed to contain the root file system of the OS.)
+
+OS images may use any kind of Linux-supported file systems. In addition they may make use of LUKS disk encryption, and contain Verity integrity information. Note that qualifying OS images may be booted with :ref:`systemd-nspawn(1)`'s :code:`--image=` switch, and be used as root file system for system service using the :code:`RootImage=` unit file setting, see :ref:`systemd.exec(5)`.
+
+Note that the partition table shown when invoked without command switch (as listed below) does not necessarily show all partitions included in the image, but just the partitions that are understood and considered part of an OS disk image. Specifically, partitions of unknown types are ignored, as well as duplicate partitions (i.e. more than one per partition type), as are root and :code:`/usr/` partitions of architectures not compatible with the local system. In other words: this tool will display what it operates with when mounting the image. To display the complete list of partitions use a tool such as :man-pages:`fdisk(8)`.
+
+The :code:`systemd-dissect` command may be invoked as :code:`mount.ddi` in which case it implements the :man-pages:`mount(8)` "external helper" interface. This ensures disk images compatible with :code:`systemd-dissect` can be mounted directly by :code:`mount` and :man-pages:`fstab(5)`. For details see below.
+
+.. include:: vpick.rst
+    :start-after: .. inclusion-marker-do-not-remove image|
+    :end-before: .. inclusion-end-marker-do-not-remove image|
+
+Commands
+########
+
+If neither of the command switches listed below are passed the specified disk image is opened and general information about the image and the contained partitions and their use is shown.
+
+.. systemd:option:: --mount, -m
+
+   Mount the specified OS image to the specified directory. This will dissect the image, determine the OS root file system — as well as possibly other partitions — and mount them to the specified directory. If the OS image contains multiple partitions marked with the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_ multiple nested mounts are established. This command expects two arguments: a path to an image file and a path to a directory where to mount the image.
+
+   To unmount an OS image mounted like this use the :code:`--umount` operation.
+
+   When the OS image contains LUKS encrypted or Verity integrity protected file systems appropriate volumes are automatically set up and marked for automatic disassembly when the image is unmounted.
+
+   The OS image may either be specified as path to an OS image stored in a regular file or may refer to block device node (in the latter case, the block device must be the "whole" device, i.e. not a partition device). (The other supported commands described here support this, too.)
+
+   All mounted file systems are checked with the appropriate :man-pages:`fsck(8)` implementation in automatic fixing mode, unless explicitly turned off (:code:`--fsck=no`) or read-only operation is requested (:code:`--read-only`).
+
+   Note that this functionality is also available in :man-pages:`mount(8)` via a command such as :code:`mount -t ddi myimage.raw targetdir/`, as well as in :man-pages:`fstab(5)`. For details, see below.
+
+   .. versionadded:: 247
+
+.. systemd:option:: -M
+
+   This is a shortcut for :code:`--mount --mkdir`.
+
+   .. versionadded:: 247
+
+.. systemd:option:: --umount, -u
+
+   Unmount an OS image from the specified directory. This command expects one argument: a directory where an OS image was mounted.
+
+   All mounted partitions will be recursively unmounted, and the underlying loop device will be removed, along with all its partition sub-devices.
+
+   .. versionadded:: 252
+
+.. systemd:option:: -U
+
+   This is a shortcut for :code:`--umount --rmdir`.
+
+   .. versionadded:: 252
+
+.. systemd:option:: --attach
+
+   Attach the specified disk image to an automatically allocated loopback block device, and print the path to the loopback block device to standard output. This is similar to an invocation of :code:`losetup --find --show --partscan`, but will validate the image as DDI before attaching, and derive the correct sector size to use automatically. Moreover, it ensures the per-partition block devices are created before returning and attempts to enable direct IO mode, if possible. Takes a path to a disk image file.
+
+   If combined with :code:`--quiet` output of the block device name is suppressed.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --detach
+
+   Detach the specified disk image from a loopback block device. This undoes the effect of :code:`--attach` above. This expects either a path to a loopback block device as an argument, or the path to the backing image file. In the latter case, it will automatically determine the right device to detach.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --list, -l
+
+   Prints the paths of all the files and directories in the specified OS image or directory to standard output.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --mtree
+
+   Generates a BSD :die-net:`mtree(8)` compatible file manifest of the specified disk image or directory. This is useful for comparing image contents in detail, including inode information and other metadata. While the generated manifest will contain detailed inode information, it currently excludes extended attributes, file system capabilities, MAC labels, :man-pages:`chattr(1)` file flags, `btrfs(5) <https://btrfs.readthedocs.io/en/latest/btrfs-man5.html>`_ subvolume information, and various other file metadata. File content information is shown via a SHA256 digest. Additional fields might be added in future. Note that inode information such as link counts, inode numbers and timestamps is excluded from the output on purpose, as it typically complicates reproducibility.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --with
+
+   Runs the specified command with the specified OS image mounted. This will mount the image to a temporary directory, switch the current working directory to it, and invoke the specified command line as child process. Once the process ends it will unmount the image again, and remove the temporary directory. If no command is specified a shell is invoked. The image is mounted writable, use :code:`--read-only` to switch to read-only operation. The invoked process will have the :code:`$SYSTEMD_DISSECT_ROOT` environment variable set, containing the absolute path name of the temporary mount point, i.e. the same directory that is set as the current working directory. It will also have the :code:`$SYSTEMD_DISSECT_DEVICE` environment variable set, containing the absolute path name of the loop device the image was attached to.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --copy-from, -x
+
+   Copies a file or directory from the specified OS image or directory into the specified location on the host file system. Expects three arguments: a path to an image file or directory, a source path (relative to the image's root directory) and a destination path (relative to the current working directory, or an absolute path, both outside of the image). If the destination path is omitted or specified as dash ("-"), the specified file is written to standard output. If the source path in the image file system refers to a regular file it is copied to the destination path. In this case, access mode, extended attributes and timestamps are copied as well, but file ownership is not. If the source path in the image refers to a directory, it is copied to the destination path, recursively with all containing files and directories, merging into existing directories and updating already existing files. In this case, the file ownership is copied too.
+
+   .. versionadded:: 247
+
+.. systemd:option:: --copy-to, -a
+
+   Copies a file or directory from the specified location in the host file system into the specified OS image or directory. Expects three arguments: a path to an image file or directory, a source path (relative to the current working directory, or an absolute path, both outside of the image) and a destination path (relative to the image's root directory). If the source path is omitted or specified as dash ("-"), the data to write is read from standard input. If the source path in the host file system refers to a regular file, it is copied to the destination path. In this case, access mode, extended attributes and timestamps are copied as well, but file ownership is not. If the source path in the host file system refers to a directory it is copied to the destination path, recursively with all containing files and directories, merging into existing directories and updating already existing files.. In this case, the file ownership is copied too.
+
+   As with :code:`--mount` file system checks are implicitly run before the copy operation begins.
+
+   .. versionadded:: 247
+
+.. systemd:option:: --make-archive
+
+   Generates an archive file from the specified disk image. Expects two arguments: the path to the disk image and optionally the output archive file path. If the latter is omitted the archive is written to standard output. The archive file format is determined automatically from the specified output archive file name, e.g. any path suffixed with ".tar.xz" will result in an xz compressed UNIX tarball (if the path is omitted an uncompressed UNIX tarball is created). See :die-net:`libarchive(3)` for a list of supported archive formats and compression schemes.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --discover
+
+   Show a list of DDIs in well-known directories. This will show machine, portable service and system/configuration extension disk images in the usual directories :code:`/usr/lib/machines/`, :code:`/usr/lib/portables/`, :code:`/usr/lib/confexts/`, :code:`/var/lib/machines/`, :code:`/var/lib/portables/`, :code:`/var/lib/extensions/` and so on.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --validate
+
+   Validates the partition arrangement of a disk image (DDI), and ensures it matches the image policy specified via :code:`--image-policy=`, if one is specified. This parses the partition table and probes the file systems in the image, but does not attempt to mount them (nor to set up disk encryption/authentication via LUKS/Verity). It does this taking the configured image dissection policy into account. Since this operation does not mount file systems, this command – unlike all other commands implemented by this tool – requires no privileges other than the ability to access the specified file. Prints "OK" and returns zero if the image appears to be in order and matches the specified image dissection policy. Otherwise, prints an error message and returns non-zero.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --shift
+
+   Recursively iterates through all inodes of the specified image and shifts the UIDs and GIDs the inodes are owned by into the specified UID range. Takes an image path and a UID base as parameter. The UID base can be specified numerically (in which case it must be a multiple of 65536, and either 0 or within the container or foreign UID range, as per `Users, Groups, UIDs and GIDs on systemd Systems <https://systemd.io/UIDS-GIDS/>`_), or as the symbolic identifier "foreign" which is shorthand to the foreign UID base. This command is useful for preparing directory container images for unprivileged use. Note that this command is intended for images that use the 16bit UIDs/GIDs range only, and it always ignores the upper 16bit of the current UID/GID ownership, combining the lower 16 bit with the target UID base.
+
+   Use :code:`systemd-dissect --shift /some/container/tree foreign` to shift a container image into the foreign UID range, or :code:`systemd-dissect --shift /some/container/tree 0` to shift it to host UID range.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --read-only, -r
+
+   Operate in read-only mode. By default, :code:`--mount` will establish writable mount points. If this option is specified they are established in read-only mode instead.
+
+   .. versionadded:: 247
+
+.. systemd:option:: --fsck=no
+
+   Turn off automatic file system checking. By default, when an image is accessed for writing (by :code:`--mount` or :code:`--copy-to`) the file systems contained in the OS image are automatically checked using the appropriate :man-pages:`fsck(8)` command, in automatic fixing mode. This behavior may be switched off using :code:`--fsck=no`.
+
+   .. versionadded:: 247
+
+.. systemd:option:: --growfs=no
+
+   Turn off automatic growing of accessed file systems to their partition size, if marked for that in the GPT partition table. By default, when an image is accessed for writing (by :code:`--mount` or :code:`--copy-to`) the file systems contained in the OS image are automatically grown to their partition sizes, if bit 59 in the GPT partition flags is set for partition types that are defined by the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_. This behavior may be switched off using :code:`--growfs=no`. File systems are grown automatically on access if all of the following conditions are met:
+
+   1.       The file system is mounted writable
+
+   2.       The file system currently is smaller than the partition it is contained in (and thus can be grown)
+
+   3.       The image contains a GPT partition table
+
+   4.       The file system is stored on a partition defined by the Discoverable Partitions Specification
+
+   5.       Bit 59 of the GPT partition flags for this partition is set, as per specification
+
+   6.       The :code:`--growfs=no` option is not passed.
+
+   .. versionadded:: 249
+
+.. systemd:option:: --mkdir
+
+   If combined with :code:`--mount` the directory to mount the OS image to is created if it is missing. Note that the directory is not automatically removed when the disk image is unmounted again.
+
+   .. versionadded:: 247
+
+.. systemd:option:: --rmdir
+
+   If combined with :code:`--umount` the specified directory where the OS image is mounted is removed after unmounting the OS image.
+
+   .. versionadded:: 252
+
+.. systemd:option:: --discard=
+
+   Takes one of "disabled", "loop", "all", "crypto". If "disabled" the image is accessed with empty block discarding turned off. If "loop" discarding is enabled if operating on a regular file. If "crypt" discarding is enabled even on encrypted file systems. If "all" discarding is unconditionally enabled.
+
+   .. versionadded:: 247
+
+.. systemd:option:: --in-memory
+
+   If specified an in-memory copy of the specified disk image is used. This may be used to operate with write-access on a (possibly read-only) image, without actually modifying the original file. This may also be used in order to operate on a disk image without keeping the originating file system busy, in order to allow it to be unmounted.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --root-hash=, --root-hash-sig=, --verity-data=
+
+   Configure various aspects of Verity data integrity for the OS image. Option :code:`--root-hash=` specifies a hex-encoded top-level Verity hash to use for setting up the Verity integrity protection. Option :code:`--root-hash-sig=` specifies the path to a file containing a PKCS#7 signature for the hash. This signature is passed to the kernel during activation, which will match it against signature keys available in the kernel keyring. Option :code:`--verity-data=` specifies a path to a file with the Verity data to use for the OS image, in case it is stored in a detached file. It is recommended to embed the Verity data directly in the image, using the Verity mechanisms in the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_.
+
+   .. versionadded:: 247
+
+.. systemd:option:: --usr-hash=, --usr-hash-sig=
+
+   Similar to :code:`--root-hash=` and :code:`--root-hash-sig=`, but specifies hash and signature for the :code:`/usr/` partition. Note that either the options for the root partition may be used or the ones for the :code:`/usr/`, but not both in combination.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --loop-ref=
+
+   Configures the "reference" string the kernel shall report as backing file for the loopback block device. While this is supposed to be a path or filename referencing the backing file, this is not enforced and the kernel accepts arbitrary free-form strings, chosen by the user. Accepts arbitrary strings up to a length of 63 characters. This sets the kernel's ".lo_file_name" field for the block device. Note this is distinct from the :code:`/sys/class/block/loopX/loop/backing_file` attribute file that always reports a path referring to the actual backing file. The latter is subject to mount namespace translation, the former is not.
+
+   This setting is particularly useful in combination with the :code:`--attach` command, as it allows later referencing the allocated loop device via :code:`/dev/disk/by-loop-ref/…` symlinks. Example: first, set up the loopback device via :code:`systemd-dissect attach --loop-ref=quux foo.raw`, and then reference it in a command via the specified filename: :code:`cfdisk /dev/disk/by-loop-ref/quux`.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --loop-ref-auto
+
+   Similar to :code:`--loop-ref=`, but automatically derive the reference string from the specified backing filename, truncating it if necessary.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --mtree-hash=no
+
+   If combined with :code:`--mtree`, turns off inclusion of file hashes in the mtree output. This makes the :code:`--mtree` faster when operating on large images.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --system, --user
+
+   When used together with :code:`--discover` controls whether to search for images installed system-wide or in the user's directories in :code:`$HOME`. If neither switch is specified, will search within both scopes.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --all
+
+   If combined with :code:`--discover`, also shows images that start with a dot, i.e. hidden images.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --quiet, -q
+
+   If combined with :code:`--attach`, suppresses output of the used loopback block device path.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove image-policy-open|
+    :end-before: .. inclusion-end-marker-do-not-remove image-policy-open|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove image-filter|
+    :end-before: .. inclusion-end-marker-do-not-remove image-filter|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise. If the :code:`--with` command is used the exit status of the invoked command is propagated.
+
+Invocation as :code:`/sbin/mount.ddi`
+#####################################
+
+The :code:`systemd-dissect` executable may be symlinked to :code:`/sbin/mount.ddi`. If invoked through that it implements :man-pages:`mount(8)`'s "external helper" interface for the (pseudo) file system type "ddi". This means conformant disk images may be mounted directly via
+
+.. code-block:: sh
+
+   # mount -t ddi myimage.raw targetdir/
+
+in a fashion mostly equivalent to:
+
+.. code-block:: sh
+
+   # systemd-dissect --mount myimage.raw targetdir/
+
+Note that since a single DDI may contain multiple file systems it should later be unmounted with :code:`umount -R targetdir/`, for recursive operation.
+
+This functionality is particularly useful to mount DDIs automatically at boot via simple :code:`/etc/fstab` entries. For example:
+
+.. code-block:: sh
+
+   /path/to/myimage.raw /images/myimage/ ddi defaults 0 0
+
+When invoked this way the mount options "ro", "rw", "discard", "nodiscard" map to the corresponding options listed above (i.e. :code:`--read-only`, :code:`--discard=all`, :code:`--discard=disabled`). Mount options are *not* generically passed on to the file systems inside the images. generically passed on to the file systems inside the images.
+
+Examples
+########
+
+Generate a tarball from an OS disk image (:code:`--with`)
+---------------------------------------------------------
+
+.. code-block:: sh
+
+   # systemd-dissect --with foo.raw tar cz . >foo.tar.gz
+
+or alternatively just:
+
+Generate a tarball from an OS disk image (:code:`--make-archive`)
+-----------------------------------------------------------------
+
+.. code-block:: sh
+
+   # systemd-dissect --make-archive foo.raw foo.tar.gz
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-nspawn(1)`, :ref:`systemd.exec(5)`, :ref:`systemd.v(7)`, `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_, :man-pages:`mount(8)`, :man-pages:`umount(8)`, :man-pages:`fdisk(8)`
+
+

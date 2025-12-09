@@ -1,0 +1,56 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-makefs@.service
+:manvolnum: 8
+:summary: Creating and growing file systems on demand
+:aliases: systemd-mkswap@.service, systemd-growfs@.service, systemd-growfs-root.service, systemd-makefs, systemd-growfs
+
+.. _systemd-makefs@.service(8):
+
+==========================
+systemd-makefs@.service(8)
+==========================
+
+Name
+####
+
+systemd-makefs@.service, systemd-mkswap@.service, systemd-growfs@.service, systemd-growfs-root.service, systemd-makefs, systemd-growfs — Creating and growing file systems on demand
+
+Synopsis
+########
+
+:code:`systemd-makefs@device.service`
+
+:code:`systemd-mkswap@device.service`
+
+:code:`systemd-growfs@mountpoint.service`
+
+:code:`systemd-growfs-root.service`
+
+:code:`/usr/lib/systemd/systemd-makefs`
+
+:code:`/usr/lib/systemd/systemd-growfs`
+
+Description
+###########
+
+:code:`systemd-makefs@.service`, :code:`systemd-mkswap@.service`, :code:`systemd-growfs@.service`, and :code:`systemd-growfs-root.service` are used to implement the :code:`x-systemd.makefs` and :code:`x-systemd.growfs` options in :man-pages:`fstab(5)`, see :ref:`systemd.mount(5)`. They are instantiated for each device for which the file system or swap structure needs to be initialized, and for each mount point where the file system needs to be grown.
+
+These services are started at boot, either right before or right after the mount point or swap device are used.
+
+:code:`systemd-makefs` knows very little about specific file systems and swap devices, and after checking that the block device does not already contain a file system or other content, it will execute binaries specific to each filesystem type (:code:`/sbin/mkfs.type` or :code:`/sbin/mkswap`). For certain file system types (currently ext2/ext3/:man-pages:`ext4(5)`, `btrfs(5) <https://btrfs.readthedocs.io/en/latest/btrfs-man5.html>`_, :man-pages:`xfs(5)`, f2fs, vfat) and for swap devices, it will configure reasonable defaults and set the file system label and UUID based on the device name.
+
+:code:`systemd-growfs` knows very little about specific file systems and swap devices, and will instruct the kernel to grow the mounted filesystem to full size of the underlying block device. Nevertheless, it needs to know the :man-pages:`ioctl(2)` number specific to each file system, so only certain types are supported. Currently: :man-pages:`ext4(5)`, `btrfs(5) <https://btrfs.readthedocs.io/en/latest/btrfs-man5.html>`_, :man-pages:`xfs(5)`,
+
+.. COMMENT: yes, that's what the man page is called.
+
+and dm-crypt partitions (see :die-net:`cryptsetup(8)`).
+
+If the creation of a file system or swap device fails, the mount point or swap is failed too. If the growing of a file system fails, a warning is emitted.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.mount(5)`, :ref:`systemd-fstab-generator(8)`, :ref:`systemd-repart(8)`, `mkfs.btrfs(8) <https://btrfs.readthedocs.io/en/latest/mkfs.btrfs.html>`_, :man-pages:`mkfs.cramfs(8)`, :man-pages:`mkfs.ext4(8)`, :man-pages:`mkfs.fat(8)`, :man-pages:`mkfs.hfsplus(8)`, :man-pages:`mkfs.minix(8)`, :man-pages:`mkfs.ntfs(8)`, :man-pages:`mkfs.xfs(8)`
+
+

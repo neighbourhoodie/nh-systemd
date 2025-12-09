@@ -1,0 +1,74 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_list_names
+:manvolnum: 3
+:summary: Retrieve information about registered names on a bus
+
+.. _sd_bus_list_names(3):
+
+====================
+sd_bus_list_names(3)
+====================
+
+Name
+####
+
+sd_bus_list_names — Retrieve information about registered names on a bus
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_list_names(sd_bus *bus,
+	char ***acquired,
+	char ***activatable);
+
+Description
+###########
+
+:code:`sd_bus_list_names()` retrieves information about the registered names on a bus. If :code:`acquired` is not :code:`NULL`, this function calls `org.freedesktop.DBus.ListNames <https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-list-names>`_ to retrieve the list of currently-owned names on the bus. If :code:`acquired` is not :code:`NULL`, the function calls `org.freedesktop.DBus.ListActivableNames <https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-list-activatable-names>`_ to retrieve the list of all names on the bus that can be activated. Note that ownership of the arrays returned by :code:`sd_bus_list_names()` in :code:`acquired` and :code:`activatable` is transferred to the caller and hence, the caller is responsible for freeing these arrays and their contents.
+
+Return Value
+############
+
+On success, :code:`sd_bus_list_names()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   :code:`bus` or both :code:`acquired` and :code:`activatable` were :code:`NULL`.
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+.. systemd:option:: -ECHILD
+
+   The bus was created in a different process, library or module instance.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. systemd:option:: -ENOTCONN
+
+   The bus is not connected.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_list_names()` was added in version 221.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`
+
+

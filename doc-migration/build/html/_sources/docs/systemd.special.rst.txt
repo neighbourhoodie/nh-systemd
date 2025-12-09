@@ -1,0 +1,717 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.special
+:manvolnum: 7
+:summary: Special systemd units
+
+.. _systemd.special(7):
+
+==================
+systemd.special(7)
+==================
+
+Name
+####
+
+systemd.special — Special systemd units
+
+Synopsis
+########
+
+.. COMMENT: sort alphabetically, targets first
+
+:code:`basic.target`, :code:`bluetooth.target`, :code:`cryptsetup-pre.target`, :code:`cryptsetup.target`, :code:`veritysetup-pre.target`, :code:`veritysetup.target`, :code:`ctrl-alt-del.target`, :code:`blockdev@.target`, :code:`boot-complete.target`, :code:`default.target`, :code:`emergency.target`, :code:`exit.target`, :code:`factory-reset.target`, :code:`factory-reset-now.target`, :code:`final.target`, :code:`first-boot-complete.target`, :code:`getty.target`, :code:`getty-pre.target`, :code:`graphical.target`, :code:`halt.target`, :code:`hibernate.target`, :code:`hybrid-sleep.target`, :code:`suspend-then-hibernate.target`, :code:`initrd.target`, :code:`initrd-fs.target`, :code:`initrd-root-device.target`, :code:`initrd-root-fs.target`, :code:`initrd-usr-fs.target`, :code:`integritysetup-pre.target`, :code:`integritysetup.target`, :code:`kbrequest.target`, :code:`kexec.target`, :code:`local-fs-pre.target`, :code:`local-fs.target`, :code:`machines.target`, :code:`multi-user.target`, :code:`network-online.target`, :code:`network-pre.target`, :code:`network.target`, :code:`nss-lookup.target`, :code:`nss-user-lookup.target`, :code:`paths.target`, :code:`poweroff.target`, :code:`printer.target`, :code:`reboot.target`, :code:`remote-cryptsetup.target`, :code:`remote-integritysetup.target`, :code:`remote-veritysetup.target`, :code:`remote-fs-pre.target`, :code:`remote-fs.target`, :code:`rescue.target`, :code:`rpcbind.target`, :code:`shutdown.target`, :code:`sigpwr.target`, :code:`sleep.target`, :code:`slices.target`, :code:`smartcard.target`, :code:`sockets.target`, :code:`soft-reboot.target`, :code:`sound.target`, :code:`ssh-access.target`, :code:`storage-target-mode.target`, :code:`suspend.target`, :code:`swap.target`, :code:`sysinit.target`, :code:`system-update.target`, :code:`system-update-pre.target`, :code:`time-set.target`, :code:`time-sync.target`, :code:`timers.target`, :code:`tpm2.target`, :code:`umount.target`, :code:`usb-gadget.target`,
+
+.. COMMENT: slices
+
+:code:`-.slice`, :code:`capsule.slice`, :code:`machine.slice`, :code:`system.slice`, :code:`user.slice`,
+
+.. COMMENT: the rest
+
+:code:`-.mount`, :code:`dbus.service`, :code:`dbus.socket`, :code:`display-manager.service`, :code:`init.scope`, :code:`syslog.socket`, :code:`system-update-cleanup.service`
+
+Description
+###########
+
+A few units are treated specially by systemd. Many of them have special internal semantics and cannot be renamed, while others simply have a standard meaning and should be present on all systems.
+
+Units managed by the system service manager
+###########################################
+
+Special System Units
+####################
+
+.. systemd:option:: -.mount
+
+   The root mount point, i.e. the mount unit for the :code:`/` path. This unit is unconditionally active, during the entire time the system is up, as this mount point is where the basic userspace is running from.
+
+   .. versionadded:: 235
+
+.. systemd:option:: basic.target
+
+   A special target unit covering basic boot-up.
+
+   systemd automatically adds dependency of the type :code:`After=` for this target unit to all services (except for those with :code:`DefaultDependencies=no`).
+
+   Usually, this should pull-in all local mount points plus :code:`/var/`, :code:`/tmp/` and :code:`/var/tmp/`, swap devices, sockets, timers, path units and other basic initialization necessary for general purpose daemons. The mentioned mount points are special cased to allow them to be remote.
+
+   This target usually does not pull in any non-target units directly, but rather does so indirectly via other early boot targets. It is instead meant as a synchronization point for late boot services. Refer to :man-pages:`bootup(7)` for details on the targets involved.
+
+.. systemd:option:: boot-complete.target
+
+   This target is intended as generic synchronization point for services that shall determine or act on whether the boot process completed successfully. Order units that are required to succeed for a boot process to be considered successful before this unit, and add a :code:`Requires=` dependency from the target unit to them. Order units that shall only run when the boot process is considered successful after the target unit and pull in the target from it, also with :code:`Requires=`. Note that by default this target unit is not part of the initial boot transaction, but is supposed to be pulled in only if required by units that want to run only on successful boots.
+
+   See :ref:`systemd-boot-check-no-failures.service(8)` for a service that implements a generic system health check and orders itself before :code:`boot-complete.target`.
+
+   See :ref:`systemd-bless-boot.service(8)` for a service that propagates boot success information to the boot loader, and orders itself after :code:`boot-complete.target`.
+
+   .. versionadded:: 240
+
+.. systemd:option:: ctrl-alt-del.target
+
+   systemd starts this target whenever Control+Alt+Del is pressed on the console. Usually, this should be aliased (symlinked) to :code:`reboot.target`.
+
+.. systemd:option:: cryptsetup.target
+
+   A target that pulls in setup services for all encrypted block devices.
+
+.. systemd:option:: veritysetup.target
+
+   A target that pulls in setup services for all verity integrity protected block devices.
+
+   .. versionadded:: 248
+
+.. systemd:option:: dbus.service
+
+   A special unit for the D-Bus bus daemon. As soon as this service is fully started up systemd will connect to it and register its service.
+
+.. systemd:option:: dbus.socket
+
+   A special unit for the D-Bus system bus socket. All units with :code:`Type=dbus` automatically gain a dependency on this unit.
+
+.. systemd:option:: default.target
+
+   The default unit systemd starts at bootup. Usually, this should be aliased (symlinked) to :code:`multi-user.target` or :code:`graphical.target`. See :man-pages:`bootup(7)` for more discussion.
+
+   The default unit systemd starts at bootup can be overridden with the :code:`systemd.unit=` kernel command line option, or more conveniently, with the short names like :code:`single`, :code:`rescue`, :code:`1`, :code:`3`, :code:`5`, …; see :ref:`systemd(1)`.
+
+   For typical unit files please set "WantedBy=" to a regular target (like :code:`multi-user.target` or :code:`graphical.target`), instead of :code:`default.target`, since such a service will also be run on special boots like on system update, emergency boot…
+
+.. systemd:option:: display-manager.service
+
+   The display manager service. Usually, this should be aliased (symlinked) to :code:`gdm.service` or a similar display manager service.
+
+.. systemd:option:: emergency.target
+
+   A special target unit that starts an emergency shell on the main console. This target does not pull in other services or mounts. It is the most minimal version of starting the system in order to acquire an interactive shell; the only processes running are usually just the system manager (PID 1) and the shell process. This unit may be used by specifying :code:`emergency` on the kernel command line; it is also used when a file system check on a required file system fails and boot-up cannot continue. Compare with :code:`rescue.target`, which serves a similar purpose, but also starts the most basic services and mounts all file systems.
+
+   In many ways booting into :code:`emergency.target` is similar to the effect of booting with "init=/bin/sh" on the kernel command line, except that emergency mode provides you with the full system and service manager, and allows starting individual units in order to continue the boot process in steps.
+
+   Note that depending on how :code:`emergency.target` is reached, the root file system might be mounted read-only or read-write (no remounting is done specially for this target). For example, the system may boot with root mounted read-only when :code:`ro` is used on the kernel command line and remain this way for :code:`emergency.target`, or the system may transition to :code:`emergency.target` after the system has been partially booted and disks have already been remounted read-write.
+
+.. systemd:option:: exit.target
+
+   A special service unit for shutting down the system or user service manager. It is equivalent to :code:`poweroff.target` on non-container systems, and also works in containers.
+
+   systemd will start this unit when it receives the :code:`SIGTERM` or :code:`SIGINT` signal when running as user service daemon.
+
+   Normally, this (indirectly) pulls in :code:`shutdown.target`, which in turn should be conflicted by all units that want to be scheduled for shutdown when the service manager starts to exit.
+
+   .. versionadded:: 186
+
+.. systemd:option:: factory-reset.target
+
+   A special target to request a factory reset operation. This will typically persistently store a request flag for the next boot and then reboot in order to reset the system to factory state.
+
+   See `Factory Reset <https://systemd.io/FACTORY_RESET>`_ for more information.
+
+   .. versionadded:: 250
+
+.. systemd:option:: factory-reset-now.target
+
+   A special target that is started on boots that shall execute a factory reset. It may be used to pull in additional services that shall be invoked during a factory reset operation. It also acts as ordering barrier: once the target is reached the factory reset state is marked as "completed".
+
+   See `Factory Reset <https://systemd.io/FACTORY_RESET>`_ for more information.
+
+   .. versionadded:: 258
+
+.. systemd:option:: final.target
+
+   A special target unit that is used during the shutdown logic and may be used to pull in late services after all normal services are already terminated and all mounts unmounted.
+
+.. systemd:option:: getty.target
+
+   A special target unit that pulls in statically configured local TTY :code:`getty` instances.
+
+.. systemd:option:: graphical.target
+
+   A special target unit for setting up a graphical login screen. This pulls in :code:`multi-user.target`.
+
+   Units that are needed for graphical logins shall add :code:`Wants=` dependencies for their unit to this unit (or :code:`multi-user.target`) during installation. This is best configured via :code:`WantedBy=graphical.target` in the unit's \[Install] section.
+
+.. systemd:option:: hibernate.target
+
+   A special target unit for hibernating the system. This pulls in :code:`sleep.target`.
+
+.. systemd:option:: hybrid-sleep.target
+
+   A special target unit for hibernating and suspending the system at the same time. This pulls in :code:`sleep.target`.
+
+   .. versionadded:: 196
+
+.. systemd:option:: suspend-then-hibernate.target
+
+   A special target unit for suspending the system for a period of time, waking it and putting it into hibernate. This pulls in :code:`sleep.target`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: halt.target
+
+   A special target unit for shutting down and halting the system. Note that this target is distinct from :code:`poweroff.target` in that it generally really just halts the system rather than powering it down.
+
+   Applications wanting to halt the system should not start this unit directly, but should instead execute :code:`systemctl halt` (possibly with the :code:`--no-block` option) or call :ref:`systemd(1)`'s :code:`org.freedesktop.systemd1.Manager.Halt` D-Bus method directly.
+
+.. systemd:option:: imports.target
+
+   A target unit that pulls in all disk image download jobs to execute on system boot. This is used by :ref:`systemd-import-generator(8)`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: init.scope
+
+   This scope unit is where the system and service manager (PID 1) itself resides. It is active as long as the system is running.
+
+   .. versionadded:: 235
+
+.. systemd:option:: initrd.target
+
+   This is the default target in the initrd, similar to :code:`default.target` in the main system. It is used to mount the real root and transition to it. See :man-pages:`bootup(7)` for more discussion.
+
+   .. versionadded:: 245
+
+.. systemd:option:: initrd-fs.target
+
+   :ref:`systemd-fstab-generator(8)` automatically adds dependencies of type :code:`Before=` to :code:`sysroot-usr.mount` and all mount points found in :code:`/etc/fstab` that have the :code:`x-initrd.mount` mount option set and do not have the :code:`noauto` mount option set. It is also indirectly ordered after :code:`sysroot.mount`. Thus, once this target is reached the :code:`/sysroot/` hierarchy is fully set up, in preparation for the transition to the host OS.
+
+   .. versionadded:: 199
+
+.. systemd:option:: initrd-root-device.target
+
+   A special initrd target unit that is reached when the root filesystem device is available, but before it has been mounted. :ref:`systemd-fstab-generator(8)` and :ref:`systemd-gpt-auto-generator(8)` automatically set up the appropriate dependencies to make this happen.
+
+   .. versionadded:: 230
+
+.. systemd:option:: initrd-root-fs.target
+
+   :ref:`systemd-fstab-generator(8)` automatically adds dependencies of type :code:`Before=` to the :code:`sysroot.mount` unit, which is generated from the kernel command line's :code:`root=` setting (or equivalent).
+
+   .. versionadded:: 199
+
+.. systemd:option:: initrd-usr-fs.target
+
+   :ref:`systemd-fstab-generator(8)` automatically adds dependencies of type :code:`Before=` to the :code:`sysusr-usr.mount` unit, which is generated from the kernel command line's :code:`usr=` switch. Services may order themselves after this target unit in order to run once the :code:`/sysusr/` hierarchy becomes available, on systems that come up initially without a root file system, but with an initialized :code:`/usr/` and need to access that before setting up the root file system to ultimately switch to. On systems where :code:`usr=` is not used this target is ordered after :code:`sysroot.mount` and thus mostly equivalent to :code:`initrd-root-fs.target`. In effect on any system once this target is reached the file system backing :code:`/usr/` is mounted, though possibly at two different locations, either below the :code:`/sysusr/` or the :code:`/sysroot/` hierarchies.
+
+   .. versionadded:: 249
+
+.. systemd:option:: kbrequest.target
+
+   systemd starts this target whenever Alt+ArrowUp is pressed on the console. Note that any user with physical access to the machine will be able to do this, without authentication, so this should be used carefully.
+
+.. systemd:option:: kexec.target
+
+   A special target unit for shutting down and rebooting the system via kexec.
+
+   Applications wanting to reboot the system should not start this unit directly, but should instead execute :code:`systemctl kexec` (possibly with the :code:`--no-block` option) or call :ref:`systemd-logind(8)`'s :code:`org.freedesktop.login1.Manager.RebootWithFlags()` D-Bus method directly.
+
+   See :ref:`systemd-kexec.service(8)` for further details of the operation this target pulls in.
+
+.. systemd:option:: local-fs.target
+
+   :ref:`systemd-fstab-generator(8)` automatically adds dependencies of type :code:`Before=` to all mount units that refer to local mount points for this target unit. In addition, it adds dependencies of type :code:`Wants=` to this target unit for those mounts listed in :code:`/etc/fstab` that have the :code:`auto` mount option set.
+
+.. systemd:option:: machines.target
+
+   A standard target unit for starting all the containers and other virtual machines. See :code:`systemd-nspawn@.service` for an example.
+
+   .. versionadded:: 233
+
+.. systemd:option:: multi-user.target
+
+   A special target unit for setting up a multi-user system (non-graphical). This is pulled in by :code:`graphical.target`.
+
+   Units that are needed for a multi-user system shall add :code:`Wants=` dependencies for their unit to this unit during installation. This is best configured via :code:`WantedBy=multi-user.target` in the unit's \[Install] section.
+
+.. systemd:option:: network-online.target
+
+   Units that strictly require a configured network connection should pull in :code:`network-online.target` (via a :code:`Wants=` type dependency) and order themselves after it. This target unit is intended to pull in a service that delays further execution until the network is sufficiently set up. What precisely this requires is left to the implementation of the network managing service.
+
+   Note the distinction between this unit and :code:`network.target`. This unit is an active unit (i.e. pulled in by the consumer rather than the provider of this functionality) and pulls in a service which possibly adds substantial delays to further execution. In contrast, :code:`network.target` is a passive unit (i.e. pulled in by the provider of the functionality, rather than the consumer) that usually does not delay execution much. Usually, :code:`network.target` is part of the boot of most systems, while :code:`network-online.target` is not, except when at least one unit requires it. Also see `Running Services After the Network Is Up <https://systemd.io/NETWORK_ONLINE>`_ for more information.
+
+   All mount units for remote network file systems automatically pull in this unit, and order themselves after it. Note that networking daemons that simply *provide* functionality to other hosts (as opposed to functionality to other hosts (as opposed to *consume* functionality of other hosts) generally do not need to pull this in. functionality of other hosts) generally do not need to pull this in.
+
+   systemd automatically adds dependencies of type :code:`Wants=` and :code:`After=` for this target unit to all SysV init script service units with an LSB header referring to the "$network" facility.
+
+   Note that this unit is only useful during the original system start-up logic. After the system has completed booting up, it will not track the online state of the system anymore. Due to this it cannot be used as a network connection monitor concept, it is purely a one-time system start-up concept.
+
+   .. versionadded:: 200
+
+.. systemd:option:: paths.target
+
+   A special target unit that sets up all path units (see :ref:`systemd.path(5)` for details) that shall be active after boot.
+
+   It is recommended that path units installed by applications get pulled in via :code:`Wants=` dependencies from this unit. This is best configured via a :code:`WantedBy=paths.target` in the path unit's \[Install] section.
+
+   .. versionadded:: 199
+
+.. systemd:option:: poweroff.target
+
+   A special target unit for shutting down and powering off the system.
+
+   Applications wanting to power off the system should not start this unit directly, but should instead execute :code:`systemctl poweroff` (possibly with the :code:`--no-block` option) or call :ref:`systemd-logind(8)`'s :code:`org.freedesktop.login1.Manager.PowerOff` D-Bus method directly.
+
+.. systemd:option:: reboot.target
+
+   A special target unit for shutting down and rebooting the system.
+
+   Applications wanting to reboot the system should not start this unit directly, but should instead execute :code:`systemctl reboot` (possibly with the :code:`--no-block` option) or call :ref:`systemd-logind(8)`'s :code:`org.freedesktop.login1.Manager.Reboot()` D-Bus method directly.
+
+   See :ref:`systemd-reboot.service(8)` for further details of the operation this target pulls in.
+
+.. systemd:option:: remote-cryptsetup.target
+
+   Similar to :code:`cryptsetup.target`, but for encrypted devices which are accessed over the network. It is used for :man-pages:`crypttab(5)` entries marked with :code:`_netdev`.
+
+   .. versionadded:: 235
+
+.. systemd:option:: remote-integritysetup.target
+
+   Similar to :code:`integritysetup.target`, but for integrity protected devices which are accessed over the network. It is used for :man-pages:`integritytab(5)` entries marked with :code:`_netdev`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: remote-veritysetup.target
+
+   Similar to :code:`veritysetup.target`, but for verity protected devices which are accessed over the network. It is used for :man-pages:`veritytab(5)` entries marked with :code:`_netdev`.
+
+   .. versionadded:: 248
+
+.. systemd:option:: remote-fs.target
+
+   Similar to :code:`local-fs.target`, but for remote mount points.
+
+   systemd automatically adds dependencies of type :code:`After=` for this target unit to all SysV init script service units with an LSB header referring to the "$remote_fs" facility.
+
+.. systemd:option:: rescue.target
+
+   A special target unit that pulls in the base system (including system mounts) and spawns a rescue shell. Isolate to this target in order to administer the system in single-user mode with all file systems mounted but with no services running, except for the most basic. Compare with :code:`emergency.target`, which is much more reduced and does not provide the file systems or most basic services. Compare with :code:`multi-user.target`, this target could be seen as :code:`single-user.target`.
+
+   Use the "systemd.unit=rescue.target" kernel command line option to boot into this mode. A short alias for this kernel command line option is "1", for compatibility with SysV.
+
+.. systemd:option:: shutdown.target
+
+   A special target unit that terminates the services on system shutdown.
+
+   Services that shall be terminated on system shutdown shall add :code:`Conflicts=` and :code:`Before=` dependencies to this unit for their service unit, which is implicitly done when :code:`DefaultDependencies=yes` is set (the default).
+
+.. systemd:option:: sigpwr.target
+
+   A special target that is started when systemd receives the SIGPWR process signal, which is normally sent by the kernel or UPS daemons when power fails.
+
+.. systemd:option:: sleep.target
+
+   A special target unit that is pulled in by :code:`suspend.target`, :code:`hibernate.target`, :code:`suspend-then-hibernate.target`, and :code:`hybrid-sleep.target` and may be used to hook units into the sleep state logic.
+
+   In order to hook external programs *before* the actual system sleep operation, place their command line in a service unit file's the actual system sleep operation, place their command line in a service unit file's :code:`ExecStart=` line (use :code:`Type=oneshot`), and ensure the unit is pulled in by :code:`sleep.target` and ordered before it. In order to hook program code *after* the actual system sleep operation (i.e. to be run after the system woke up again), place the command in the actual system sleep operation (i.e. to be run after the system woke up again), place the command in :code:`ExecStop=` instead, and make sure to enable :code:`StopWhenUnneeded=` and :code:`RemainAfterExit=`. Both approaches can be combined into one unit file in order to run programs both before and after the sleep operation.
+
+   Combined Example
+   ----------------
+
+     .. code-block:: sh
+
+        [Unit]
+        DefaultDependencies=no
+        StopWhenUnneeded=yes
+        Before=sleep.target
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/some-before-command
+        ExecStop=/Usr/bin/some-after-command
+        [Install]
+        WantedBy=sleep.target
+
+.. systemd:option:: slices.target
+
+   A special target unit that sets up all slice units (see :ref:`systemd.slice(5)` for details) that shall always be active after boot. By default, the generic :code:`system.slice` slice unit as well as the root slice unit :code:`-.slice` are pulled in and ordered before this unit (see below).
+
+   Adding slice units to :code:`slices.target` is generally not necessary. Instead, when some unit that uses :code:`Slice=` is started, the specified slice will be started automatically. Adding :code:`WantedBy=slices.target` lines to the \[Install] section should only be done for units that need to be always active. In that case care needs to be taken to avoid creating a loop through the automatic dependencies on "parent" slices.
+
+   .. versionadded:: 229
+
+.. systemd:option:: sockets.target
+
+   A special target unit that sets up all socket units (see :ref:`systemd.socket(5)` for details) that shall be active after boot.
+
+   Services that can be socket-activated shall add :code:`Wants=` dependencies to this unit for their socket unit during installation. This is best configured via a :code:`WantedBy=sockets.target` in the socket unit's \[Install] section.
+
+.. systemd:option:: soft-reboot.target
+
+   A special target unit for shutting down and rebooting the userspace of the system (leaving the kernel running).
+
+   Applications wanting to reboot the system should not start this unit directly, but should instead execute :code:`systemctl soft-reboot` (possibly with the :code:`--no-block` option) or call :ref:`systemd-logind(8)`'s :code:`org.freedesktop.login1.Manager.RebootWithFlags()` D-Bus method directly.
+
+   See :ref:`systemd-soft-reboot.service(8)` for further details of the operation this target pulls in.
+
+   .. versionadded:: 254
+
+.. systemd:option:: storage-target-mode.target
+
+   A special target unit that can be booted into that selects the "Storage Target Mode" for the OS. In this mode all local storage disks are exposed to external systems as block devices. This invokes :ref:`systemd-storagetm.service(8)` which exposes all local disks as NVMe-TCP devices for access over the network. It might as well invoke other services too that make local disks available via other mechanisms.
+
+   .. versionadded:: 255
+
+.. systemd:option:: suspend.target
+
+   A special target unit for suspending the system. This pulls in :code:`sleep.target`.
+
+.. systemd:option:: swap.target
+
+   Similar to :code:`local-fs.target`, but for swap partitions and swap files.
+
+.. systemd:option:: sysinit.target
+
+   systemd automatically adds dependencies of the types :code:`Requires=` and :code:`After=` for this target unit to all services (except for those with :code:`DefaultDependencies=no`).
+
+   This target pulls in the services required for system initialization. System services pulled in by this target should declare :code:`DefaultDependencies=no` and specify all their dependencies manually, including access to anything more than a read only root filesystem. For details on the dependencies of this target, refer to :man-pages:`bootup(7)`.
+
+.. systemd:option:: syslog.socket
+
+   The socket unit syslog implementations should listen on. All userspace log messages will be made available on this socket. For more information about syslog integration, please consult the `Syslog Interface <https://systemd.io/SYSLOG>`_ document.
+
+.. systemd:option:: system-update.target, system-update-pre.target, system-update-cleanup.service
+
+   A special target unit that is used for offline system updates. :ref:`systemd-system-update-generator(8)` will redirect the boot process to this target if :code:`/system-update` or :code:`/etc/system-update` exists. For more information see :ref:`systemd.offline-updates(7)`.
+
+   Updates should happen before the :code:`system-update.target` is reached, and the services which implement them should cause the machine to reboot. The main units executing the update should order themselves after :code:`system-update-pre.target` but not pull it in. Services which want to run during system updates only, but before the actual system update is executed should order themselves before this unit and pull it in. As a safety measure, if this does not happen, and :code:`/system-update` or :code:`/etc/system-update` still exists after :code:`system-update.target` is reached, :code:`system-update-cleanup.service` will remove the symlinks and reboot the machine.
+
+   .. versionadded:: 186
+
+.. systemd:option:: timers.target
+
+   A special target unit that sets up all timer units (see :ref:`systemd.timer(5)` for details) that shall be active after boot.
+
+   It is recommended that timer units installed by applications get pulled in via :code:`Wants=` dependencies from this unit. This is best configured via :code:`WantedBy=timers.target` in the timer unit's \[Install] section.
+
+   .. versionadded:: 199
+
+.. systemd:option:: umount.target
+
+   A special target unit that unmounts all mount and automount points on system shutdown.
+
+   Mounts that shall be unmounted on system shutdown shall add Conflicts dependencies to this unit for their mount unit, which is implicitly done when :code:`DefaultDependencies=yes` is set (the default).
+
+Special System Units for Devices
+################################
+
+Some target units are automatically pulled in as devices of certain kinds show up in the system. These may be used to automatically activate various services based on the specific type of the available hardware.
+
+.. systemd:option:: bluetooth.target
+
+   This target is started automatically as soon as a Bluetooth controller is plugged in or becomes available at boot.
+
+   This may be used to pull in Bluetooth management daemons dynamically when Bluetooth hardware is found.
+
+.. systemd:option:: printer.target
+
+   This target is started automatically as soon as a printer is plugged in or becomes available at boot.
+
+   This may be used to pull in printer management daemons dynamically when printer hardware is found.
+
+.. systemd:option:: smartcard.target
+
+   This target is started automatically as soon as a smartcard controller is plugged in or becomes available at boot.
+
+   This may be used to pull in smartcard management daemons dynamically when smartcard hardware is found.
+
+.. systemd:option:: sound.target
+
+   This target is started automatically as soon as a sound card is plugged in or becomes available at boot.
+
+   This may be used to pull in audio management daemons dynamically when audio hardware is found.
+
+.. systemd:option:: usb-gadget.target
+
+   This target is started automatically as soon as a USB Device Controller becomes available at boot.
+
+   This may be used to pull in usb gadget dynamically when UDC hardware is found.
+
+   .. versionadded:: 242
+
+.. systemd:option:: tpm2.target
+
+   This target is started automatically if a TPM2 device is discovered, either by the OS or by the firmware. It acts as synchronization point for services that require TPM2 device access. The target unit is enqueued by :ref:`systemd-tpm2-generator(8)` if it detects that the firmware has discovered a TPM2 device but the OS kernel has not activated a driver for it yet. It is also pulled in whenever :ref:`systemd-udevd.service(8)` discovers a TPM2 device. The target unit is ordered after the :code:`/dev/tpmrm0` device node, so that it only becomes active once the TPM2 device is actually accessible. Early boot programs that intend to access the TPM2 device should hence order themselves after this target unit, but not pull it in.
+
+   .. versionadded:: 256
+
+Special Passive System Units
+############################
+
+A number of special system targets are defined that can be used to properly order boot-up of optional services. These targets are generally not part of the initial boot transaction, unless they are explicitly pulled in by one of the implementing services. Note specifically that these *passive* target units are generally not pulled in by the consumer of a service, but by the provider of the service. This means: a consuming service should order itself after these targets (as appropriate), but not pull it in. A providing service should order itself before these targets (as appropriate) and pull it in (via a target units are generally not pulled in by the consumer of a service, but by the provider of the service. This means: a consuming service should order itself after these targets (as appropriate), but not pull it in. A providing service should order itself before these targets (as appropriate) and pull it in (via a :code:`Wants=` type dependency).
+
+Note that these passive units cannot be started manually, i.e. "systemctl start time-sync.target" will fail with an error. They can only be pulled in by dependency. This is enforced since they exist for ordering purposes only and thus are not useful as only unit within a transaction.
+
+.. systemd:option:: blockdev@.target
+
+   This template unit is used to order mount units and other consumers of block devices after services that synthesize these block devices. In particular, this is intended to be used with storage services (such as :ref:`systemd-cryptsetup@.service(5)`/ :ref:`systemd-veritysetup@.service(8)`) that allocate and manage a virtual block device. Storage services are ordered before an instance of :code:`blockdev@.target`, and the consumer units after it. The ordering is particularly relevant during shutdown, as it ensures that the mount is deactivated first and the service backing the mount later. The :code:`blockdev@.target` instance should be pulled in via a :code:`Wants=` dependency of the storage daemon and thus generally not be part of any transaction unless a storage daemon is used. The instance name for instances of this template unit must be a properly escaped block device node path, e.g. :code:`blockdev@dev-mapper-foobar.target` for the storage device :code:`/dev/mapper/foobar`.
+
+   .. versionadded:: 245
+
+.. systemd:option:: cryptsetup-pre.target
+
+   This passive target unit may be pulled in by services that want to run before any encrypted block device is set up. All encrypted block devices are set up after this target has been reached. Since the shutdown order is implicitly the reverse start-up order between units, this target is particularly useful to ensure that a service is shut down only after all encrypted block devices are fully stopped.
+
+   .. versionadded:: 215
+
+.. systemd:option:: veritysetup-pre.target
+
+   This passive target unit may be pulled in by services that want to run before any verity integrity protected block device is set up. All verity integrity protected block devices are set up after this target has been reached. Since the shutdown order is implicitly the reverse start-up order between units, this target is particularly useful to ensure that a service is shut down only after all verity integrity protected block devices are fully stopped.
+
+   .. versionadded:: 248
+
+.. systemd:option:: first-boot-complete.target
+
+   This passive target is intended as a synchronization point for units that need to run once during the first boot. Only after all units ordered before this target have finished, will the :man-pages:`machine-id(5)` be committed to disk, marking the first boot as completed. If the boot is aborted at any time before that, the next boot will re-run any units with :code:`ConditionFirstBoot=yes`.
+
+   .. versionadded:: 247
+
+.. systemd:option:: getty-pre.target
+
+   A special passive target unit. Users of this target are expected to pull it in the boot transaction via a dependency (e.g. :code:`Wants=`). Order your unit before this unit if you want to make use of the console just before :code:`getty` is started.
+
+   .. versionadded:: 235
+
+.. systemd:option:: imports-pre.target
+
+   A passive unit that is ordered before all disk image download jobs to execute on system boot. This is used by :ref:`systemd-import-generator(8)`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: local-fs-pre.target
+
+   This target unit is automatically ordered before all local mount points marked with :code:`auto` (see above). It can be used to execute certain units before all local mounts.
+
+.. systemd:option:: network.target
+
+   This unit is supposed to indicate when network functionality is available, but it is only very weakly defined what that is supposed to mean. However, the following should apply at minimum:
+
+   *       At start-up, any configured synthetic network devices (i.e. not physical ones that require hardware to show up and be probed, but virtual ones like bridge devices and similar which are created programmatically) that do not depend on any underlying hardware should be allocated by the time this target is reached. It is not necessary for these interfaces to also have completed IP level configuration by the time :code:`network.target` is reached.
+
+   *       At shutdown, a unit that is ordered after :code:`network.target` will be stopped before the network — to whatever level it might be set up by then — is shut down. It is hence useful when writing service files that require network access on shutdown, which should order themselves after this target, but not pull it in. Also see `Running Services After the Network Is Up <https://systemd.io/NETWORK_ONLINE>`_ for more information.
+
+   It must emphasized that at start-up there's no guarantee that hardware-based devices have shown up by the time this target is reached, or even acquired complete IP configuration. For that purpose use :code:`network-online.target` as described above.
+
+.. systemd:option:: network-pre.target
+
+   This passive target unit may be pulled in by services that want to run before any network is set up, for example for the purpose of setting up a firewall. All network management software orders itself after this target, but does not pull it in. Also see `Running Services After the Network Is Up <https://systemd.io/NETWORK_ONLINE>`_ for more information.
+
+   .. versionadded:: 214
+
+.. systemd:option:: nss-lookup.target
+
+   A target that should be used as synchronization point for all host/network name service lookups. Note that this is independent of UNIX user/group name lookups for which :code:`nss-user-lookup.target` should be used. All services for which the availability of full host/network name resolution is essential should be ordered after this target, but not pull it in. systemd automatically adds dependencies of type :code:`After=` for this target unit to all SysV init script service units with an LSB header referring to the "$named" facility.
+
+.. systemd:option:: nss-user-lookup.target
+
+   A target that should be used as synchronization point for all regular UNIX user/group name service lookups. Note that this is independent of host/network name lookups for which :code:`nss-lookup.target` should be used. All services for which the availability of the full user/group database is essential should be ordered after this target, but not pull it in. All services which provide parts of the user/group database should be ordered before this target, and pull it in. Note that this unit is only relevant for regular users and groups — system users and groups are required to be resolvable during earliest boot already, and hence do not need any special ordering against this target.
+
+.. systemd:option:: remote-fs-pre.target
+
+   This target unit is automatically ordered before all mount point units (see above) and cryptsetup/veritysetup devices marked with the :code:`_netdev`. It can be used to run certain units before remote encrypted devices and mounts are established. Note that this unit is generally not part of the initial transaction, unless the unit that wants to be ordered before all remote mounts pulls it in via a :code:`Wants=` type dependency. If the unit wants to be pulled in by the first remote mount showing up, it should use :code:`network-online.target` (see above).
+
+.. systemd:option:: rpcbind.target
+
+   The portmapper/rpcbind pulls in this target and orders itself before it, to indicate its availability. systemd automatically adds dependencies of type :code:`After=` for this target unit to all SysV init script service units with an LSB header referring to the "$portmap" facility.
+
+.. systemd:option:: ssh-access.target
+
+   Service and socket units that provide remote SSH secure shell access to the local system should pull in this unit and order themselves before this unit. It's supposed to act as a milestone indicating if and when SSH access into the system is available. It should only become active when an SSH port is bound for remote clients (i.e. if SSH is used as a local privilege escalation mechanism, it should *not* involve this target unit), regardless of the protocol choices, i.e. regardless of whether IPv4, IPv6 or involve this target unit), regardless of the protocol choices, i.e. regardless of whether IPv4, IPv6 or :code:`AF_VSOCK` is used.
+
+   .. versionadded:: 256
+
+.. systemd:option:: time-set.target
+
+   Services responsible for setting the system clock (:code:`CLOCK_REALTIME`) from a local source (such as a maintained timestamp file or imprecise real-time clock) should pull in this target and order themselves before it. Services where approximate, roughly monotonic time is desired should be ordered after this unit, but not pull it in.
+
+   This target does not provide the accuracy guarantees of :code:`time-sync.target` (see below), however does not depend on remote clock sources to be reachable, i.e. the target is typically not delayed by network problems and similar. Use of this target is recommended for services where approximate clock accuracy and rough monotonicity is desired but activation shall not be delayed for possibly unreliable network communication.
+
+   The service manager automatically adds dependencies of type :code:`After=` for this target unit to all timer units with at least one :code:`OnCalendar=` directive.
+
+   The :ref:`systemd-timesyncd.service(8)` service is a simple daemon that pulls in this target and orders itself before it. Besides implementing the SNTP network protocol it maintains a timestamp file on disk whose modification time is regularly updated. At service start-up the local system clock is set from that modification time, ensuring it increases roughly monotonically.
+
+   Note that ordering a unit after :code:`time-set.target` only has effect if there's actually a service ordered before it that delays it until the clock is adjusted for rough monotonicity. Otherwise, this target might get reached before the clock is adjusted to be roughly monotonic. Enable :ref:`systemd-timesyncd.service(8)`, or an alternative NTP implementation to delay the target.
+
+   .. versionadded:: 242
+
+.. systemd:option:: time-sync.target
+
+   Services indicating completed synchronization of the system clock (:code:`CLOCK_REALTIME`) to a remote source should pull in this target and order themselves before it. Services where accurate time is essential should be ordered after this unit, but not pull it in.
+
+   The service manager automatically adds dependencies of type :code:`After=` for this target unit to all SysV init script service units with an LSB header referring to the "$time" facility, as well to all timer units with at least one :code:`OnCalendar=` directive.
+
+   This target provides stricter clock accuracy guarantees than :code:`time-set.target` (see above), but likely requires network communication and thus introduces unpredictable delays. Services that require clock accuracy and where network communication delays are acceptable should use this target. Services that require a less accurate clock, and only approximate and roughly monotonic clock behaviour should use :code:`time-set.target` instead.
+
+   Note that ordering a unit after :code:`time-sync.target` only has effect if there's actually a service ordered before it that delays it until clock synchronization is reached. Otherwise, this target might get reached before the clock is synchronized to any remote accurate reference clock. When using :ref:`systemd-timesyncd.service(8)`, enable :ref:`systemd-time-wait-sync.service(8)` to delay the target; or use an equivalent service for other NTP implementations.
+
+   .. list-table:: Comparison
+      :header-rows: 1
+
+      * - :code:`time-set.target`
+        - :code:`time-sync.target`
+      * - "quick" to reach
+        - "slow" to reach
+      * - typically uses local clock sources, boot process not affected by availability of external resources
+        - typically uses remote clock sources, inserts dependencies on remote resources into boot process
+      * - reliable, because local
+        - unreliable, because typically network involved
+      * - typically guarantees an approximate and roughly monotonic clock only
+        - typically guarantees an accurate clock
+      * - implemented by :code:`systemd-timesyncd.service`
+        - implemented by :code:`systemd-time-wait-sync.service`
+
+Special Slice Units
+###################
+
+There are four ".slice" units which form the basis of the hierarchy for assignment of resources for services, users, and virtual machines or containers. See :ref:`systemd.slice(5)` for details about slice units.
+
+.. systemd:option:: -.slice
+
+   The root slice is the root of the slice hierarchy. It usually does not contain units directly, but may be used to set defaults for the whole tree.
+
+   .. versionadded:: 206
+
+.. systemd:option:: machine.slice
+
+   By default, all virtual machines and containers registered with :code:`systemd-machined` are found in this slice. This is pulled in by :code:`systemd-machined.service`.
+
+   .. versionadded:: 206
+
+.. systemd:option:: capsule.slice
+
+   By default, all capsules encapsulated in :code:`capsule@.service` are found in this slice.
+
+   .. versionadded:: 255
+
+.. systemd:option:: system.slice
+
+   By default, all system services started by :code:`systemd` are found in this slice.
+
+   .. versionadded:: 206
+
+.. systemd:option:: user.slice
+
+   By default, all user processes and services started on behalf of the user, including the per-user systemd instance are found in this slice. This is pulled in by :code:`systemd-logind.service`.
+
+   .. versionadded:: 206
+
+Units managed by the user service manager
+#########################################
+
+Special User Units
+##################
+
+When systemd runs as a user instance, the following special units are available:
+
+.. systemd:option:: default.target
+
+   This is the main target of the user service manager, started by default when the service manager is invoked. Various services that compose the normal user session should be pulled into this target. In this regard, :code:`default.target` is similar to :code:`multi-user.target` in the system instance, but it is a real unit, not an alias.
+
+   .. versionadded:: 242
+
+.. systemd:option:: capsule@.target
+
+   This is the main target of capsule service managers, started by default, instantiated with the capsule name. This may be used to define different sets of units that are started for different capsules via generic unit definitions. For details about capsules see :man-pages:`capsule@.service(5)`.
+
+   .. versionadded:: 255
+
+In addition, the following units are available which have definitions similar to their system counterparts: :code:`exit.target`, :code:`shutdown.target`, :code:`sockets.target`, :code:`timers.target`, :code:`paths.target`, :code:`bluetooth.target`, :code:`printer.target`, :code:`smartcard.target`, :code:`sound.target`.
+
+Special Passive User Units
+##########################
+
+.. systemd:option:: graphical-session.target
+
+   This target is active whenever any graphical session is running. It is used to stop user services which only apply to a graphical (X, Wayland, etc.) session when the session is terminated. Such services should have "PartOf=graphical-session.target" in their \[Unit] section. A target for a particular session (e. g. :code:`gnome-session.target`) starts and stops "graphical-session.target" with "BindsTo=graphical-session.target".
+
+   Which services are started by a session target is determined by the "Wants=" and "Requires=" dependencies. For services that can be enabled independently, symlinks in ".wants/" and ".requires/" should be used, see :ref:`systemd.unit(5)`. Those symlinks should either be shipped in packages, or should be added dynamically after installation, for example using "systemctl add-wants", see :man-pages:`systemctl(1)`.
+
+   Nautilus as part of a GNOME session
+   -----------------------------------
+
+   "gnome-session.target" pulls in Nautilus as top-level service:
+
+     .. code-block:: sh
+
+        [Unit]
+        Description=User systemd services for GNOME graphical session
+        Wants=nautilus.service
+        BindsTo=graphical-session.target
+
+   "nautilus.service" gets stopped when the session stops:
+
+     .. code-block:: sh
+
+        [Unit]
+        Description=Render the desktop icons with Nautilus
+        PartOf=graphical-session.target
+        [Service]
+        …
+
+   .. versionadded:: 234
+
+.. systemd:option:: graphical-session-pre.target
+
+   This target contains services which set up the environment or global configuration of a graphical session, such as SSH/GPG agents (which need to export an environment variable into all desktop processes) or migration of obsolete d-conf keys after an OS upgrade (which needs to happen before starting any process that might use them). This target must be started before starting a graphical session like :code:`gnome-session.target`.
+
+   .. versionadded:: 234
+
+.. systemd:option:: xdg-desktop-autostart.target
+
+   The XDG specification defines a way to autostart applications using XDG desktop files. systemd ships :ref:`systemd-xdg-autostart-generator(8)` for the XDG desktop files in autostart directories. Desktop Environments can opt-in to use this service by adding a :code:`Wants=` dependency on :code:`xdg-desktop-autostart.target`.
+
+   .. versionadded:: 246
+
+Special User Slice Units
+########################
+
+There are four ".slice" units which form the basis of the user hierarchy for assignment of resources for user applications and services. See :ref:`systemd.slice(5)` for details about slice units and the documentation about `Desktop Environments <https://systemd.io/DESKTOP_ENVIRONMENTS>`_ for further information.
+
+.. systemd:option:: -.slice
+
+   The root slice is the root of the user's slice hierarchy. It usually does not contain units directly, but may be used to set defaults for the whole tree.
+
+   .. versionadded:: 247
+
+.. systemd:option:: app.slice
+
+   By default, all user services and applications managed by :code:`systemd` are found in this slice. All interactively launched applications like web browsers and text editors as well as non-critical services should be placed into this slice.
+
+   .. versionadded:: 247
+
+.. systemd:option:: session.slice
+
+   All essential services and applications required for the session should use this slice. These are services that either cannot be restarted easily or where latency issues may affect the interactivity of the system and applications. This includes the display server, screen readers and other services such as DBus or XDG portals. Such services should be configured to be part of this slice by adding :code:`Slice=session.slice` to their unit files.
+
+   .. versionadded:: 247
+
+.. systemd:option:: background.slice
+
+   All services running low-priority background tasks should use this slice. This permits resources to be preferentially assigned to the other slices. Examples include non-interactive tasks like file indexing or backup operations where latency is not important.
+
+   .. versionadded:: 247
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.service(5)`, :ref:`systemd.socket(5)`, :ref:`systemd.target(5)`, :ref:`systemd.slice(5)`, :man-pages:`bootup(7)`, :ref:`systemd-fstab-generator(8)`, :man-pages:`user@.service(5)`
+
+

@@ -1,0 +1,67 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-binfmt.service
+:manvolnum: 8
+:summary: Configure additional binary formats for executables at boot
+:aliases: systemd-binfmt
+
+.. _systemd-binfmt.service(8):
+
+=========================
+systemd-binfmt.service(8)
+=========================
+
+Name
+####
+
+systemd-binfmt.service, systemd-binfmt — Configure additional binary formats for executables at boot
+
+Synopsis
+########
+
+:code:`systemd-binfmt.service`
+
+:code:`/usr/lib/systemd/systemd-binfmt`
+
+Description
+###########
+
+:code:`systemd-binfmt.service` is an early boot service that registers additional binary formats for executables in the kernel.
+
+See :man-pages:`binfmt.d(5)` for information about the configuration of this service.
+
+Options
+#######
+
+.. systemd:option:: --unregister
+
+   If passed, instead of registering configured binary formats in the kernel, the reverse operation is executed: all currently registered binary formats are unregistered from the kernel.
+
+   .. versionadded:: 246
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove cat-config|
+    :end-before: .. inclusion-end-marker-do-not-remove cat-config|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove tldr|
+    :end-before: .. inclusion-end-marker-do-not-remove tldr|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`binfmt.d(5)`, :die-net:`wine(8)`
+
+

@@ -1,0 +1,63 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_interface_name_is_valid
+:manvolnum: 3
+:summary: Check if a string is a valid bus name or object path
+:aliases: sd_bus_service_name_is_valid, sd_bus_member_name_is_valid, sd_bus_object_path_is_valid
+
+.. _sd_bus_interface_name_is_valid(3):
+
+=================================
+sd_bus_interface_name_is_valid(3)
+=================================
+
+Name
+####
+
+sd_bus_interface_name_is_valid, sd_bus_service_name_is_valid, sd_bus_member_name_is_valid, sd_bus_object_path_is_valid — Check if a string is a valid bus name or object path
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_interface_name_is_valid(const char* p); .. code-block::
+
+   int sd_bus_service_name_is_valid(const char* p); .. code-block::
+
+   int sd_bus_member_name_is_valid(const char* p); .. code-block::
+
+   int sd_bus_object_path_is_valid(const char* p);
+
+Description
+###########
+
+:code:`sd_bus_interface_name_is_valid()` checks if a given string :code:`p` is a syntactically valid bus interface name. Similarly, :code:`sd_bus_service_name_is_valid()` checks if the argument is a valid bus service name, :code:`sd_bus_member_name_is_valid()` checks if the argument is a valid bus interface member name, and :code:`sd_bus_object_path_is_valid()` checks if the argument is a valid bus object path. Those functions generally check that only allowed characters are used and that the length of the string is within limits.
+
+Return Value
+############
+
+Those functions return 1 if the argument is a valid interface / service / member name or object path, and 0 if it is not. If the argument is :code:`NULL`, an error is returned.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`p` parameter is :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_interface_name_is_valid()`, :code:`sd_bus_service_name_is_valid()`, :code:`sd_bus_member_name_is_valid()`, and :code:`sd_bus_object_path_is_valid()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_call_method(3)`
+
+

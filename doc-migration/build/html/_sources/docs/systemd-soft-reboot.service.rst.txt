@@ -1,0 +1,111 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-soft-reboot.service
+:manvolnum: 8
+:summary: Userspace reboot operation
+
+.. _systemd-soft-reboot.service(8):
+
+==============================
+systemd-soft-reboot.service(8)
+==============================
+
+Name
+####
+
+systemd-soft-reboot.service — Userspace reboot operation
+
+Synopsis
+########
+
+:code:`systemd-soft-reboot.service`
+
+Description
+###########
+
+:code:`systemd-soft-reboot.service` is a system service that is pulled in by :code:`soft-reboot.target` and is responsible for performing a userspace-only reboot operation. When invoked, it will send the :code:`SIGTERM` signal to any processes left running (but does not wait for the processes to exit), and follow up with :code:`SIGKILL`. If the :code:`/run/nextroot/` directory exists (which may be a regular directory, a directory mount point or a symlink to either) then it will switch the file system root to it. It then reexecutes the service manager off the (possibly now new) root file system, which will enqueue a new boot transaction as in a normal reboot.
+
+Such a userspace-only reboot operation permits updating or resetting the entirety of userspace with minimal downtime, as the reboot operation does *not* transition through: transition through:
+
+*    The second phase of regular shutdown, as implemented by :ref:`systemd-shutdown(8)`.
+
+*    The third phase of regular shutdown, i.e. the return to the initrd context.
+
+*    The hardware reboot operation.
+
+*    The firmware initialization.
+
+*    The boot loader initialization.
+
+*    The kernel initialization.
+
+*    The initrd initialization.
+
+However, this form of reboot comes with drawbacks as well:
+
+*    The OS update remains incomplete, as the kernel is not reset and continues running.
+
+*    Kernel settings (such as :code:`/proc/sys/` settings, a.k.a. "sysctl", or :code:`/sys/` settings) are not reset.
+
+These limitations may be addressed by various means, which are outside of the scope of this documentation, such as kernel live-patching and sufficiently comprehensive :code:`/etc/sysctl.d/` files.
+
+Resource Pass-Through
+#####################
+
+Various runtime OS resources can passed from a system runtime to the next, through the userspace reboot operation. Specifically:
+
+*    File descriptors placed in the file descriptor store of services that remain active until the very end are passed to the next boot, where they are placed in the file descriptor store of the same unit. For this to work, units must declare :code:`DefaultDependencies=no` (and avoid a manual :code:`Conflicts=shutdown.target` or similar) to ensure they are not terminated as usual during the system shutdown operation. Alternatively, use :code:`FileDescriptorStorePreserve=` to allow the file descriptor store to remain pinned even when the unit is down. See :ref:`systemd.service(5)` for details about the file descriptor store.
+
+*    Similar to this, file descriptors associated with :code:`.socket` units remain open (and connectible) if the units are not stopped during the transition. (Achieved by :code:`DefaultDependencies=no`.)
+
+*    The :code:`/run/` file system remains mounted and populated and may be used to pass state information between such userspace reboot cycles.
+
+*    Service processes may continue to run over the transition, past soft-reboot and into the next session, if they are placed in services that remain active until the very end of shutdown (which again is achieved via :code:`DefaultDependencies=no`). They must also be set up to avoid being killed by the aforementioned :code:`SIGTERM` and :code:`SIGKILL` via :code:`SurviveFinalKillSignal=yes`, and also be configured to avoid being stopped on isolate via :code:`IgnoreOnIsolate=yes`. They also have to be configured to be stopped on normal shutdown, reboot and maintenance mode. Finally, they have to be ordered after :code:`basic.target` to ensure correct ordering on boot. Note that in case any new or custom units are used to isolate to, or that implement an equivalent shutdown functionality, they will also have to be configured manually for correct ordering and conflicting. For example:
+
+     .. code-block:: sh
+
+        [Unit]
+        Description=My Surviving Service
+        SurviveFinalKillSignal=yes
+        IgnoreOnIsolate=yes
+        DefaultDependencies=no
+        After=basic.target
+        Conflicts=reboot.target kexec.target poweroff.target halt.target rescue.target emergency.target
+        Before=shutdown.target rescue.target emergency.target
+        [Service]
+        Type=oneshot
+        ExecStart=sleep infinity
+
+*    On top of the above, templated units also need a configuration file for their slice, as they by default use a slice named after the non-templated part of the unit. For example, for a :code:`foo@test.service` instance, a :code:`system-foo.slice` unit may be added with the following content:
+
+     .. code-block:: sh
+
+        [Unit]
+        SurviveFinalKillSignal=yes
+        IgnoreOnIsolate=yes
+        DefaultDependencies=no
+
+*    File system mounts may remain mounted during the transition, and complex storage attached, if configured to remain until the very end of the shutdown process. (Also achieved via :code:`DefaultDependencies=no`, and by avoiding :code:`Conflicts=umount.target`)
+
+*    If the unit publishes a service over D-Bus, the connection needs to be re-established after soft-reboot as the D-Bus broker will be stopped and then started again. When using the :ref:`sd-bus(3)` library this can be achieved by adapting the following example.
+
+   .. literalinclude:: /code-examples/c/sd_bus_service_reconnect.c
+       :language: c
+
+Even though passing resources from one soft reboot cycle to the next is possible this way, we strongly suggest to use this functionality sparingly only, as it creates a more fragile system as resources from different versions of the OS and applications might be mixed with unforeseen consequences. In particular it is recommended to *avoid* allowing processes to survive the soft reboot operation, as this means code updates will necessarily be incomplete, and processes typically pin various other resources (such as the file system they are backed by), thus increasing memory usage (as two versions of the OS/application/file system might be kept in memory). Leaving processes running during a soft-reboot operation requires disconnecting the service comprehensively from the rest of the OS, i.e. minimizing IPC and reducing sharing of resources with the rest of the OS. A possible mechanism to achieve this is the concept of allowing processes to survive the soft reboot operation, as this means code updates will necessarily be incomplete, and processes typically pin various other resources (such as the file system they are backed by), thus increasing memory usage (as two versions of the OS/application/file system might be kept in memory). Leaving processes running during a soft-reboot operation requires disconnecting the service comprehensively from the rest of the OS, i.e. minimizing IPC and reducing sharing of resources with the rest of the OS. A possible mechanism to achieve this is the concept of `Portable Services <https://systemd.io/PORTABLE_SERVICES>`_, but make sure no resource from the host's OS filesystems is pinned via :code:`BindPaths=` or similar unit settings, otherwise the old, originating filesystem will remain mounted as long as the unit is running.
+
+Notes
+#####
+
+Note that because :ref:`systemd-shutdown(8)` is not executed, the executables in :code:`/usr/lib/systemd/system-shutdown/` are not executed either.
+
+Note that :code:`systemd-soft-reboot.service` (and related units) should never be executed directly. Instead, trigger system shutdown with a command such as :code:`systemctl soft-reboot`.
+
+Note that if a new root file system has been set up on "/run/nextroot/", a :code:`soft-reboot` will be performed when the :code:`reboot` command is invoked.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd.special(7)`, :ref:`systemd-poweroff.service(8)`, :ref:`systemd-suspend.service(8)`, :man-pages:`bootup(7)`
+
+

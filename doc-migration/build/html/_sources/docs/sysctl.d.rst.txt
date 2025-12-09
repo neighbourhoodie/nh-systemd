@@ -1,0 +1,131 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sysctl.d
+:manvolnum: 5
+:summary: Configure kernel parameters at boot
+
+.. _sysctl.d(5):
+
+===========
+sysctl.d(5)
+===========
+
+Name
+####
+
+sysctl.d — Configure kernel parameters at boot
+
+Synopsis
+########
+
+| :code:`/etc/sysctl.d/\*.conf`
+| :code:`/run/sysctl.d/\*.conf`
+| :code:`/usr/local/lib/sysctl.d/\*.conf`
+| :code:`/usr/lib/sysctl.d/\*.conf`
+
+.. code-block:: sh
+
+   key.name.under.proc.sys = some value
+   key/name/under/proc/sys = some value
+   key/middle.part.with.dots/foo = 123
+   key.middle/part/with/dots.foo = 123
+   -key.that.will.not.fail = value
+   key.pattern.*.with.glob = whatever
+   -key.pattern.excluded.with.glob
+   key.pattern.overridden.with.glob = custom
+
+Description
+###########
+
+At boot, :ref:`systemd-sysctl.service(8)` reads configuration files from the above directories to configure :man-pages:`sysctl(8)` kernel parameters.
+
+Configuration Format
+####################
+
+The configuration files contain a list of variable assignments, separated by newlines. Empty lines and lines whose first non-whitespace character is "#" or ";" are ignored.
+
+Note that either "/" or "." may be used as separators within sysctl variable names. If the first separator is a slash, remaining slashes and dots are left intact. If the first separator is a dot, dots and slashes are interchanged. "kernel.domainname=foo" and "kernel/domainname=foo" are equivalent and will cause "foo" to be written to :code:`/proc/sys/kernel/domainname`. Either "net.ipv4.conf.enp3s0/200.forwarding" or "net/ipv4/conf/enp3s0.200/forwarding" may be used to refer to :code:`/proc/sys/net/ipv4/conf/enp3s0.200/forwarding`. A glob :man-pages:`glob(7)` pattern may be used to write the same value to all matching keys. Keys for which an explicit pattern exists will be excluded from any glob matching. In addition, a key may be explicitly excluded from being set by any matching glob patterns by specifying the key name prefixed with a "-" character and not followed by "=", see SYNOPSIS.
+
+Any access permission errors and attempts to write variables not present on the local system are logged at debug level and do not cause the service to fail. Other types of errors when setting variables are logged with higher priority and cause the service to return failure at the end (after processing other variables). As an exception, if a variable assignment is prefixed with a single "-" character, failure to set the variable for any reason will be logged at debug level and will not cause the service to fail.
+
+The settings configured with :code:`sysctl.d` files will be applied early on boot. The network interface-specific options will also be applied individually for each network interface as it shows up in the system. (More specifically, :code:`net.ipv4.conf.*`, :code:`net.ipv6.conf.*`, :code:`net.ipv4.neigh.*` and :code:`net.ipv6.neigh.*`).
+
+Many sysctl parameters only become available when certain kernel modules are loaded. Modules are usually loaded on demand, e.g. when certain hardware is plugged in or network brought up. This means that :ref:`systemd-sysctl.service(8)` which runs during early boot will not configure such parameters if they become available after it has run. To set such parameters, it is recommended to add an :man-pages:`udev(7)` rule to set those parameters when they become available. Alternatively, a slightly simpler and less efficient option is to add the module to :man-pages:`modules-load.d(5)`, causing it to be loaded statically before sysctl settings are applied (see example below).
+
+%% include="standard-conf.rst" id="confd|" %%
+
+Examples
+########
+
+Set kernel YP domain name
+-------------------------
+
+:code:`/etc/sysctl.d/domain-name.conf`:
+
+.. code-block:: sh
+
+   kernel.domainname=example.com
+
+Apply settings available only when a certain module is loaded (method one)
+--------------------------------------------------------------------------
+
+:code:`/etc/udev/rules.d/99-bridge.rules`:
+
+.. code-block:: sh
+
+   ACTION=="add", SUBSYSTEM=="module", KERNEL=="br_netfilter", \
+         RUN+="/usr/lib/systemd/systemd-sysctl --prefix=/net/bridge"
+
+:code:`/etc/sysctl.d/bridge.conf`:
+
+.. code-block:: sh
+
+   net.bridge.bridge-nf-call-ip6tables = 0
+   net.bridge.bridge-nf-call-iptables = 0
+   net.bridge.bridge-nf-call-arptables = 0
+
+This method applies settings when the module is loaded. Please note that, unless the :code:`br_netfilter` module is loaded, bridged packets will not be filtered by Netfilter (starting with kernel 3.18), so simply not loading the module is sufficient to avoid filtering.
+
+Apply settings available only when a certain module is loaded (method two)
+--------------------------------------------------------------------------
+
+:code:`/etc/modules-load.d/bridge.conf`:
+
+.. code-block:: sh
+
+   br_netfilter
+
+:code:`/etc/sysctl.d/bridge.conf`:
+
+.. code-block:: sh
+
+   net.bridge.bridge-nf-call-ip6tables = 0
+   net.bridge.bridge-nf-call-iptables = 0
+   net.bridge.bridge-nf-call-arptables = 0
+
+This method forces the module to be always loaded. Please note that, unless the :code:`br_netfilter` module is loaded, bridged packets will not be filtered with Netfilter (starting with kernel 3.18), so simply not loading the module is sufficient to avoid filtering.
+
+Set network routing properties for all interfaces
+-------------------------------------------------
+
+:code:`/etc/sysctl.d/20-rp_filter.conf`:
+
+.. code-block:: sh
+
+   net.ipv4.conf.default.rp_filter = 2
+   net.ipv4.conf.*.rp_filter = 2
+   -net.ipv4.conf.all.rp_filter
+   net.ipv4.conf.hub0.rp_filter = 1
+
+The :code:`rp_filter` key will be set to "2" for all interfaces, except "hub0". We set :code:`net.ipv4.conf.default.rp_filter` first, so any interfaces which are added *later* will get this value (this also covers any interfaces detected while we're running). The glob matches any interfaces which were detected will get this value (this also covers any interfaces detected while we're running). The glob matches any interfaces which were detected *earlier*\. The glob will also match . The glob will also match :code:`net.ipv4.conf.all.rp_filter`, which we do not want to set at all, so it is explicitly excluded. And "hub0" is excluded from the glob because it has an explicit setting.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-sysctl.service(8)`, :ref:`systemd-delta(1)`, :man-pages:`sysctl(8)`, :man-pages:`sysctl.conf(5)`, :man-pages:`modprobe(8)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

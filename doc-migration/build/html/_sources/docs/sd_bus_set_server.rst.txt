@@ -1,0 +1,114 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_set_server
+:manvolnum: 3
+:summary: Configure connection mode for a bus object
+:aliases: sd_bus_is_server, sd_bus_get_bus_id, sd_bus_set_bus_client, sd_bus_is_bus_client, sd_bus_set_monitor, sd_bus_is_monitor
+
+.. _sd_bus_set_server(3):
+
+====================
+sd_bus_set_server(3)
+====================
+
+Name
+####
+
+sd_bus_set_server, sd_bus_is_server, sd_bus_get_bus_id, sd_bus_set_bus_client, sd_bus_is_bus_client, sd_bus_set_monitor, sd_bus_is_monitor — Configure connection mode for a bus object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_set_server(sd_bus *bus,
+	int b,
+	sd_id128_t id); .. code-block::
+
+   int sd_bus_is_server(sd_bus *bus); .. code-block::
+
+   int sd_bus_get_bus_id(sd_bus *bus,
+	sd_id128_t *id); .. code-block::
+
+   int sd_bus_set_bus_client(sd_bus *bus,
+	int b); .. code-block::
+
+   int sd_bus_is_bus_client(sd_bus *bus); .. code-block::
+
+   int sd_bus_set_monitor(sd_bus *bus,
+	int b); .. code-block::
+
+   int sd_bus_is_monitor(sd_bus *bus);
+
+Description
+###########
+
+:code:`sd_bus_set_server()` configures the bus object as a server for direct D-Bus connections. :code:`b` enables/disables the server mode. If zero, the server mode is disabled. Otherwise, the server mode is enabled. Configuring a bus object as a server is required to allow establishing direct connections between two peers without going via the D-Bus daemon. :code:`id` must contain a 128-bit integer id for the server. If clients add a guid field to their D-Bus address string, the server id must match this guid or the D-Bus authentication handshake will fail. If no specific id is defined for the server, :ref:`sd_id128_randomize(3)` can be used to generate a random id instead.
+
+:code:`sd_bus_is_server()` returns whether the server mode is enabled for the given bus object.
+
+:code:`sd_bus_get_bus_id()` stores the D-Bus server id configured using :code:`sd_bus_set_server()` (for server bus objects) or received during D-Bus authentication (for client bus objects) in :code:`id`.
+
+:code:`sd_bus_set_bus_client()` configures the bus object as a D-Bus daemon client. :code:`b` enables/disables the client mode. If zero, the client mode is disabled and the bus object should connect directly to a D-Bus server. Otherwise, the client mode is enabled and the bus object should connect to a D-Bus daemon. When connecting to an existing bus using any of the functions in the :ref:`sd_bus_open(3)` family of functions or any of the functions in the :ref:`sd_bus_default(3)` family of functions, the bus object is automatically configured as a bus client. However, when connecting to a D-Bus daemon by calling :ref:`sd_bus_set_address(3)` followed by :ref:`sd_bus_start(3)`, the bus object should be manually configured as a bus client using :code:`sd_bus_set_bus_client()`. By default, a bus object is not configured as a D-Bus daemon client.
+
+:code:`sd_bus_is_bus_client()` returns whether the client mode is enabled/disabled for the given bus object.
+
+:code:`sd_bus_set_monitor()` configures the bus object as a D-Bus monitor object. :code:`b` enables/disables the monitor mode. If zero, the monitor mode is disabled. If non-zero, the monitor mode is enabled. When the monitor mode is enabled, no messages may be sent via the bus object and it may not expose any objects on the bus. To start monitoring messages, call the :code:`org.freedesktop.DBus.Monitoring.BecomeMonitor` method of the D-Bus daemon and pass a list of matches indicating which messages to intercept. See `The D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-become-monitor>`_ for more information.
+
+:code:`sd_bus_is_monitor()` returns whether the monitor mode is enabled/disabled for the given bus object.
+
+Return Value
+############
+
+On success, :code:`sd_bus_set_server()`, :code:`sd_bus_get_bus_id()`, :code:`sd_bus_set_bus_client()` and :code:`sd_bus_set_monitor()` return a non-negative integer. On failure, they return a negative errno-style error code.
+
+:code:`sd_bus_is_server()`, :code:`sd_bus_is_bus_client()` and :code:`sd_bus_is_monitor()` return a positive integer when the server or client mode is enabled, respectively. Otherwise, they return zero.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ECHILD
+
+   The bus connection has been created in a different process, library or module instance.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EPERM
+
+   The bus connection has already been started.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EINVAL
+
+   A required parameter was :code:`NULL` or :code:`b` was zero and :code:`id` did not equal :code:`SD_ID128_NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOTCONN
+
+   The bus is not connected.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_set_server()`, :code:`sd_bus_is_server()`, :code:`sd_bus_get_bus_id()`, :code:`sd_bus_set_bus_client()`, :code:`sd_bus_is_bus_client()`, :code:`sd_bus_set_monitor()`, and :code:`sd_bus_is_monitor()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`
+
+

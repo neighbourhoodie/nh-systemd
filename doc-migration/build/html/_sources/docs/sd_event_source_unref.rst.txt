@@ -1,0 +1,70 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_source_unref
+:manvolnum: 3
+:summary: Increase or decrease event source reference counters
+:aliases: sd_event_source_unrefp, sd_event_source_ref, sd_event_source_disable_unref, sd_event_source_disable_unrefp
+
+.. _sd_event_source_unref(3):
+
+========================
+sd_event_source_unref(3)
+========================
+
+Name
+####
+
+sd_event_source_unref, sd_event_source_unrefp, sd_event_source_ref, sd_event_source_disable_unref, sd_event_source_disable_unrefp — Increase or decrease event source reference counters
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   sd_event_source* sd_event_source_unref(sd_event_source *source); .. code-block::
+
+   void sd_event_source_unrefp(sd_event_source **source); .. code-block::
+
+   sd_event_source* sd_event_source_ref(sd_event_source *source); .. code-block::
+
+   sd_event_source* sd_event_source_disable_unref(sd_event_source *source); .. code-block::
+
+   void sd_event_source_disable_unrefp(sd_event_source **source);
+
+Description
+###########
+
+:code:`sd_event_source_unref()` may be used to decrement by one the internal reference counter of the event source object specified as :code:`source`. The reference counter is initially set to one, when the event source is created with calls such as :ref:`sd_event_add_io(3)` or :ref:`sd_event_add_time(3)`. When the reference counter reaches zero, the object is detached from the event loop object and destroyed.
+
+:code:`sd_event_source_unrefp()` is similar to :code:`sd_event_source_unref()` but takes a pointer to a pointer to an sd_event_source object. This call is useful in conjunction with GCC's and LLVM's `Clean-up Variable Attribute <https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html>`_. Note that this function is defined as inline function.
+
+:code:`sd_event_source_ref()` may be used to increase by one the internal reference counter of the event source object specified as :code:`source`.
+
+:code:`sd_event_source_unref()`, :code:`sd_bus_creds_unrefp()` and :code:`sd_bus_creds_ref()` execute no operation if the passed event source object is :code:`NULL`.
+
+Note that event source objects stay alive and may be dispatched as long as they have a reference counter greater than zero. In order to drop a reference of an event source and make sure the associated event source handler function is not called anymore it is recommended to combine a call of :code:`sd_event_source_unref()` with a prior call to :code:`sd_event_source_set_enabled()` with :code:`SD_EVENT_OFF` or call :code:`sd_event_source_disable_unref()`, see below.
+
+:code:`sd_event_source_disable_unref()` combines a call to :code:`sd_event_source_set_enabled()` with :code:`SD_EVENT_OFF` with :code:`sd_event_source_unref()`. This ensures that the source is disabled before the local reference to it is lost. The :code:`source` parameter is allowed to be :code:`NULL`.
+
+:code:`sd_event_source_disable_unrefp()` is similar to :code:`sd_event_source_unrefp()`, but in addition disables the source first. This call is useful in conjunction with GCC's and LLVM's `Clean-up Variable Attribute <https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html>`_. Note that this function is defined as inline function.
+
+Return Value
+############
+
+:code:`sd_event_source_unref()` and :code:`sd_event_source_disable_unref()` always return :code:`NULL`. :code:`sd_event_source_ref()` always returns the event source object passed in.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_source_unref()`, :code:`sd_event_source_unrefp()`, and :code:`sd_event_source_ref()` were added in version 229.
+
+:code:`sd_event_source_disable_unref()` and :code:`sd_event_source_disable_unrefp()` were added in version 243.
+
+See Also
+########
+
+:ref:`sd-event(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_source_set_enabled(3)`
+
+

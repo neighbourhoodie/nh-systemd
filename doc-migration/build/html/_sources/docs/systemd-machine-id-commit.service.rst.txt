@@ -1,0 +1,37 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-machine-id-commit.service
+:manvolnum: 8
+:summary: Commit a transient machine ID to disk
+
+.. _systemd-machine-id-commit.service(8):
+
+====================================
+systemd-machine-id-commit.service(8)
+====================================
+
+Name
+####
+
+systemd-machine-id-commit.service — Commit a transient machine ID to disk
+
+Synopsis
+########
+
+:code:`systemd-machine-id-commit.service`
+
+Description
+###########
+
+:code:`systemd-machine-id-commit.service` is an early boot service responsible for committing transient :code:`/etc/machine-id` files to a writable disk file system. See :man-pages:`machine-id(5)` for more information about machine IDs.
+
+This service is started after :code:`local-fs.target` in case :code:`/etc/machine-id` is a mount point of its own (usually from a memory file system such as "tmpfs") and /etc is writable. The service will invoke :code:`systemd-machine-id-setup --commit`, which writes the current transient machine ID to disk and unmount the :code:`/etc/machine-id` file in a race-free manner to ensure that file is always valid and accessible for other processes. See :ref:`systemd-machine-id-setup(1)` for details.
+
+The main use case of this service are systems where :code:`/etc/machine-id` is read-only and initially not initialized. In this case, the system manager will generate a transient machine ID file on a memory file system, and mount it over :code:`/etc/machine-id`, during the early boot phase. This service is then invoked in a later boot phase, as soon as :code:`/etc/` has been remounted writable and the ID may thus be committed to disk to make it permanent.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-machine-id-setup(1)`, :man-pages:`machine-id(5)`, :ref:`systemd-firstboot(1)`
+
+

@@ -1,0 +1,37 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-tpm2-generator
+:manvolnum: 8
+:summary: Generator for inserting TPM2 synchronization point in the boot process
+
+.. _systemd-tpm2-generator(8):
+
+=========================
+systemd-tpm2-generator(8)
+=========================
+
+Name
+####
+
+systemd-tpm2-generator — Generator for inserting TPM2 synchronization point in the boot process
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-tpm2-generator`
+
+Description
+###########
+
+:code:`systemd-tpm2-generator` is a generator that adds a :code:`Wants=` dependency from :code:`sysinit.target` to :code:`tpm2.target` when it detects that the firmware discovered a TPM2 device but the OS kernel so far did not. :code:`tpm2.target` is supposed to act as synchronization point for all services that require TPM2 device access. See :ref:`systemd.special(7)` for details.
+
+The :code:`systemd.tpm2_wait=` kernel command line option may be used to override behaviour of the generator. It accepts a boolean value: if true then :code:`tpm2.target` will be added as synchronization point even if the firmware has not detected a TPM2 device. If false, the target will not be inserted even if firmware reported a device but the OS kernel does not expose a device for it yet. The latter might be useful in environments where a suitable TPM2 driver for the available hardware is not available.
+
+:code:`systemd-tpm2-generator` implements :ref:`systemd.generator(7)`.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.special(7)`, :man-pages:`kernel-command-line(7)`
+
+

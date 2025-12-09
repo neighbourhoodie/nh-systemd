@@ -1,0 +1,345 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: busctl
+:manvolnum: 1
+:summary: Introspect the bus
+
+.. _busctl(1):
+
+=========
+busctl(1)
+=========
+
+Name
+####
+
+busctl — Introspect the bus
+
+Synopsis
+########
+
+:code:`busctl [OPTIONS...] [COMMAND] [<NAME>...]`
+
+Description
+###########
+
+:code:`busctl` may be used to introspect and monitor the D-Bus bus.
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: list
+
+   Show all peers on the bus, by their service names. By default, shows both unique and well-known names, but this may be changed with the :code:`--unique` and :code:`--acquired` switches. This is the default operation if no command is specified.
+
+   .. versionadded:: 209
+
+.. systemd:option:: status [<SERVICE>]
+
+   Show process information and credentials of a bus service (if one is specified by its unique or well-known name), a process (if one is specified by its numeric PID), or the owner of the bus (if no parameter is specified).
+
+   .. versionadded:: 209
+
+.. systemd:option:: monitor [<SERVICE>...]
+
+   Dump messages being exchanged. If :emphasis:`SERVICE` is specified, show messages to or from this peer, identified by its well-known or unique name. Otherwise, show all messages on the bus. Use :kbd:`Ctrl` + :kbd:`C` to terminate the dump.
+
+   .. versionadded:: 209
+
+.. systemd:option:: capture [<SERVICE>...]
+
+   Similar to :code:`monitor` but writes the output in pcapng format (for details, see `PCAP Next Generation (pcapng) Capture File Format <https://github.com/pcapng/pcapng/>`_). Make sure to redirect standard output to a file or pipe. Tools like :die-net:`wireshark(1)` may be used to dissect and view the resulting files.
+
+   .. versionadded:: 218
+
+.. systemd:option:: tree [<SERVICE>...]
+
+   Shows an object tree of one or more services. If :emphasis:`SERVICE` is specified, show object tree of the specified services only. Otherwise, show all object trees of all services on the bus that acquired at least one well-known name.
+
+   .. versionadded:: 218
+
+.. systemd:option:: introspect SERVICE OBJECT [<INTERFACE>]
+
+   Show interfaces, methods, properties and signals of the specified object (identified by its path) on the specified service. If the interface argument is passed, the output is limited to members of the specified interface.
+
+   .. versionadded:: 218
+
+.. systemd:option:: call SERVICE OBJECT INTERFACE METHOD [<SIGNATURE> [<<ARGUMENT>...>]]
+
+   Invoke a method and show the response. Takes a service name, object path, interface name and method name. If parameters shall be passed to the method call, a signature string is required, followed by the arguments, individually formatted as strings. For details on the formatting used, see below. To suppress output of the returned data, use the :code:`--quiet` option.
+
+   .. versionadded:: 218
+
+.. systemd:option:: emit OBJECT INTERFACE SIGNAL [<SIGNATURE> [<<ARGUMENT>...>]]
+
+   Emit a signal. Takes an object path, interface name and method name. If parameters shall be passed, a signature string is required, followed by the arguments, individually formatted as strings. For details on the formatting used, see below. To specify the destination of the signal, use the :code:`--destination=` option.
+
+   .. versionadded:: 242
+
+.. systemd:option:: wait [<SERVICE>] OBJECT INTERFACE SIGNAL
+
+   Wait for a signal. Takes an object path, interface name, and signal name. To suppress output of the returned data, use the :code:`--quiet` option. The service name may be omitted, in which case :code:`busctl` will match signals from any sender.
+
+   .. versionadded:: 257
+
+.. systemd:option:: get-property SERVICE OBJECT INTERFACE PROPERTY...
+
+   Retrieve the current value of one or more object properties. Takes a service name, object path, interface name and property name. Multiple properties may be specified at once, in which case their values will be shown one after the other, separated by newlines. The output is, by default, in terse format. Use :code:`--verbose` for a more elaborate output format.
+
+   .. versionadded:: 218
+
+.. systemd:option:: set-property SERVICE OBJECT INTERFACE PROPERTY SIGNATURE ARGUMENT...
+
+   Set the current value of an object property. Takes a service name, object path, interface name, property name, property signature, followed by a list of parameters formatted as strings.
+
+   .. versionadded:: 218
+
+.. systemd:option:: help
+
+   Show command syntax help.
+
+   .. versionadded:: 209
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --address=ADDRESS
+
+   Connect to the bus specified by :emphasis:`ADDRESS` instead of using suitable defaults for either the system or user bus (see :code:`--system` and :code:`--user` options).
+
+   .. versionadded:: 209
+
+.. systemd:option:: --show-machine
+
+   When showing the list of peers, show a column containing the names of containers they belong to. See :ref:`systemd-machined.service(8)`.
+
+   .. versionadded:: 209
+
+.. systemd:option:: --unique
+
+   When showing the list of peers, show only "unique" names (of the form "::emphasis:`number`.:emphasis:`number`").
+
+   .. versionadded:: 209
+
+.. systemd:option:: --acquired
+
+   The opposite of :code:`--unique` — only "well-known" names will be shown.
+
+   .. versionadded:: 209
+
+.. systemd:option:: --activatable
+
+   When showing the list of peers, show only peers which have actually not been activated yet, but may be started automatically if accessed.
+
+   .. versionadded:: 209
+
+.. systemd:option:: --match=MATCH
+
+   When showing messages being exchanged, show only the subset matching :emphasis:`MATCH`. See :ref:`sd_bus_add_match(3)`.
+
+   .. versionadded:: 209
+
+.. systemd:option:: --size=
+
+   When used with the :code:`capture` command, specifies the maximum bus message size to capture ("snaplen"). Defaults to 4096 bytes.
+
+   .. versionadded:: 218
+
+.. systemd:option:: --list
+
+   When used with the :code:`tree` command, shows a flat list of object paths instead of a tree.
+
+   .. versionadded:: 218
+
+.. systemd:option:: -q, --quiet
+
+   When used with the :code:`call` command, suppresses display of the response message payload. Note that even if this option is specified, errors returned will still be printed and the tool will indicate success or failure with the process exit code.
+
+   .. versionadded:: 218
+
+.. systemd:option:: --verbose
+
+   When used with the :code:`call` or :code:`get-property` command, shows output in a more verbose format.
+
+   .. versionadded:: 218
+
+.. systemd:option:: --xml-interface
+
+   When used with the :code:`introspect` call, dump the XML description received from the D-Bus :code:`org.freedesktop.DBus.Introspectable.Introspect` call instead of the normal output.
+
+   .. versionadded:: 243
+
+.. systemd:option:: --expect-reply=BOOL
+
+   When used with the :code:`call` command, specifies whether :code:`busctl` shall wait for completion of the method call, output the returned method response data, and return success or failure via the process exit code. If this is set to "no", the method call will be issued but no response is expected, the tool terminates immediately, and thus no response can be shown, and no success or failure is returned via the exit code. To only suppress output of the reply message payload, use :code:`--quiet` above. Defaults to "yes".
+
+   .. versionadded:: 218
+
+.. systemd:option:: --auto-start=BOOL
+
+   When used with the :code:`call` or :code:`emit` command, specifies whether the method call should implicitly activate the called service, should it not be running yet but is configured to be auto-started. Defaults to "yes".
+
+   .. versionadded:: 218
+
+.. systemd:option:: --allow-interactive-authorization=BOOL
+
+   When used with the :code:`call` command, specifies whether the services may enforce interactive authorization while executing the operation, if the security policy is configured for this. Defaults to "yes".
+
+   .. versionadded:: 218
+
+.. systemd:option:: --timeout=SECS
+
+   When used with the :code:`call` command, specifies the maximum time to wait for method call completion. When used with the :code:`monitor` command, since version v257, specifies the maximum time to wait for messages before automatically exiting. If no time unit is specified, assumes seconds. The usual other units are understood, too (ms, us, s, min, h, d, w, month, y). Note that this timeout does not apply if :code:`--expect-reply=no` is used, when combined with the :code:`call` command, as the tool does not wait for any reply message then. When not specified or when set to 0, the default of "25s" is assumed for the :code:`call` command, and it is disabled for the :code:`monitor` command.
+
+   .. versionadded:: 218
+
+.. systemd:option:: --limit-messages=NUMBER, -N NUMBER
+
+   When used with the :code:`monitor` command, if enabled will make :code:`busctl` exit when the specified number of messages have been received and printed. This is useful in combination with :code:`--match=`, to wait for the specified number of occurrences of specific D-Bus messages.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --augment-creds=BOOL
+
+   Controls whether credential data reported by :code:`list` or :code:`status` shall be augmented with data from :code:`/proc/`. When this is turned on, the data shown is possibly inconsistent, as the data read from :code:`/proc/` might be more recent than the rest of the credential information. Defaults to "yes".
+
+   .. versionadded:: 218
+
+.. systemd:option:: --watch-bind=BOOL
+
+   Controls whether to wait for the specified :code:`AF_UNIX` bus socket to appear in the file system before connecting to it. Defaults to off. When enabled, the tool will watch the file system until the socket is created and then connect to it.
+
+   .. versionadded:: 237
+
+.. systemd:option:: --destination=SERVICE
+
+   Takes a service name. When used with the :code:`emit` command, a signal is emitted to the specified service.
+
+   .. versionadded:: 242
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove user|
+    :end-before: .. inclusion-end-marker-do-not-remove user|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove system|
+    :end-before: .. inclusion-end-marker-do-not-remove system|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove machine|
+    :end-before: .. inclusion-end-marker-do-not-remove machine|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove capsule|
+    :end-before: .. inclusion-end-marker-do-not-remove capsule|
+
+.. systemd:option:: -l, --full
+
+   Do not ellipsize the output in :code:`list` command.
+
+   .. versionadded:: 245
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove j|
+    :end-before: .. inclusion-end-marker-do-not-remove j|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Parameter Formatting
+####################
+
+The :code:`call` and :code:`set-property` commands take a signature string followed by a list of parameters formatted as string (for details on D-Bus signature strings, see the `Type system chapter of the D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html#type-system>`_). For simple types, each parameter following the signature should simply be the parameter's value formatted as string. Positive boolean values may be formatted as "true", "yes", "on", or "1"; negative boolean values may be specified as "false", "no", "off", or "0". For arrays, a numeric argument for the number of entries followed by the entries shall be specified. For variants, the signature of the contents shall be specified, followed by the contents. For dictionaries and structs, the contents of them shall be directly specified.
+
+For example,
+
+.. code-block:: sh
+
+   s jawoll
+
+is the formatting of a single string "jawoll".
+
+.. code-block:: sh
+
+   as 3 hello world foobar
+
+is the formatting of a string array with three entries, "hello", "world" and "foobar".
+
+.. code-block:: sh
+
+   a{sv} 3 One s Eins Two u 2 Yes b true
+
+is the formatting of a dictionary array that maps strings to variants, consisting of three entries. The string "One" is assigned the string "Eins". The string "Two" is assigned the 32-bit unsigned integer 2. The string "Yes" is assigned a positive boolean.
+
+Note that the :code:`call`, :code:`get-property`, :code:`introspect` commands will also generate output in this format for the returned data. Since this format is sometimes too terse to be easily understood, the :code:`call` and :code:`get-property` commands may generate a more verbose, multi-line output when passed the :code:`--verbose` option.
+
+Examples
+########
+
+Write and Read a Property
+-------------------------
+
+The following two commands first write a property and then read it back. The property is found on the "/org/freedesktop/systemd1" object of the "org.freedesktop.systemd1" service. The name of the property is "LogLevel" on the "org.freedesktop.systemd1.Manager" interface. The property contains a single string:
+
+.. code-block:: sh
+
+   # busctl set-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager LogLevel s debug
+   # busctl get-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager LogLevel
+   s "debug"
+
+Terse and Verbose Output
+------------------------
+
+The following two commands read a property that contains an array of strings, and first show it in terse format, followed by verbose format:
+
+.. code-block:: sh
+
+   $ busctl get-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager Environment
+   as 2 "LANG=en_US.UTF-8" "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+   $ busctl get-property --verbose org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager Environment
+   ARRAY "s" {
+           STRING "LANG=en_US.UTF-8";
+           STRING "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin";
+   };
+
+Invoking a Method
+-----------------
+
+The following command invokes the "StartUnit" method on the "org.freedesktop.systemd1.Manager" interface of the "/org/freedesktop/systemd1" object of the "org.freedesktop.systemd1" service, and passes it two strings "cups.service" and "replace". As a result of the method call, a single object path parameter is received and shown:
+
+.. code-block:: sh
+
+   # busctl call org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager StartUnit ss "cups.service" "replace"
+   o "/org/freedesktop/systemd1/job/42684"
+
+See Also
+########
+
+:dbus:`dbus-daemon(1)`, `D-Bus <https://www.freedesktop.org/wiki/Software/dbus>`_, :ref:`sd-bus(3)`, :man-pages:`varlinkctl(1)`, :ref:`systemd(1)`, :man-pages:`machinectl(1)`, :die-net:`wireshark(1)`
+
+

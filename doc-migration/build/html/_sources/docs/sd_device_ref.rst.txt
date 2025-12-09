@@ -1,0 +1,62 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_device_ref
+:manvolnum: 3
+:summary: Create or destroy references to a device object
+:aliases: sd_device_unref, sd_device_unrefp
+
+.. _sd_device_ref(3):
+
+================
+sd_device_ref(3)
+================
+
+Name
+####
+
+sd_device_ref, sd_device_unref, sd_device_unrefp — Create or destroy references to a device object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-device.h>` .. code-block::
+
+   sd_device* sd_device_ref(sd_device *device); .. code-block::
+
+   sd_device* sd_device_unref(sd_device *device); .. code-block::
+
+   void sd_device_unrefp(sd_device **device);
+
+:code:`sd_device_ref()` increases the internal reference counter of :code:`device` by one.
+
+:code:`sd_device_unref()` decreases the internal reference counter of :code:`device` by one. Once the reference count has dropped to zero, :code:`device` is destroyed and cannot be used anymore, so further calls to :code:`sd_device_ref()` or :code:`sd_device_unref()` are illegal.
+
+:code:`sd_device_unrefp()` is similar to :code:`sd_device_unref()` but takes a pointer to a pointer to an sd_device object. This call is useful in conjunction with GCC's and LLVM's `Clean-up Variable Attribute <https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html>`_. Note that this function is defined as an inline function. Use a declaration like the following, in order to allocate a device object that is freed automatically as the code block is left:
+
+.. code-block:: sh
+
+   {
+     __attribute__((cleanup(sd_device_unrefp))) sd_device *device = NULL;
+     int r;
+     …
+     r = sd_device_new_from_syspath(&device, "…");
+     if (r < 0) {
+       errno = -r;
+       fprintf(stderr, "Failed to allocate device: %m\n");
+     }
+     …
+   }
+
+:code:`sd_device_ref()` and :code:`sd_device_unref()` execute no operation if the argument is :code:`NULL`. :code:`sd_device_unrefp()` will first dereference its argument, which must not be :code:`NULL`, and will execute no operation if *that* is is :code:`NULL`.
+
+Return Value
+############
+
+:code:`sd_device_ref()` always returns the argument, and :code:`sd_device_unref()` always returns :code:`NULL`.
+
+History
+#######
+
+:code:`sd_device_ref()`, :code:`sd_device_unref()`, and :code:`sd_device_unrefp()` were added in version 251.
+
+

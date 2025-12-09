@@ -1,0 +1,77 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-logind.service
+:manvolnum: 8
+:summary: Login manager
+:aliases: systemd-logind
+
+.. _systemd-logind.service(8):
+
+=========================
+systemd-logind.service(8)
+=========================
+
+Name
+####
+
+systemd-logind.service, systemd-logind — Login manager
+
+Synopsis
+########
+
+:code:`systemd-logind.service`
+
+:code:`/usr/lib/systemd/systemd-logind`
+
+Description
+###########
+
+:code:`systemd-logind` is a system service that manages user logins. It is responsible for:
+
+*    Keeping track of users and sessions, their processes and their idle state. This is implemented by allocating a systemd slice unit for each user below :code:`user.slice`, and a scope unit below it for each concurrent session of a user. Also, a per-user service manager is started as system service instance of :code:`user@.service` for each logged in user.
+
+*    Generating and managing session IDs. If auditing is available and an audit session ID is already set for a session, then this ID is reused as the session ID. Otherwise, an independent session counter is used.
+
+*    Providing `polkit <https://www.freedesktop.org/wiki/Software/polkit>`_-based access for users for operations such as system shutdown or sleep
+
+*    Implementing a shutdown/sleep inhibition logic for applications
+
+*    Handling of power/sleep hardware keys
+
+*    Multi-seat management
+
+*    Session switch management
+
+*    Device access management for users
+
+*    Automatic spawning of text logins (gettys) on virtual console activation and user runtime directory management
+
+*    Scheduled shutdown
+
+*    Sending "wall" messages
+
+User sessions are registered with logind via the :man-pages:`pam_systemd(8)` PAM module.
+
+See :man-pages:`logind.conf(5)` for information about the configuration of this service.
+
+See :ref:`sd-login(3)` for information about the basic concepts of logind such as users, sessions and seats.
+
+See :man-pages:`org.freedesktop.login1(5)` and :man-pages:`org.freedesktop.LogControl1(5)` for information about the D-Bus APIs :code:`systemd-logind` provides.
+
+For more information see `Inhibitor Locks <https://systemd.io/INHIBITOR_LOCKS>`_.
+
+If you are interested in writing a display manager that makes use of logind, please have look at `Writing Display Managers <https://systemd.io/WRITING_DISPLAY_MANAGERS>`_. If you are interested in writing a desktop environment that makes use of logind, please have look at `Writing Desktop Environments <https://systemd.io/WRITING_DESKTOP_ENVIRONMENTS>`_.
+
+Signal
+######
+
+.. systemd:constant:: SIGHUP
+
+   Reloads the service configuration file.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-user-sessions.service(8)`, :man-pages:`loginctl(1)`, :man-pages:`logind.conf(5)`, :man-pages:`pam_systemd(8)`, :ref:`sd-login(3)`, :man-pages:`org.freedesktop.login1(5)`
+
+

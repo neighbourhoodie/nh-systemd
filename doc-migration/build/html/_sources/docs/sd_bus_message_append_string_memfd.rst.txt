@@ -1,0 +1,64 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_append_string_memfd
+:manvolnum: 3
+:summary: Attach a string to a message
+:aliases: sd_bus_message_append_string_iovec, sd_bus_message_append_string_space
+
+.. _sd_bus_message_append_string_memfd(3):
+
+=====================================
+sd_bus_message_append_string_memfd(3)
+=====================================
+
+Name
+####
+
+sd_bus_message_append_string_memfd, sd_bus_message_append_string_iovec, sd_bus_message_append_string_space — Attach a string to a message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_append_string_memfd(sd_bus_message *m,
+	int memfd); .. code-block::
+
+   int sd_bus_message_append_string_iovec(sd_bus_message *m,
+	const struct iovec *iov,
+	unsigned n); .. code-block::
+
+   int sd_bus_message_append_string_space(sd_bus_message *m,
+	size_t size,
+	char **s);
+
+Description
+###########
+
+The functions :code:`sd_bus_message_append_string_memfd()` and :code:`sd_bus_message_append_string_iovec()` can be used to append a single string (item of type "s") to message :code:`m`.
+
+In case of :code:`sd_bus_message_append_string_memfd()`, the contents of :code:`memfd` are the string. They must satisfy the same constraints as described for the "s" type in :ref:`sd_bus_message_append_basic(3)`.
+
+In case of :code:`sd_bus_message_append_string_iovec()`, the payload of :code:`iov` is the string. It must satisfy the same constraints as described for the "s" type in :ref:`sd_bus_message_append_basic(3)`.
+
+The :code:`iov` argument must point to :code:`n` struct iovec structures. Each structure may have the iov_base field set, in which case the memory pointed to will be copied into the message, or unset, in which case a block of spaces (ASCII 32) of length iov_len will be inserted. The memory pointed at by :code:`iov` may be changed after this call.
+
+The :code:`sd_bus_message_append_string_space()` function appends space for a string to message :code:`m`. It behaves similar to :code:`sd_bus_message_append_basic()` with type "s", but instead of copying a string into the message, it returns a pointer to the destination area to the caller in pointer :code:`p`. Space for the string of length :code:`size` plus the terminating :code:`NUL` is allocated.
+
+Return Value
+############
+
+On success, those calls return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+.. include:: sd_bus_message_append_basic.rst
+    :start-after: .. inclusion-marker-do-not-remove errors|
+    :end-before: .. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_append_basic(3)`, `The D-Bus specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_
+
+

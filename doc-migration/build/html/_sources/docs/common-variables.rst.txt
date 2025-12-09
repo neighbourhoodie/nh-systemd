@@ -1,0 +1,199 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+Environment
+###########
+
+.. inclusion-marker-do-not-remove log-level|
+
+.. systemd:var:: $SYSTEMD_LOG_LEVEL
+   :group: environment-variables
+
+      .. inclusion-marker-do-not-remove log-level-body|
+
+      The maximum log level of emitted messages (messages with a higher log level, i.e. less important ones, will be suppressed). Takes a comma-separated list of values. A value may be either one of (in order of decreasing importance) :systemd:constant:`emerg`, :systemd:constant:`alert`, :systemd:constant:`crit`, :systemd:constant:`err`, :systemd:constant:`warning`, :systemd:constant:`notice`, :systemd:constant:`info`, :systemd:constant:`debug`, or an integer in the range 0…7. See :man-pages:`syslog(3)` for more information. Each value may optionally be prefixed with one of :systemd:constant:`console`, :systemd:constant:`syslog`, :systemd:constant:`kmsg` or :systemd:constant:`journal` followed by a colon to set the maximum log level for that specific log target (e.g. :systemd:constant:`SYSTEMD_LOG_LEVEL=debug,console:info` specifies to log at debug level except when logging to the console which should be at info level). Note that the global maximum log level takes priority over any per target maximum log levels.
+
+      .. inclusion-end-marker-do-not-remove log-level-body|
+
+.. inclusion-end-marker-do-not-remove log-level|
+
+.. inclusion-marker-do-not-remove log-color|
+
+.. systemd:var:: $SYSTEMD_LOG_COLOR
+   :group: environment-variables
+
+      .. inclusion-marker-do-not-remove log-color-body|
+
+      A boolean. If true, messages written to the tty will be colored according to priority.
+
+      .. inclusion-end-marker-do-not-remove log-color-body|
+
+   This setting is only useful when messages are written directly to the terminal, because :man-pages:`journalctl(1)` and other tools that display logs will color messages based on the log level on their own.
+
+.. inclusion-end-marker-do-not-remove log-color|
+
+.. inclusion-marker-do-not-remove log-time|
+
+.. systemd:var:: $SYSTEMD_LOG_TIME
+   :group: environment-variables
+
+      .. inclusion-marker-do-not-remove log-time-body|
+
+      A boolean. If true, console log messages will be prefixed with a timestamp.
+
+      .. inclusion-end-marker-do-not-remove log-time-body|
+
+   This setting is only useful when messages are written directly to the terminal or a file, because :man-pages:`journalctl(1)` and other tools that display logs will attach timestamps based on the entry metadata on their own.
+
+.. inclusion-end-marker-do-not-remove log-time|
+
+.. inclusion-marker-do-not-remove log-location|
+
+.. systemd:var:: $SYSTEMD_LOG_LOCATION
+   :group: environment-variables
+
+      .. inclusion-marker-do-not-remove log-location-body|
+
+      A boolean. If true, messages will be prefixed with a filename and line number in the source code where the message originates.
+
+      .. inclusion-end-marker-do-not-remove log-location-body|
+
+   Note that the log location is often attached as metadata to journal entries anyway. Including it directly in the message text can nevertheless be convenient when debugging programs.
+
+.. inclusion-end-marker-do-not-remove log-location|
+
+.. inclusion-marker-do-not-remove log-tid|
+
+.. systemd:var:: $SYSTEMD_LOG_TID
+   :group: environment-variables
+
+      .. inclusion-marker-do-not-remove log-tid-body|
+
+      A boolean. If true, messages will be prefixed with the current numerical thread ID (TID).
+
+      .. inclusion-end-marker-do-not-remove log-tid-body|
+
+   Note that the this information is attached as metadata to journal entries anyway. Including it directly in the message text can nevertheless be convenient when debugging programs.
+
+.. inclusion-end-marker-do-not-remove log-tid|
+
+.. inclusion-marker-do-not-remove log-target|
+
+.. systemd:var:: $SYSTEMD_LOG_TARGET
+   :group: environment-variables
+
+      .. inclusion-marker-do-not-remove log-target-body|
+
+      The destination for log messages. One of :systemd:constant:`console` (log to the attached tty), :systemd:constant:`console-prefixed` (log to the attached tty but with prefixes encoding the log level and "facility", see :man-pages:`syslog(3)`, :systemd:constant:`kmsg` (log to the kernel circular log buffer), :systemd:constant:`journal` (log to the journal), :systemd:constant:`journal-or-kmsg` (log to the journal if available, and to kmsg otherwise), :systemd:constant:`auto` (determine the appropriate log target automatically, the default), :systemd:constant:`null` (disable log output).
+
+      .. inclusion-end-marker-do-not-remove log-target-body|
+
+   .. COMMENT: <constant>syslog</constant>, <constant>syslog-or-kmsg</constant> are deprecated
+
+.. inclusion-end-marker-do-not-remove log-target|
+
+.. inclusion-marker-do-not-remove log-ratelimit-kmsg|
+
+.. systemd:var:: $SYSTEMD_LOG_RATELIMIT_KMSG
+   :group: environment-variables
+
+      .. inclusion-marker-do-not-remove log-ratelimit-kmsg-body|
+
+      Whether to ratelimit kmsg or not. Takes a boolean. Defaults to "true". If disabled, systemd will not ratelimit messages written to kmsg.
+
+      .. inclusion-end-marker-do-not-remove log-ratelimit-kmsg-body|
+
+.. inclusion-end-marker-do-not-remove log-ratelimit-kmsg|
+
+.. inclusion-marker-do-not-remove pager|
+
+.. systemd:var:: $SYSTEMD_PAGER, $PAGER
+   :group: environment-variables
+
+   Pager to use when :systemd:option:`--no-pager` is not given. :systemd:var:`$SYSTEMD_PAGER` is used if set; otherwise :systemd:var:`$PAGER` is used. If neither :systemd:var:`$SYSTEMD_PAGER` nor :systemd:var:`$PAGER` are set, a set of well-known pager implementations is tried in turn, including :man-pages:`less(1)` and :man-pages:`more(1)`, until one is found. If no pager implementation is discovered, no pager is invoked. Setting those environment variables to an empty string or the value "cat" is equivalent to passing :systemd:option:`--no-pager`.
+
+   Note: if :systemd:var:`$SYSTEMD_PAGERSECURE` is not set, :systemd:var:`$SYSTEMD_PAGER` and :systemd:var:`$PAGER` can only be used to disable the pager (with "cat" or ""), and are otherwise ignored.
+
+.. inclusion-end-marker-do-not-remove pager|
+
+.. inclusion-marker-do-not-remove less|
+
+.. systemd:var:: $SYSTEMD_LESS
+   :group: environment-variables
+
+   Override the options passed to :code:`less` (by default "FRSXMK").
+
+   Users might want to change two options in particular:
+
+   .. systemd:constant:: K
+      :group: environment-variables
+
+         This option instructs the pager to exit immediately when :kbd:`Ctrl` + :kbd:`C` is pressed. To allow :code:`less` to handle :kbd:`Ctrl` + :kbd:`C` itself to switch back to the pager command prompt, unset this option.
+
+         If the value of :systemd:var:`$SYSTEMD_LESS` does not include "K", and the pager that is invoked is :code:`less`, :kbd:`Ctrl` + :kbd:`C` will be ignored by the executable, and needs to be handled by the pager.
+
+   .. systemd:constant:: X
+      :group: environment-variables
+
+         This option instructs the pager to not send termcap initialization and deinitialization strings to the terminal. It is set by default to allow command output to remain visible in the terminal even after the pager exits. Nevertheless, this prevents some pager functionality from working, in particular paged output cannot be scrolled with the mouse.
+
+   Note that setting the regular :systemd:var:`$LESS` environment variable has no effect for :code:`less` invocations by systemd tools.
+
+   See :man-pages:`less(1)` for more discussion.
+
+.. inclusion-end-marker-do-not-remove less|
+
+.. inclusion-marker-do-not-remove lesscharset|
+
+.. systemd:var:: $SYSTEMD_LESSCHARSET
+   :group: environment-variables
+
+   Override the charset passed to :code:`less` (by default "utf-8", if the invoking terminal is determined to be UTF-8 compatible).
+
+   Note that setting the regular :systemd:var:`$LESSCHARSET` environment variable has no effect for :code:`less` invocations by systemd tools.
+
+.. inclusion-end-marker-do-not-remove lesscharset|
+
+.. inclusion-marker-do-not-remove lesssecure|
+
+.. systemd:var:: $SYSTEMD_PAGERSECURE
+   :group: environment-variables
+
+   Common pager commands like :man-pages:`less(1)`, in addition to "paging", i.e. scrolling through the output, support opening of or writing to other files and running arbitrary shell commands. When commands are invoked with elevated privileges, for example under :man-pages:`sudo(8)` or :die-net:`pkexec(1)`, the pager becomes a security boundary. Care must be taken that only programs with strictly limited functionality are used as pagers, and unintended interactive features like opening or creation of new files or starting of subprocesses are not allowed. "Secure mode" for the pager may be enabled as described below, *if the pager supports that* (most pagers are not written in a way that takes this into consideration). It is recommended to either explicitly enable "secure mode" or to completely disable the pager using (most pagers are not written in a way that takes this into consideration). It is recommended to either explicitly enable "secure mode" or to completely disable the pager using :systemd:option:`--no-pager` or :systemd:var:`PAGER=cat` when allowing untrusted users to execute commands with elevated privileges.
+
+   This option takes a boolean argument. When set to true, the "secure mode" of the pager is enabled. In "secure mode", :systemd:option:`LESSSECURE=1` will be set when invoking the pager, which instructs the pager to disable commands that open or create new files or start new subprocesses. Currently only :man-pages:`less(1)` is known to understand this variable and implement "secure mode".
+
+   When set to false, no limitation is placed on the pager. Setting :systemd:var:`SYSTEMD_PAGERSECURE=0` or not removing it from the inherited environment may allow the user to invoke arbitrary commands.
+
+   When :systemd:var:`$SYSTEMD_PAGERSECURE` is not set, systemd tools attempt to automatically figure out if "secure mode" should be enabled and whether the pager supports it. "Secure mode" is enabled if the effective UID is not the same as the owner of the login session, see :man-pages:`geteuid(2)` and :ref:`sd_pid_get_owner_uid(3)`, or when running under :man-pages:`sudo(8)` or similar tools (:systemd:var:`$SUDO_UID` is set  [#]_ ). In those cases, :systemd:var:`SYSTEMD_PAGERSECURE=1` will be set and pagers which are not known to implement "secure mode" will not be used at all. Note that this autodetection only covers the most common mechanisms to elevate privileges and is intended as convenience. It is recommended to explicitly set :systemd:var:`$SYSTEMD_PAGERSECURE` or disable the pager.
+
+   Note that if the :systemd:var:`$SYSTEMD_PAGER` or :systemd:var:`$PAGER` variables are to be honoured, other than to disable the pager, :systemd:var:`$SYSTEMD_PAGERSECURE` must be set too.
+
+.. inclusion-end-marker-do-not-remove lesssecure|
+
+.. inclusion-marker-do-not-remove colors|
+
+.. systemd:var:: $SYSTEMD_COLORS
+   :group: environment-variables
+
+   Takes a boolean argument. When true, :code:`systemd` and related utilities will use colors in their output, otherwise the output will be monochrome. Additionally, the variable can take one of the following special values: "16", "256" to restrict the use of colors to the base 16 or 256 ANSI colors, respectively. This can be specified to override the automatic decision based on :systemd:var:`$TERM` and what the console is connected to.
+
+.. inclusion-end-marker-do-not-remove colors|
+
+.. COMMENT: This is not documented on purpose, because it is not clear if $NO_COLOR will become supported widely enough. So let's provide support, but without advertising this. <varlistentry id='no-color'> <term><varname>$NO_COLOR</varname></term> <listitem><para>If set (to any value), and <varname>$SYSTEMD_COLORS</varname> is not set, equivalent to <option>SYSTEMD_COLORS=0</option>. See <ulink url="https://no-color.org/">no-color.org</ulink>.</para> </listitem> </varlistentry>
+
+.. inclusion-marker-do-not-remove urlify|
+
+.. systemd:var:: $SYSTEMD_URLIFY
+   :group: environment-variables
+
+   The value must be a boolean. Controls whether clickable links should be generated in the output for terminal emulators supporting this. This can be specified to override the decision that :code:`systemd` makes based on :systemd:var:`$TERM` and other conditions.
+
+.. inclusion-end-marker-do-not-remove urlify|
+
+
+
+.. rubric:: Footnotes
+
+.. [#] It is recommended for other tools to set and check :systemd:var:`$SUDO_UID` as appropriate, treating it is a common interface.
+ 
+

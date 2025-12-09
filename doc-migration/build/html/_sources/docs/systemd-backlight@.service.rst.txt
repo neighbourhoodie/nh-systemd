@@ -1,0 +1,54 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-backlight@.service
+:manvolnum: 8
+:summary: Load and save the display backlight brightness at boot and shutdown
+:aliases: systemd-backlight
+
+.. _systemd-backlight@.service(8):
+
+=============================
+systemd-backlight@.service(8)
+=============================
+
+Name
+####
+
+systemd-backlight@.service, systemd-backlight — Load and save the display backlight brightness at boot and shutdown
+
+Synopsis
+########
+
+:code:`systemd-backlight@.service`
+
+:code:`/usr/lib/systemd/systemd-backlight` save \[backlight|leds]:DEVICE
+
+:code:`/usr/lib/systemd/systemd-backlight` load \[backlight|leds]:DEVICE
+
+Description
+###########
+
+:code:`systemd-backlight@.service` is a service that restores the brightness of a display backlight or LED (e.g. keyboard backlight) device at early boot, and saves it at shutdown. The brightness is stored in :code:`/var/lib/systemd/backlight/`.
+
+On restoring brightness of a display backlight device, :code:`systemd-backlight` reads :code:`ID_BACKLIGHT_CLAMP` udev property, that takes a boolean value or a percentage (needs to be suffixed with "%", e.g. "30%"). When a percentage is specified, the saved brightness is clamped to a value of at least 1 or the specified percentage of the maximum brightness, whichever is greater. When unset or set to true, the brightness is clamped in the same way with percentage 5%. When false, the saved brightness will not be clamped, and loaded as is.
+
+On restoring brightness of a LED device, :code:`systemd-backlight` reads :code:`ID_LEDS_CLAMP` udev property, that also takes a boolean value or a percentage. When a percentage is specified, the saved brightness is clamped to the specified percentage of the maximum brightness. When set to true, the brightness is clamped in the same way with percentage 5%. When unset or set to false, the saved brightness will not be clamped, and loaded as is.
+
+Kernel Command Line
+###################
+
+:code:`systemd-backlight` understands the following kernel command line parameter:
+
+.. systemd:option:: systemd.restore_state=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. Defaults to "1". If "0", does not restore the backlight settings on boot. However, settings will still be stored on shutdown.
+
+   .. versionadded:: 209
+
+See Also
+########
+
+:ref:`systemd(1)`
+
+

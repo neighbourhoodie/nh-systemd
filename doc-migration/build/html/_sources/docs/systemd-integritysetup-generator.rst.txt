@@ -1,0 +1,35 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-integritysetup-generator
+:manvolnum: 8
+:summary: Unit generator for integrity protected block devices
+
+.. _systemd-integritysetup-generator(8):
+
+===================================
+systemd-integritysetup-generator(8)
+===================================
+
+Name
+####
+
+systemd-integritysetup-generator — Unit generator for integrity protected block devices
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-integritysetup-generator`
+
+Description
+###########
+
+:code:`systemd-integritysetup-generator` is a generator that translates :code:`/etc/integritytab` entries into native systemd units early at boot. This will create :ref:`systemd-integritysetup@.service(8)` units as necessary.
+
+:code:`systemd-integritysetup-generator` implements :ref:`systemd.generator(7)`.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-integritysetup@.service(8)`, :die-net:`integritysetup(8)`
+
+

@@ -1,0 +1,43 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd-varlink
+:manvolnum: 3
+:summary: APIs for Varlink IPC
+
+.. _sd-varlink(3):
+
+=============
+sd-varlink(3)
+=============
+
+Name
+####
+
+sd-varlink — APIs for Varlink IPC
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-varlink.h>`
+
+:code:`pkg-config --cflags --libs libsystemd`
+
+Description
+###########
+
+:code:`sd-varlink.h` is part of :man-pages:`libsystemd(3)` and provides APIs for implementing Varlink IPC clients and services. See `<https://varlink.org/>`_ for more information about Varlink IPC.
+
+Varlink IPC uses `JSON <https://json.org/>`_ as marshalling format. The sd-varlink API relies on the :ref:`sd-json(3)` API for JSON serialization, deserialization and manipulation.
+
+Canonical encoding rules: sd-varlink omits the ""parameters"" member on the wire in replies, errors, and notifications when there are no parameters to transmit. This reduces message size and avoids ambiguity. Receivers must be tolerant and accept any of the following encodings for the absence of parameters: an omitted ""parameters"" key (preferred), a JSON "null" value, or an empty object "{}". When decoding, sd-varlink treats JSON "null" as if the member was omitted.
+
+The :man-pages:`varlinkctl(1)` tool makes the functionality implemented by sd-varlink available from the command line.
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd-json(3)`, :man-pages:`varlinkctl(1)`, :ref:`sd-bus(3)`, :die-net:`pkg-config(1)`
+
+

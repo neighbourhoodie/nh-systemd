@@ -1,0 +1,64 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-machined.service
+:manvolnum: 8
+:summary: Virtual machine and container registration manager
+:aliases: systemd-machined
+
+.. _systemd-machined.service(8):
+
+===========================
+systemd-machined.service(8)
+===========================
+
+Name
+####
+
+systemd-machined.service, systemd-machined — Virtual machine and container registration manager
+
+Synopsis
+########
+
+:code:`systemd-machined.service`
+
+:code:`/usr/lib/systemd/systemd-machined`
+
+Description
+###########
+
+:code:`systemd-machined` is a system service that keeps track of locally running virtual machines and containers.
+
+:code:`systemd-machined` is useful for registering and keeping track of both OS containers (containers that share the host kernel but run a full init system of their own and behave in most regards like a full virtual operating system rather than just one virtualized app) and full virtual machines (virtualized hardware running normal operating systems and possibly different kernels).
+
+:code:`systemd-machined` should *not* be used for registering/keeping track of application sandbox containers. A be used for registering/keeping track of application sandbox containers. A *machine* in the context of in the context of :code:`systemd-machined` is supposed to be an abstract term covering both OS containers and full virtual machines, but not application sandboxes.
+
+Machines registered with machined are exposed in various ways in the system. For example: *    Tools like :man-pages:`ps(1)` will show to which machine a specific process belongs in a column of its own, and so will `gnome-system-monitor <https://help.gnome.org/users/gnome-system-monitor/>`_ or :ref:`systemd-cgls(1)`.
+
+*    systemd's various tools (:man-pages:`systemctl(1)`, :man-pages:`journalctl(1)`, :man-pages:`loginctl(1)`, :man-pages:`hostnamectl(1)`, :man-pages:`timedatectl(1)`, :man-pages:`localectl(1)`, :man-pages:`machinectl(1)`, ...) support the :code:`-M` switch to operate on local containers instead of the host system.
+
+*    :code:`systemctl list-machines` will show the system state of all local containers, connecting to the container's init system for that.
+
+*    systemctl's :code:`--recursive` switch has the effect of not only showing the locally running services, but recursively showing the services of all registered containers.
+
+*    The :code:`machinectl` command provides access to a number of useful operations on registered containers, such as introspecting them, rebooting, shutting them down, and getting a login prompt on them.
+
+*    The :ref:`sd-bus(3)` library exposes the :ref:`sd_bus_open_system_machine(3)` call to connect to the system bus of any registered container.
+
+*    The :man-pages:`nss-mymachines(8)` module makes sure all registered containers can be resolved via normal glibc :man-pages:`gethostbyname(3)` or :man-pages:`getaddrinfo(3)` calls.
+
+See :ref:`systemd-nspawn(1)` for some examples on how to run containers with OS tools.
+
+If you are interested in writing a VM or container manager that makes use of machined, please have look at `Writing Virtual Machine or Container Managers <https://systemd.io/WRITING_VM_AND_CONTAINER_MANAGERS>`_. Also see the `New Control Group Interfaces <https://systemd.io/CONTROL_GROUP_INTERFACE>`_.
+
+The daemon provides both a C library interface (which is shared with :ref:`systemd-logind.service(8)`) as well as a D-Bus interface and a Varlink interface. The library interface may be used to introspect and watch the state of virtual machines/containers. The bus interface provides the same but in addition may also be used to register or terminate machines. The Varlink interface may be used to register machines with optional extensions, e.g. with an SSH key / address; it can be queried with :code:`varlinkctl introspect /run/systemd/machine/io.systemd.Machine io.systemd.Machine`. For more information please consult :ref:`sd-login(3)` and :man-pages:`org.freedesktop.machine1(5)` and :man-pages:`org.freedesktop.LogControl1(5)`.
+
+A small companion daemon :ref:`systemd-importd.service(8)` is also available, which implements importing, exporting, and downloading of container and VM images.
+
+For each container registered with :code:`systemd-machined.service` that employs user namespacing, users/groups are synthesized for the used UIDs/GIDs. These are made available to the system using the `User/Group Record Lookup API via Varlink <https://systemd.io/USER_GROUP_API>`_, and thus may be resolved with :man-pages:`userdbctl(1)` or the usual glibc NSS calls.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`machinectl(1)`, :ref:`systemd-nspawn(1)`, :man-pages:`nss-mymachines(8)`, :ref:`systemd.special(7)`, :man-pages:`org.freedesktop.machine1(5)`, :man-pages:`ssh(1)`
+
+

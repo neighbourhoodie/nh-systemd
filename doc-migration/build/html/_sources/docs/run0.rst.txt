@@ -1,0 +1,252 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: run0
+:manvolnum: 1
+:summary: Elevate privileges
+
+.. _run0(1):
+
+=======
+run0(1)
+=======
+
+Name
+####
+
+run0 — Elevate privileges
+
+Synopsis
+########
+
+:code:`run0 [OPTIONS...] [COMMAND...]`
+
+Description
+###########
+
+:code:`run0` may be used to temporarily and interactively acquire elevated or different privileges. It serves a similar purpose as :man-pages:`sudo(8)`, but operates differently in a couple of key areas:
+
+*    No execution or security context credentials are inherited from the caller into the invoked commands, as they are invoked from a fresh, isolated service forked off by the service manager.
+
+*    Authentication takes place via `polkit <https://www.freedesktop.org/wiki/Software/polkit>`_, thus isolating the authentication prompt from the terminal (if possible).
+
+*    An independent pseudo-tty is allocated for the invoked command, detaching its lifecycle and isolating it for security.
+
+*    No SetUID/SetGID file access bit functionality is used for the implementation.
+
+Altogether this should provide a safer and more robust alternative to the :code:`sudo` mechanism, in particular in OS environments where SetUID/SetGID support is not available (for example by setting the :code:`NoNewPrivileges=` variable in :ref:`systemd-system.conf(5)`).
+
+Any session invoked via :code:`run0` will run through the "systemd-run0" PAM stack.
+
+Note that :code:`run0` is implemented as an alternative multi-call invocation of :ref:`systemd-run(1)`. That is, :code:`run0` is a symbolic link to :code:`systemd-run` executable file, and it behaves as :code:`run0` if it is invoked through the symbolic link, otherwise behaves as :code:`systemd-run`.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --unit=
+
+   Use this unit name instead of an automatically generated one.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --property=
+
+   Sets a property of the service unit that is created. This option takes an assignment in the same format as :man-pages:`systemctl(1)`'s :code:`set-property` command.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --description=
+
+   Provide a description for the service unit that is invoked. If not specified, the command itself will be used as a description. See :code:`Description=` in :ref:`systemd.unit(5)`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --slice=
+
+   Make the new :code:`.service` unit part of the specified slice, instead of :code:`user.slice`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --slice-inherit
+
+   Make the new :code:`.service` unit part of the slice the :code:`run0` itself has been invoked in. This option may be combined with :code:`--slice=`, in which case the slice specified via :code:`--slice=` is placed within the slice the :code:`run0` command is invoked in.
+
+   Example: consider :code:`run0` being invoked in the slice :code:`foo.slice`, and the :code:`--slice=` argument is :code:`bar`. The unit will then be placed under :code:`foo-bar.slice`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --user=, -u, --group=, -g
+
+   Switches to the specified user/group. If not specified defaults to "root", unless :code:`--area=` or :code:`--empower` are used (see below), in which case this defaults to the invoking user.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --nice=
+
+   Runs the invoked session with the specified nice level.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --chdir=, -D
+
+   Runs the invoked session with the specified working directory. If not specified defaults to the client's current working directory if switching to the root user, or the target user's home directory otherwise.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --via-shell
+
+   Invokes the target user's login shell and runs the specified command (if any) via it.
+
+   .. versionadded:: 258
+
+.. systemd:option:: -i
+
+   Shortcut for :code:`--via-shell --chdir='~'`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --setenv=NAME[=VALUE]
+
+   Runs the invoked session with the specified environment variable set. This parameter may be used more than once to set multiple variables. When "=" and :emphasis:`VALUE` are omitted, the value of the variable with the same name in the invoking environment will be used.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --background=COLOR
+
+   Change the terminal background color to the specified ANSI color as long as the session lasts. If not specified, the background will be tinted in a reddish tone when operating as root, and in a yellowish tone when operating under another UID, as reminder of the changed privileges. The color specified should be an ANSI X3.64 SGR background color, i.e. strings such as "40", "41", …, "47", "48;2;…", "48;5;…". See `ANSI Escape Code (Wikipedia) <https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters>`_ for details. Set to an empty string to disable.
+
+   Example: "--background=44" for a blue background.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --pty, --pty-late, --pipe
+
+   Request allocation of a pseudo TTY for the :code:`run0` session (in case of :code:`--pty` or :code:`--pty-late`), or request passing the caller's STDIO file descriptors directly through (in case of :code:`--pipe`). :code:`--pty-late` is very similar to :code:`--pty` but begins the TTY processing only once unit startup is complete, leaving input to any passwords/polkit agents until that time. If neither switch is specified, or if both :code:`--pipe` and one of :code:`--pty`/:code:`--pty-late` are specified, the mode will be picked automatically: if standard input, standard output, and standard error output are all connected to a TTY then a pseudo TTY is allocated (in :code:`--pty-late` mode unless :code:`--no-ask-password` is specified in which case :code:`--pty` is selected), otherwise the relevant file descriptors are passed through directly.
+
+      .. inclusion-marker-do-not-remove v257|
+
+      :code:`--pty` and :code:`--pipe` were added in v257.
+
+      .. inclusion-end-marker-do-not-remove v257|
+
+      .. inclusion-marker-do-not-remove v258|
+
+      :code:`--pty-late` was added in v258.
+
+      .. inclusion-end-marker-do-not-remove v258|
+
+.. systemd:option:: --shell-prompt-prefix=STRING
+
+   Set a shell prompt prefix string. This ultimately controls the :code:`$SHELL_PROMPT_PREFIX` environment variable for the invoked program, which is typically imported into the shell prompt. By default – if emojis are supported –, a superhero emoji is shown (🦸). This default may also be changed (or turned off) by passing the :code:`$SYSTEMD_RUN_SHELL_PROMPT_PREFIX` environment variable to :code:`run0`, see below. Set to an empty string to disable shell prompt prefixing.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --lightweight=BOOLEAN
+
+   Controls whether to activate the per-user service manager for the target user. By default if the target user is "root" or a system user the per-user service manager is not activated as effect of the :code:`run0` invocation, otherwise it is.
+
+   This ultimately controls the :code:`$XDG_SESSION_CLASS` environment variable :man-pages:`pam_systemd(8)` respects.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --area=AREA
+
+   Controls the "area" of the target account to log into. Areas are secondary home directories within the primary home directory of the target user, i.e. logging into area "foobar" of an account translates to :code:`$HOME` being set to :code:`~/Areas/foobar` on login.
+
+   If this option is used, the default user to transition to changes from root to the calling user's (but :code:`--user=` takes precedence, see above). Or in other words, just specifying an area without a user is a mechanism to create a new session of the calling user, just with a different area.
+
+   This ultimately controls the :code:`$XDG_AREA` environment variable :man-pages:`pam_systemd(8)` respects.
+
+   For details on the area concept see :man-pages:`pam_systemd_home(8)`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: --empower
+
+   If specified, run0 will elevate the privileges of the selected user (using :code:`--user=`) or the current user if no user is explicitly selected. Currently this means we give the invoked process all available capabilities and add the the "empower" group as a supplemental group (for which all polkit actions are allowed by default), but other privileges may be granted in the future as well when using this option.
+
+   .. versionadded:: 259
+
+.. systemd:option:: --same-root-dir
+
+   Execute the :code:`run0` session in the same root directory that the :code:`run0` command is executed in.
+
+   .. versionadded:: 259
+
+.. systemd:option:: --machine=
+
+   Execute operation in a local container. Specify a container name to connect to.
+
+   .. versionadded:: 256
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+All command line arguments after the first non-option argument become part of the command line of the launched process. If no command line is specified an interactive shell is invoked. The shell to invoke may be controlled through :code:`--via-shell` - when specified the target user's shell is used - or :code:`--setenv=SHELL=…`. By default, the *originating user's* shell is executed if operating locally, or shell is executed if operating locally, or :code:`/bin/sh` when operating with :code:`--machine=`.
+
+Note that unlike :code:`sudo`, :code:`run0` always spawns shells with login shell semantics, regardless of :code:`-i`.
+
+Exit status
+###########
+
+On success, 0 is returned. If :code:`run0` failed to start the session or the specified command fails, a non-zero return value will be returned.
+
+Environment Variables
+#####################
+
+As with :code:`systemd-run`, the session will inherit the system environment from the service manager. In addition, the following environment variables will be set:
+
+.. systemd:var:: $TERM
+
+   Copied from the :code:`$TERM` of the caller. Can be overridden with :code:`--setenv=`
+
+   .. versionadded:: 256
+
+.. systemd:var:: $SUDO_USER
+
+   Set to the username of the originating user.
+
+   .. versionadded:: 256
+
+.. systemd:var:: $SUDO_UID
+
+   Set to the numeric UNIX user id of the originating user.
+
+   .. versionadded:: 256
+
+.. systemd:var:: $SUDO_GID
+
+   Set to the primary numeric UNIX group id of the originating session.
+
+   .. versionadded:: 256
+
+.. systemd:var:: $SHELL_PROMPT_PREFIX
+
+   By default, set to the superhero emoji (if supported), but may be overridden with the :code:`$SYSTEMD_RUN_SHELL_PROMPT_PREFIX` environment variable (see below), or the :code:`--shell-prompt-prefix=` switch (see above).
+
+   .. versionadded:: 257
+
+The following variables may be passed to :code:`run0`:
+
+.. systemd:var:: $SYSTEMD_RUN_SHELL_PROMPT_PREFIX
+
+   If set, overrides the default shell prompt prefix that :code:`run0` sets for the invoked shell (the superhero emoji). Set to an empty string to disable shell prompt prefixing.
+
+   .. versionadded:: 257
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-run(1)`, :man-pages:`sudo(8)`, :man-pages:`machinectl(1)`, :man-pages:`pam_systemd(8)`
+
+

@@ -1,0 +1,84 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_add_node_enumerator
+:manvolnum: 3
+:summary: Add a node enumerator for a D-Bus object path prefix
+
+.. _sd_bus_add_node_enumerator(3):
+
+=============================
+sd_bus_add_node_enumerator(3)
+=============================
+
+Name
+####
+
+sd_bus_add_node_enumerator — Add a node enumerator for a D-Bus object path prefix
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   typedef int (*sd_bus_node_enumerator_t)(sd_bus *bus,
+	const char *prefix,
+	void *userdata,
+	char ***ret_nodes,
+	sd_bus_error *ret_error); .. code-block::
+
+   int sd_bus_add_node_enumerator(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *path,
+	sd_bus_node_enumerator_t callback,
+	void *userdata);
+
+Description
+###########
+
+:code:`sd_bus_add_node_enumerator()` adds a D-Bus node enumerator for the given path prefix. The given callback is called to enumerate all the available objects with the given path prefix when required (e.g. when :code:`org.freedesktop.DBus.Introspectable.Introspect` or :code:`org.freedesktop.DBus.ObjectManager.GetManagedObjects` are called on a D-Bus service managed by sd-bus).
+
+:code:`callback` is called with the path and userdata pointer registered with :code:`sd_bus_add_node_enumerator()`. When called, it should store all the child object paths of the given path prefix in :code:`ret_nodes` with a NULL terminator item. The callback should return a non-negative value on success. If an error occurs, it can either return a negative integer, set :code:`ret_error` to a non-empty error or do both. Any errors returned by the callback are encoded as D-Bus errors and sent back to the caller. Errors in :code:`ret_error` take priority over negative return values.
+
+Note that a node enumerator callback will only ever be called for a single path prefix and hence, for normal operation, :code:`prefix` can be ignored. Also, a node enumerator is only used to enumerate the available child objects under a given prefix. To install a handler for a set of dynamic child objects, use :ref:`sd_bus_add_fallback_vtable(3)`.
+
+When :code:`sd_bus_add_node_enumerator()` succeeds, a slot is created internally. If the output parameter :emphasis:`slot` is :code:`NULL`, a "floating" slot object is created, see :ref:`sd_bus_slot_set_floating(3)`. Otherwise, a pointer to the slot object is returned. In that case, the reference to the slot object should be dropped when the node enumerator is not needed anymore, see :ref:`sd_bus_slot_unref(3)`.
+
+Return Value
+############
+
+On success, :code:`sd_bus_add_node_enumerator()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   One of the required parameters is :code:`NULL` or :code:`path` is not a valid object path.
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+.. systemd:option:: -ECHILD
+
+   The bus was created in a different process, library or module instance.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_node_enumerator_t()` and :code:`sd_bus_add_node_enumerator()` were added in version 221.
+
+See Also
+########
+
+:ref:`sd-bus(3)`, :man-pages:`busctl(1)`, :ref:`sd_bus_add_fallback_vtable(3)`, :ref:`sd_bus_slot_unref(3)`
+
+

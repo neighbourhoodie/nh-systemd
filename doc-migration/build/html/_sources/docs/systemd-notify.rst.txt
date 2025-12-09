@@ -1,0 +1,184 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-notify
+:manvolnum: 1
+:summary: Notify service manager about start-up completion and other daemon status changes
+
+.. _systemd-notify(1):
+
+=================
+systemd-notify(1)
+=================
+
+Name
+####
+
+systemd-notify — Notify service manager about start-up completion and other daemon status changes
+
+Synopsis
+########
+
+:code:`systemd-notify [OPTIONS...] [VARIABLE=VALUE...]`
+
+:code:`systemd-notify --exec [OPTIONS...] [VARIABLE=VALUE...] ; -- {CMDLINE}`
+
+:code:`systemd-notify --fork [OPTIONS...] -- {CMDLINE}`
+
+Description
+###########
+
+:code:`systemd-notify` may be called by service scripts to notify the invoking service manager about status changes. It can be used to send arbitrary information, encoded in an environment-block-like list of strings. Most importantly, it can be used for start-up completion notification.
+
+This is mostly just a wrapper around :code:`sd_notify()` and makes this functionality available to shell scripts. For details see :ref:`sd_notify(3)`.
+
+The command line may carry a list of environment variables to send as part of the status update.
+
+Note that systemd will refuse reception of status updates from this command unless :code:`NotifyAccess=` is appropriately set for the service unit this command is called from. See :ref:`systemd.service(5)` for details.
+
+Note that :code:`sd_notify()` notifications may be attributed to units correctly only if either the sending process is still around at the time the service manager processes the message, or if the sending process is explicitly runtime-tracked by the service manager. The latter is the case if the service manager originally forked off the process, i.e. on all processes that match :code:`NotifyAccess=`:code:`main` or :code:`NotifyAccess=`:code:`exec`. Conversely, if an auxiliary process of the unit sends an :code:`sd_notify()` message and immediately exits, the service manager might not be able to properly attribute the message to the unit, and thus will ignore it, even if :code:`NotifyAccess=`:code:`all` is set for it. To address this :code:`systemd-notify` will wait until the notification message has been processed by the service manager. When :code:`--no-block` is used, this synchronization for reception of notifications is disabled, and hence the aforementioned race may occur if the invoking process is not the service manager or spawned by the service manager.
+
+:code:`systemd-notify` will first attempt to invoke :code:`sd_notify()` pretending to have the PID of the parent process of :code:`systemd-notify` (i.e. the invoking process). This will only succeed when invoked with sufficient privileges. On failure, it will then fall back to invoking it under its own PID. This behaviour is useful in order that when the tool is invoked from a shell script the shell process — and not the :code:`systemd-notify` process — appears as sender of the message, which in turn is helpful if the shell process is the main process of a service, due to the limitations of :code:`NotifyAccess=`:code:`all`. Use the :code:`--pid=` switch to tweak this behaviour.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --ready
+
+   Inform the invoking service manager about service start-up or configuration reload completion. This is equivalent to :code:`systemd-notify READY=1`. For details about the semantics of this option see :ref:`sd_notify(3)`.
+
+.. systemd:option:: --reloading
+
+   Inform the invoking service manager about the beginning of a configuration reload cycle. This is equivalent to :code:`systemd-notify RELOADING=1` (but implicitly also sets a :code:`MONOTONIC_USEC=` field as required for :code:`Type=notify-reload` services, see :ref:`systemd.service(5)` for details). For details about the semantics of this option see :ref:`sd_notify(3)`.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --stopping
+
+   Inform the invoking service manager about the beginning of the shutdown phase of the service. This is equivalent to :code:`systemd-notify STOPPING=1`. For details about the semantics of this option see :ref:`sd_notify(3)`.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --pid=
+
+   Inform the service manager about the main PID of the service. Takes a PID as argument. If the argument is specified as "auto" or omitted, the PID of the process that invoked :code:`systemd-notify` is used, except if that's the service manager. If the argument is specified as "self", the PID of the :code:`systemd-notify` command itself is used, and if "parent" is specified the calling process' PID is used — even if it is the service manager. :code:`--pid=auto` is equivalent to :code:`systemd-notify --pid=$PID`. For details about the semantics of this option see :ref:`sd_notify(3)`.
+
+   :code:`systemd-notify` will first attempt to invoke :code:`sd_notify()` pretending to have the PID specified with :code:`--pid=`. This will only succeed when invoked with sufficient privileges. On failure, it will then fall back to invoking it under its own PID. Effectively, this means that a privileged invocation of :code:`systemd-notify --pid=` may circumvent :code:`NotifyAccess=main` or :code:`NotifyAccess=exec` restrictions enforced for a service.
+
+   If this switch is used in an unprivileged :code:`systemd-notify` invocation from a process that shall become the new main process of a service — and which is not the process forked off by the service manager (or the current main process) —, then it is essential to set :code:`NotifyAccess=all` in the service unit file, or otherwise the notification will be ignored for security reasons. See :ref:`systemd.service(5)` for details.
+
+.. systemd:option:: --uid=USER
+
+   Set the user ID to send the notification from. Takes a UNIX user name or numeric UID. When specified the notification message will be sent with the specified UID as sender, in place of the user the command was invoked as. This option requires sufficient privileges in order to be able manipulate the user identity of the process.
+
+   .. versionadded:: 237
+
+.. systemd:option:: --status=
+
+   Send a free-form human-readable status string for the daemon to the service manager. This option takes the status string as argument. This is equivalent to :code:`systemd-notify STATUS=…`. For details about the semantics of this option see :ref:`sd_notify(3)`. This information is shown in :man-pages:`systemctl(1)`'s :code:`status` output, among other places.
+
+.. systemd:option:: --booted
+
+   Returns 0 if the system was booted up with systemd, non-zero otherwise. If this option is passed, no message is sent. This option is hence unrelated to the other options. For details about the semantics of this option, see :ref:`sd_booted(3)`. An alternate way to check for this state is to call :man-pages:`systemctl(1)` with the :code:`is-system-running` command. It will output "offline" if the system was not booted with systemd, though the return value has a different meaning.
+
+.. systemd:option:: --no-block
+
+   Do not synchronously wait for the requested operation to finish. Use of this option is only recommended when :code:`systemd-notify` is spawned by the service manager, or when the invoking process is directly spawned by the service manager and has enough privileges to allow :code:`systemd-notify` to send the notification on its behalf. Sending notifications with this option set is prone to race conditions in all other cases.
+
+   .. versionadded:: 246
+
+.. systemd:option:: --exec
+
+   If specified :code:`systemd-notify` will execute another command line after it completed its operation, replacing its own process. If used, the list of assignments to include in the message sent must be followed by a ";" character (as separate argument), followed by the command line to execute. This permits "chaining" of commands, i.e. issuing one operation, followed immediately by another, without changing PIDs.
+
+   Note that many shells interpret ";" as their own separator for command lines, hence when :code:`systemd-notify` is invoked from a shell the semicolon must usually be escaped as "\\;".
+
+   .. versionadded:: 254
+
+.. systemd:option:: --fd=
+
+   Send a file descriptor along with the notification message. This is useful when invoked in services that have the :code:`FileDescriptorStoreMax=` setting enabled, see :ref:`systemd.service(5)` for details. The specified file descriptor must be passed to :code:`systemd-notify` when invoked. This option may be used multiple times to pass multiple file descriptors in a single notification message.
+
+   To use this functionality from a :man-pages:`bash(1)` shell, use an expression like the following:
+
+     .. code-block:: sh
+
+        systemd-notify --fd=4 --fd=5 4</some/file 5</some/other/file
+
+   .. versionadded:: 254
+
+.. systemd:option:: --fdname=
+
+   Set a name to assign to the file descriptors passed via :code:`--fd=` (see above). This controls the "FDNAME=" field. This setting may only be specified once, and applies to all file descriptors passed. Invoke this tool multiple times in case multiple file descriptors with different file descriptor names shall be submitted.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --fork
+
+   Instead of sending a notification message, fork off a command line and wait until a "READY=1" message is received from it. In other words: this makes :code:`systemd-notify` the receiver of notification messages instead of the sender, swapping roles. This is useful to quickly fork off a process that implements the :code:`sd_notify()` protocol from a shell script. The invoked command line will have standard input and standard output connected to :code:`/dev/null`, but standard error will be inherited from the invoking process. The numeric process ID is written to standard output by :code:`systemd-notify` (unless :code:`--quiet` is specified), which may be used to later terminate the forked off process.
+
+   Note that processes forked off like this will likely remain running after :code:`systemd-notify` already returned, which hence will result in them being reparented to the closest process reaper process, i.e. typically the per-user or system service manager.
+
+   Note that this option should not be used to invoke full services ad-hoc, use :code:`systemd-run` for that.
+
+   Also note that when invoked with this switch :code:`systemd-notify` will exit successfully under two distinction conditions: 1.       :code:`systemd-notify` received a "READY=1" notification from the child it just forked off.
+
+   2.       The child process exited cleanly (with exit status zero) before sending "READY=1".
+
+   Example use:
+
+     .. code-block:: sh
+
+        # PID=$(systemd-notify --fork -- mycommand)
+        …
+        kill "$PID"
+        unset PID
+
+   .. versionadded:: 258
+
+.. systemd:option:: --quiet, -q
+
+   Turn off output of the numeric process ID when :code:`--fork` is used.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+Example
+#######
+
+Start-up Notification and Status Updates
+----------------------------------------
+
+A simple shell daemon that sends start-up notifications after having set up its communication channel. During runtime it sends further status updates to the init system:
+
+.. code-block:: sh
+
+   #!/bin/sh
+   mkfifo /tmp/waldo
+   systemd-notify --ready --status="Waiting for data…"
+   while : ; do
+           read -r a < /tmp/waldo
+           systemd-notify --status="Processing $a"
+           # Do something with $a …
+           systemd-notify --status="Waiting for data…"
+   done
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.service(5)`, :ref:`sd_notify(3)`, :ref:`sd_booted(3)`
+
+

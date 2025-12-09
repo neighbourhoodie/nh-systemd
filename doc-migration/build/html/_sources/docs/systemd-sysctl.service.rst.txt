@@ -1,0 +1,143 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-sysctl.service
+:manvolnum: 8
+:summary: Configure kernel parameters at boot
+:aliases: systemd-sysctl
+
+.. _systemd-sysctl.service(8):
+
+=========================
+systemd-sysctl.service(8)
+=========================
+
+Name
+####
+
+systemd-sysctl.service, systemd-sysctl — Configure kernel parameters at boot
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/systemd-sysctl [OPTIONS...] [<CONFIGFILE>...]`
+
+:code:`systemd-sysctl.service`
+
+Description
+###########
+
+:code:`systemd-sysctl.service` is an early boot service that configures :man-pages:`sysctl(8)` kernel parameters by invoking :code:`/usr/lib/systemd/systemd-sysctl`.
+
+When invoked with no arguments, :code:`/usr/lib/systemd/systemd-sysctl` applies all directives from configuration files listed in :man-pages:`sysctl.d(5)`. When invoked with positional arguments, the configuration specified by the command line arguments is executed. If the string "-" is specified instead of a filename, the configuration is read from standard input. If the argument is a file name (without any slashes), all configuration directories are searched for a matching file and the file found that has the highest priority is executed. If the argument is a path, that file is used directly without searching the configuration directories for any other matching file.
+
+In addition, :code:`--prefix=` option may be used to limit which sysctl settings are applied.
+
+See :man-pages:`sysctl.d(5)` for information about the configuration of sysctl settings. After sysctl configuration is changed on disk, it must be written to the files in :code:`/proc/sys/` before it takes effect. It is possible to update specific settings, or simply to reload all configuration, see Examples below.
+
+Options
+#######
+
+.. inclusion-marker-do-not-remove prefix|
+
+.. systemd:option:: --prefix=
+
+   Only apply rules with the specified prefix.
+
+   .. versionadded:: 230
+
+.. inclusion-end-marker-do-not-remove prefix|
+
+.. inclusion-marker-do-not-remove strict|
+
+.. systemd:option:: --strict=
+
+   Always return non-zero exit code on failure (including invalid sysctl variable name and insufficient permissions), unless the sysctl variable name is prefixed with a "-" character.
+
+   .. versionadded:: 252
+
+.. inclusion-end-marker-do-not-remove strict|
+
+.. systemd:option:: --inline
+
+   Treat each positional argument as a separate configuration line instead of a file name.
+
+   .. versionadded:: 259
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove cat-config|
+    :end-before: .. inclusion-end-marker-do-not-remove cat-config|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove tldr|
+    :end-before: .. inclusion-end-marker-do-not-remove tldr|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Credentials
+###########
+
+:code:`systemd-sysctl` supports the service credentials logic as implemented by :code:`ImportCredential=`/:code:`LoadCredential=`/:code:`SetCredential=` (see :ref:`systemd.exec(5)` for details). The following credentials are used when passed in:
+
+.. systemd:option:: sysctl.extra
+   :group: system-credentials
+
+   The contents of this credential may contain additional lines to operate on. The credential contents should follow the same format as any other :code:`sysctl.d/` drop-in configuration file. If this credential is passed it is processed after all of the drop-in files read from the file system. The settings configured in the credential hence take precedence over those in the file system.
+
+   .. versionadded:: 252
+
+Note that by default the :code:`systemd-sysctl.service` unit file is set up to inherit the "sysctl.extra" credential from the service manager.
+
+Examples
+########
+
+Reset all sysctl settings
+-------------------------
+
+.. code-block:: sh
+
+   systemctl restart systemd-sysctl
+
+View coredump handler configuration
+-----------------------------------
+
+.. code-block:: sh
+
+   # sysctl kernel.core_pattern
+   kernel.core_pattern = |/usr/libexec/abrt-hook-ccpp %s %c %p %u %g %t %P %I
+
+Update coredump handler configuration
+-------------------------------------
+
+.. code-block:: sh
+
+   # /usr/lib/systemd/systemd-sysctl --prefix kernel.core_pattern
+
+This searches all the directories listed in :man-pages:`sysctl.d(5)` for configuration files and writes :code:`/proc/sys/kernel/core_pattern`.
+
+Update coredump handler configuration according to a specific file
+------------------------------------------------------------------
+
+.. code-block:: sh
+
+   # /usr/lib/systemd/systemd-sysctl 50-coredump.conf
+
+This applies all the settings found in :code:`50-coredump.conf`. Either :code:`/etc/sysctl.d/50-coredump.conf`, or :code:`/run/sysctl.d/50-coredump.conf`, or :code:`/usr/lib/sysctl.d/50-coredump.conf` will be used, in the order of preference.
+
+See :man-pages:`sysctl(8)` for various ways to directly apply sysctl settings.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`sysctl.d(5)`, :man-pages:`sysctl(8)`
+
+

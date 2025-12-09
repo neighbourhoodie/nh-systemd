@@ -1,0 +1,83 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_read_strv
+:manvolnum: 3
+:summary: Access an array of strings in a message
+:aliases: sd_bus_message_read_strv_extend
+
+.. _sd_bus_message_read_strv(3):
+
+===========================
+sd_bus_message_read_strv(3)
+===========================
+
+Name
+####
+
+sd_bus_message_read_strv, sd_bus_message_read_strv_extend — Access an array of strings in a message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_read_strv(sd_bus_message *m,
+	char ***l); .. code-block::
+
+   int sd_bus_message_read_strv_extend(sd_bus_message *m,
+	char ***l);
+
+Description
+###########
+
+:code:`sd_bus_message_read_strv()` reads an array of string-like items from the message :code:`m`. The "read pointer" in the message must be right before an array of strings (D-Bus type "as"), object paths (D-Bus type "ao"), or signatures (D-Bus type "ag"). On success, a pointer to a :code:`NULL`-terminated array of strings (strv) is returned in the output parameter :code:`l`. Note that ownership of this array is transferred to the caller. Hence, the caller is responsible for freeing this array and its contents. Also note that as a matter of optimization, if an empty array is encountered a :code:`NULL` pointer might be returned here, and should be considered equivalent to an array with zero entries.
+
+:code:`sd_bus_message_read_strv_extend()` is similar, but the second parameter is an input-output parameter. If :code:`*l` is :code:`NULL`, if behaves identically to :code:`sd_bus_message_read_strv()`. Otherwise, :code:`*l` must point to a strv, which will be reallocated and extended with additional strings. This function is particularly useful when combining multiple lists of strings in a message or messages into a single array of strings.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   :code:`m` or :code:`l` are :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EPERM
+
+   The message is not sealed.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -EBADMSG
+
+   The message cannot be parsed.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENXIO
+
+   The message "read pointer" is not right before an array of the appropriate type.
+
+   .. versionadded:: 248
+
+History
+#######
+
+:code:`sd_bus_message_read_strv()` was added in version 246.
+
+:code:`sd_bus_message_read_strv_extend()` was added in version 252.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_read(3)`
+
+

@@ -1,0 +1,44 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-hibernate-resume.service
+:manvolnum: 8
+:summary: Resume from hibernation
+:aliases: systemd-hibernate-clear.service, systemd-hibernate-resume
+
+.. _systemd-hibernate-resume.service(8):
+
+===================================
+systemd-hibernate-resume.service(8)
+===================================
+
+Name
+####
+
+systemd-hibernate-resume.service, systemd-hibernate-clear.service, systemd-hibernate-resume — Resume from hibernation
+
+Synopsis
+########
+
+:code:`systemd-hibernate-resume.service`
+
+:code:`systemd-hibernate-clear.service`
+
+:code:`/usr/lib/systemd/systemd-hibernate-resume`
+
+Description
+###########
+
+:code:`systemd-hibernate-resume.service` initiates the resume from hibernation.
+
+:code:`systemd-hibernate-resume` only supports the in-kernel hibernation implementation, see `Swap suspend <https://docs.kernel.org/power/swsusp.html>`_. Internally, it works by writing the major:minor of selected device node to :code:`/sys/power/resume`, along with the offset in memory pages (:code:`/sys/power/resume_offset`) if supported.
+
+The resume device node is either passed directly through arguments, or automatically acquired from kernel command line options and/or :code:`HibernateLocation` EFI variable. The latter will normally be cleared by :code:`systemd-hibernate-resume.service` on resumption. If a stale variable is detected, it would be cleared by :code:`systemd-hibernate-clear.service`.
+
+Failing to initiate a resume is not an error condition. It may mean that there was no resume image (e. g. if the system has been simply powered off and not hibernated). In such cases, the boot is ordinarily continued.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-hibernate-resume-generator(8)`
+
+

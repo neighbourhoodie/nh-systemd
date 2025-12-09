@@ -1,0 +1,84 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sysext.conf
+:manvolnum: 5
+:summary: Configuration files for systemd-sysext
+:aliases: confext.conf, sysext.conf.d, confext.conf.d
+
+.. _sysext.conf(5):
+
+==============
+sysext.conf(5)
+==============
+
+Name
+####
+
+sysext.conf, confext.conf, sysext.conf.d, confext.conf.d — Configuration files for systemd-sysext
+
+Synopsis
+########
+
+:code:`/etc/systemd/sysext.conf`
+
+:code:`/etc/systemd/sysext.conf.d/\*.conf`
+
+:code:`/run/systemd/sysext.conf`
+
+:code:`/run/systemd/sysext.conf.d/\*.conf`
+
+:code:`/usr/lib/systemd/sysext.conf`
+
+:code:`/usr/lib/systemd/sysext.conf.d/\*.conf`
+
+:code:`/etc/systemd/confext.conf`
+
+:code:`/etc/systemd/confext.conf.d/\*.conf`
+
+:code:`/run/systemd/confext.conf`
+
+:code:`/run/systemd/confext.conf.d/\*.conf`
+
+:code:`/usr/lib/systemd/confext.conf`
+
+:code:`/usr/lib/systemd/confext.conf.d/\*.conf`
+
+Description
+###########
+
+These configuration files control the behavior of :ref:`systemd-sysext(8)` and :ref:`systemd-confext(8)`. They are especially useful when needing to customize the behavior of the respective extension service units.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+The following options are understood in both the "[Sysext]" and "[Confext]" sections:
+
+Section Options
+###############
+
+.. systemd:option:: Mutable=
+   :group: config-directives
+
+   Set the mutable mode for system extensions. Takes one of "no", "yes", "auto", "import", "ephemeral", or "ephemeral-import". For details about the modes, see the :systemd:option:`--mutable=` option in :ref:`systemd-sysext(8)`. Defaults to "no".
+
+   .. versionadded:: 259
+
+.. systemd:option:: ImagePolicy=
+   :group: config-directives
+
+   Set the image policy. Takes an image policy string as argument, as per :ref:`systemd.image-policy(7)`. For details, see the :systemd:option:`--image-policy=` option in :ref:`systemd-sysext(8)`.
+
+   .. versionadded:: 259
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-sysext(8)`, :ref:`systemd.syntax(7)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

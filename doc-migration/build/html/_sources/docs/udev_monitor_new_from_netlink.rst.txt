@@ -1,0 +1,48 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udev_monitor_new_from_netlink
+:manvolnum: 3
+:summary: Create, acquire and release a udev monitor object
+:aliases: udev_monitor_ref, udev_monitor_unref
+
+.. _udev_monitor_new_from_netlink(3):
+
+================================
+udev_monitor_new_from_netlink(3)
+================================
+
+Name
+####
+
+udev_monitor_new_from_netlink, udev_monitor_ref, udev_monitor_unref — Create, acquire and release a udev monitor object
+
+Synopsis
+########
+
+:code:`#include <libudev.h>` .. code-block::
+
+   struct udev_monitor *udev_monitor_new_from_netlink(struct udev *udev,
+	const char *name); .. code-block::
+
+   struct udev_monitor *udev_monitor_ref(struct udev_monitor *udev_monitor); .. code-block::
+
+   struct udev_monitor *udev_monitor_unref(struct udev_monitor *udev_monitor);
+
+.. COMMENT: <refsect1> <title>Description</title> <para>XXX: Add short description.</para> </refsect1>
+
+Return Value
+############
+
+On success, :code:`udev_monitor_new_from_netlink()` returns a pointer to the allocated udev monitor. On failure, :code:`NULL` is returned. :code:`udev_monitor_ref()` returns the argument that it was passed, unmodified. :code:`udev_monitor_unref()` always returns :code:`NULL`.
+
+History
+#######
+
+:code:`udev_monitor_new_from_netlink()`, :code:`udev_monitor_ref()`, and :code:`udev_monitor_unref()` were added in version 221.
+
+See Also
+########
+
+:man-pages:`udev_new(3)`, :man-pages:`udev_device_new_from_syspath(3)`, :man-pages:`udev_enumerate_new(3)`, :man-pages:`udev_monitor_filter_update(3)`, :man-pages:`udev_monitor_receive_device(3)`, :man-pages:`udev_list_entry(3)`, :ref:`systemd(1)`
+
+

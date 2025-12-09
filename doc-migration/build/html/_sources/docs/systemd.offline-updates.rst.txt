@@ -1,0 +1,59 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.offline-updates
+:manvolnum: 7
+:summary: Implementation of offline updates in systemd
+
+.. _systemd.offline-updates(7):
+
+==========================
+systemd.offline-updates(7)
+==========================
+
+Name
+####
+
+systemd.offline-updates — Implementation of offline updates in systemd
+
+Implementing Offline System Updates
+###################################
+
+This man page describes how to implement "offline" system updates with systemd. By "offline" OS updates we mean package installations and updates that are run with the system booted into a special system update mode, in order to avoid problems related to conflicts of libraries and services that are currently running with those on disk. This document is inspired by this `GNOME design whiteboard <https://wiki.gnome.org/Design/OS/SoftwareUpdates>`_.
+
+The logic:
+
+1.    The package manager prepares system updates by downloading all (.rpm or .deb or whatever) packages to update off-line in a special directory :code:`/var/lib/system-update` (or another directory of the package/upgrade manager's choice).
+
+2.    When the user OK'ed the update, the symlink :code:`/system-update` or :code:`/etc/system-update` is created that points to :code:`/var/lib/system-update` (or wherever the directory with the upgrade files is located) and the system is rebooted. This symlink is in the root directory, since we need to check for it very early at boot, at a time where :code:`/var/` is not available yet.
+
+3.    Very early in the new boot :ref:`systemd-system-update-generator(8)` checks whether :code:`/system-update` or :code:`/etc/system-update` exists. If so, it (temporarily and for this boot only) redirects (i.e. symlinks) :code:`default.target` to :code:`system-update.target`, a special target that pulls in the base system (i.e. :code:`sysinit.target`, so that all file systems are mounted but little else) and the system update units.
+
+4.    The system now continues to boot into :code:`default.target`, and thus into :code:`system-update.target`. This target pulls in all system update units. Only one service should perform an update (see the next point), and all the other ones should exit cleanly with a "success" return code and without doing anything. Update services should be ordered after :code:`sysinit.target` so that the update starts after all file systems have been mounted.
+
+5.    As the first step, an update service should check if the :code:`/system-update` or :code:`/etc/system-update` symlink points to the location used by that update service. In case it does not exist or points to a different location, the service must exit without error. It is possible for multiple update services to be installed, and for multiple update services to be launched in parallel, and only the one that corresponds to the tool that *created* the symlink before reboot should perform any actions. It is unsafe to run multiple updates in parallel. the symlink before reboot should perform any actions. It is unsafe to run multiple updates in parallel.
+
+6.    The update service should now do its job. If applicable and possible, it should create a file system snapshot, then install all packages. After completion (regardless whether the update succeeded or failed) the machine must be rebooted, for example by calling :code:`systemctl reboot`. In addition, on failure the script should revert to the old file system snapshot (without the symlink).
+
+7.    The update scripts should exit only after the update is finished. It is expected that the service which performs the update will cause the machine to reboot after it is done. If the :code:`system-update.target` is successfully reached, i.e. all update services have run, and the :code:`/system-update` or :code:`/etc/system-update` symlink still exists, it will be removed and the machine rebooted as a safety measure.
+
+8.    After a reboot, now that the :code:`/system-update` and :code:`/etc/system-update` symlink is gone, the generator will not redirect :code:`default.target` anymore and the system now boots into the default target again.
+
+Recommendations
+###############
+
+1.    To make things a bit more robust we recommend hooking the update script into :code:`system-update.target` via a :code:`.wants/` symlink in the distribution package, rather than depending on :code:`systemctl enable` in the postinst scriptlets of your package. More specifically, for your update script create a .service file, without \[Install] section, and then add a symlink like :code:`/usr/lib/systemd/system/system-update.target.wants/foobar.service` → :code:`../foobar.service` to your package.
+
+2.    Make sure to remove the :code:`/system-update` and :code:`/etc/system-update` symlinks as early as possible in the update script to avoid reboot loops in case the update fails.
+
+3.    Use :code:`FailureAction=reboot` in the service file for your update script to ensure that a reboot is automatically triggered if the update fails. :code:`FailureAction=` makes sure that the specified unit is activated if your script exits uncleanly (by non-zero error code, or signal/coredump). If your script succeeds you should trigger the reboot in your own code, for example by invoking logind's :code:`Reboot()` call or calling :code:`systemctl reboot`. See :man-pages:`org.freedesktop.login1(5)` for details about the logind D-Bus API.
+
+4.    The update service should declare :code:`DefaultDependencies=no`, :code:`Requires=sysinit.target`, :code:`After=sysinit.target`, :code:`After=system-update-pre.target`, :code:`Before=system-update.target` and explicitly pull in any other services it requires.
+
+5.    It may be desirable to always run an auxiliary unit when booting into offline-updates mode, which itself does not install updates. To do this create a .service file with :code:`Wants=system-update-pre.target` and :code:`Before=system-update-pre.target` and add a symlink to that file under :code:`/usr/lib/systemd/system-update.target.wants` .
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.generator(7)`, :ref:`systemd-system-update-generator(8)`, :mankier:`dnf.plugin.system-upgrade(8)`
+
+

@@ -1,0 +1,209 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.timer
+:manvolnum: 5
+:summary: Timer unit configuration
+
+.. _systemd.timer(5):
+
+================
+systemd.timer(5)
+================
+
+Name
+####
+
+systemd.timer — Timer unit configuration
+
+Synopsis
+########
+
+:code:`timer.timer`
+
+Description
+###########
+
+A unit configuration file whose name ends in ".timer" encodes information about a timer controlled and supervised by systemd, for timer-based activation.
+
+This man page lists the configuration options specific to this unit type. See :ref:`systemd.unit(5)` for the common options of all unit configuration files. The common configuration items are configured in the generic \[Unit] and \[Install] sections. The timer specific configuration options are configured in the \[Timer] section.
+
+For each timer file, a matching unit file must exist, describing the unit to activate when the timer elapses. By default, a service by the same name as the timer (except for the suffix) is activated. Example: a timer file :code:`foo.timer` activates a matching service :code:`foo.service`. The unit to activate may be controlled by :code:`Unit=` (see below).
+
+Note that in case the unit to activate is already active at the time the timer elapses it is not restarted, but simply left running. There is no concept of spawning new service instances in this case. Due to this, services with :code:`RemainAfterExit=yes` set (which stay around continuously even after the service's main process exited) are usually not suitable for activation via repetitive timers, as they will only be activated once, and then stay around forever. Target units, which by default do not deactivate on their own, can be activated repeatedly by timers by setting :code:`StopWhenUnneeded=yes` on them. This will cause a target unit to be stopped immediately after its activation, if it is not a dependency of another running unit.
+
+Automatic Dependencies
+######################
+
+Implicit Dependencies
+#####################
+
+The following dependencies are implicitly added:
+
+*    Timer units automatically gain a :code:`Before=` dependency on the service they are supposed to activate.
+
+Default Dependencies
+####################
+
+The following dependencies are added unless :code:`DefaultDependencies=no` is set:
+
+*    Timer units will automatically have dependencies of type :code:`Requires=` and :code:`After=` on :code:`sysinit.target`, a dependency of type :code:`Before=` on :code:`timers.target`, as well as :code:`Conflicts=` and :code:`Before=` on :code:`shutdown.target` to ensure that they are stopped cleanly prior to system shutdown. Only timer units involved with early boot or late system shutdown should disable the :code:`DefaultDependencies=` option.
+
+*    Timer units with at least one :code:`OnCalendar=` directive acquire a pair of additional :code:`After=` dependencies on :code:`time-set.target` and :code:`time-sync.target`, in order to avoid being started before the system clock has been correctly set. See :ref:`systemd.special(7)` for details on these two targets.
+
+Options
+#######
+
+Timer unit files may include \[Unit] and \[Install] sections, which are described in :ref:`systemd.unit(5)`.
+
+Timer unit files must include a \[Timer] section, which carries information about the timer it defines. The options specific to the \[Timer] section of timer units are the following:
+
+.. systemd:option:: OnActiveSec=, OnBootSec=, OnStartupSec=, OnUnitActiveSec=, OnUnitInactiveSec=
+   :group: unit-directives
+
+   Defines monotonic timers relative to different starting points:
+
+   .. list-table:: Settings and their starting points
+      :header-rows: 1
+
+      * - Setting
+        - Meaning
+      * - :systemd:var:`OnActiveSec=`
+        - Defines a timer relative to the moment the timer unit itself is activated.
+      * - :systemd:var:`OnBootSec=`
+        - Defines a timer relative to when the machine was booted up. In containers, for the system manager instance, this is mapped to :systemd:var:`OnStartupSec=`, making both equivalent.
+      * - :systemd:var:`OnStartupSec=`
+        - Defines a timer relative to when the service manager was first started. For system timer units this is very similar to :systemd:var:`OnBootSec=` as the system service manager is generally started very early at boot. It's primarily useful when configured in units running in the per-user service manager, as the user service manager is generally started on first login only, not already during boot.
+      * - :systemd:var:`OnUnitActiveSec=`
+        - Defines a timer relative to when the unit the timer unit is activating was last activated.
+      * - :systemd:var:`OnUnitInactiveSec=`
+        - Defines a timer relative to when the unit the timer unit is activating was last deactivated.
+
+   Multiple directives may be combined of the same and of different types, in which case the timer unit will trigger whenever any of the specified timer expressions elapse. For example, by combining :systemd:var:`OnBootSec=` and :systemd:var:`OnUnitActiveSec=`, it is possible to define a timer that elapses in regular intervals and activates a specific service each time. Moreover, both monotonic time expressions and :systemd:var:`OnCalendar=` calendar expressions may be combined in the same timer unit.
+
+   The arguments to the directives are time spans configured in seconds. Example: "OnBootSec=50" means 50s after boot-up. The argument may also include time units. Example: "OnBootSec=5h 30min" means 5 hours and 30 minutes after boot-up. For details about the syntax of time spans, see :ref:`systemd.time(7)`.
+
+   If a timer configured with :systemd:var:`OnBootSec=` or :systemd:var:`OnStartupSec=` is already in the past when the timer unit is activated, it will immediately elapse and the configured unit is started. This is not the case for timers defined in the other directives.
+
+   These are monotonic timers, independent of wall-clock time and timezones. If the computer is temporarily suspended, the monotonic clock generally pauses, too. Note that if :systemd:var:`WakeSystem=` is used, a different monotonic clock is selected that continues to advance while the system is suspended and thus can be used as the trigger to resume the system.
+
+   If the empty string is assigned to any of these options, the list of timers is reset (both monotonic timers and :systemd:var:`OnCalendar=` timers, see below), and all prior assignments will have no effect.
+
+   Note that timers do not necessarily expire at the precise time configured with these settings, as they are subject to the :systemd:var:`AccuracySec=` setting below.
+
+.. systemd:option:: OnCalendar=
+   :group: unit-directives
+
+   Defines realtime (i.e. wallclock) timers with calendar event expressions. See :ref:`systemd.time(7)` for more information on the syntax of calendar event expressions. Otherwise, the semantics are similar to :systemd:var:`OnActiveSec=` and related settings.
+
+   Note that timers do not necessarily expire at the precise time configured with this setting, as it is subject to the :systemd:var:`AccuracySec=` setting below.
+
+   May be specified more than once, in which case the timer unit will trigger whenever any of the specified expressions elapse. Moreover, calendar timers and monotonic timers (see above) may be combined within the same timer unit.
+
+   If the empty string is assigned to any of these options, the list of timers is reset (both :systemd:var:`OnCalendar=` timers and monotonic timers, see above), and all prior assignments will have no effect.
+
+   Note that calendar timers might be triggered at unexpected times if the system's realtime clock is not set correctly. Specifically, on systems that lack a battery-buffered Realtime Clock (RTC) it might be wise to enable :code:`systemd-time-wait-sync.service` to ensure the clock is adjusted to a network time source *before* the timer event is set up. Timer units with at least one the timer event is set up. Timer units with at least one :systemd:var:`OnCalendar=` expression are automatically ordered after :code:`time-sync.target`, which :code:`systemd-time-wait-sync.service` is ordered before.
+
+   When a system is temporarily put to sleep (i.e. system suspend or hibernation) the realtime clock does not pause. When a calendar timer elapses while the system is sleeping it will not be acted on immediately, but once the system is later resumed it will catch up and process all timers that triggered while the system was sleeping. Note that if a calendar timer elapsed more than once while the system was continuously sleeping the timer will only result in a single service activation. If :systemd:var:`WakeSystem=` (see below) is enabled a calendar time event elapsing while the system is suspended will cause the system to wake up (under the condition the system's hardware supports time-triggered wake-up functionality).
+
+   .. versionadded:: 197
+
+.. systemd:option:: AccuracySec=
+   :group: unit-directives
+
+   Specify the accuracy the timer shall elapse with. Defaults to 1min. The timer is scheduled to elapse within a time window starting with the time specified in :systemd:var:`OnCalendar=`, :systemd:var:`OnActiveSec=`, :systemd:var:`OnBootSec=`, :systemd:var:`OnStartupSec=`, :systemd:var:`OnUnitActiveSec=` or :systemd:var:`OnUnitInactiveSec=` and ending the time configured with :systemd:var:`AccuracySec=` later. Within this time window, the expiry time will be placed at a host-specific, randomized, but stable position that is synchronized between all local timer units. This is done in order to optimize power consumption to suppress unnecessary CPU wake-ups. To get best accuracy, set this option to 1us. Note that the timer is still subject to the timer slack configured via :ref:`systemd-system.conf(5)`'s :systemd:var:`TimerSlackNSec=` setting. See :man-pages:`prctl(2)` for details. To optimize power consumption, make sure to set this value as high as possible and as low as necessary.
+
+   Note that this setting is primarily a power saving option that allows coalescing CPU wake-ups. It should not be confused with :systemd:var:`RandomizedDelaySec=` (see below) which adds a random value to the time the timer shall elapse next and whose purpose is the opposite: to stretch elapsing of timer events over a longer period to reduce workload spikes. For further details and explanations and how both settings play together, see below.
+
+   .. versionadded:: 209
+
+.. systemd:option:: RandomizedDelaySec=
+   :group: unit-directives
+
+   Delay the timer by a randomly selected, evenly distributed amount of time between 0 and the specified time value. Defaults to 0, indicating that no randomized delay shall be applied. Each timer unit will determine this delay randomly before each iteration, unless modified with :systemd:var:`FixedRandomDelay=`, see below. The delay is added on top of the next determined elapsing time or the service manager's startup time, whichever is later.
+
+   This setting is useful to stretch dispatching of similarly configured timer events over a certain time interval, to prevent them from firing all at the same time, possibly resulting in resource congestion on the local system.
+
+   Note the relation to :systemd:var:`AccuracySec=` above: the latter allows the service manager to coalesce timer events within a specified time range in order to minimize wakeups, while this setting does the opposite: it stretches timer events over an interval, to make it unlikely that they fire simultaneously. If :systemd:var:`RandomizedDelaySec=` and :systemd:var:`AccuracySec=` are used in conjunction, first the randomized delay is added, and then the result is possibly further shifted to coalesce it with other timer events happening on the system. As mentioned above :systemd:var:`AccuracySec=` defaults to 1 minute and :systemd:var:`RandomizedDelaySec=` to 0, thus encouraging coalescing of timer events. In order to optimally stretch timer events over a certain range of time, set :systemd:var:`AccuracySec=1us` and :systemd:var:`RandomizedDelaySec=` to some higher value.
+
+   .. versionadded:: 229
+
+.. systemd:option:: FixedRandomDelay=
+   :group: unit-directives
+
+   Takes a boolean argument. When enabled, the randomized delay specified by :systemd:var:`RandomizedDelaySec=` is chosen deterministically, and remains stable between all firings of the same timer, even if the manager is restarted. The delay is derived from the machine ID, the manager's user identifier, and the timer unit's name. This effectively creates a unique fixed offset for each timer, reducing the jitter in firings of an individual timer while still avoiding firing at the same time as other similarly configured timers.
+
+   This setting has an effect only if :systemd:var:`RandomizedDelaySec=` is not 0. Defaults to :systemd:option:`false`.
+
+   .. versionadded:: 247
+
+.. systemd:option:: RandomizedOffsetSec=
+   :group: unit-directives
+
+   Offsets the timer by a stable, randomly-selected, and evenly distributed amount of time between 0 and the specified time value. Defaults to 0, indicating that no such offset shall be applied. The offset is chosen deterministically, and is derived the same way as :systemd:var:`FixedRandomDelay=`, see above. The offset is added on top of the next determined elapsing time. This setting only has an effect on timers configured with :systemd:var:`OnCalendar=`, and it can be combined with :systemd:var:`RandomizedDelaySec=`.
+
+   Much like :systemd:var:`RandomizedDelaySec=`, this setting is for distributing timer events to prevent them from firing all at once. However, this setting is most useful to prevent resource congestion on a remote service, from a fleet of similarly-configured clients. Unlike :systemd:var:`RandomizedDelaySec=`, this setting applies its offset with no regard to manager startup time. This maintains the periodicity of configured :systemd:var:`OnCalendar=` events across manager restarts.
+
+   For example, let's say you're running a backup service and have a fleet of laptops that wish to make backups weekly. To distribute load on the backup service, each laptop should randomly pick a weekday to upload its backups. This could be achieved by setting :systemd:var:`OnCalendar=` to "weekly", and then configuring a :systemd:var:`RandomizedDelaySec=` of "5 days" with :systemd:var:`FixedRandomDelay=` enabled. Let's say that some laptop randomly chooses a delay of 4 days. If this laptop is restarted more often than that, then the timer will never fire: on each fresh boot, the 4 day delay is restarted and will not be finished by the time of the next shutdown. Instead, you should use :systemd:var:`RandomizedOffsetSec=`, which will maintain the configured weekly cadence of timer events, even across reboots.
+
+   .. versionadded:: 258
+
+.. systemd:option:: DeferReactivation=
+   :group: unit-directives
+
+   Takes a boolean argument. When enabled, the timer schedules the next elapse based on the trigger unit entering inactivity, instead of the last trigger time. This is most apparent in the case where the service unit takes longer to run than the timer interval. With this setting enabled, the timer will schedule the next elapse based on when the service finishes running, and so it will have to wait until the next realtime elapse time to trigger. Otherwise, the default behavior is for the timer unit to immediately trigger again once the service finishes running. This happens because the timer schedules the next elapse based on the previous trigger time, and since the interval is shorter than the service runtime, that elapse will be in the past, causing it to immediately trigger once done.
+
+   This setting has an effect only if a realtime timer has been specified with :systemd:var:`OnCalendar=`. Defaults to :systemd:option:`false`.
+
+   .. versionadded:: 257
+
+.. systemd:option:: OnClockChange=, OnTimezoneChange=
+   :group: unit-directives
+
+   These options take boolean arguments. When true, the service unit will be triggered when the system clock (:systemd:constant:`CLOCK_REALTIME`) jumps relative to the monotonic clock (:systemd:constant:`CLOCK_MONOTONIC`), or when the local system timezone is modified. These options can be used alone or in combination with other timer expressions (see above) within the same timer unit. These options default to :systemd:option:`false`.
+
+   .. versionadded:: 242
+
+.. systemd:option:: Unit=
+   :group: unit-directives
+
+   The unit to activate when this timer elapses. The argument is a unit name, whose suffix is not ".timer". If not specified, this value defaults to a service that has the same name as the timer unit, except for the suffix. (See above.) It is recommended that the unit name that is activated and the unit name of the timer unit are named identically, except for the suffix.
+
+.. systemd:option:: Persistent=
+   :group: unit-directives
+
+   Takes a boolean argument. If true, the time when the service unit was last triggered is stored on disk. When the timer is activated, the service unit is triggered immediately if it would have been triggered at least once during the time when the timer was inactive. Such triggering is nonetheless subject to the delay imposed by :systemd:var:`RandomizedDelaySec=`. This is useful to catch up on missed runs of the service when the system was powered down. Note that this setting only has an effect on timers configured with :systemd:var:`OnCalendar=`. Defaults to :systemd:option:`false`.
+
+   Use :code:`systemctl clean --what=state …` on the timer unit to remove the timestamp file maintained by this option from disk. In particular, use this command before uninstalling a timer unit. See :man-pages:`systemctl(1)` for details.
+
+   .. versionadded:: 212
+
+.. systemd:option:: WakeSystem=
+   :group: unit-directives
+
+   Takes a boolean argument. If true, an elapsing timer will cause the system to resume from suspend, should it be suspended and if the system supports this. Note that this option will only make sure the system resumes on the appropriate times, it will not take care of suspending it again after any work that is to be done is finished. Defaults to :systemd:option:`false`.
+
+   Note that this functionality requires privileges and is thus generally only available in the system service manager.
+
+   Note that behaviour of monotonic clock timers (as configured with :systemd:var:`OnActiveSec=`, :systemd:var:`OnBootSec=`, :systemd:var:`OnStartupSec=`, :systemd:var:`OnUnitActiveSec=`, :systemd:var:`OnUnitInactiveSec=`, see above) is altered depending on this option. If false, a monotonic clock is used that is paused during system suspend (:systemd:constant:`CLOCK_MONOTONIC`), if true a different monotonic clock is used that continues advancing during system suspend (:systemd:constant:`CLOCK_BOOTTIME`), see :man-pages:`clock_getres(2)` for details.
+
+   .. versionadded:: 212
+
+.. systemd:option:: RemainAfterElapse=
+   :group: unit-directives
+
+   Takes a boolean argument. If true, a timer will stay loaded, and its state remains queryable even after it elapsed and the associated unit (as configured with :systemd:var:`Unit=`, see above) deactivated again. If false, an elapsed timer unit that cannot elapse anymore is unloaded once its associated unit deactivated again. Turning this off is particularly useful for transient timer units. Note that this setting has an effect when repeatedly starting a timer unit: if :systemd:var:`RemainAfterElapse=` is on, starting the timer a second time has no effect. However, if :systemd:var:`RemainAfterElapse=` is off and the timer unit was already unloaded, it can be started again, and thus the service can be triggered multiple times. Defaults to :systemd:option:`true`.
+
+   .. versionadded:: 229
+
+.. include:: systemd.service.rst
+    :start-after: .. inclusion-marker-do-not-remove shared-unit-options|
+    :end-before: .. inclusion-end-marker-do-not-remove shared-unit-options|
+
+See Also
+########
+
+Environment variables with details on the trigger will be set for triggered units. See the "Environment Variables Set or Propagated by the Service Manager" section in :ref:`systemd.exec(5)` for more details.
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.service(5)`, :ref:`systemd.time(7)`, :ref:`systemd.directives(7)`, :ref:`systemd-system.conf(5)`, :man-pages:`prctl(2)`
+
+

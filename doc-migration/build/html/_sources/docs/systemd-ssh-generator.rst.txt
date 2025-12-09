@@ -1,0 +1,89 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-ssh-generator
+:manvolnum: 8
+:summary: Generator for binding a socket-activated SSH server to local
+
+.. _systemd-ssh-generator(8):
+
+========================
+systemd-ssh-generator(8)
+========================
+
+Name
+####
+
+systemd-ssh-generator — Generator for binding a socket-activated SSH server to local
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-ssh-generator`
+
+Description
+###########
+
+:code:`systemd-ssh-generator` binds a socket-activated SSH server to local :code:`AF_VSOCK` and :code:`AF_UNIX` sockets under certain conditions. It only has an effect if the :man-pages:`sshd(8)` binary is installed. Specifically, it does the following:
+
+*    If invoked in a VM with :code:`AF_VSOCK` support, a socket-activated SSH per-connection service is bound to :code:`AF_VSOCK` port 22.
+
+*    If invoked in a container environment with a writable directory :code:`/run/host/unix-export/` pre-mounted it binds SSH to an :code:`AF_UNIX` socket :code:`/run/host/unix-export/ssh`. The assumption is that this directory is bind mounted to the host side as well, and can be used to connect to the container from there. See `Container Interface <https://systemd.io/CONTAINER_INTERFACE>`_ for more information about this interface.
+
+*    A local :code:`AF_UNIX` socket :code:`/run/ssh-unix-local/socket` is also bound, unconditionally. This may be used for SSH communication from the host to itself, without involving networking, for example to traverse security boundaries safely and with secure authentication.
+
+*    Additional :code:`AF_UNIX` and :code:`AF_VSOCK` sockets are optionally bound, based on the :code:`systemd.ssh_listen=` kernel command line option or the :code:`ssh.listen` system credential (see below).
+
+See :ref:`systemd-ssh-proxy(1)` for details on how to connect to these sockets via the :code:`ssh` client.
+
+The :code:`ssh.authorized_keys.root` credential can be used to allow specific public keys to log in over SSH. See :ref:`systemd.system-credentials(7)` for more information.
+
+The generator will use a packaged :code:`sshd@.service` service template file if one exists, and otherwise generate a suitable service template file.
+
+:code:`systemd-ssh-generator` implements :ref:`systemd.generator(7)`.
+
+Kernel Command Line
+###################
+
+:code:`systemd-ssh-generator` understands the following :man-pages:`kernel-command-line(7)` parameters:
+
+.. systemd:option:: systemd.ssh_auto=
+   :group: kernel-commandline-options
+
+   This option takes an optional boolean argument, and defaults to yes. If enabled, the automatic binding to the :systemd:constant:`AF_VSOCK` and :systemd:constant:`AF_UNIX` sockets listed above is done. If disable, this is not done, except for those explicitly requested via :systemd:var:`systemd.ssh_listen=` on the kernel command line or via the :systemd:var:`ssh.listen` system credential.
+
+   .. versionadded:: 256
+
+.. systemd:option:: systemd.ssh_listen=
+   :group: kernel-commandline-options
+
+   This option configures an additional socket to bind SSH to. It may be used multiple times to bind multiple sockets. The syntax should follow the one of :systemd:var:`ListenStream=`, see :ref:`systemd.socket(5)` for details. This functionality supports all socket families :ref:`systemd(1)` supports, including :systemd:constant:`AF_INET` and :systemd:constant:`AF_INET6`.
+
+   .. versionadded:: 256
+
+Credentials
+###########
+
+:code:`systemd-ssh-generator` supports the system credentials logic. The following credentials are used when passed in:
+
+.. systemd:option:: ssh.listen
+   :group: system-credentials
+
+   This credential should be a text file, with each line referencing one additional socket to bind SSH to. The syntax should follow the one of :systemd:var:`ListenStream=`, see :ref:`systemd.socket(5)` for details. This functionality supports all socket families systemd supports, including :systemd:constant:`AF_INET` and :systemd:constant:`AF_INET6`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: ssh.ephemeral-authorized_keys-all
+   :group: system-credentials
+
+   Provides additional public keys, given in the customary :code:`authorized_keys` format, for all users, for incoming connections via the generated :systemd:constant:`AF_VSOCK` and :systemd:constant:`AF_UNIX` socket units.
+
+   The intended use of this is for a host system (in either VM or container configurations) to generate a keypair and inject the public key into the guest, using the private key to connect to any user account on the guest via ssh, without further authentication.
+
+   .. versionadded:: 256
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`kernel-command-line(7)`, :ref:`systemd.system-credentials(7)`, :man-pages:`vsock(7)`, :man-pages:`unix(7)`, :man-pages:`ssh(1)`, :man-pages:`sshd(8)`
+
+

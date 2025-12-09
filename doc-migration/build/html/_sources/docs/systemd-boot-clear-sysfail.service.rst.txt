@@ -1,0 +1,37 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-boot-clear-sysfail.service
+:manvolnum: 8
+:summary: Clear LoaderEntrySysFail entry
+
+.. _systemd-boot-clear-sysfail.service(8):
+
+=====================================
+systemd-boot-clear-sysfail.service(8)
+=====================================
+
+Name
+####
+
+systemd-boot-clear-sysfail.service — Clear LoaderEntrySysFail entry
+
+Synopsis
+########
+
+:code:`systemd-boot-clear-sysfail.service`
+
+Description
+###########
+
+:code:`systemd-boot-clear-sysfail.service` is a system service that automatically clears the 'LoaderEntrySysFail' boot loader entry if the boot was successful and the 'LoaderSysFailReason' EFI variable, which indicates the reason for the system failure, is not set.
+
+The :code:`systemd-boot-clear-sysfail.service` unit invokes the :code:`bootctl --graceful set-sysfail ""` command, which clears the LoaderEntrySysFail entry. The service is conditionalized so that it is run only when a LoaderSysFailReason entry is not set.
+
+For further details see :man-pages:`bootctl(1)`, regarding the command this service invokes.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`bootctl(1)`, :ref:`systemd-boot(7)`
+
+

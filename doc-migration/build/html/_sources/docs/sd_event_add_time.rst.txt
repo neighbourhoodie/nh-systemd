@@ -1,0 +1,153 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_add_time
+:manvolnum: 3
+:summary: Add a timer event source to an event loop
+:aliases: sd_event_add_time_relative, sd_event_source_get_time, sd_event_source_set_time, sd_event_source_set_time_relative, sd_event_source_get_time_accuracy, sd_event_source_set_time_accuracy, sd_event_source_get_time_clock, sd_event_time_handler_t
+
+.. _sd_event_add_time(3):
+
+====================
+sd_event_add_time(3)
+====================
+
+Name
+####
+
+sd_event_add_time, sd_event_add_time_relative, sd_event_source_get_time, sd_event_source_set_time, sd_event_source_set_time_relative, sd_event_source_get_time_accuracy, sd_event_source_set_time_accuracy, sd_event_source_get_time_clock, sd_event_time_handler_t — Add a timer event source to an event loop
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` :code:`:code:`typedef` struct sd_event_source sd_event_source;` .. code-block::
+
+   typedef int (*sd_event_time_handler_t)(sd_event_source *s,
+	uint64_t usec,
+	void *userdata); .. code-block::
+
+   int sd_event_add_time(sd_event *event,
+	sd_event_source **source,
+	clockid_t clock,
+	uint64_t usec,
+	uint64_t accuracy,
+	sd_event_time_handler_t handler,
+	void *userdata); .. code-block::
+
+   int sd_event_add_time_relative(sd_event *event,
+	sd_event_source **source,
+	clockid_t clock,
+	uint64_t usec,
+	uint64_t accuracy,
+	sd_event_time_handler_t handler,
+	void *userdata); .. code-block::
+
+   int sd_event_source_get_time(sd_event_source *source,
+	uint64_t *ret); .. code-block::
+
+   int sd_event_source_set_time(sd_event_source *source,
+	uint64_t usec); .. code-block::
+
+   int sd_event_source_set_time_relative(sd_event_source *source,
+	uint64_t usec); .. code-block::
+
+   int sd_event_source_get_time_accuracy(sd_event_source *source,
+	uint64_t *ret); .. code-block::
+
+   int sd_event_source_set_time_accuracy(sd_event_source *source,
+	uint64_t usec); .. code-block::
+
+   int sd_event_source_get_time_clock(sd_event_source *source,
+	clockid_t *ret);
+
+Description
+###########
+
+:code:`sd_event_add_time()` adds a new timer event source to an event loop. The event loop object is specified in the :code:`event` parameter, the event source object is returned in the :code:`source` parameter. The :code:`clock` parameter takes a clock identifier, one of :code:`CLOCK_REALTIME`, :code:`CLOCK_MONOTONIC`, :code:`CLOCK_BOOTTIME`, :code:`CLOCK_REALTIME_ALARM`, or :code:`CLOCK_BOOTTIME_ALARM`. See :man-pages:`timerfd_create(2)` for details regarding the various types of clocks. The :code:`usec` parameter specifies the earliest time, in microseconds (μs), relative to the clock's epoch, when the timer shall be triggered. If a time already in the past is specified (including :code:`0`), this timer source "fires" immediately and is ready to be dispatched. If the parameter is specified as :code:`UINT64_MAX` the timer event will never elapse, which may be used as an alternative to explicitly disabling a timer event source with :ref:`sd_event_source_set_enabled(3)`. The :code:`accuracy` parameter specifies an additional accuracy value in μs specifying how much the timer event may be delayed. Use :code:`0` to select the default accuracy (250ms). Use 1μs for maximum accuracy. Consider specifying 60000000μs (1min) or larger for long-running events that may be delayed substantially. Picking higher accuracy values allows the system to coalesce timer events more aggressively, improving power efficiency.
+
+The :code:`handler` is a function to call when the timer elapses or :code:`NULL`. The :code:`userdata` pointer will be passed to the handler function, and may be chosen freely by the caller. The configured trigger time is also passed to the handler, even if the call actually happens slightly later, subject to the specified accuracy value, the kernel timer slack (see :man-pages:`prctl(2)`), and additional scheduling latencies. To query the actual time the handler was called use :ref:`sd_event_now(3)`. The handler may return negative to signal an error (see below), other return values are ignored. If :code:`handler` is :code:`NULL`, a default handler that calls :ref:`sd_event_exit(3)` will be used.
+
+By default, the timer will elapse once (:code:`SD_EVENT_ONESHOT`), but this may be changed with :ref:`sd_event_source_set_enabled(3)`. If the handler function returns a negative error code, it will either be disabled after the invocation, even if the :code:`SD_EVENT_ON` mode was requested before, or it will cause the loop to terminate, see :ref:`sd_event_source_set_exit_on_failure(3)`. Note that a timer event set to :code:`SD_EVENT_ON` will fire continuously unless its configured time is updated using :code:`sd_event_source_set_time()`.
+
+:code:`sd_event_add_time_relative()` is like :code:`sd_event_add_time()`, but takes a relative time specification. It's relative to the current time of the event loop iteration, as returned by :ref:`sd_event_now(3)`.
+
+To destroy an event source object use :ref:`sd_event_source_unref(3)`, but note that the event source is only removed from the event loop when all references to the event source are dropped. To make sure an event source does not fire anymore, even if it is still referenced, disable the event source using :ref:`sd_event_source_set_enabled(3)` with :code:`SD_EVENT_OFF`.
+
+If the second parameter of :code:`sd_event_add_time()` is :code:`NULL` no reference to the event source object is returned. In this case, the event source is considered "floating", and will be destroyed implicitly when the event loop itself is destroyed.
+
+If the :code:`handler` parameter to :code:`sd_event_add_time()` is :code:`NULL`, and the event source fires, this will be considered a request to exit the event loop. In this case, the :code:`userdata` parameter, cast to an integer, is passed as the exit code parameter to :ref:`sd_event_exit(3)`.
+
+Use :code:`CLOCK_BOOTTIME_ALARM` and :code:`CLOCK_REALTIME_ALARM` to define event sources that may wake up the system from suspend.
+
+In order to set up relative timers (that is, relative to the current time), retrieve the current time via :ref:`sd_event_now(3)`, add the desired timespan to it, and use the result as the :code:`usec` parameter to :code:`sd_event_add_time()`.
+
+In order to set up repetitive timers (that is, timers that are triggered in regular intervals), set up the timer normally, for the first invocation. Each time the event handler is invoked, update the timer's trigger time with :ref:`sd_event_source_set_time(3)` for the next timer iteration, and reenable the timer using :code:`sd_event_source_set_enabled()`. To calculate the next point in time to pass to :code:`sd_event_source_set_time()`, either use as base the :code:`usec` parameter passed to the timer callback, or the timestamp returned by :code:`sd_event_now()`. In the former case timer events will be regular, while in the latter case, the scheduling latency will keep accumulating on the timer.
+
+:code:`sd_event_source_get_time()` retrieves the configured time value of an event source created previously with :code:`sd_event_add_time()` or :code:`sd_event_add_time_relative()`. It takes the event source object and a pointer to a variable to store the time in, relative to the selected clock's epoch, in μs. The returned value is relative to the epoch, even if the event source was created with a relative time via :code:`sd_event_add_time_relative()`.
+
+:code:`sd_event_source_set_time()` changes the time of an event source created previously with :code:`sd_event_add_time()` or :code:`sd_event_add_time_relative()`. It takes the event source object and a time relative to the selected clock's epoch, in μs.
+
+:code:`sd_event_source_set_time_relative()` is similar to :code:`sd_event_source_set_time()`, but takes a time relative to the current time of the event loop iteration, as returned by :code:`sd_event_now()`.
+
+:code:`sd_event_source_get_time_accuracy()` retrieves the configured accuracy value of an event source created previously with :code:`sd_event_add_time()`. It takes the event source object and a pointer to a variable to store the accuracy in. The accuracy is specified in μs.
+
+:code:`sd_event_source_set_time_accuracy()` changes the configured accuracy of a timer event source created previously with :code:`sd_event_add_time()`. It takes the event source object and accuracy, in μs.
+
+:code:`sd_event_source_get_time_clock()` retrieves the configured clock of an event source created previously with :code:`sd_event_add_time()`. It takes the event source object and a pointer to a variable to store the clock identifier in.
+
+Return Value
+############
+
+On success, these functions return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned values may indicate the following problems:
+
+.. systemd:option:: -ENOMEM
+
+   Not enough memory to allocate an object.
+
+.. systemd:option:: -EINVAL
+
+   An invalid argument has been passed.
+
+.. systemd:option:: -ESTALE
+
+   The event loop is already terminated.
+
+.. systemd:option:: -ECHILD
+
+   The event loop has been created in a different process, library or module instance.
+
+.. systemd:option:: -EOPNOTSUPP
+
+   The selected clock is not supported by the event loop implementation.
+
+.. systemd:option:: -EDOM
+
+   The passed event source is not a timer event source.
+
+.. systemd:option:: -EOVERFLOW
+
+   The passed relative time is outside of the allowed range for time values (i.e. the specified value added to the current time is outside the 64 bit unsigned integer range).
+
+   .. versionadded:: 247
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_add_time()`, :code:`sd_event_source_get_time()`, :code:`sd_event_source_set_time()`, :code:`sd_event_source_get_time_accuracy()`, :code:`sd_event_source_set_time_accuracy()`, and :code:`sd_event_source_get_time_clock()` were added in version 213.
+
+:code:`sd_event_time_handler_t()` was added in version 217.
+
+:code:`sd_event_add_time_relative()` and :code:`sd_event_source_set_time_relative()` were added in version 247.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_new(3)`, :ref:`sd_event_now(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_source_set_enabled(3)`, :ref:`sd_event_source_set_priority(3)`, :ref:`sd_event_source_set_userdata(3)`, :ref:`sd_event_source_set_description(3)`, :ref:`sd_event_source_set_floating(3)`, :man-pages:`clock_gettime(2)`, :man-pages:`timerfd_create(2)`, :man-pages:`prctl(2)`
+
+

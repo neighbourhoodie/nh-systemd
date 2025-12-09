@@ -1,0 +1,50 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-rfkill.service
+:manvolnum: 8
+:summary: Load and save the RF kill switch state at boot and change
+:aliases: systemd-rfkill.socket, systemd-rfkill
+
+.. _systemd-rfkill.service(8):
+
+=========================
+systemd-rfkill.service(8)
+=========================
+
+Name
+####
+
+systemd-rfkill.service, systemd-rfkill.socket, systemd-rfkill — Load and save the RF kill switch state at boot and change
+
+Synopsis
+########
+
+:code:`systemd-rfkill.service`
+
+:code:`systemd-rfkill.socket`
+
+:code:`/usr/lib/systemd/systemd-rfkill`
+
+Description
+###########
+
+:code:`systemd-rfkill.service` is a service that restores the RF kill switch state at early boot and saves it on each change. On disk, the RF kill switch state is stored in :code:`/var/lib/systemd/rfkill/`.
+
+Kernel Command Line
+###################
+
+:code:`systemd-rfkill` understands the following kernel command line parameter. See also :man-pages:`kernel-command-line(7)`.
+
+.. systemd:option:: systemd.restore_state=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. Defaults to "1". If "0", does not restore the rfkill settings on boot. However, settings will still be stored on shutdown.
+
+   .. versionadded:: 227
+
+See Also
+########
+
+:ref:`systemd(1)`
+
+

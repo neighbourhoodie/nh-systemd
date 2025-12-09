@@ -1,0 +1,38 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-importd.service
+:manvolnum: 8
+:summary: VM and container image import and export service
+:aliases: systemd-importd
+
+.. _systemd-importd.service(8):
+
+==========================
+systemd-importd.service(8)
+==========================
+
+Name
+####
+
+systemd-importd.service, systemd-importd — VM and container image import and export service
+
+Synopsis
+########
+
+:code:`systemd-importd.service`
+
+:code:`/usr/lib/systemd/systemd-importd`
+
+Description
+###########
+
+:code:`systemd-importd` is a system service that allows importing, exporting and downloading of disk images. It provides the implementation for :man-pages:`importctl(1)`'s :code:`pull-raw`, :code:`pull-tar`, :code:`import-raw`, :code:`import-tar`, :code:`import-fs`, :code:`export-raw`, and :code:`export-tar` commands.
+
+See :man-pages:`org.freedesktop.import1(5)` and :man-pages:`org.freedesktop.LogControl1(5)` for a description of the D-Bus API.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`importctl(1)`, :ref:`systemd-machined.service(8)`, :ref:`systemd-nspawn(1)`, :man-pages:`org.freedesktop.import1(5)`
+
+

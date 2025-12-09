@@ -1,0 +1,23 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+.. inclusion-marker-do-not-remove singular|
+
+.. inclusion-marker-do-not-remove singular|
+
+When enabled for services running in per-user instances of the service manager this option implicitly enables :code:`PrivateUsers=` (requires unprivileged user namespaces support to be enabled in the kernel via the "kernel.unprivileged_userns_clone=" sysctl) and also relies on :ref:`systemd-mountfsd.service(8)`.
+
+.. inclusion-end-marker-do-not-remove singular|
+
+.. inclusion-end-marker-do-not-remove singular|
+
+.. inclusion-marker-do-not-remove plural|
+
+.. inclusion-marker-do-not-remove plural|
+
+When enabled for services running in per-user instances of the service manager these options implicitly enable :code:`PrivateUsers=` (requires unprivileged user namespaces support to be enabled in the kernel via the "kernel.unprivileged_userns_clone=" sysctl) and also rely on :ref:`systemd-mountfsd.service(8)`.
+
+.. inclusion-end-marker-do-not-remove plural|
+
+.. inclusion-end-marker-do-not-remove plural|
+
+

@@ -1,0 +1,102 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: timesyncd.conf
+:manvolnum: 5
+:summary: Network Time Synchronization configuration files
+:aliases: timesyncd.conf.d
+
+.. _timesyncd.conf(5):
+
+=================
+timesyncd.conf(5)
+=================
+
+Name
+####
+
+timesyncd.conf, timesyncd.conf.d — Network Time Synchronization configuration files
+
+Synopsis
+########
+
+| :code:`/etc/systemd/timesyncd.conf`
+| :code:`/run/systemd/timesyncd.conf`
+| :code:`/usr/local/lib/systemd/timesyncd.conf`
+| :code:`/usr/lib/systemd/timesyncd.conf`
+| :code:`/etc/systemd/timesyncd.conf.d/\*.conf`
+| :code:`/run/systemd/timesyncd.conf.d/\*.conf`
+| :code:`/usr/local/lib/systemd/timesyncd.conf.d/\*.conf`
+| :code:`/usr/lib/systemd/timesyncd.conf.d/\*.conf`
+
+Description
+###########
+
+These configuration files control NTP network time synchronization. See :ref:`systemd.syntax(7)` for a general description of the syntax.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+The following settings are configured in the \[Time] section:
+
+.. systemd:option:: NTP=
+   :group: network-directives
+
+   A space-separated list of NTP server host names or IP addresses. During runtime this list is combined with any per-interface NTP servers acquired from :ref:`systemd-networkd.service(8)`. :code:`systemd-timesyncd` will contact all configured system or per-interface servers in turn, until one responds. When the empty string is assigned, the list of NTP servers is reset, and all prior assignments will have no effect. This setting defaults to an empty list.
+
+   .. versionadded:: 216
+
+.. systemd:option:: FallbackNTP=
+   :group: network-directives
+
+   A space-separated list of NTP server host names or IP addresses to be used as the fallback NTP servers. Any per-interface NTP servers obtained from :ref:`systemd-networkd.service(8)` take precedence over this setting, as do any servers set via :systemd:var:`NTP=` above. This setting is hence only relevant if no other NTP server information is known. When the empty string is assigned, the list of NTP servers is reset, and all prior assignments will have no effect. If this option is not given, a compiled-in list of NTP servers is used.
+
+   .. versionadded:: 216
+
+.. systemd:option:: RootDistanceMaxSec=
+   :group: network-directives
+
+   Maximum acceptable root distance, i.e. the maximum estimated time required for a packet to travel to the server we are connected to from the server with the reference clock. If the current server does not satisfy this limit, :code:`systemd-timesyncd` will switch to a different server.
+
+   Takes a time span value. The default unit is seconds, but other units may be specified, see :ref:`systemd.time(7)`. Defaults to 5 seconds.
+
+   .. versionadded:: 236
+
+.. systemd:option:: PollIntervalMinSec=, PollIntervalMaxSec=
+   :group: network-directives
+
+   The minimum and maximum poll intervals for NTP messages. Polling starts at the minimum poll interval, and is adjusted within the specified limits in response to received packets.
+
+   Each setting takes a time span value. The default unit is seconds, but other units may be specified, see :ref:`systemd.time(7)`. :systemd:var:`PollIntervalMinSec=` defaults to 32 seconds and must not be smaller than 16 seconds. :systemd:var:`PollIntervalMaxSec=` defaults to 34 min 8 s (2048 seconds) and must be larger than :systemd:var:`PollIntervalMinSec=`.
+
+   .. versionadded:: 236
+
+.. systemd:option:: ConnectionRetrySec=
+   :group: network-directives
+
+   Specifies the minimum delay before subsequent attempts to contact a new NTP server are made.
+
+   Takes a time span value. The default unit is seconds, but other units may be specified, see :ref:`systemd.time(7)`. Defaults to 30 seconds and must not be smaller than 1 second.
+
+   .. versionadded:: 248
+
+.. systemd:option:: SaveIntervalSec=
+   :group: network-directives
+
+   The interval at which the current time is periodically saved to disk, in the absence of any recent synchronisation from an NTP server. This is especially useful for offline systems with no local RTC, as it will guarantee that the system clock remains roughly monotonic across reboots.
+
+   Takes a time interval value. The default unit is seconds, but other units may be specified, see :ref:`systemd.time(7)`. Defaults to 60 seconds.
+
+   .. versionadded:: 250
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-timesyncd.service(8)`, :ref:`systemd-networkd.service(8)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

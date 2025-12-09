@@ -1,0 +1,70 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_get_name_machine_id
+:manvolnum: 3
+:summary: Retrieve a bus client's machine identity
+
+.. _sd_bus_get_name_machine_id(3):
+
+=============================
+sd_bus_get_name_machine_id(3)
+=============================
+
+Name
+####
+
+sd_bus_get_name_machine_id — Retrieve a bus client's machine identity
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_get_name_machine_id(sd_bus *bus,
+	const char *name,
+	sd_id128_t *machine);
+
+Description
+###########
+
+:code:`sd_bus_get_name_machine_id()` retrieves the D-Bus machine identity of the machine that the bus client identified by :code:`name` is running on. Internally, it calls the :code:`GetMachineId` method of the :code:`org.freedesktop.DBus.Peer` interface. The D-Bus machine identity is a 128-bit UUID. On Linux systems running systemd, this corresponds to the contents of :code:`/etc/machine-id`. On success, the machine identity is stored in :code:`machine`.
+
+Return Value
+############
+
+On success, this function returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An argument is invalid.
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+.. systemd:option:: -ECHILD
+
+   The bus was created in a different process, library or module instance.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_get_name_machine_id()` was added in version 221.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`
+
+

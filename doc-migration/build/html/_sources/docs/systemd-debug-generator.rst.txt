@@ -1,0 +1,109 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-debug-generator
+:manvolnum: 8
+:summary: Generator for enabling a runtime debug shell and masking specific units at boot
+
+.. _systemd-debug-generator(8):
+
+==========================
+systemd-debug-generator(8)
+==========================
+
+Name
+####
+
+systemd-debug-generator — Generator for enabling a runtime debug shell and masking specific units at boot
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-debug-generator`
+
+Description
+###########
+
+:code:`systemd-debug-generator` is a generator that provides some debugging functionality.
+
+:code:`systemd-debug-generator` implements :ref:`systemd.generator(7)`.
+
+Kernel Command Line
+###################
+
+:code:`systemd-debug-generator` understands the following kernel command line parameters:
+
+.. systemd:option:: systemd.mask=, rd.systemd.mask=
+   :group: kernel-commandline-options
+
+   These options take a unit name as argument. The unit specified is masked for the runtime (i.e. for this session — from boot to shutdown), similarly to the effect of :man-pages:`systemctl(1)`'s :code:`mask` command. This is useful to boot with certain units removed from the initial boot transaction for debugging system startup. May be specified more than once. The option prefixed with "rd." is honored only in the initrd, while the one without prefix is only honored on the host.
+
+   .. versionadded:: 215
+
+.. systemd:option:: systemd.wants=, rd.systemd.wants=
+   :group: kernel-commandline-options
+
+   These options take a unit name as argument. A start job for this unit is added to the initial transaction. This is useful to start one or more additional units at boot. May be specified more than once. The option prefixed with "rd." is honored only in the initrd, while the one that is not prefixed only on the host.
+
+   .. versionadded:: 215
+
+.. systemd:option:: systemd.debug_shell, rd.systemd.debug_shell, systemd.default_debug_tty=, rd.systemd.default_debug_tty=
+   :group: kernel-commandline-options
+
+   If the :systemd:option:`systemd.debug_shell` or :systemd:option:`rd.systemd.debug_shell` option is specified, the debug shell service "debug-shell.service" is pulled into the boot transaction and a debug shell will be spawned during early boot. By default, :code:`|DEBUGTTY|` is used, but a specific tty can also be specified, either with or without the :code:`/dev/` prefix. To set the tty to use without enabling the debug shell, the :systemd:option:`systemd.default_debug_tty=` option can be used which also takes a tty with or without the :code:`/dev/` prefix. Note that the shell may also be turned on persistently by enabling it with :man-pages:`systemctl(1)`'s :code:`enable` command. The options prefixed with "rd." are honored only in the initrd, while the ones without prefix are only honored on the host.
+
+   .. versionadded:: 215
+
+.. systemd:option:: systemd.break=, rd.systemd.break=
+   :group: kernel-commandline-options
+
+   Takes one of :systemd:option:`pre-udev`, :systemd:option:`pre-basic`, :systemd:option:`pre-mount`, or :systemd:option:`pre-switch-root` (the default for the "rd." option). It also accepts multiple values separated by comma (","). These options allow one to pause the boot process at a certain point and spawn a debug shell. After exiting this shell, the system will resume booting. The option prefixed with "rd." is honored only in the initrd, while the one without prefix is only honored on the host.
+
+   .. list-table:: Available breakpoints
+      :header-rows: 1
+
+      * - Breakpoints
+        - Description
+        - Can be used in the initrd
+        - Can be used on the host
+      * - :systemd:option:`pre-udev`
+        - Before starting to process kernel uevents, i.e., before :code:`systemd-udevd.service` starts.
+        - ✓
+        - ✓
+      * - :systemd:option:`pre-basic`
+        - Before leaving early boot and regular services start, i.e., before :code:`basic.target` is reached.
+        - ✓
+        - ✓
+      * - :systemd:option:`pre-mount`
+        - Before the root filesystem is mounted, i.e., before :code:`sysroot.mount` starts.
+        - ✓
+        - ✗
+      * - :systemd:option:`pre-switch-root`
+        - Before switching from the initrd to the real root.
+        - ✓
+        - ✗
+
+   .. versionadded:: 258
+
+System Credentials
+##################
+
+.. systemd:option:: systemd.extra-unit.*
+   :group: system-credentials
+
+   Credentials prefixed with "systemd.extra-unit." specify additional units to add to the final system. Note that these additional units are added to both the initrd and the final system. :systemd:var:`ConditionPathExists=!/etc/initrd-release` can be used to make sure the unit is conditioned out in the initrd. Note that this can also be used to mask units, by simply specifying an empty value.
+
+   .. versionadded:: 256
+
+.. systemd:option:: systemd.unit-dropin.*
+   :group: system-credentials
+
+   Credentials prefixed with "systemd.unit-dropin." add drop-ins for the corresponding units in the final system. Each credential must be suffixed with the full unit name including the unit extension. Its contents must be a valid unit drop-in file. Optionally, the unit name may be followed with "~", followed by the drop-in name without the ".conf" suffix. If not specified, the name of the generated drop-in will be "50-credential.conf". Note that these additional drop-ins are added to both the initrd and the final system.
+
+   .. versionadded:: 256
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :man-pages:`kernel-command-line(7)`, :ref:`systemd.system-credentials(7)`, :man-pages:`bootup(7)`
+
+

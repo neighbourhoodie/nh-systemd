@@ -1,0 +1,39 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd-path
+:manvolnum: 3
+:summary: APIs to query file system paths
+
+.. _sd-path(3):
+
+==========
+sd-path(3)
+==========
+
+Name
+####
+
+sd-path — APIs to query file system paths
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-path.h>`
+
+:code:`pkg-config --cflags --libs libsystemd`
+
+Description
+###########
+
+:code:`sd-path.h` is part of :man-pages:`libsystemd(3)` and provides APIs to query file system paths. This functionality is similar to the command-line functionality provided by :ref:`systemd-path(1)`.
+
+See :ref:`sd_path_lookup(3)` for information about the functions available.
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-path(1)`, :die-net:`pkg-config(1)`
+
+

@@ -1,0 +1,50 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-modules-load.service
+:manvolnum: 8
+:summary: Load kernel modules at boot
+:aliases: systemd-modules-load
+
+.. _systemd-modules-load.service(8):
+
+===============================
+systemd-modules-load.service(8)
+===============================
+
+Name
+####
+
+systemd-modules-load.service, systemd-modules-load — Load kernel modules at boot
+
+Synopsis
+########
+
+:code:`systemd-modules-load.service`
+
+:code:`/usr/lib/systemd/systemd-modules-load`
+
+Description
+###########
+
+:code:`systemd-modules-load.service` is an early boot service that loads kernel modules. It reads static configuration from files in :code:`/usr/` and :code:`/etc/`, but also runtime configuration from :code:`/run/` and the kernel command line (see below).
+
+See :man-pages:`modules-load.d(5)` for information about the configuration format of this service and paths where configuration files can be created.
+
+Kernel Command Line
+###################
+
+:code:`systemd-modules-load.service` understands the following kernel command line parameters:
+
+.. systemd:option:: modules_load=, rd.modules_load=
+   :group: kernel-commandline-options
+
+   Takes a comma-separated list of kernel modules to statically load during early boot. The option prefixed with "rd." is read in the initrd only.
+
+   .. versionadded:: 187
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`modules-load.d(5)`
+
+

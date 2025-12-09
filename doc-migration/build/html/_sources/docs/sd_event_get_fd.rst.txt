@@ -1,0 +1,71 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_get_fd
+:manvolnum: 3
+:summary: Obtain a file descriptor to poll for event loop events
+
+.. _sd_event_get_fd(3):
+
+==================
+sd_event_get_fd(3)
+==================
+
+Name
+####
+
+sd_event_get_fd — Obtain a file descriptor to poll for event loop events
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   int sd_event_get_fd(sd_event *event);
+
+Description
+###########
+
+:code:`sd_event_get_fd()` returns the file descriptor that an event loop object returned by the :ref:`sd_event_new(3)` function uses to wait for events. This file descriptor may itself be polled for :code:`POLLIN`/:code:`EPOLLIN` events. This makes it possible to embed an :ref:`sd-event(3)` event loop into another, possibly foreign, event loop.
+
+The returned file descriptor refers to an :man-pages:`epoll(7)` object. It is recommended not to alter it by invoking :man-pages:`epoll_ctl(2)` on it, in order to avoid interference with the event loop's inner logic and assumptions.
+
+Return Value
+############
+
+On success, :code:`sd_event_get_fd()` returns a non-negative file descriptor. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   :code:`event` is not a valid pointer to an sd_event structure.
+
+.. systemd:option:: -ECHILD
+
+   The event loop has been created in a different process, library or module instance.
+
+Examples
+########
+
+Integration in the GLib event loop
+----------------------------------
+
+.. literalinclude:: /code-examples/c/glib-event-glue.c
+    :language: c
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_get_fd()` was added in version 217.
+
+See Also
+########
+
+:ref:`sd-event(3)`, :ref:`sd_event_new(3)`, :ref:`sd_event_wait(3)`, :man-pages:`epoll_ctl(2)`, :man-pages:`epoll(7)`
+
+

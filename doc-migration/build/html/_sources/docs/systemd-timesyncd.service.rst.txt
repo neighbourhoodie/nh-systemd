@@ -1,0 +1,65 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-timesyncd.service
+:manvolnum: 8
+:summary: Network Time Synchronization
+:aliases: systemd-timesyncd
+
+.. _systemd-timesyncd.service(8):
+
+============================
+systemd-timesyncd.service(8)
+============================
+
+Name
+####
+
+systemd-timesyncd.service, systemd-timesyncd — Network Time Synchronization
+
+Synopsis
+########
+
+:code:`systemd-timesyncd.service`
+
+:code:`/usr/lib/systemd/systemd-timesyncd`
+
+Description
+###########
+
+:code:`systemd-timesyncd.service` is a system service that may be used to synchronize the local system clock with a remote Network Time Protocol (NTP) server. It also saves the local time to disk every time the clock has been synchronized and uses this to possibly advance the system realtime clock on subsequent reboots to ensure it (roughly) monotonically advances even if the system lacks a battery-buffered RTC chip.
+
+The :code:`systemd-timesyncd.service` service implements SNTP only. This minimalistic service will step the system clock for large offsets or slowly adjust it for smaller deltas. Complex use cases that require full NTP support (and where SNTP is not sufficient) are not covered by :code:`systemd-timesyncd.service`.
+
+The NTP servers contacted are determined from the global settings in :man-pages:`timesyncd.conf(5)`, the per-link static settings in :code:`.network` files, and the per-link dynamic settings received over DHCP. See :ref:`systemd.network(5)` for further details.
+
+:man-pages:`timedatectl(1)`'s :code:`set-ntp` command may be used to enable and start, or disable and stop this service.
+
+:man-pages:`timedatectl(1)`'s :code:`timesync-status` or :code:`show-timesync` command can be used to show the current status of this service.
+
+Initialization of :code:`systemd-timesyncd.service` delays the start of units that are ordered after :code:`time-set.target` (see :ref:`systemd.special(7)` for details) until the local time has been updated from :code:`/var/lib/systemd/timesync/clock` (see below) in order to make it roughly monotonic. It does not delay other units until synchronization with an accurate reference time sources has been reached. Use :ref:`systemd-time-wait-sync.service(8)` to achieve that, which will delay start of units that are ordered after :code:`time-sync.target` until synchronization to an accurate reference clock is reached.
+
+:code:`systemd` and :code:`systemd-timesyncd` advance the system clock to the "epoch" (the lowest date above which the system clock time is assumed to be set correctly). See "System clock epoch" section in :ref:`systemd(1)` for details. :code:`systemd` will set the clock when initializing, but :code:`/var/lib/systemd/timesync/clock` might not yet be available at that point. :code:`systemd-timesyncd` will advance the clock when it is started and notices that the system clock is before the modification time of :code:`/var/lib/systemd/timesync/clock`.
+
+Files
+#####
+
+.. systemd:option:: /var/lib/systemd/timesync/clock
+
+   The modification time ("mtime") of this file is updated on each successful NTP synchronization or after each :code:`SaveIntervalSec=` time interval, as specified in :man-pages:`timesyncd.conf(5)`.
+
+   If present, the modification time of this file is used for the epoch by :ref:`systemd(1)` and :code:`systemd-timesyncd.service`.
+
+   .. versionadded:: 219
+
+.. systemd:option:: /run/systemd/timesync/synchronized
+
+   A file that is touched on each successful synchronization to assist :ref:`systemd-time-wait-sync.service(8)` service and other applications in detecting synchronization to an accurate reference clock.
+
+   .. versionadded:: 239
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`timesyncd.conf(5)`, :ref:`systemd.network(5)`, :ref:`systemd-networkd.service(8)`, :ref:`systemd-time-wait-sync.service(8)`, :ref:`systemd.special(7)`, :man-pages:`timedatectl(1)`, :man-pages:`localtime(5)`, :man-pages:`hwclock(8)`
+
+

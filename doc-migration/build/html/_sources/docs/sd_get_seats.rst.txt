@@ -1,0 +1,71 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_get_seats
+:manvolnum: 3
+:summary: Determine available seats, sessions, logged in users and virtual machines/containers
+:aliases: sd_get_sessions, sd_get_uids, sd_get_machine_names
+
+.. _sd_get_seats(3):
+
+===============
+sd_get_seats(3)
+===============
+
+Name
+####
+
+sd_get_seats, sd_get_sessions, sd_get_uids, sd_get_machine_names — Determine available seats, sessions, logged in users and virtual machines/containers
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-login.h>` .. code-block::
+
+   int sd_get_seats(char ***seats); .. code-block::
+
+   int sd_get_sessions(char ***sessions); .. code-block::
+
+   int sd_get_uids(uid_t **users); .. code-block::
+
+   int sd_get_machine_names(char ***machines);
+
+Description
+###########
+
+:code:`sd_get_seats()` may be used to determine all currently available local seats. Returns the number of seat identifiers and if the input pointer is non-:code:`NULL`, a :code:`NULL`-terminated array of seat identifiers is stored at the address. The returned array and all strings it references need to be freed with the libc :man-pages:`free(3)` call after use. Note that instead of an empty array :code:`NULL` may be returned and should be considered equivalent to an empty array.
+
+Similarly, :code:`sd_get_sessions()` may be used to determine all current login sessions.
+
+Similarly, :code:`sd_get_uids()` may be used to determine all Unix users who currently have login sessions.
+
+Similarly, :code:`sd_get_machine_names()` may be used to determine all current virtual machines and containers on the system.
+
+Note that the returned lists are not sorted and in an undefined order.
+
+Return Value
+############
+
+On success, :code:`sd_get_seats()`, :code:`sd_get_sessions()`, :code:`sd_get_uids()` and :code:`sd_get_machine_names()` return the number of entries in the arrays. On failure, these calls return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_get_machine_names()` was added in version 203.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-login(3)`, :ref:`sd_session_get_seat(3)`
+
+

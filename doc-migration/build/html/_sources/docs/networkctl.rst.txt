@@ -1,0 +1,403 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: networkctl
+:manvolnum: 1
+:summary: Query or modify the status of network links
+
+.. _networkctl(1):
+
+=============
+networkctl(1)
+=============
+
+Name
+####
+
+networkctl — Query or modify the status of network links
+
+Synopsis
+########
+
+:code:`networkctl [OPTIONS...] COMMAND [LINK...]`
+
+Description
+###########
+
+:code:`networkctl` may be used to query or modify the state of the network links as seen by :code:`systemd-networkd`. Please refer to :ref:`systemd-networkd.service(8)` for an introduction to the basic concepts, functionality, and configuration syntax.
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: list [PATTERN…]
+
+   Show a list of existing links and their status. If one or more :emphasis:`PATTERN`\s are specified, only links matching one of them are shown. If no further arguments are specified shows all links, otherwise just the specified links. Produces output similar to:
+
+     .. code-block:: sh
+
+        IDX LINK         TYPE     OPERATIONAL SETUP
+          1 lo           loopback carrier     unmanaged
+          2 eth0         ether    routable    configured
+          3 virbr0       ether    no-carrier  unmanaged
+          4 virbr0-nic   ether    off         unmanaged
+        4 links listed.
+
+   The operational status is one of the following: .. systemd:option:: missing
+
+         The device is missing.
+
+         .. versionadded:: 245
+
+   .. systemd:option:: off
+
+         The device is powered down.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: no-carrier
+
+         The device is powered up, but does not yet have a carrier.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: dormant
+
+         The device has a carrier, but is not yet ready for normal traffic.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: degraded-carrier
+
+         One of the bonding or bridge slave network interfaces is in off, no-carrier, or dormant state, and the master interface has no address.
+
+         .. versionadded:: 242
+
+   .. systemd:option:: carrier
+
+         The link has carrier, or for bond or bridge master, all bonding or bridge slave network interfaces are enslaved to the master.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: degraded
+
+         The link has carrier and addresses valid on the local link configured. For bond or bridge master this means that not all slave network interfaces have carrier but at least one does.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: enslaved
+
+         The link has carrier and is enslaved to bond or bridge master network interface.
+
+         .. versionadded:: 242
+
+   .. systemd:option:: routable
+
+         The link has carrier and routable address configured. For bond or bridge master it is not necessary for all slave network interfaces to have carrier, but at least one must.
+
+         .. versionadded:: 240
+
+   The setup status is one of the following: .. systemd:option:: pending
+
+         :ref:`systemd-udevd(8)` is still processing the link, we do not yet know if we will manage it.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: initialized
+
+         :ref:`systemd-udevd(8)` has processed the link, but we do not yet know if we will manage it.
+
+         .. versionadded:: 251
+
+   .. systemd:option:: configuring
+
+         Configuration for the link is being retrieved or the link is being configured.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: configured
+
+         Link has been configured successfully.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: unmanaged
+
+         :code:`systemd-networkd` is not handling the link.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: failed
+
+         :code:`systemd-networkd` failed to configure the link.
+
+         .. versionadded:: 240
+
+   .. systemd:option:: linger
+
+         The link is gone, but has not yet been dropped by :code:`systemd-networkd`.
+
+         .. versionadded:: 240
+
+   .. versionadded:: 219
+
+.. systemd:option:: status [PATTERN…]
+
+   Show information about the specified links: type, state, kernel module driver, hardware and IP address, configured DNS servers, etc. If one or more :emphasis:`PATTERN`\s are specified, only links matching one of them are shown.
+
+   When no links are specified, an overall network status is shown. Also see the option :code:`--all`.
+
+   Produces output similar to:
+
+     .. code-block:: sh
+
+        ●        State: routable
+          Online state: online
+               Address: 10.193.76.5 on eth0
+                        192.168.122.1 on virbr0
+                        169.254.190.105 on eth0
+                        fe80::5054:aa:bbbb:cccc on eth0
+               Gateway: 10.193.11.1 (CISCO SYSTEMS, INC.) on eth0
+                   DNS: 8.8.8.8
+                        8.8.4.4
+
+   In the overall network status, the online state depends on the individual online state of all required links. Managed links are required for online by default. In this case, the online state is one of the following: .. systemd:option:: unknown
+
+         All links have unknown online status (i.e. there are no required links).
+
+         .. versionadded:: 249
+
+   .. systemd:option:: offline
+
+         All required links are offline.
+
+         .. versionadded:: 249
+
+   .. systemd:option:: partial
+
+         Some, but not all, required links are online.
+
+         .. versionadded:: 249
+
+   .. systemd:option:: online
+
+         All required links are online.
+
+         .. versionadded:: 249
+
+   .. versionadded:: 219
+
+.. systemd:option:: lldp [PATTERN…]
+
+   Show discovered LLDP (Link Layer Discovery Protocol) neighbors. If one or more :emphasis:`PATTERN`\s are specified only neighbors on those interfaces are shown. Otherwise, shows discovered neighbors on all interfaces. Note that for this feature to work, :code:`LLDP=` must be turned on for the specific interface, see :ref:`systemd.network(5)` for details.
+
+   Produces output similar to:
+
+     .. code-block:: sh
+
+        LINK    SYSTEM-NAME SYSTEM-DESCRIPTION CHASSIS-ID        PORT-ID PORT-DESCRIPTION CAPS
+        enp0s25 GS1900      -                  00:e0:4c:00:00:00 2       Port #2           ..b........
+        Capability Flags:
+        o - Other; p - Repeater;  b - Bridge; w - WLAN Access Point; r - Router;
+        t - Telephone; d - DOCSIS cable device; a - Station; c - Customer VLAN;
+        s - Service VLAN, m - Two-port MAC Relay (TPMR)
+        1 neighbor(s) listed.
+
+   .. versionadded:: 219
+
+.. systemd:option:: label
+
+   Show numerical address labels that can be used for address selection. This is the same information that :die-net:`ip-addrlabel(8)` shows. See `RFC 3484 <https://tools.ietf.org/html/rfc3484>`_ for a discussion of address labels.
+
+   Produces output similar to:
+
+     .. code-block:: sh
+
+        Prefix/Prefixlen                          Label
+                ::/0                                  1
+            fc00::/7                                  5
+            fec0::/10                                11
+            2002::/16                                 2
+            3ffe::/16                                12
+         2001:10::/28                                 7
+            2001::/32                                 6
+        ::ffff:0.0.0.0/96                             4
+                ::/96                                 3
+               ::1/128                                0
+
+   .. versionadded:: 234
+
+.. systemd:option:: delete DEVICE…
+
+   Deletes virtual netdevs. Takes interface name or index number.
+
+   .. versionadded:: 243
+
+.. systemd:option:: up DEVICE…
+
+   Bring devices up. Takes interface name or index number.
+
+   .. versionadded:: 246
+
+.. systemd:option:: down DEVICE…
+
+   Bring devices down. Takes interface name or index number.
+
+   .. versionadded:: 246
+
+.. systemd:option:: renew DEVICE…
+
+   Renew dynamic configurations e.g. addresses received from DHCP server. Takes interface name or index number.
+
+   .. versionadded:: 244
+
+.. systemd:option:: forcerenew DEVICE…
+
+   Send a FORCERENEW message to all connected clients, triggering DHCP reconfiguration. Takes interface name or index number.
+
+   .. versionadded:: 246
+
+.. systemd:option:: reconfigure DEVICE…
+
+   Reconfigure network interfaces. Takes interface name or index number. Note that this does not reload :code:`.netdev` or :code:`.network` corresponding to the specified interface. So, if you edit config files, it is necessary to call :code:`networkctl reload` first to apply new settings.
+
+   .. versionadded:: 244
+
+.. systemd:option:: reload
+
+   Reload :code:`.netdev` and :code:`.network` files.
+
+   If a new or modified :code:`.netdev` file is found, then the corresponding netdev is created or updated, respectively. Note, if the corresponding interface already exists, then some of new settings may not be applied. E.g., VLAN ID cannot be changed after the interface was created, so changing \[VLAN] :code:`Id=` will not take effect if the matching VLAN interface already exists. To apply such settings, the interfaces need to be removed manually before reload. Also note that even if a :code:`.netdev` file is removed, :ref:`systemd-networkd(8)` does not remove the existing netdev corresponding to the file.
+
+   If a new, modified, or removed :code:`.network` file is found, then all interfaces that matched the file are reconfigured.
+
+   .. versionadded:: 244
+
+.. systemd:option:: edit FILE|@DEVICE…
+
+   Edit network configuration files, which include :code:`.network`, :code:`.netdev`, and :code:`.link` files. If no network config file matching the given name is found, a new one will be created under :code:`/etc/` or :code:`/run/`, depending on whether :code:`--runtime` is specified. Specially, if the name is prefixed by "@", it will be treated as a network interface, and editing will be performed on the network config files associated with it. Additionally, the interface name can be suffixed with ":network" (default), ":link", or ":netdev", in order to choose the type of network config to operate on.
+
+   If :code:`--drop-in=` is specified, edit the drop-in file instead of the main configuration file. Unless :code:`--no-reload` is specified, :ref:`systemd-networkd(8)` will be reloaded after the edit of the :code:`.network` or :code:`.netdev` files finishes. The same applies for :code:`.link` files and :ref:`systemd-udevd(8)`. Note that the changed link settings are not automatically applied after reloading. To achieve that, trigger uevents for the corresponding interface. Refer to :ref:`systemd.link(5)` for more information.
+
+   If :code:`--stdin` is specified, the new content will be read from standard input. In this mode, the old content of the file is discarded.
+
+   .. versionadded:: 254
+
+.. systemd:option:: cat [FILE|@DEVICE…]
+
+   Show network configuration files. This command honors the "@" prefix in a similar way as :code:`edit`, with support for an additional suffix ":all" for showing all types of configuration files associated with the interface at once. When no argument is specified, :man-pages:`networkd.conf(5)` and its drop-in files will be shown.
+
+   .. versionadded:: 254
+
+.. systemd:option:: mask FILE…
+
+   Mask network configuration files, which include :code:`.network`, :code:`.netdev`, and :code:`.link` files. A symlink of the given name will be created under :code:`/etc/` or :code:`/run/`, depending on whether :code:`--runtime` is specified, that points to :code:`/dev/null`. If a non-empty config file with the specified name exists under the target directory or a directory with higher priority (e.g. :code:`--runtime` is used while an existing config resides in :code:`/etc/`), the operation is aborted.
+
+   This command honors :code:`--no-reload` in the same way as :code:`edit`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: unmask FILE…
+
+   Unmask network configuration files, i.e. reverting the effect of :code:`mask`. Note that this command operates regardless of the scope of the directory, i.e. :code:`--runtime` is of no effect.
+
+   This command honors :code:`--no-reload` in the same way as :code:`edit` and :code:`mask`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: persistent-storage BOOL
+
+   Notify :ref:`systemd-networkd.service(8)` that the persistent storage for the service is ready. This is called by :code:`systemd-networkd-persistent-storage.service`. Usually, this command should not be called manually by users or administrators.
+
+   .. versionadded:: 256
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: -a --all
+
+   Show all links with :code:`status`.
+
+   .. versionadded:: 219
+
+.. systemd:option:: -s --stats
+
+   Show link statistics with :code:`status`.
+
+   .. versionadded:: 243
+
+.. systemd:option:: -l, --full
+
+   Do not ellipsize the output.
+
+   .. versionadded:: 245
+
+.. systemd:option:: -n, --lines=
+
+   When used with :code:`status`, controls the number of journal lines to show, counting from the most recent ones. Takes a positive integer argument. Defaults to 10.
+
+   .. versionadded:: 245
+
+.. systemd:option:: --drop-in=NAME
+
+   When used with :code:`edit`, edit the drop-in file :emphasis:`NAME` instead of the main configuration file.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --no-reload
+
+   When used with :code:`edit`, :code:`mask`, or :code:`unmask`, :ref:`systemd-networkd.service(8)` or :ref:`systemd-udevd.service(8)` will not be reloaded after the operation finishes.
+
+   .. versionadded:: 254
+
+.. systemd:option:: --runtime
+
+   When used with :code:`edit` or :code:`mask`, operate on the file under :code:`/run/` instead of :code:`/etc/`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --stdin
+
+   When used with :code:`edit`, the contents of the file will be read from standard input and the editor will not be launched. In this mode, the old contents of the file are automatically replaced. This is useful to "edit" configuration from scripts, especially so that drop-in directories are created and populated in one go.
+
+   Multiple drop-ins may be "edited" in this mode with :code:`--drop-in=`, and the same contents will be written to all of them. Otherwise, exactly one main configuration file is expected.
+
+   .. versionadded:: 257
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd-networkd.service(8)`, :ref:`systemd.network(5)`, :ref:`systemd.netdev(5)`, :die-net:`ip(8)`
+
+

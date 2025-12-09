@@ -1,0 +1,43 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-sysv-generator
+:manvolnum: 8
+:summary: Unit generator for SysV init scripts
+
+.. _systemd-sysv-generator(8):
+
+=========================
+systemd-sysv-generator(8)
+=========================
+
+Name
+####
+
+systemd-sysv-generator — Unit generator for SysV init scripts
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-sysv-generator`
+
+Description
+###########
+
+*Note: this component is deprecated and scheduled for removal. Please replace remaining SysV init scripts with native unit files.*
+
+:code:`systemd-sysv-generator` is a generator that creates wrapper .service units for `System V init <https://savannah.nongnu.org/projects/sysvinit>`_ scripts in :code:`/etc/init.d/*` at boot and when configuration of the system manager is reloaded. This allows :ref:`systemd(1)` to support them similarly to native units.
+
+`LSB headers <http://refspecs.linuxbase.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html>`_ in SysV init scripts are interpreted, and the ordering specified in the header is turned into dependencies between the generated unit and other units. The LSB facilities "$remote_fs", "$network", "$named", "$portmap", "$time" are supported and will be turned into dependencies on specific native systemd targets. See :ref:`systemd.special(7)` for more details.
+
+Note that compatibility is quite comprehensive but not 100%, for more details see `Compatibility with SysV <https://systemd.io/INCOMPATIBILITIES>`_.
+
+:code:`systemd` does not support SysV scripts as part of early boot, so all wrapper units are ordered after :code:`basic.target`.
+
+:code:`systemd-sysv-generator` implements :ref:`systemd.generator(7)`.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.service(5)`, :ref:`systemd.target(5)`
+
+

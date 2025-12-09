@@ -1,0 +1,88 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-network-generator.service
+:manvolnum: 8
+:summary: Generate network configuration from the kernel command line
+:aliases: systemd-network-generator
+
+.. _systemd-network-generator.service(8):
+
+====================================
+systemd-network-generator.service(8)
+====================================
+
+Name
+####
+
+systemd-network-generator.service, systemd-network-generator — Generate network configuration from the kernel command line
+
+Synopsis
+########
+
+:code:`systemd-network-generator.service`
+
+:code:`/usr/lib/systemd/systemd-network-generator`
+
+Description
+###########
+
+:code:`systemd-network-generator.service` is a system service that translates :code:`ip=` and related settings on the kernel command line (see below) into :ref:`systemd.network(5)`, :ref:`systemd.netdev(5)`, and :ref:`systemd.link(5)` configuration files understood by :ref:`systemd-networkd.service(8)` and :ref:`systemd-udevd.service(8)`.
+
+Files are generated in :code:`/run/systemd/network/`.
+
+Note: despite the name, this generator executes as a normal systemd service and is *not* an implementation of the an implementation of the :ref:`systemd.generator(7)` concept.
+
+Kernel command line options
+###########################
+
+This tool understands the following options:
+
+.. systemd:option:: ip=, nameserver=, rd.route=, rd.peerdns=
+   :group: kernel-commandline-options
+
+   Translated into :ref:`systemd.network(5)` files.
+
+   In addition to the parameters :man-pages:`dracut.cmdline(7)` defines the :systemd:var:`ip=` option accepts the special value "link-local". If selected, the network interfaces will be configured for link-local addressing (IPv4LL, IPv6LL) only, DHCP or IPv6RA will not be enabled.
+
+   .. versionadded:: 245
+
+.. systemd:option:: ifname=, net.ifname_policy=
+   :group: kernel-commandline-options
+
+   Translated into :ref:`systemd.link(5)` files.
+
+   .. versionadded:: 245
+
+.. systemd:option:: vlan=, bond=, bridge=, bootdev=
+   :group: kernel-commandline-options
+
+   Translated into :ref:`systemd.netdev(5)` files.
+
+   .. versionadded:: 245
+
+.. COMMENT: unsupported: team=<teammaster>:<teamslaves> bootdev= BOOTIF= bootdev= bootdev= bootdev=
+
+See :man-pages:`dracut.cmdline(7)` and :ref:`systemd-udevd.service(8)` for option syntax and details.
+
+Credentials
+###########
+
+:code:`systemd-network-generator` supports the service credentials logic as implemented by :code:`ImportCredential=`/:code:`LoadCredential=`/:code:`SetCredential=` (see :ref:`systemd.exec(5)` for details). The following credentials are used when passed in:
+
+.. systemd:option:: network.conf.*, network.link.*, network.netdev.*, network.network.*
+   :group: system-credentials
+
+   These credentials should contain valid :man-pages:`networkd.conf(5)`, :ref:`systemd.link(5)`, :ref:`systemd.netdev(5)`, :ref:`systemd.network(5)` configuration data. From each matching credential a separate file is created. Example: a passed credential :code:`network.link.50-foobar` will be copied into a configuration file :code:`50-foobar.link`.
+
+   Note that the resulting files are created world-readable, it is hence recommended to not include secrets in these credentials, but to supply them via separate credentials directly to :ref:`systemd-networkd.service(8)`.
+
+   .. versionadded:: 256
+
+Note that by default the :ref:`systemd-networkd.service(8)` service is set up to inherit the these credentials from the service manager.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-networkd.service(8)`, :man-pages:`dracut(8)`
+
+

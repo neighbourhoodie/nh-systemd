@@ -1,0 +1,69 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_wait
+:manvolnum: 3
+:summary: Wait for I/O on a bus connection
+
+.. _sd_bus_wait(3):
+
+==============
+sd_bus_wait(3)
+==============
+
+Name
+####
+
+sd_bus_wait — Wait for I/O on a bus connection
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_wait(sd_bus *bus,
+	uint64_t timeout_usec);
+
+Description
+###########
+
+:code:`sd_bus_wait()` synchronously waits for I/O on the specified bus connection object. This function is supposed to be called whenever :ref:`sd_bus_process(3)` returns zero, indicating that no work is pending on the connection. Internally, this call invokes :man-pages:`ppoll(2)`, to wait for I/O on the bus connection. If the :code:`timeout_usec` parameter is specified, the call will block at most for the specified amount of time in μs. Pass :code:`UINT64_MAX` to permit it to sleep indefinitely.
+
+After each invocation of :code:`sd_bus_wait()` the :code:`sd_bus_process()` call should be invoked in order to process any now pending I/O work.
+
+Note that :code:`sd_bus_wait()` is suitable only for simple programs as it does not permit waiting for other I/O events. For more complex programs either connect the bus connection object to an external event loop using :ref:`sd_bus_get_fd(3)` or to an :ref:`sd-event(3)` event loop using :ref:`sd_bus_attach_event(3)`.
+
+Return Value
+############
+
+If any I/O was seen, a positive value is returned, zero otherwise. If an error occurs, a negative :code:`errno`-style error code is returned.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An invalid bus object was passed.
+
+.. systemd:option:: -ECHILD
+
+   The bus connection was allocated in a parent process and is being reused in a child process after :code:`fork()`.
+
+.. systemd:option:: -ENOTCONN
+
+   The bus connection has been terminated already.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_wait()` was added in version 240.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_process(3)`, :ref:`sd_bus_get_fd(3)`, :ref:`sd-event(3)`, :ref:`sd_bus_attach_event(3)`
+
+

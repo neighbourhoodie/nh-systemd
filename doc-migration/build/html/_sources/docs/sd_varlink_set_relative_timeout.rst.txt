@@ -1,0 +1,59 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_varlink_set_relative_timeout
+:manvolnum: 3
+:summary: Set method call time-out
+
+.. _sd_varlink_set_relative_timeout(3):
+
+==================================
+sd_varlink_set_relative_timeout(3)
+==================================
+
+Name
+####
+
+sd_varlink_set_relative_timeout — Set method call time-out
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-varlink.h>` .. code-block::
+
+   int sd_varlink_set_relative_timeout(sd_varlink *link,
+	uint64_t usec);
+
+Description
+###########
+
+:code:`sd_varlink_set_relative_timeout()` sets the relative timeout in µs to enforce on Varlink method calls. A default time-out of 45s (currently) applies, which may be changed with this call. Set to :code:`UINT64_MAX` to disable the time-out, and to 0 to revert to revert back to the default time-out. The time-out begins whenever a method call is started, and if no response is received by the time the time-out elapses a synthetic :code:`io.systemd.TimedOut` error is raised as client-generated reply to the method call.
+
+This call is particularly useful for method calls issued via :code:`sd_varlink_observe()` that shall remain open continuously for a long time.
+
+Return Value
+############
+
+On success, :code:`sd_varlink_set_relative_timeout()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An argument is invalid.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_varlink_set_relative_timeout()` was added in version 257.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-varlink(3)`
+
+

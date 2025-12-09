@@ -1,0 +1,51 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd-journal
+:manvolnum: 3
+:summary: APIs for submitting and querying log entries to and from the journal
+
+.. _sd-journal(3):
+
+=============
+sd-journal(3)
+=============
+
+Name
+####
+
+sd-journal — APIs for submitting and querying log entries to and from the journal
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>`
+
+:code:`pkg-config --cflags --libs libsystemd`
+
+Description
+###########
+
+:code:`sd-journal.h` is part of :man-pages:`libsystemd(3)` and provides APIs to submit and query log entries. The APIs exposed act both as client for the :ref:`systemd-journald.service(8)` journal service and as parser for the journal files on disk.
+
+See :ref:`sd_journal_print(3)`, :ref:`sd_journal_stream_fd(3)`, :ref:`sd_journal_open(3)`, :ref:`sd_journal_next(3)`, :ref:`sd_journal_get_realtime_usec(3)`, :ref:`sd_journal_add_match(3)`, :ref:`sd_journal_seek_head(3)`, :ref:`sd_journal_enumerate_fields(3)`, :ref:`sd_journal_get_cursor(3)`, :ref:`sd_journal_get_cutoff_realtime_usec(3)`, :ref:`sd_journal_get_cutoff_monotonic_usec(3)`, :ref:`sd_journal_get_usage(3)`, :ref:`sd_journal_get_catalog(3)`, :ref:`sd_journal_get_fd(3)`, :ref:`sd_journal_has_runtime_files(3)` and :ref:`sd_journal_has_persistent_files(3)` for more information about the functions implemented.
+
+Command line access for submitting entries to the journal is available with the :ref:`systemd-cat(1)` tool. Command line access for querying entries from the journal is available with the :man-pages:`journalctl(1)` tool.
+
+Thread safety
+#############
+
+Functions that operate on sd_journal objects are thread agnostic — a given sd_journal pointer may only be used from one thread at a time, but multiple independent threads may use multiple objects concurrently. Some functions — those that are used to send entries to the journal, like :ref:`sd_journal_print(3)` and similar, or those that are used to retrieve global information like :ref:`sd_journal_stream_fd(3)` and :ref:`sd_journal_get_catalog_for_message_id(3)` — are fully thread-safe and may be called from multiple threads in parallel.
+
+Optional dependencies
+#####################
+
+Depending on which build-time options are enabled, functions that operate on sd_journal objects might cause optional shared libraries to be dynamically loaded via :man-pages:`dlopen(3)`, such as decompression libraries (xz, lz4, zstd) or cryptographic libraries (gcrypt).
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd_journal_print(3)`, :ref:`sd_journal_stream_fd(3)`, :ref:`sd_journal_open(3)`, :ref:`sd_journal_next(3)`, :ref:`sd_journal_get_data(3)`, :ref:`sd_journal_get_realtime_usec(3)`, :ref:`sd_journal_add_match(3)`, :ref:`sd_journal_seek_head(3)`, :ref:`sd_journal_enumerate_fields(3)`, :ref:`sd_journal_get_cursor(3)`, :ref:`sd_journal_get_cutoff_realtime_usec(3)`, :ref:`sd_journal_get_cutoff_monotonic_usec(3)`, :ref:`sd_journal_get_usage(3)`, :ref:`sd_journal_get_fd(3)`, :ref:`sd_journal_query_unique(3)`, :ref:`sd_journal_get_catalog(3)`, :ref:`sd_journal_has_runtime_files(3)`, :ref:`sd_journal_has_persistent_files(3)`, :man-pages:`journalctl(1)`, :ref:`sd-id128(3)`, :die-net:`pkg-config(1)`
+
+

@@ -1,0 +1,58 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_device_enumerator_get_device_first
+:manvolnum: 3
+:summary: Enumerates devices and get the first or next device.
+:aliases: sd_device_enumerator_get_device_next, sd_device_enumerator_get_subsystem_first, sd_device_enumerator_get_subsystem_next
+
+.. _sd_device_enumerator_get_device_first(3):
+
+========================================
+sd_device_enumerator_get_device_first(3)
+========================================
+
+Name
+####
+
+sd_device_enumerator_get_device_first, sd_device_enumerator_get_device_next, sd_device_enumerator_get_subsystem_first, sd_device_enumerator_get_subsystem_next — Enumerates devices and get the first or next device.
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-device.h>` .. code-block::
+
+   sd_device *sd_device_enumerator_get_device_first(sd_device_enumerator *enumerator); .. code-block::
+
+   sd_device *sd_device_enumerator_get_device_next(sd_device_enumerator *enumerator); .. code-block::
+
+   sd_device *sd_device_enumerator_get_subsystem_first(sd_device_enumerator *enumerator); .. code-block::
+
+   sd_device *sd_device_enumerator_get_subsystem_next(sd_device_enumerator *enumerator);
+
+Description
+###########
+
+The :code:`sd_device_enumerator_get_device_first()` function enumerates all matching devices under :code:`/sys/bus/SUBSYSTEM/devices/` and :code:`/sys/class/SUBSYSTEM/devices/`, and returns a pointer to the first sd_device object. If no devices are found, :code:`NULL` is returned.
+
+The :code:`sd_device_enumerator_get_device_next()` function returns the pointer to the next sd_device from the :code:`enumerator`. It should be called after :code:`sd_device_enumerator_get_device_first()` or after a previous call to this function. If no more devices are available, :code:`NULL` is returned.
+
+The :code:`sd_device_enumerator_get_subsystem_first()` function enumerates all matching subsystem devices in :code:`/sys/module/`, :code:`/sys/bus/`, and :code:`/sys/bus/SUBSYSTEM/drivers/` (such as :code:`/sys/bus/pci/drivers/`). It returns a pointer to the first sd_device object. If no devices are found :code:`NULL` is returned. Note that this does *not* enumerate devices provided by enumerate devices provided by :code:`sd_device_enumerator_get_device_first/next()`. Hence, e.g. :code:`/sys/bus/pci/`, :code:`/sys/bus/pci/drivers/ahci/` and so on are enumerated, but :code:`/sys/bus/pci/devices/0000:00:00.0/` and so on are not.
+
+The :code:`sd_device_enumerator_get_subsystem_next()` function returns the next subsystem device from the enumerator. It should be called after :code:`sd_device_enumerator_get_subsystem_first()` or after a previous call to this function. If no more subsystem devices are available, :code:`NULL` is returned.
+
+Return Value
+############
+
+On success, these functions return a pointer to an sd_device object. On failure or when no more devices are available, :code:`NULL` is returned. The returned pointers are owned by the enumerator and should not be freed by the caller.
+
+History
+#######
+
+:code:`sd_device_enumerator_get_device_first()`, :code:`sd_device_enumerator_get_device_next()`, :code:`sd_device_enumerator_get_subsystem_first()`, and :code:`sd_device_enumerator_get_subsystem_next()` were introduced in systemd version 240.
+
+See Also
+########
+
+:ref:`sd_device_enumerator_new(3)`, :ref:`sd_device_enumerator_add_match_parent(3)`, :ref:`sd_device_ref(3)`
+
+

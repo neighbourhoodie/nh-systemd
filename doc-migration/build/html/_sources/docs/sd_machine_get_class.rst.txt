@@ -1,0 +1,71 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_machine_get_class
+:manvolnum: 3
+:summary: Determine the class and network interface indices of a locally running virtual machine or container
+:aliases: sd_machine_get_ifindices
+
+.. _sd_machine_get_class(3):
+
+=======================
+sd_machine_get_class(3)
+=======================
+
+Name
+####
+
+sd_machine_get_class, sd_machine_get_ifindices — Determine the class and network interface indices of a locally running virtual machine or container
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-login.h>` .. code-block::
+
+   int sd_machine_get_class(const char* machine,
+	char **class); .. code-block::
+
+   int sd_machine_get_ifindices(const char* machine,
+	int **ret_ifindices);
+
+Description
+###########
+
+:code:`sd_machine_get_class()` may be used to determine the class of a locally running virtual machine or container that is registered with :ref:`systemd-machined.service(8)`. The string returned is either "vm" or "container". The returned string needs to be freed with the libc :man-pages:`free(3)` call after use.
+
+:code:`sd_machine_get_ifindices()` may be used to determine the numeric indices of the network interfaces on the host that are pointing towards the specified locally running virtual machine or container. The vm or container must be registered with :ref:`systemd-machined.service(8)`. The output parameter :code:`ret_ifindices` may be passed as :code:`NULL` when the output value is not needed. The returned array needs to be freed with the libc :man-pages:`free(3)` call after use.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. :code:`sd_machine_get_ifindices()` returns the number of the relevant network interfaces. On failure, these calls return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENXIO
+
+   The specified machine does not exist or is currently not running.
+
+.. systemd:option:: -EINVAL
+
+   An input parameter was invalid (out of range, or :code:`NULL`, where that is not accepted).
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_machine_get_class()` and :code:`sd_machine_get_ifindices()` were added in version 217.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-login(3)`, :ref:`systemd-machined.service(8)`, :ref:`sd_pid_get_machine_name(3)`
+
+

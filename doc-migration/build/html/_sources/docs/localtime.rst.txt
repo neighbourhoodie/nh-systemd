@@ -1,0 +1,41 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: localtime
+:manvolnum: 5
+:summary: Local timezone configuration file
+
+.. _localtime(5):
+
+============
+localtime(5)
+============
+
+Name
+####
+
+localtime — Local timezone configuration file
+
+Synopsis
+########
+
+:code:`/etc/localtime` -> :code:`../usr/share/zoneinfo/…`
+
+Description
+###########
+
+The :code:`/etc/localtime` file configures the system-wide timezone of the local system that is used by applications for presentation to the user. It should be an absolute or relative symbolic link pointing to :code:`/usr/share/zoneinfo/`, followed by a timezone identifier such as "Europe/Berlin" or "Etc/UTC". The resulting link should lead to the corresponding binary :man-pages:`tzfile(5)` timezone data for the configured timezone.
+
+Because the timezone identifier is extracted from the symlink target name of :code:`/etc/localtime`, this file may not be a normal file or hardlink.
+
+If :code:`/etc/localtime` is missing, the default "UTC" timezone is used.
+
+The timezone may be overridden for individual programs by using the :code:`$TZ` environment variable. See :man-pages:`environ(7)`.
+
+You may use :man-pages:`timedatectl(1)` to change the settings of this file from the command line during runtime. Use :ref:`systemd-firstboot(1)` to initialize the time zone on mounted (but not booted) system images.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`tzset(3)`, :man-pages:`localtime(3)`, :man-pages:`timedatectl(1)`, :ref:`systemd-timedated.service(8)`, :ref:`systemd-firstboot(1)`
+
+

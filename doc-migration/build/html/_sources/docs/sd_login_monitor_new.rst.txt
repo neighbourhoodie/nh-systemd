@@ -1,0 +1,124 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_login_monitor_new
+:manvolnum: 3
+:summary: Monitor login sessions, seats, users and virtual machines/containers
+:aliases: sd_login_monitor_unref, sd_login_monitor_unrefp, sd_login_monitor_flush, sd_login_monitor_get_fd, sd_login_monitor_get_events, sd_login_monitor_get_timeout, sd_login_monitor
+
+.. _sd_login_monitor_new(3):
+
+=======================
+sd_login_monitor_new(3)
+=======================
+
+Name
+####
+
+sd_login_monitor_new, sd_login_monitor_unref, sd_login_monitor_unrefp, sd_login_monitor_flush, sd_login_monitor_get_fd, sd_login_monitor_get_events, sd_login_monitor_get_timeout, sd_login_monitor — Monitor login sessions, seats, users and virtual machines/containers
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-login.h>` .. code-block::
+
+   int sd_login_monitor_new(const char *category,
+	sd_login_monitor **ret); .. code-block::
+
+   sd_login_monitor *sd_login_monitor_unref(sd_login_monitor *m); .. code-block::
+
+   void sd_login_monitor_unrefp(sd_login_monitor **m); .. code-block::
+
+   int sd_login_monitor_flush(sd_login_monitor *m); .. code-block::
+
+   int sd_login_monitor_get_fd(sd_login_monitor *m); .. code-block::
+
+   int sd_login_monitor_get_events(sd_login_monitor *m); .. code-block::
+
+   int sd_login_monitor_get_timeout(sd_login_monitor *m,
+	uint64_t *timeout_usec);
+
+Description
+###########
+
+:code:`sd_login_monitor_new()` may be used to monitor login sessions, users, seats, and virtual machines/containers. Via a monitor object a file descriptor can be integrated into an application defined event loop which is woken up each time a user logs in, logs out or a seat is added or removed, or a session, user, seat or virtual machine/container changes state otherwise. The first parameter takes a string which can be "seat" (to get only notifications about seats being added, removed or changed), "session" (to get only notifications about sessions being created or removed or changed), "uid" (to get only notifications when a user changes state in respect to logins) or "machine" (to get only notifications when a virtual machine or container is started or stopped). If notifications shall be generated in all these conditions, :code:`NULL` may be passed. Note that in the future additional categories may be defined. The second parameter returns a monitor object and needs to be freed with the :code:`sd_login_monitor_unref()` call after use.
+
+:code:`sd_login_monitor_unref()` may be used to destroy a monitor object. Note that this will invalidate any file descriptor returned by :code:`sd_login_monitor_get_fd()`.
+
+:code:`sd_login_monitor_unrefp()` is similar to :code:`sd_login_monitor_unref()` but takes a pointer to a pointer to an sd_login_monitor object. This call is useful in conjunction with GCC's and LLVM's `Clean-up Variable Attribute <https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html>`_. Note that this function is defined as inline function. Use a declaration like the following, in order to allocate a login monitor object that is freed automatically as the code block is left:
+
+.. code-block:: sh
+
+   {
+     __attribute__((cleanup(sd_login_monitor_unrefp))) sd_login_monitor *m = NULL;
+     int r;
+     …
+     r = sd_login_monitor_new(NULL, &m);
+     if (r < 0) {
+       errno = -r;
+       fprintf(stderr, "Failed to allocate login monitor object: %m\n");
+     }
+     …
+   }
+
+:code:`sd_login_monitor_flush()` may be used to reset the wakeup state of the monitor object. Whenever an event causes the monitor to wake up the event loop via the file descriptor this function needs to be called to reset the wake-up state. If this call is not invoked, the file descriptor will immediately wake up the event loop again.
+
+:code:`sd_login_monitor_unref()` and :code:`sd_login_monitor_unrefp()` execute no operation if the passed in monitor object is :code:`NULL`.
+
+:code:`sd_login_monitor_get_fd()` may be used to retrieve the file descriptor of the monitor object that may be integrated in an application defined event loop, based around :man-pages:`poll(2)` or a similar interface. The application should include the returned file descriptor as wake-up source for the events mask returned by :code:`sd_login_monitor_get_events()`. It should pass a timeout value as returned by :code:`sd_login_monitor_get_timeout()`. Whenever a wake-up is triggered the file descriptor needs to be reset via :code:`sd_login_monitor_flush()`. An application needs to reread the login state with a function like :ref:`sd_get_seats(3)` or similar to determine what changed.
+
+:code:`sd_login_monitor_get_events()` will return the :code:`poll()` mask to wait for. This function will return a combination of :code:`POLLIN`, :code:`POLLOUT` and similar to fill into the ".events" field of :code:`struct pollfd`.
+
+:code:`sd_login_monitor_get_timeout()` will return a timeout value for usage in :code:`poll()`. This returns a value in microseconds since the epoch of :code:`CLOCK_MONOTONIC` for timing out :code:`poll()` in :code:`timeout_usec`. See :man-pages:`clock_gettime(2)` for details about :code:`CLOCK_MONOTONIC`. If there is no timeout to wait for this will fill in :code:`(uint64_t) -1` instead. Note that :code:`poll()` takes a relative timeout in milliseconds rather than an absolute timeout in microseconds. To convert the absolute 'μs' timeout into relative 'ms', use code like the following:
+
+.. code-block:: sh
+
+   uint64_t t;
+   int msec;
+   sd_login_monitor_get_timeout(m, &t);
+   if (t == (uint64_t) -1)
+     msec = -1;
+   else {
+     struct timespec ts;
+     uint64_t n;
+     clock_gettime(CLOCK_MONOTONIC, &ts);
+     n = (uint64_t) ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
+     msec = t > n ? (int) ((t - n + 999) / 1000) : 0;
+   }
+
+The code above does not do any error checking for brevity's sake. The calculated :code:`msec` integer can be passed directly as :code:`poll()`'s timeout parameter.
+
+Return Value
+############
+
+On success, :code:`sd_login_monitor_new()`, :code:`sd_login_monitor_flush()` and :code:`sd_login_monitor_get_timeout()` return 0 or a positive integer. On success, :code:`sd_login_monitor_get_fd()` returns a Unix file descriptor. On success, :code:`sd_login_monitor_get_events()` returns a combination of :code:`POLLIN`, :code:`POLLOUT` and suchlike. On failure, these calls return a negative errno-style error code.
+
+:code:`sd_login_monitor_unref()` always returns :code:`NULL`.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An input parameter was invalid (out of range, or :code:`NULL`, where that is not accepted). The specified category to watch is not known.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_login_monitor_get_events()` and :code:`sd_login_monitor_get_timeout()` were added in version 201.
+
+:code:`sd_login_monitor_unrefp()` was added in version 229.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-login(3)`, :ref:`sd_get_seats(3)`, :man-pages:`poll(2)`, :man-pages:`clock_gettime(2)`
+
+

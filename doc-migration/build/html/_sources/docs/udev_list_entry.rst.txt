@@ -1,0 +1,52 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udev_list_entry
+:manvolnum: 3
+:summary: Iterate and access udev lists
+:aliases: udev_list_entry_get_next, udev_list_entry_get_by_name, udev_list_entry_get_name, udev_list_entry_get_value
+
+.. _udev_list_entry(3):
+
+==================
+udev_list_entry(3)
+==================
+
+Name
+####
+
+udev_list_entry, udev_list_entry_get_next, udev_list_entry_get_by_name, udev_list_entry_get_name, udev_list_entry_get_value — Iterate and access udev lists
+
+Synopsis
+########
+
+:code:`#include <libudev.h>` .. code-block::
+
+   struct udev_list_entry *udev_list_entry_get_next(struct udev_list_entry *list_entry); .. code-block::
+
+   struct udev_list_entry *udev_list_entry_get_by_name(struct udev_list_entry *list_entry,
+	const char *name); .. code-block::
+
+   const char *udev_list_entry_get_name(struct udev_list_entry *list_entry); .. code-block::
+
+   const char *udev_list_entry_get_value(struct udev_list_entry *list_entry);
+
+.. COMMENT: <refsect1> <title>Description</title> <para>XXX: Add short description.</para> </refsect1>
+
+Return Value
+############
+
+On success, :code:`udev_list_entry_get_next()` and :code:`udev_list_entry_get_by_name()` return a pointer to the requested list entry. If no such entry can be found, or on failure, :code:`NULL` is returned.
+
+On success, :code:`udev_list_entry_get_name()` and :code:`udev_list_entry_get_value()` return a pointer to a constant string representing the requested value. The string is bound to the lifetime of the list entry itself. On failure, :code:`NULL` is returned.
+
+History
+#######
+
+:code:`udev_list_entry_get_next()`, :code:`udev_list_entry_get_by_name()`, :code:`udev_list_entry_get_name()`, and :code:`udev_list_entry_get_value()` were added in version 221.
+
+See Also
+########
+
+:man-pages:`udev_new(3)`, :man-pages:`udev_device_new_from_syspath(3)`, :man-pages:`udev_enumerate_new(3)`, :man-pages:`udev_monitor_new_from_netlink(3)`, :ref:`systemd(1)`
+
+

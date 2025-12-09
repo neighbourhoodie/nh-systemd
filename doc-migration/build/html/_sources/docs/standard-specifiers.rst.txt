@@ -1,0 +1,133 @@
+:orphan:
+
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+.. inclusion-marker-do-not-remove a|
+
+* - "%a"
+  - Architecture
+  - A short string identifying the architecture of the local system. A string such as :code:`x86`, :code:`x86-64` or :code:`arm64`. See the architectures defined for :code:`ConditionArchitecture=` in :ref:`systemd.unit(5)` for a full list.
+
+.. inclusion-end-marker-do-not-remove a|
+
+.. inclusion-marker-do-not-remove A|
+
+* - "%A"
+  - Operating system image version
+  - The operating system image version identifier of the running system, as read from the :code:`IMAGE_VERSION=` field of :code:`/etc/os-release`. If not set, resolves to an empty string. See :man-pages:`os-release(5)` for more information.
+
+.. inclusion-end-marker-do-not-remove A|
+
+.. inclusion-marker-do-not-remove b|
+
+* - "%b"
+  - Boot ID
+  - The boot ID of the running system, formatted as string. See :man-pages:`random(4)` for more information.
+
+.. inclusion-end-marker-do-not-remove b|
+
+.. inclusion-marker-do-not-remove B|
+
+* - "%B"
+  - Operating system build ID
+  - The operating system build identifier of the running system, as read from the :code:`BUILD_ID=` field of :code:`/etc/os-release`. If not set, resolves to an empty string. See :man-pages:`os-release(5)` for more information.
+
+.. inclusion-end-marker-do-not-remove B|
+
+.. inclusion-marker-do-not-remove H|
+
+* - "%H"
+  - Host name
+  - The hostname of the running system.
+
+.. inclusion-end-marker-do-not-remove H|
+
+.. inclusion-marker-do-not-remove l|
+
+* - "%l"
+  - Short host name
+  - The hostname of the running system, truncated at the first dot to remove any domain component.
+
+.. inclusion-end-marker-do-not-remove l|
+
+.. inclusion-marker-do-not-remove m|
+
+* - "%m"
+  - Machine ID
+  - The machine ID of the running system, formatted as string. See :man-pages:`machine-id(5)` for more information.
+
+.. inclusion-end-marker-do-not-remove m|
+
+.. inclusion-marker-do-not-remove M|
+
+* - "%M"
+  - Operating system image identifier
+  - The operating system image identifier of the running system, as read from the :code:`IMAGE_ID=` field of :code:`/etc/os-release`. If not set, resolves to an empty string. See :man-pages:`os-release(5)` for more information.
+
+.. inclusion-end-marker-do-not-remove M|
+
+.. inclusion-marker-do-not-remove o|
+
+* - "%o"
+  - Operating system ID
+  - The operating system identifier of the running system, as read from the :code:`ID=` field of :code:`/etc/os-release`. See :man-pages:`os-release(5)` for more information.
+
+.. inclusion-end-marker-do-not-remove o|
+
+.. inclusion-marker-do-not-remove q|
+
+* - "%q"
+  - Pretty host name
+  - The pretty hostname of the running system, as read from the :code:`PRETTY_HOSTNAME=` field of :code:`/etc/machine-info`. If not set, resolves to the short hostname. See :man-pages:`machine-info(5)` for more information.
+
+.. inclusion-end-marker-do-not-remove q|
+
+.. inclusion-marker-do-not-remove T|
+
+* - "%T"
+  - Directory for temporary files
+  - This is either :code:`/tmp` or the path "$TMPDIR", "$TEMP" or "$TMP" are set to. (Note that the directory may be specified without a trailing slash.)
+
+.. inclusion-end-marker-do-not-remove T|
+
+.. inclusion-marker-do-not-remove v|
+
+* - "%v"
+  - Kernel release
+  - Identical to :code:`uname -r` output.
+
+.. inclusion-end-marker-do-not-remove v|
+
+.. inclusion-marker-do-not-remove V|
+
+* - "%V"
+  - Directory for larger and persistent temporary files
+  - This is either :code:`/var/tmp` or the path "$TMPDIR", "$TEMP" or "$TMP" are set to. (Note that the directory may be specified without a trailing slash.)
+
+.. inclusion-end-marker-do-not-remove V|
+
+.. inclusion-marker-do-not-remove w|
+
+* - "%w"
+  - Operating system version ID
+  - The operating system version identifier of the running system, as read from the :code:`VERSION_ID=` field of :code:`/etc/os-release`. If not set, resolves to an empty string. See :man-pages:`os-release(5)` for more information.
+
+.. inclusion-end-marker-do-not-remove w|
+
+.. inclusion-marker-do-not-remove W|
+
+* - "%W"
+  - Operating system variant ID
+  - The operating system variant identifier of the running system, as read from the :code:`VARIANT_ID=` field of :code:`/etc/os-release`. If not set, resolves to an empty string. See :man-pages:`os-release(5)` for more information.
+
+.. inclusion-end-marker-do-not-remove W|
+
+.. inclusion-marker-do-not-remove percent|
+
+* - "%%"
+  - Single percent sign
+  - Use "%%" in place of "%" to specify a single percent sign.
+
+.. inclusion-end-marker-do-not-remove percent|
+
+

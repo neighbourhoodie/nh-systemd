@@ -1,0 +1,48 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-mountfsd.service
+:manvolnum: 8
+:summary: Disk Image File System Mount Service
+:aliases: systemd-mountfsd
+
+.. _systemd-mountfsd.service(8):
+
+===========================
+systemd-mountfsd.service(8)
+===========================
+
+Name
+####
+
+systemd-mountfsd.service, systemd-mountfsd — Disk Image File System Mount Service
+
+Synopsis
+########
+
+:code:`systemd-mountfsd.service`
+
+:code:`/usr/lib/systemd/systemd-mountfsd`
+
+Description
+###########
+
+:code:`systemd-mountfsd` is a system service that dissects disk images, and returns mount file descriptors for the file systems contained therein to clients, via a Varlink IPC API.
+
+The disk images provided must contain a raw file system image or must follow the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification/>`_. Before mounting any file systems authenticity of the disk image is established in one or a combination of the following ways:
+
+1.    If the disk image is located in a regular file in one of the directories :code:`/var/lib/machines/`, :code:`/var/lib/portables/`, :code:`/var/lib/extensions/`, :code:`/var/lib/confexts/` or their counterparts in the :code:`/etc/`, :code:`/run/`, :code:`/usr/lib/` it is assumed to be trusted.
+
+2.    If the disk image contains a Verity enabled disk image, along with a signature partition with a key in the kernel keyring or in :code:`/etc/verity.d/` (and related directories) the disk image is considered trusted.
+
+This service provides one `Varlink <https://varlink.org/>`_ service: :code:`io.systemd.MountFileSystem` which accepts a file descriptor to a regular file or block device, and returns a number of file descriptors referring to an :code:`fsmount()` file descriptor the client may then attach to a path of their choice.
+
+The returned mounts are automatically allowlisted in the per-user-namespace allowlist maintained by :ref:`systemd-nsresourced.service(8)`.
+
+The file systems are automatically :man-pages:`fsck(8)`'ed before mounting.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-nsresourced.service(8)`
+
+

@@ -1,0 +1,140 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-escape
+:manvolnum: 1
+:summary: Escape strings for usage in systemd unit names
+
+.. _systemd-escape(1):
+
+=================
+systemd-escape(1)
+=================
+
+Name
+####
+
+systemd-escape — Escape strings for usage in systemd unit names
+
+Synopsis
+########
+
+:code:`systemd-escape [OPTIONS...] [STRING...]`
+
+Description
+###########
+
+:code:`systemd-escape` may be used to escape strings for inclusion in systemd unit names. The command may be used to escape and to undo escaping of strings.
+
+The command takes any number of strings on the command line, and will process them individually, one after another. It will output them separated by spaces to stdout.
+
+By default, this command will escape the strings passed, unless :code:`--unescape` is passed which results in the inverse operation being applied. If :code:`--mangle` is given, a special mode of escaping is applied instead, which assumes the string is already escaped but will escape everything that appears obviously non-escaped.
+
+For details on the escaping and unescaping algorithms see the relevant section in :ref:`systemd.unit(5)`.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --suffix=
+
+   Appends the specified unit type suffix to the escaped string. Takes one of the unit types supported by systemd, such as "service" or "mount". May not be used in conjunction with :code:`--template=`, :code:`--unescape` or :code:`--mangle`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --template=
+
+   Inserts the escaped strings in a unit name template. Takes a unit name template such as :code:`foobar@.service`. With :code:`--unescape`, expects instantiated unit names for this template and extracts and unescapes just the instance part. May not be used in conjunction with :code:`--suffix=`, :code:`--instance` or :code:`--mangle`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --path, -p
+
+   When escaping or unescaping a string, assume it refers to a file system path. This simplifies the path (leading, trailing, and duplicate "/" characters are removed, no-op path "." components are removed, and for absolute paths, leading ".." components are removed). After the simplification, the path must not contain "..".
+
+   This is particularly useful for generating strings suitable for unescaping with the "%f" specifier in unit files, see :ref:`systemd.unit(5)`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --unescape, -u
+
+   Instead of escaping the specified strings, undo the escaping, reversing the operation. May not be used in conjunction with :code:`--suffix=` or :code:`--mangle`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --mangle, -m
+
+   Like :code:`--escape`, but only escape characters that are obviously not escaped yet, and possibly automatically append an appropriate unit type suffix to the string. May not be used in conjunction with :code:`--suffix=`, :code:`--template=` or :code:`--unescape`.
+
+   .. versionadded:: 216
+
+.. systemd:option:: --instance
+
+   With :code:`--unescape`, unescape and print only the instance part of an instantiated unit name template. Results in an error for an uninstantiated template like :code:`ssh@.service` or a non-template name like :code:`ssh.service`. Must be used in conjunction with :code:`--unescape` and may not be used in conjunction with :code:`--template`.
+
+   .. versionadded:: 240
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Examples
+########
+
+To escape a single string:
+
+.. code-block:: sh
+
+   $ systemd-escape 'Hallöchen, Meister'
+   Hall\xc3\xb6chen\x2c\x20Meister
+
+To undo escaping on a single string:
+
+.. code-block:: sh
+
+   $ systemd-escape -u 'Hall\xc3\xb6chen\x2c\x20Meister'
+   Hallöchen, Meister
+
+To generate the mount unit for a path:
+
+.. code-block:: sh
+
+   $ systemd-escape -p --suffix=mount "/tmp//waldi/foobar/"
+   tmp-waldi-foobar.mount
+
+To generate instance names of three strings:
+
+.. code-block:: sh
+
+   $ systemd-escape --template=systemd-nspawn@.service 'My Container 1' 'containerb' 'container/III'
+   systemd-nspawn@My\x20Container\x201.service systemd-nspawn@containerb.service systemd-nspawn@container-III.service
+
+To extract the instance part of an instantiated unit:
+
+.. code-block:: sh
+
+   $ systemd-escape -u --instance 'systemd-nspawn@My\x20Container\x201.service'
+   My Container 1
+
+To extract the instance part of an instance of a particular template:
+
+.. code-block:: sh
+
+   $ systemd-escape -u --template=systemd-nspawn@.service 'systemd-nspawn@My\x20Container\x201.service'
+   My Container 1
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.unit(5)`, :man-pages:`systemctl(1)`
+
+

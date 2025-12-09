@@ -1,0 +1,1848 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="ukify(1)" href="ukify.html"><link rel="prev" title="udev_new(3)" href="udev_new.html">
+        <link rel="prefetch" href="../_static/systemd-logo.svg" as="image">
+        <link rel="prefetch" href="../_static/systemd-logo-dark.svg" as="image">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>udevadm(8)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6e47b7e0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #35a764;
+  --color-brand-content: #35a764;
+  --color-brand-visited: #197b43;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">systemd</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/systemd-logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/systemd-logo-dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">B</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="binfmt.d.html">binfmt.d(5) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootctl.html">bootctl(1) — Control EFI firmware boot settings and manage boot loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootup.html">bootup(7) — System bootup process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="busctl.html">busctl(1) — Introspect the bus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capsule%40.service.html">capsule@.service(5) — System unit for the capsule service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredump.conf.html">coredump.conf(5) — Core dump storage configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredumpctl.html">coredumpctl(1) — Retrieve and process saved core dumps and metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypttab.html">crypttab(5) — Configuration for encrypted block devices</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">D</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daemon.html">daemon(7) — Writing and packaging system daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dnssec-trust-anchors.d.html">dnssec-trust-anchors.d(5) — DNSSEC trust anchor configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">E</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment.d.html">environment.d(5) — Definition of user service environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">F</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-hierarchy.html">file-hierarchy(7) — File system hierarchy overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">H</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="homectl.html">homectl(1) — Create, remove, change or inspect home directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homed.conf.html">homed.conf(5) — Home area/user account manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostname.html">hostname(5) — Local hostname configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostnamectl.html">hostnamectl(1) — Control the system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hwdb.html">hwdb(7) — Hardware Database</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">I</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="importctl.html">importctl(1) — Download, import or export disk images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integritytab.html">integritytab(5) — Configuration for integrity block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocost.conf.html">iocost.conf(5) — Configuration files for the iocost solution manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">J</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="journal-remote.conf.html">journal-remote.conf(5) — Configuration files for the service accepting remote journal uploads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal-upload.conf.html">journal-upload.conf(5) — Configuration files for the journal upload service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journalctl.html">journalctl(1) — Print log entries from the systemd journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journald.conf.html">journald.conf(5) — Journal service configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">K</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kernel-command-line.html">kernel-command-line(7) — Kernel command line parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-install.html">kernel-install(8) — Add and remove kernel and initrd images to and from the boot partition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">L</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libsystemd.html">libsystemd(3) — Functions for implementing services and interacting with systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libudev.html">libudev(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.conf.html">loader.conf(5) — Configuration file for systemd-boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locale.conf.html">locale.conf(5) — Configuration file for locale settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localectl.html">localectl(1) — Control the system locale and keyboard layout settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localtime.html">localtime(5) — Local timezone configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loginctl.html">loginctl(1) — Control the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logind.conf.html">logind.conf(5) — Login manager configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">M</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="machine-id.html">machine-id(5) — Local machine ID configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machine-info.html">machine-info(5) — Local machine information file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machinectl.html">machinectl(1) — Control the systemd machine manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules-load.d.html">modules-load.d(5) — Configure kernel modules to load at boot</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">N</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="networkctl.html">networkctl(1) — Query or modify the status of network links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networkd.conf.html">networkd.conf(5) — Global Network configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-myhostname.html">nss-myhostname(8) — Hostname resolution for the locally configured system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-mymachines.html">nss-mymachines(8) — Hostname resolution for local container instances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-resolve.html">nss-resolve(8) — Hostname resolution via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-systemd.html">nss-systemd(8) — UNIX user and group name resolution for user/group lookup via Varlink</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">O</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oomctl.html">oomctl(1) — Analyze the state stored in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oomd.conf.html">oomd.conf(5) — Global</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.home1.html">org.freedesktop.home1(5) — The D-Bus interface of systemd-homed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.hostname1.html">org.freedesktop.hostname1(5) — The D-Bus interface of systemd-hostnamed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.import1.html">org.freedesktop.import1(5) — The D-Bus interface of systemd-importd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.locale1.html">org.freedesktop.locale1(5) — The D-Bus interface of systemd-localed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.LogControl1.html">org.freedesktop.LogControl1(5) — D-Bus interface to query and set logging configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.login1.html">org.freedesktop.login1(5) — The D-Bus interface of systemd-logind</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.machine1.html">org.freedesktop.machine1(5) — The D-Bus interface of systemd-machined</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.network1.html">org.freedesktop.network1(5) — The D-Bus interface of systemd-networkd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.oom1.html">org.freedesktop.oom1(5) — The D-Bus interface of systemd-oomd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.portable1.html">org.freedesktop.portable1(5) — The D-Bus interface of systemd-portabled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.resolve1.html">org.freedesktop.resolve1(5) — The D-Bus interface of systemd-resolved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.systemd1.html">org.freedesktop.systemd1(5) — The D-Bus interface of systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.sysupdate1.html">org.freedesktop.sysupdate1(5) — The D-Bus interface of systemd-sysupdated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timedate1.html">org.freedesktop.timedate1(5) — The D-Bus interface of systemd-timedated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timesync1.html">org.freedesktop.timesync1(5) — The D-Bus interface of systemd-timesyncd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="os-release.html">os-release(5) — Operating system identification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">P</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd.html">pam_systemd(8) — Register user sessions in the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_home.html">pam_systemd_home(8) — Authenticate users and mount home directories via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_loadkey.html">pam_systemd_loadkey(8) — Read password from kernel keyring and set it as PAM authtok</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portablectl.html">portablectl(1) — Attach, detach or inspect portable service images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="poweroff.html">poweroff(8) — Power off, reboot, or halt the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pstore.conf.html">pstore.conf(5) — PStore configuration file</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">R</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="repart.d.html">repart.d(5) — Partition Definition Files for Automatic Boot-Time Repartitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolvectl.html">resolvectl(1) — Resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services; introspect and reconfigure the DNS resolver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolved.conf.html">resolved.conf(5) — Network Name Resolution configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run0.html">run0(1) — Elevate privileges</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">S</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus.html">sd-bus(3) — A lightweight D-Bus IPC client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus-errors.html">sd-bus-errors(3) — Standard D-Bus error names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-daemon.html">sd-daemon(3) — APIs for new-style daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-device.html">sd-device(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-event.html">sd-event(3) — A generic event loop implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-hwdb.html">sd-hwdb(3) — Read-only access to the hardware description database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-id128.html">sd-id128(3) — APIs for processing 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-journal.html">sd-journal(3) — APIs for submitting and querying log entries to and from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-json.html">sd-json(3) — APIs for Dealing with JSON Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-login.html">sd-login(3) — APIs for tracking logins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-path.html">sd-path(3) — APIs to query file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-varlink.html">sd-varlink(3) — APIs for Varlink IPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_booted.html">sd_booted(3) — Test whether the system is running the systemd init system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_match.html">sd_bus_add_match(3) — Add a match rule for incoming message dispatching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_node_enumerator.html">sd_bus_add_node_enumerator(3) — Add a node enumerator for a D-Bus object path prefix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object.html">sd_bus_add_object(3) — Declare properties and methods for a D-Bus path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object_manager.html">sd_bus_add_object_manager(3) — Add a D-Bus object manager for a D-Bus object sub-tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_attach_event.html">sd_bus_attach_event(3) — Attach a bus connection object to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call.html">sd_bus_call(3) — Invoke a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call_method.html">sd_bus_call_method(3) — Initialize a bus message object and invoke the corresponding D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_can_send.html">sd_bus_can_send(3) — Check which types can be sent over a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_close.html">sd_bus_close(3) — Close and flush a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_get_pid.html">sd_bus_creds_get_pid(3) — Retrieve fields from a credentials object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_new_from_pid.html">sd_bus_creds_new_from_pid(3) — Retrieve credentials object for the specified PID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_default.html">sd_bus_default(3) — Acquire a connection to a system or user bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_emit_signal.html">sd_bus_emit_signal(3) — Convenience functions for emitting (standard) D-Bus signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_enqueue_for_read.html">sd_bus_enqueue_for_read(3) — Re-enqueue a bus message on a bus connection, for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error.html">sd_bus_error(3) — sd-bus error handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error_add_map.html">sd_bus_error_add_map(3) — Additional sd-dbus error mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_current_handler.html">sd_bus_get_current_handler(3) — Query information of the callback a bus object is currently running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_fd.html">sd_bus_get_fd(3) — Get the file descriptor, I/O events and timeout to wait for from a message bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_n_queued_read.html">sd_bus_get_n_queued_read(3) — Get the number of pending bus messages in the read and write queues of a bus connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_creds.html">sd_bus_get_name_creds(3) — Query bus client credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_machine_id.html">sd_bus_get_name_machine_id(3) — Retrieve a bus client's machine identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_interface_name_is_valid.html">sd_bus_interface_name_is_valid(3) — Check if a string is a valid bus name or object path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_is_open.html">sd_bus_is_open(3) — Check whether the bus connection is open or ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_list_names.html">sd_bus_list_names(3) — Retrieve information about registered names on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append.html">sd_bus_message_append(3) — Attach fields to a D-Bus message based on a type string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_array.html">sd_bus_message_append_array(3) — Append an array of fields to a D-Bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_basic.html">sd_bus_message_append_basic(3) — Attach a single field to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_string_memfd.html">sd_bus_message_append_string_memfd(3) — Attach a string to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_strv.html">sd_bus_message_append_strv(3) — Attach an array of strings to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_at_end.html">sd_bus_message_at_end(3) — Check if a message has been fully read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_copy.html">sd_bus_message_copy(3) — Copy the contents of one message to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_dump.html">sd_bus_message_dump(3) — Produce a string representation of a message for debugging purposes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_cookie.html">sd_bus_message_get_cookie(3) — Returns the transaction cookie of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_monotonic_usec.html">sd_bus_message_get_monotonic_usec(3) — Retrieve the sender timestamps and sequence number of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_signature.html">sd_bus_message_get_signature(3) — Query bus message signature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_type.html">sd_bus_message_get_type(3) — Query bus message addressing/credentials metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new.html">sd_bus_message_new(3) — Create a new bus message object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_call.html">sd_bus_message_new_method_call(3) — Create a method call message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_error.html">sd_bus_message_new_method_error(3) — Create an error reply for a method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_signal.html">sd_bus_message_new_signal(3) — Create a signal message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_open_container.html">sd_bus_message_open_container(3) — Create and move between containers in D-Bus messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read.html">sd_bus_message_read(3) — Read a sequence of values from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_array.html">sd_bus_message_read_array(3) — Access an array of elements in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_basic.html">sd_bus_message_read_basic(3) — Read a basic type from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_strv.html">sd_bus_message_read_strv(3) — Access an array of strings in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_rewind.html">sd_bus_message_rewind(3) — Return to beginning of message or current container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_seal.html">sd_bus_message_seal(3) — Prepare a D-Bus message for transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_sensitive.html">sd_bus_message_sensitive(3) — Mark a message object as containing sensitive data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_destination.html">sd_bus_message_set_destination(3) — Set and query bus message addressing information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_expect_reply.html">sd_bus_message_set_expect_reply(3) — Set and query bus message metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_skip.html">sd_bus_message_skip(3) — Skip elements in a bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_verify_type.html">sd_bus_message_verify_type(3) — Check if the message has specified type at the current location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_negotiate_fds.html">sd_bus_negotiate_fds(3) — Control feature negotiation on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_new.html">sd_bus_new(3) — Create a new bus object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_path_encode.html">sd_bus_path_encode(3) — Convert an external identifier into an object path and back</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_pending_method_calls.html">sd_bus_pending_method_calls(3) — Return the number of currently pending, outgoing method calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_process.html">sd_bus_process(3) — Drive the connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_query_sender_creds.html">sd_bus_query_sender_creds(3) — Query bus message sender credentials/privileges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_error.html">sd_bus_reply_method_error(3) — Reply with an error to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_return.html">sd_bus_reply_method_return(3) — Reply to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_request_name.html">sd_bus_request_name(3) — Request or release a well-known service name on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_send.html">sd_bus_send(3) — Queue a D-Bus message for transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_address.html">sd_bus_set_address(3) — Set or query the address of the bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_close_on_exit.html">sd_bus_set_close_on_exit(3) — Control whether to close the bus connection during the event loop exit phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_connected_signal.html">sd_bus_set_connected_signal(3) — Control emission of local connection establishment signal on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_description.html">sd_bus_set_description(3) — Set or query properties of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_exit_on_disconnect.html">sd_bus_set_exit_on_disconnect(3) — Control the exit behavior when the bus object disconnects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_fd.html">sd_bus_set_fd(3) — Set the file descriptors to use for bus communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_method_call_timeout.html">sd_bus_set_method_call_timeout(3) — Set or query the default D-Bus method call timeout of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_property.html">sd_bus_set_property(3) — Set or query D-Bus service properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_sender.html">sd_bus_set_sender(3) — Configure default sender for outgoing messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_server.html">sd_bus_set_server(3) — Configure connection mode for a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_watch_bind.html">sd_bus_set_watch_bind(3) — Control socket binding watching on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_get_bus.html">sd_bus_slot_get_bus(3) — Query information attached to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_ref.html">sd_bus_slot_ref(3) — Create and destroy references to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_description.html">sd_bus_slot_set_description(3) — Set or query the description of bus slot objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_destroy_callback.html">sd_bus_slot_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_floating.html">sd_bus_slot_set_floating(3) — Control whether a bus slot object is "floating"</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_userdata.html">sd_bus_slot_set_userdata(3) — Set and query the value in the "userdata" field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_start.html">sd_bus_start(3) — Initiate a bus connection to the D-bus broker daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_add_name.html">sd_bus_track_add_name(3) — Add, remove and retrieve bus peers tracked in a bus peer tracking object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_new.html">sd_bus_track_new(3) — Track bus peers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_wait.html">sd_bus_wait(3) — Wait for I/O on a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_add_match_parent.html">sd_device_enumerator_add_match_parent(3) — Add a filter to the device enumerator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_get_device_first.html">sd_device_enumerator_get_device_first(3) — Enumerates devices and get the first or next device.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_new.html">sd_device_enumerator_new(3) — Create, reference, and release a device enumerator object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_get_syspath.html">sd_device_get_syspath(3) — Returns various fields of device objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_ref.html">sd_device_ref(3) — Create or destroy references to a device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_child.html">sd_event_add_child(3) — Add a child process state change event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_defer.html">sd_event_add_defer(3) — Add static event sources to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_inotify.html">sd_event_add_inotify(3) — Add an "inotify" file system inode event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_io.html">sd_event_add_io(3) — Add an I/O event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_memory_pressure.html">sd_event_add_memory_pressure(3) — Add and configure an event source run as result of memory pressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_signal.html">sd_event_add_signal(3) — Add a UNIX process signal event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_time.html">sd_event_add_time(3) — Add a timer event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_exit.html">sd_event_exit(3) — Ask the event loop to exit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_get_fd.html">sd_event_get_fd(3) — Obtain a file descriptor to poll for event loop events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_new.html">sd_event_new(3) — Acquire and release an event loop object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_now.html">sd_event_now(3) — Retrieve current event loop iteration timestamp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_run.html">sd_event_run(3) — Run an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_exit_on_idle.html">sd_event_set_exit_on_idle(3) — Enable event loop exit-on-idle support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_signal_exit.html">sd_event_set_signal_exit(3) — Automatically leave event loop on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_watchdog.html">sd_event_set_watchdog(3) — Enable event loop watchdog support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_event.html">sd_event_source_get_event(3) — Retrieve the event loop of an event source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_pending.html">sd_event_source_get_pending(3) — Determine pending state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_description.html">sd_event_source_set_description(3) — Set or retrieve descriptive names of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_destroy_callback.html">sd_event_source_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_enabled.html">sd_event_source_set_enabled(3) — Enable or disable event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_exit_on_failure.html">sd_event_source_set_exit_on_failure(3) — Set or retrieve the exit-on-failure feature of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_floating.html">sd_event_source_set_floating(3) — Set or retrieve 'floating' state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_prepare.html">sd_event_source_set_prepare(3) — Set a preparation callback for event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_priority.html">sd_event_source_set_priority(3) — Set or retrieve the priority of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_ratelimit.html">sd_event_source_set_ratelimit(3) — Configure rate limiting on event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_userdata.html">sd_event_source_set_userdata(3) — Set or retrieve user data pointer of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_unref.html">sd_event_source_unref(3) — Increase or decrease event source reference counters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_wait.html">sd_event_wait(3) — Low-level event loop operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_get_seats.html">sd_get_seats(3) — Determine available seats, sessions, logged in users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_get.html">sd_hwdb_get(3) — Seek to a location in hwdb or access entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_new.html">sd_hwdb_new(3) — Create a new hwdb object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_get_machine.html">sd_id128_get_machine(3) — Retrieve 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_randomize.html">sd_id128_randomize(3) — Generate 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_to_string.html">sd_id128_to_string(3) — Format or parse 128-bit IDs as strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_is_fifo.html">sd_is_fifo(3) — Check the type of a file descriptor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_add_match.html">sd_journal_add_match(3) — Add or remove entry matches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_enumerate_fields.html">sd_journal_enumerate_fields(3) — Read used field names from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_catalog.html">sd_journal_get_catalog(3) — Retrieve message catalog entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cursor.html">sd_journal_get_cursor(3) — Get cursor string for or test cursor string against the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cutoff_realtime_usec.html">sd_journal_get_cutoff_realtime_usec(3) — Read cut-off timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_data.html">sd_journal_get_data(3) — Read data fields from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_fd.html">sd_journal_get_fd(3) — Journal change notification interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_realtime_usec.html">sd_journal_get_realtime_usec(3) — Read timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_seqnum.html">sd_journal_get_seqnum(3) — Read sequence number from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_usage.html">sd_journal_get_usage(3) — Journal disk usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_has_runtime_files.html">sd_journal_has_runtime_files(3) — Query availability of runtime or persistent journal files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_next.html">sd_journal_next(3) — Advance or set back the read pointer in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_open.html">sd_journal_open(3) — Open the system journal for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_print.html">sd_journal_print(3) — Submit log entries to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_query_unique.html">sd_journal_query_unique(3) — Read unique data fields from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_seek_head.html">sd_journal_seek_head(3) — Seek to a position in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_stream_fd.html">sd_journal_stream_fd(3) — Create log stream file descriptor to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_json_dispatch_string.html">sd_json_dispatch_string(3) — Decode JSON variant values and write them to the specified memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_listen_fds.html">sd_listen_fds(3) — Check for file descriptors passed by the system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_login_monitor_new.html">sd_login_monitor_new(3) — Monitor login sessions, seats, users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_machine_get_class.html">sd_machine_get_class(3) — Determine the class and network interface indices of a locally running virtual machine or container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_notify.html">sd_notify(3) — Notify service manager about start-up completion and other service status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_path_lookup.html">sd_path_lookup(3) — Query well-known file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pid_get_owner_uid.html">sd_pid_get_owner_uid(3) — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pidfd_get_inode_id.html">sd_pidfd_get_inode_id(3) — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_seat_get_active.html">sd_seat_get_active(3) — Determine state of a specific seat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_session_is_active.html">sd_session_is_active(3) — Determine state of a specific session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_uid_get_state.html">sd_uid_get_state(3) — Determine login state of a specific Unix user ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_is_connected.html">sd_varlink_is_connected(3) — Query if a Varlink connection object is currently connected or idle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_push_fd.html">sd_varlink_push_fd(3) — Submit a file descriptor to send along with the next outgoing Varlink message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_send.html">sd_varlink_send(3) — Enqueues a Varlink method call, not expecting a reply</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_server_new.html">sd_varlink_server_new(3) — Allocate Varlink server object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_description.html">sd_varlink_set_description(3) — Set or query description of a Varlink connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_relative_timeout.html">sd_varlink_set_relative_timeout(3) — Set method call time-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_watchdog_enabled.html">sd_watchdog_enabled(3) — Check whether the service manager expects watchdog keep-alive notifications from a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shutdown.html">shutdown(8) — Halt, power off or reboot the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smbios-type-11.html">smbios-type-11(7) — SMBIOS Type 11 strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysctl.d.html">sysctl.d(5) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysext.conf.html">sysext.conf(5) — Configuration files for systemd-sysext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemctl.html">systemctl(1) — Control the systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.html">systemd(1) — systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ac-power.html">systemd-ac-power(1) — Report whether we are connected to an external power source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-analyze.html">systemd-analyze(1) — Analyze and debug system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password.html">systemd-ask-password(1) — Query the user for a system password</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password-console.service.html">systemd-ask-password-console.service(8) — Query the user for system passwords on the console and via wall</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-backlight%40.service.html">systemd-backlight@.service(8) — Load and save the display backlight brightness at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-battery-check.service.html">systemd-battery-check.service(8) — Check battery level whether there's enough charge, and power off if not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-binfmt.service.html">systemd-binfmt.service(8) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot-generator.html">systemd-bless-boot-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot.service.html">systemd-bless-boot.service(8) — Mark current boot process as successful</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot.html">systemd-boot(7) — A simple UEFI boot manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-check-no-failures.service.html">systemd-boot-check-no-failures.service(8) — verify that the system booted up cleanly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-clear-sysfail.service.html">systemd-boot-clear-sysfail.service(8) — Clear LoaderEntrySysFail entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-random-seed.service.html">systemd-boot-random-seed.service(8) — Refresh boot loader random seed at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bsod.service.html">systemd-bsod.service(8) — Displays boot-time emergency log message in full screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cat.html">systemd-cat(1) — Connect a pipeline or program's output with the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgls.html">systemd-cgls(1) — Recursively show control group contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgtop.html">systemd-cgtop(1) — Show top control groups by their resource usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-coredump.html">systemd-coredump(8) — Acquire, save and process core dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-creds.html">systemd-creds(1) — Lists, shows, encrypts and decrypts service credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptenroll.html">systemd-cryptenroll(1) — Enroll PKCS#11, FIDO2, TPM2 token/devices to LUKS2 encrypted volumes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup.html">systemd-cryptsetup(8) — Full disk decryption logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup-generator.html">systemd-cryptsetup-generator(8) — Unit generator for</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-debug-generator.html">systemd-debug-generator(8) — Generator for enabling a runtime debug shell and masking specific units at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-delta.html">systemd-delta(1) — Find overridden configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-detect-virt.html">systemd-detect-virt(1) — Detect execution in a virtualized environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-dissect.html">systemd-dissect(1) — Dissect Discoverable Disk Images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-environment-d-generator.html">systemd-environment-d-generator(8) — Load variables specified by</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-escape.html">systemd-escape(1) — Escape strings for usage in systemd unit names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset.html">systemd-factory-reset(8) — Request or complete a factory reset operation, or query current factory reset mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset-generator.html">systemd-factory-reset-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-firstboot.html">systemd-firstboot(1) — Initialize basic system settings on or before the first boot-up of a system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fsck%40.service.html">systemd-fsck@.service(8) — File system checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fstab-generator.html">systemd-fstab-generator(8) — Unit generator for /etc/fstab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-getty-generator.html">systemd-getty-generator(8) — Generator for enabling getty instances on the console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-gpt-auto-generator.html">systemd-gpt-auto-generator(8) — Generator for automatically discovering and mounting root,</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume-generator.html">systemd-hibernate-resume-generator(8) — Unit generator for resume= kernel parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume.service.html">systemd-hibernate-resume.service(8) — Resume from hibernation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-homed.service.html">systemd-homed.service(8) — Home Area/User Account Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hostnamed.service.html">systemd-hostnamed.service(8) — Daemon to control system hostname from programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hwdb.html">systemd-hwdb(8) — hardware database management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-id128.html">systemd-id128(1) — Generate and print sd-128 identifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-import-generator.html">systemd-import-generator(8) — Generator for automatically downloading disk images at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-importd.service.html">systemd-importd.service(8) — VM and container image import and export service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-inhibit.html">systemd-inhibit(1) — Execute a program with an inhibition lock taken</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup-generator.html">systemd-integritysetup-generator(8) — Unit generator for integrity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup%40.service.html">systemd-integritysetup@.service(8) — Disk integrity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-gatewayd.service.html">systemd-journal-gatewayd.service(8) — HTTP server for journal events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-remote.service.html">systemd-journal-remote.service(8) — Receive journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-upload.service.html">systemd-journal-upload.service(8) — Send journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journald.service.html">systemd-journald.service(8) — Journal service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-keyutil.html">systemd-keyutil(1) — Perform various operations on private keys and X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-localed.service.html">systemd-localed.service(8) — Locale bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-logind.service.html">systemd-logind.service(8) — Login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-loop%40.service.html">systemd-loop@.service(8) — Attach a loopback block device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-commit.service.html">systemd-machine-id-commit.service(8) — Commit a transient machine ID to disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-setup.html">systemd-machine-id-setup(1) — Initialize the machine ID in /etc/machine-id</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machined.service.html">systemd-machined.service(8) — Virtual machine and container registration manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-makefs%40.service.html">systemd-makefs@.service(8) — Creating and growing file systems on demand</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-measure.html">systemd-measure(1) — Pre-calculate and sign expected TPM2 PCR 11 values for booted unified kernel images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-modules-load.service.html">systemd-modules-load.service(8) — Load kernel modules at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mount.html">systemd-mount(1) — Establish and destroy transient mount or auto-mount points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mountfsd.service.html">systemd-mountfsd.service(8) — Disk Image File System Mount Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mute-console.html">systemd-mute-console(1) — Temporarily mute kernel log output and service manager status output to the system console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-network-generator.service.html">systemd-network-generator.service(8) — Generate network configuration from the kernel command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd-wait-online.service.html">systemd-networkd-wait-online.service(8) — Wait for network to come online</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd.service.html">systemd-networkd.service(8) — Network manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-notify.html">systemd-notify(1) — Notify service manager about start-up completion and other daemon status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nspawn.html">systemd-nspawn(1) — Spawn a command or OS in a lightweight container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nsresourced.service.html">systemd-nsresourced.service(8) — User Namespace Resource Delegation Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-oomd.service.html">systemd-oomd.service(8) — A userspace out-of-memory (OOM) killer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-path.html">systemd-path(1) — List and query system and user paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrlock.html">systemd-pcrlock(8) — Analyze and predict TPM2 PCR states and generate an access policy from the prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrphase.service.html">systemd-pcrphase.service(8) — Measure boot phases, machine ID, product UUID and file system identity into TPM PCRs and NvPCRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-portabled.service.html">systemd-portabled.service(8) — Portable service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-poweroff.service.html">systemd-poweroff.service(8) — System shutdown logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pstore.service.html">systemd-pstore.service(8) — A service to archive contents of pstore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pty-forward.html">systemd-pty-forward(1) — Run a command with a custom terminal background color or title</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-quotacheck%40.service.html">systemd-quotacheck@.service(8) — File system quota checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-random-seed.service.html">systemd-random-seed.service(8) — Load and save the OS system random seed at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rc-local-generator.html">systemd-rc-local-generator(8) — Compatibility generator and service to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-remount-fs.service.html">systemd-remount-fs.service(8) — Remount root and kernel file systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-repart.html">systemd-repart(8) — Automatically grow and add partitions, and generate disk images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-resolved.service.html">systemd-resolved.service(8) — Network Name Resolution manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rfkill.service.html">systemd-rfkill.service(8) — Load and save the RF kill switch state at boot and change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run.html">systemd-run(1) — Run programs in transient scope units, service units, or path-, socket-, or timer-triggered service units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run-generator.html">systemd-run-generator(8) — Generator for invoking commands specified on the kernel command line as system service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sbsign.html">systemd-sbsign(1) — Sign PE binaries for EFI Secure Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sleep.conf.html">systemd-sleep.conf(5) — Suspend and hibernation configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-activate.html">systemd-socket-activate(1) — Test socket activation of daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-proxyd.html">systemd-socket-proxyd(8) — Bidirectionally proxy local sockets to another (possibly remote) socket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-soft-reboot.service.html">systemd-soft-reboot.service(8) — Userspace reboot operation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-generator.html">systemd-ssh-generator(8) — Generator for binding a socket-activated SSH server to local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-issue.html">systemd-ssh-issue(1) — Generator for SSH login prompt drop-ins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-proxy.html">systemd-ssh-proxy(1) — SSH client plugin for connecting to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stdio-bridge.html">systemd-stdio-bridge(1) — D-Bus proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-storagetm.service.html">systemd-storagetm.service(8) — Exposes all local block devices as NVMe-TCP mass storage devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stub.html">systemd-stub(7) — A simple UEFI kernel boot stub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-suspend.service.html">systemd-suspend.service(8) — System sleep state logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysctl.service.html">systemd-sysctl.service(8) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysext.html">systemd-sysext(8) — Activates System Extension Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system-update-generator.html">systemd-system-update-generator(8) — Generator for redirecting boot to offline update mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system.conf.html">systemd-system.conf(5) — System and session service manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdate.html">systemd-sysupdate(8) — Automatically Update OS or Other Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdated.service.html">systemd-sysupdated.service(8) — System Update Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysusers.html">systemd-sysusers(8) — Allocate system users and groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysv-generator.html">systemd-sysv-generator(8) — Unit generator for SysV init scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-time-wait-sync.service.html">systemd-time-wait-sync.service(8) — Wait until kernel time is synchronized</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timedated.service.html">systemd-timedated.service(8) — Time and date bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timesyncd.service.html">systemd-timesyncd.service(8) — Network Time Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tmpfiles.html">systemd-tmpfiles(8) — Create, delete, and clean up files and directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-clear.service.html">systemd-tpm2-clear.service(8) — Request that the TPM security chip is cleared on next boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-generator.html">systemd-tpm2-generator(8) — Generator for inserting TPM2 synchronization point in the boot process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-setup.service.html">systemd-tpm2-setup.service(8) — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tty-ask-password-agent.html">systemd-tty-ask-password-agent(1) — List or process pending systemd password requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udev-settle.service.html">systemd-udev-settle.service(8) — Wait for all pending udev events to be handled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udevd.service.html">systemd-udevd.service(8) — Device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-done.service.html">systemd-update-done.service(8) — Mark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-utmp.service.html">systemd-update-utmp.service(8) — Write audit and utmp updates at bootup and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-user-sessions.service.html">systemd-user-sessions.service(8) — Permit user logins after boot, prohibit user logins at shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-userdbd.service.html">systemd-userdbd.service(8) — JSON User/Group Record Query Multiplexer/NSS Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-validatefs%40.service.html">systemd-validatefs@.service(8) — Validate File System Mount Constraint Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vconsole-setup.service.html">systemd-vconsole-setup.service(8) — Configure the virtual consoles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup-generator.html">systemd-veritysetup-generator(8) — Unit generator for verity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup%40.service.html">systemd-veritysetup@.service(8) — Disk verity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vmspawn.html">systemd-vmspawn(1) — Spawn an OS in a virtual machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-volatile-root.service.html">systemd-volatile-root.service(8) — Make the root file system volatile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vpick.html">systemd-vpick(1) — Resolve paths to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-xdg-autostart-generator.html">systemd-xdg-autostart-generator(8) — User unit generator for XDG autostart files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.automount.html">systemd.automount(5) — Automount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.device.html">systemd.device(5) — Device unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dns-delegate.html">systemd.dns-delegate(5) — DNS Server Delegation Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dnssd.html">systemd.dnssd(5) — DNS-SD configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.environment-generator.html">systemd.environment-generator(7) — systemd environment file generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.exec.html">systemd.exec(5) — Execution environment configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.generator.html">systemd.generator(7) — systemd unit generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-filter.html">systemd.image-filter(7) — Disk Image Dissection Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-policy.html">systemd.image-policy(7) — Disk Image Dissection Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.journal-fields.html">systemd.journal-fields(7) — Special journal fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.kill.html">systemd.kill(5) — Process killing procedure configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.link.html">systemd.link(5) — Network device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.mount.html">systemd.mount(5) — Mount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.net-naming-scheme.html">systemd.net-naming-scheme(7) — Network device naming schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.netdev.html">systemd.netdev(5) — Virtual Network Device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.network.html">systemd.network(5) — Network configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.nspawn.html">systemd.nspawn(5) — Container settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.offline-updates.html">systemd.offline-updates(7) — Implementation of offline updates in systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.path.html">systemd.path(5) — Path unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.pcrlock.html">systemd.pcrlock(5) — PCR measurement prediction files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.preset.html">systemd.preset(5) — Service enablement presets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.resource-control.html">systemd.resource-control(5) — Resource control unit settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.scope.html">systemd.scope(5) — Scope unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.service.html">systemd.service(5) — Service unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.slice.html">systemd.slice(5) — Slice unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.socket.html">systemd.socket(5) — Socket unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.special.html">systemd.special(7) — Special systemd units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.swap.html">systemd.swap(5) — Swap unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.syntax.html">systemd.syntax(7) — General syntax of systemd configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.system-credentials.html">systemd.system-credentials(7) — System Credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.target.html">systemd.target(5) — Target unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.time.html">systemd.time(7) — Time and date specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.timer.html">systemd.timer(5) — Timer unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.unit.html">systemd.unit(5) — Unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.v.html">systemd.v(7) — Directory with Versioned Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.d.html">sysupdate.d(5) — Transfer Definition Files for Automatic Updates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.features.html">sysupdate.features(5) — Definition Files for Optional Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysusers.d.html">sysusers.d(5) — Declarative allocation of system users and groups</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">T</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timedatectl.html">timedatectl(1) — Control the system time and date</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesyncd.conf.html">timesyncd.conf(5) — Network Time Synchronization configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tmpfiles.d.html">tmpfiles.d(5) — Configuration for creation, deletion, and cleaning of files and directories</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">U</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="udev.html">udev(7) — Dynamic device management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev.conf.html">udev.conf(5) — Configuration for device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_get_syspath.html">udev_device_get_syspath(3) — Query device properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_has_tag.html">udev_device_has_tag(3) — Retrieve or set device attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_new_from_syspath.html">udev_device_new_from_syspath(3) — Create, acquire and release a udev device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_add_match_subsystem.html">udev_enumerate_add_match_subsystem(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_new.html">udev_enumerate_new(3) — Create, acquire and release a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_scan_devices.html">udev_enumerate_scan_devices(3) — Query or modify a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_list_entry.html">udev_list_entry(3) — Iterate and access udev lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_filter_update.html">udev_monitor_filter_update(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_new_from_netlink.html">udev_monitor_new_from_netlink(3) — Create, acquire and release a udev monitor object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_receive_device.html">udev_monitor_receive_device(3) — Query and modify device monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_new.html">udev_new(3) — Create, acquire and release a udev context object</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">udevadm(8) — udev management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ukify.html">ukify(1) — Combine components into a signed Unified Kernel Image for UEFI systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updatectl.html">updatectl(1) — Control the system update service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user%40.service.html">user@.service(5) — System units to start the user manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="userdbctl.html">userdbctl(1) — Inspect users, groups and group memberships</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">V</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="varlinkctl.html">varlinkctl(1) — Introspect with and invoke Varlink services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vconsole.conf.html">vconsole.conf(5) — Configuration file for the virtual console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="veritytab.html">veritytab(5) — Configuration for verity block devices</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/blob/man_pages_in_sphinx/doc-migration/source/docs/udevadm.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/edit/man_pages_in_sphinx/doc-migration/source/docs/udevadm.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="udevadm-8">
+<span id="id1"></span><h1>udevadm(8)<a class="headerlink" href="#udevadm-8" title="Link to this heading">¶</a></h1>
+<section id="name">
+<h2>Name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
+<p>udevadm — udev management tool</p>
+</section>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">[--debug]</span> <span class="pre">[--version]</span> <span class="pre">[--help]</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">info</span> <span class="pre">[&lt;options&gt;...]</span> <span class="pre">[&lt;devpath&gt;...|&lt;syspath&gt;...|&lt;id&gt;...|&lt;unit&gt;...]</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">trigger</span> <span class="pre">[&lt;options&gt;...]</span> <span class="pre">[&lt;devpath&gt;...|&lt;syspath&gt;...|&lt;id&gt;...|&lt;unit&gt;...]</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">settle</span> <span class="pre">[&lt;options&gt;...]</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">control</span> <span class="pre">options...</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">monitor</span> <span class="pre">[&lt;options&gt;...]</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">test</span> <span class="pre">[&lt;options&gt;...]</span> <span class="pre">devpath|syspath|id|unit</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">test-builtin</span> <span class="pre">[&lt;options&gt;...]</span> <span class="pre">command</span> <span class="pre">devpath|syspath|id|unit</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">verify</span> <span class="pre">[&lt;options&gt;...]</span> <span class="pre">[&lt;files&gt;...]</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">cat</span> <span class="pre">[&lt;options&gt;...]</span> <span class="pre">[&lt;files&gt;...]</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">wait</span> <span class="pre">[&lt;options&gt;...]</span> <span class="pre">devpath...|syspath...</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">lock</span> <span class="pre">[&lt;options&gt;...]</span> <span class="pre">command...</span></code></p>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span></code> expects a command and command specific options. It controls the runtime behavior of <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>, requests kernel events, manages the event queue, and provides simple debugging mechanisms.</p>
+</section>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Link to this heading">¶</a></h2>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-d">
+<span class="sig-name descname"><span class="pre">-d</span></span><a class="headerlink" href="#systemd-option-udevadm-d" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-debug">
+<span class="sig-name descname"><span class="pre">--debug</span></span><a class="headerlink" href="#systemd-option-udevadm-debug" title="Link to this definition">¶</a></dt>
+<dd><p>Print debug messages to standard error. This option is implied in <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">test</span></code> and <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">test-builtin</span></code> commands.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-v">
+<span class="sig-name descname"><span class="pre">-V</span></span><a class="headerlink" href="#systemd-option-udevadm-v" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-version">
+<span class="sig-name descname"><span class="pre">--version</span></span><a class="headerlink" href="#systemd-option-udevadm-version" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<blockquote>
+<div><p>Print a short version string and exit.</p>
+</div></blockquote>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-h">
+<span class="sig-name descname"><span class="pre">-h</span></span><a class="headerlink" href="#systemd-option-udevadm-h" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-help">
+<span class="sig-name descname"><span class="pre">--help</span></span><a class="headerlink" href="#systemd-option-udevadm-help" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="udevadm-info-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit">
+<h2>udevadm info [<em>options</em>…] [<em>devpath</em>|:emphasis:<cite>syspath</cite>|:emphasis:<cite>id</cite>|:emphasis:<cite>unit</cite>…]<a class="headerlink" href="#udevadm-info-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit" title="Link to this heading">¶</a></h2>
+<p>Query the udev database for device information.</p>
+<p>Positional arguments should be used to specify one or more devices. Each one may be a device name (in which case it must start with <code class="code docutils literal notranslate"><span class="pre">/dev/</span></code>), a sys path (in which case it must start with <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code>), a device ID (such as “n1”, “c5:1”, or “b259:1”, see <a class="reference internal" href="sd_device_get_syspath.html#sd-device-get-syspath-3"><span class="std std-ref">sd_device_get_device_id(3)</span></a>). or a systemd device unit name (in which case it must end with “.device”, see <a class="reference internal" href="systemd.device.html#systemd-device-5"><span class="std std-ref">systemd.device(5)</span></a>).</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-q">
+<span class="sig-name descname"><span class="pre">-q</span></span><a class="headerlink" href="#systemd-option-udevadm-q" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-query-type">
+<span class="sig-name descname"><span class="pre">--query=TYPE</span></span><a class="headerlink" href="#systemd-option-udevadm-query-type" title="Link to this definition">¶</a></dt>
+<dd><p>Query the database for the specified type of device data. Valid <em>TYPE</em>s are: <code class="code docutils literal notranslate"><span class="pre">name</span></code>, <code class="code docutils literal notranslate"><span class="pre">symlink</span></code>, <code class="code docutils literal notranslate"><span class="pre">path</span></code>, <code class="code docutils literal notranslate"><span class="pre">property</span></code>, <code class="code docutils literal notranslate"><span class="pre">all</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-property-name">
+<span class="sig-name descname"><span class="pre">--property=NAME</span></span><a class="headerlink" href="#systemd-option-udevadm-property-name" title="Link to this definition">¶</a></dt>
+<dd><p>When showing device properties using the <code class="code docutils literal notranslate"><span class="pre">--query=property</span></code> option, limit display to properties specified in the argument. The argument should be a comma-separated list of property names. If not specified, all known properties are shown.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-value">
+<span class="sig-name descname"><span class="pre">--value</span></span><a class="headerlink" href="#systemd-option-udevadm-value" title="Link to this definition">¶</a></dt>
+<dd><p>When showing device properties using the <code class="code docutils literal notranslate"><span class="pre">--query=property</span></code> option, print only their values, and skip the property name and “=”.</p>
+<p>Cannot be used together with <code class="code docutils literal notranslate"><span class="pre">-x/--export</span></code> or <code class="code docutils literal notranslate"><span class="pre">-P/--export-prefix</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-p">
+<span class="sig-name descname"><span class="pre">-p</span></span><a class="headerlink" href="#systemd-option-udevadm-p" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-path-devpath">
+<span class="sig-name descname"><span class="pre">--path=DEVPATH</span></span><a class="headerlink" href="#systemd-option-udevadm-path-devpath" title="Link to this definition">¶</a></dt>
+<dd><p>The <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code> path of the device to query, e.g. <code class="code docutils literal notranslate"><span class="pre">[/sys/]/class/block/sda</span></code>. This option is an alternative to the positional argument with a <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code> prefix. <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">info</span> <span class="pre">--path=/class/block/sda</span></code> is equivalent to <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">info</span> <span class="pre">/sys/class/block/sda</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-n">
+<span class="sig-name descname"><span class="pre">-n</span></span><a class="headerlink" href="#systemd-option-udevadm-n" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-name-file">
+<span class="sig-name descname"><span class="pre">--name=FILE</span></span><a class="headerlink" href="#systemd-option-udevadm-name-file" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the device node or a symlink to query, e.g. <code class="code docutils literal notranslate"><span class="pre">[/dev/]/sda</span></code>. This option is an alternative to the positional argument with a <code class="code docutils literal notranslate"><span class="pre">/dev/</span></code> prefix. <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">info</span> <span class="pre">--name=sda</span></code> is equivalent to <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">info</span> <span class="pre">/dev/sda</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-r">
+<span class="sig-name descname"><span class="pre">-r</span></span><a class="headerlink" href="#systemd-option-udevadm-r" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-root">
+<span class="sig-name descname"><span class="pre">--root</span></span><a class="headerlink" href="#systemd-option-udevadm-root" title="Link to this definition">¶</a></dt>
+<dd><p>Print absolute paths in <code class="code docutils literal notranslate"><span class="pre">name</span></code> or <code class="code docutils literal notranslate"><span class="pre">symlink</span></code> query.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-a">
+<span class="sig-name descname"><span class="pre">-a</span></span><a class="headerlink" href="#systemd-option-udevadm-a" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-attribute-walk">
+<span class="sig-name descname"><span class="pre">--attribute-walk</span></span><a class="headerlink" href="#systemd-option-udevadm-attribute-walk" title="Link to this definition">¶</a></dt>
+<dd><p>Print all sysfs properties of the specified device that can be used in udev rules to match the specified device. It prints all devices along the chain, up to the root of sysfs that can be used in udev rules.</p>
+<p>This switch supports JSON output mode (see <code class="code docutils literal notranslate"><span class="pre">--json=</span></code> below). Note that because this switch generates multiple JSON objects, JSON-SEQ mode is automatically enabled (RFC7464). (Note: tools such as <a class="reference external" href="https://jqlang.github.io/jq/manual/">jq</a> natively support JSON-SEQ via the <code class="code docutils literal notranslate"><span class="pre">--seq</span></code> switch.)</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-t">
+<span class="sig-name descname"><span class="pre">-t</span></span><a class="headerlink" href="#systemd-option-udevadm-t" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-tree">
+<span class="sig-name descname"><span class="pre">--tree</span></span><a class="headerlink" href="#systemd-option-udevadm-tree" title="Link to this definition">¶</a></dt>
+<dd><p>Display a sysfs tree. This recursively iterates through the sysfs hierarchy and displays it in a tree structure. If a path is specified only the subtree below and its parent directories are shown. This will show both device and subsystem items.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-x">
+<span class="sig-name descname"><span class="pre">-x</span></span><a class="headerlink" href="#systemd-option-udevadm-x" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-export">
+<span class="sig-name descname"><span class="pre">--export</span></span><a class="headerlink" href="#systemd-option-udevadm-export" title="Link to this definition">¶</a></dt>
+<dd><p>Print output as key/value pairs. Values are enclosed in single quotes. This takes effects only when <code class="code docutils literal notranslate"><span class="pre">--query=property</span></code> or <code class="code docutils literal notranslate"><span class="pre">--device-id-of-file=:emphasis:`FILE`</span></code> is specified.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-p-2">
+<span class="sig-name descname"><span class="pre">-P</span></span><a class="headerlink" href="#systemd-option-udevadm-p-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-export-prefix-name">
+<span class="sig-name descname"><span class="pre">--export-prefix=NAME</span></span><a class="headerlink" href="#systemd-option-udevadm-export-prefix-name" title="Link to this definition">¶</a></dt>
+<dd><p>Add a prefix to the key name of exported values. This implies <code class="code docutils literal notranslate"><span class="pre">--export</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-d-2">
+<span class="sig-name descname"><span class="pre">-d</span></span><a class="headerlink" href="#systemd-option-udevadm-d-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-device-id-of-file-file">
+<span class="sig-name descname"><span class="pre">--device-id-of-file=FILE</span></span><a class="headerlink" href="#systemd-option-udevadm-device-id-of-file-file" title="Link to this definition">¶</a></dt>
+<dd><p>Print major/minor numbers of the underlying device, where the file lives on. If this is specified, all positional arguments are ignored.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-e">
+<span class="sig-name descname"><span class="pre">-e</span></span><a class="headerlink" href="#systemd-option-udevadm-e" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-export-db">
+<span class="sig-name descname"><span class="pre">--export-db</span></span><a class="headerlink" href="#systemd-option-udevadm-export-db" title="Link to this definition">¶</a></dt>
+<dd><p>Export the content of the udev database.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-c">
+<span class="sig-name descname"><span class="pre">-c</span></span><a class="headerlink" href="#systemd-option-udevadm-c" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-cleanup-db">
+<span class="sig-name descname"><span class="pre">--cleanup-db</span></span><a class="headerlink" href="#systemd-option-udevadm-cleanup-db" title="Link to this definition">¶</a></dt>
+<dd><p>Cleanup the udev database.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-w-seconds">
+<span class="sig-name descname"><span class="pre">-w[SECONDS]</span></span><a class="headerlink" href="#systemd-option-udevadm-w-seconds" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-wait-for-initialization-seconds">
+<span class="sig-name descname"><span class="pre">--wait-for-initialization[=SECONDS]</span></span><a class="headerlink" href="#systemd-option-udevadm-wait-for-initialization-seconds" title="Link to this definition">¶</a></dt>
+<dd><p>Wait for device to be initialized. If argument <em>SECONDS</em> is not specified, the default is to wait forever.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 243.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-subsystem-match-subsystem">
+<span class="sig-name descname"><span class="pre">--subsystem-match[=SUBSYSTEM]</span></span><a class="headerlink" href="#systemd-option-udevadm-subsystem-match-subsystem" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-subsystem-nomatch-subsystem">
+<span class="sig-name descname"><span class="pre">--subsystem-nomatch[=SUBSYSTEM]</span></span><a class="headerlink" href="#systemd-option-udevadm-subsystem-nomatch-subsystem" title="Link to this definition">¶</a></dt>
+<dd><p>When used with <code class="code docutils literal notranslate"><span class="pre">--export-db</span></code>, only show devices of or not of the given subsystem respectively.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-attr-match-file-value">
+<span class="sig-name descname"><span class="pre">--attr-match[=FILE[=VALUE]]</span></span><a class="headerlink" href="#systemd-option-udevadm-attr-match-file-value" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-attr-nomatch-file-value">
+<span class="sig-name descname"><span class="pre">--attr-nomatch[=FILE[=VALUE]]</span></span><a class="headerlink" href="#systemd-option-udevadm-attr-nomatch-file-value" title="Link to this definition">¶</a></dt>
+<dd><p>When used with <code class="code docutils literal notranslate"><span class="pre">--export-db</span></code>, only show devices matching or not matching the given attribute respectively.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-property-match-key-value">
+<span class="sig-name descname"><span class="pre">--property-match[=KEY=VALUE]</span></span><a class="headerlink" href="#systemd-option-udevadm-property-match-key-value" title="Link to this definition">¶</a></dt>
+<dd><p>When used with <code class="code docutils literal notranslate"><span class="pre">--export-db</span></code>, only show devices matching the given property and value.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-tag-match-tag">
+<span class="sig-name descname"><span class="pre">--tag-match[=TAG]</span></span><a class="headerlink" href="#systemd-option-udevadm-tag-match-tag" title="Link to this definition">¶</a></dt>
+<dd><p>When used with <code class="code docutils literal notranslate"><span class="pre">--export-db</span></code>, only show devices with the given tag.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-sysname-match-name">
+<span class="sig-name descname"><span class="pre">--sysname-match[=NAME]</span></span><a class="headerlink" href="#systemd-option-udevadm-sysname-match-name" title="Link to this definition">¶</a></dt>
+<dd><p>When used with <code class="code docutils literal notranslate"><span class="pre">--export-db</span></code>, only show devices with the given “/sys” path.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-name-match-name">
+<span class="sig-name descname"><span class="pre">--name-match[=NAME]</span></span><a class="headerlink" href="#systemd-option-udevadm-name-match-name" title="Link to this definition">¶</a></dt>
+<dd><p>When used with <code class="code docutils literal notranslate"><span class="pre">--export-db</span></code>, only show devices with the given name in “/dev”.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-parent-match-name">
+<span class="sig-name descname"><span class="pre">--parent-match[=NAME]</span></span><a class="headerlink" href="#systemd-option-udevadm-parent-match-name" title="Link to this definition">¶</a></dt>
+<dd><p>When used with <code class="code docutils literal notranslate"><span class="pre">--export-db</span></code>, only show devices with the given parent device.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-initialized-match">
+<span class="sig-name descname"><span class="pre">--initialized-match</span></span><a class="headerlink" href="#systemd-option-udevadm-initialized-match" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-initialized-nomatch">
+<span class="sig-name descname"><span class="pre">--initialized-nomatch</span></span><a class="headerlink" href="#systemd-option-udevadm-initialized-nomatch" title="Link to this definition">¶</a></dt>
+<dd><p>When used with <code class="code docutils literal notranslate"><span class="pre">--export-db</span></code>, only show devices that are initialized or not initialized respectively.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-json-mode">
+<span class="sig-name descname"><span class="pre">--json=MODE</span></span><a class="headerlink" href="#systemd-option-udevadm-json-mode" title="Link to this definition">¶</a></dt>
+<dd><p>Shows output formatted as JSON. Expects one of “short” (for the shortest possible output without any redundant whitespace or line breaks), “pretty” (for a pretty version of the same, with indentation and line breaks) or “off” (to turn off JSON output, the default).</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-no-pager">
+<span class="sig-name descname"><span class="pre">--no-pager</span></span><a class="headerlink" href="#systemd-option-udevadm-no-pager" title="Link to this definition">¶</a></dt>
+<dd><p>Do not pipe output into a pager.</p>
+</dd></dl>
+
+<p>The generated output shows the current device database entry in a terse format. Each line shown is prefixed with one of the following characters:</p>
+<div class="table-wrapper docutils container" id="id2">
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text"><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">info</span></code> output prefixes</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Prefix</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>“P:”</p></td>
+<td><p>Device path in <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>“M:”</p></td>
+<td><p>Device name in <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code> (i.e. the last component of “P:”)</p></td>
+</tr>
+<tr class="row-even"><td><p>“R:”</p></td>
+<td><p>Device number in <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code> (i.e. the numeric suffix of the last component of “P:”)</p></td>
+</tr>
+<tr class="row-odd"><td><p>“J:”</p></td>
+<td><p>Device ID</p></td>
+</tr>
+<tr class="row-even"><td><p>“U:”</p></td>
+<td><p>Kernel subsystem</p></td>
+</tr>
+<tr class="row-odd"><td><p>“B:”</p></td>
+<td><p>Driver subsystem</p></td>
+</tr>
+<tr class="row-even"><td><p>“T:”</p></td>
+<td><p>Kernel device type within subsystem</p></td>
+</tr>
+<tr class="row-odd"><td><p>“D:”</p></td>
+<td><p>Kernel device node major/minor</p></td>
+</tr>
+<tr class="row-even"><td><p>“I:”</p></td>
+<td><p>Network interface index</p></td>
+</tr>
+<tr class="row-odd"><td><p>“N:”</p></td>
+<td><p>Kernel device node name</p></td>
+</tr>
+<tr class="row-even"><td><p>“L:”</p></td>
+<td><p>Device node symlink priority</p></td>
+</tr>
+<tr class="row-odd"><td><p>“S:”</p></td>
+<td><p>Device node symlink</p></td>
+</tr>
+<tr class="row-even"><td><p>“Q:”</p></td>
+<td><p>Block device sequence number (DISKSEQ)</p></td>
+</tr>
+<tr class="row-odd"><td><p>“V:”</p></td>
+<td><p>Attached driver</p></td>
+</tr>
+<tr class="row-even"><td><p>“E:”</p></td>
+<td><p>Device property</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="udevadm-trigger-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit">
+<h2>udevadm trigger [<em>options</em>…] [<em>devpath</em>|:emphasis:<cite>syspath</cite>|:emphasis:<cite>id</cite>|:emphasis:<cite>unit</cite>…]<a class="headerlink" href="#udevadm-trigger-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit" title="Link to this heading">¶</a></h2>
+<p>Request device events from the kernel. Primarily used to replay events at system coldplug time.</p>
+<p>Takes device specifications as positional arguments. See the description of <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">info</span></code> above.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-v-2">
+<span class="sig-name descname"><span class="pre">-v</span></span><a class="headerlink" href="#systemd-option-udevadm-v-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-verbose">
+<span class="sig-name descname"><span class="pre">--verbose</span></span><a class="headerlink" href="#systemd-option-udevadm-verbose" title="Link to this definition">¶</a></dt>
+<dd><p>Print the list of devices which will be triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-n-2">
+<span class="sig-name descname"><span class="pre">-n</span></span><a class="headerlink" href="#systemd-option-udevadm-n-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-dry-run">
+<span class="sig-name descname"><span class="pre">--dry-run</span></span><a class="headerlink" href="#systemd-option-udevadm-dry-run" title="Link to this definition">¶</a></dt>
+<dd><p>Do not actually trigger the event.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-q-2">
+<span class="sig-name descname"><span class="pre">-q</span></span><a class="headerlink" href="#systemd-option-udevadm-q-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-quiet">
+<span class="sig-name descname"><span class="pre">--quiet</span></span><a class="headerlink" href="#systemd-option-udevadm-quiet" title="Link to this definition">¶</a></dt>
+<dd><p>Suppress error logging in triggering events.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 248.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-t-2">
+<span class="sig-name descname"><span class="pre">-t</span></span><a class="headerlink" href="#systemd-option-udevadm-t-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-type-type">
+<span class="sig-name descname"><span class="pre">--type=TYPE</span></span><a class="headerlink" href="#systemd-option-udevadm-type-type" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger a specific type of devices. Valid types are “all”, “devices”, and “subsystems”. The default value is “devices”.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-c-2">
+<span class="sig-name descname"><span class="pre">-c</span></span><a class="headerlink" href="#systemd-option-udevadm-c-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-action-action">
+<span class="sig-name descname"><span class="pre">--action=ACTION</span></span><a class="headerlink" href="#systemd-option-udevadm-action-action" title="Link to this definition">¶</a></dt>
+<dd><p>Type of event to be triggered. Possible actions are “add”, “remove”, “change”, “move”, “online”, “offline”, “bind”, and “unbind”. Also, the special value “help” can be used to list the possible actions. The default value is “change”.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-prioritized-subsystem-subsystem">
+<span class="sig-name descname"><span class="pre">--prioritized-subsystem=SUBSYSTEM[</span></span><a class="headerlink" href="#systemd-option-udevadm-prioritized-subsystem-subsystem" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-subsystem">
+<span class="sig-name descname"><span class="pre">SUBSYSTEM…]</span></span><a class="headerlink" href="#systemd-option-udevadm-subsystem" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a comma separated list of subsystems. When triggering events for devices, the devices from the specified subsystems and their parents are triggered first. For example, if <code class="code docutils literal notranslate"><span class="pre">--prioritized-subsystem=block,net</span></code>, then firstly all block devices and their parents are triggered, in the next all network devices and their parents are triggered, and lastly the other devices are triggered. This option can be specified multiple times, and in that case the lists of the subsystems will be merged. That is, <code class="code docutils literal notranslate"><span class="pre">--prioritized-subsystem=block</span> <span class="pre">--prioritized-subsystem=net</span></code> is equivalent to <code class="code docutils literal notranslate"><span class="pre">--prioritized-subsystem=block,net</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-s">
+<span class="sig-name descname"><span class="pre">-s</span></span><a class="headerlink" href="#systemd-option-udevadm-s" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-subsystem-match-subsystem-2">
+<span class="sig-name descname"><span class="pre">--subsystem-match=SUBSYSTEM</span></span><a class="headerlink" href="#systemd-option-udevadm-subsystem-match-subsystem-2" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger events for devices which belong to a matching subsystem. This option supports shell style pattern matching. When this option is specified more than once, then each matching result is ORed, that is, all the devices in each subsystem are triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-s-2">
+<span class="sig-name descname"><span class="pre">-S</span></span><a class="headerlink" href="#systemd-option-udevadm-s-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-subsystem-nomatch-subsystem-2">
+<span class="sig-name descname"><span class="pre">--subsystem-nomatch=SUBSYSTEM</span></span><a class="headerlink" href="#systemd-option-udevadm-subsystem-nomatch-subsystem-2" title="Link to this definition">¶</a></dt>
+<dd><p>Do not trigger events for devices which belong to a matching subsystem. This option supports shell style pattern matching. When this option is specified more than once, then each matching result is ANDed, that is, devices which do not match all specified subsystems are triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-a-2">
+<span class="sig-name descname"><span class="pre">-a</span></span><a class="headerlink" href="#systemd-option-udevadm-a-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-attr-match-attribute-value">
+<span class="sig-name descname"><span class="pre">--attr-match=ATTRIBUTE=VALUE</span></span><a class="headerlink" href="#systemd-option-udevadm-attr-match-attribute-value" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger events for devices with a matching sysfs attribute. If a value is specified along with the attribute name, the content of the attribute is matched against the given value using shell style pattern matching. If no value is specified, the existence of the sysfs attribute is checked. When this option is specified multiple times, then each matching result is ANDed, that is, only devices which have all specified attributes are triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-a-3">
+<span class="sig-name descname"><span class="pre">-A</span></span><a class="headerlink" href="#systemd-option-udevadm-a-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-attr-nomatch-attribute-value">
+<span class="sig-name descname"><span class="pre">--attr-nomatch=ATTRIBUTE=VALUE</span></span><a class="headerlink" href="#systemd-option-udevadm-attr-nomatch-attribute-value" title="Link to this definition">¶</a></dt>
+<dd><p>Do not trigger events for devices with a matching sysfs attribute. If a value is specified along with the attribute name, the content of the attribute is matched against the given value using shell style pattern matching. If no value is specified, the existence of the sysfs attribute is checked. When this option is specified multiple times, then each matching result is ANDed, that is, only devices which have none of the specified attributes are triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-p-3">
+<span class="sig-name descname"><span class="pre">-p</span></span><a class="headerlink" href="#systemd-option-udevadm-p-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-property-match-property-value">
+<span class="sig-name descname"><span class="pre">--property-match=PROPERTY=VALUE</span></span><a class="headerlink" href="#systemd-option-udevadm-property-match-property-value" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger events for devices with a matching property value. This option supports shell style pattern matching. When this option is specified more than once, then each matching result is ORed, that is, devices which have one of the specified properties are triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-g">
+<span class="sig-name descname"><span class="pre">-g</span></span><a class="headerlink" href="#systemd-option-udevadm-g" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-tag-match-tag-2">
+<span class="sig-name descname"><span class="pre">--tag-match=TAG</span></span><a class="headerlink" href="#systemd-option-udevadm-tag-match-tag-2" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger events for devices with a matching tag. When this option is specified multiple times, then each matching result is ANDed, that is, devices which have all specified tags are triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-y">
+<span class="sig-name descname"><span class="pre">-y</span></span><a class="headerlink" href="#systemd-option-udevadm-y" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-sysname-match-name-2">
+<span class="sig-name descname"><span class="pre">--sysname-match=NAME</span></span><a class="headerlink" href="#systemd-option-udevadm-sysname-match-name-2" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger events for devices for which the last component (i.e. the filename) of the <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code> path matches the specified <em>PATH</em>. This option supports shell style pattern matching. When this option is specified more than once, then each matching result is ORed, that is, all devices which have any of the specified <em>NAME</em> are triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-name-match-name-2">
+<span class="sig-name descname"><span class="pre">--name-match=NAME</span></span><a class="headerlink" href="#systemd-option-udevadm-name-match-name-2" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger events for devices with a matching device path. When this option is specified more than once, then each matching result is ORed, that is, all specified devices are triggered.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 218.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-b">
+<span class="sig-name descname"><span class="pre">-b</span></span><a class="headerlink" href="#systemd-option-udevadm-b" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-parent-match-syspath">
+<span class="sig-name descname"><span class="pre">--parent-match=SYSPATH</span></span><a class="headerlink" href="#systemd-option-udevadm-parent-match-syspath" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger events for all children of a given device. When this option is specified more than once, then each matching result is ORed, that is, all children of each specified device are triggered.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-initialized-match-2">
+<span class="sig-name descname"><span class="pre">--initialized-match</span></span><a class="headerlink" href="#systemd-option-udevadm-initialized-match-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-initialized-nomatch-2">
+<span class="sig-name descname"><span class="pre">--initialized-nomatch</span></span><a class="headerlink" href="#systemd-option-udevadm-initialized-nomatch-2" title="Link to this definition">¶</a></dt>
+<dd><p>When <code class="code docutils literal notranslate"><span class="pre">--initialized-match</span></code> is specified, trigger events for devices that are already initialized by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>, and skip devices that are not initialized yet.</p>
+<p>When <code class="code docutils literal notranslate"><span class="pre">--initialized-nomatch</span></code> is specified, trigger events for devices that are not initialized by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code> yet, and skip devices that are already initialized.</p>
+<p>Typically, it is essential that applications which intend to use such a match, make sure a suitable udev rule is installed that sets at least one property on devices that shall be matched. See also Initialized Devices section below for more details.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="code docutils literal notranslate"><span class="pre">--initialized-nomatch</span></code> can potentially save a significant amount of time compared to re-triggering all devices in the system and e.g. can be used to optimize boot time. However, this is not safe to be used in a boot sequence in general. Especially, when udev rules for a device depend on its parent devices (e.g. “ATTRS” or “IMPORT{parent}” keys, see <a class="reference external" href="https://man7.org/linux/man-pages/man7/udev.7.html">udev(7)</a> for more details), the final state of the device becomes easily unstable with this option.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-include-parents">
+<span class="sig-name descname"><span class="pre">--include-parents</span></span><a class="headerlink" href="#systemd-option-udevadm-include-parents" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger parent devices of found devices even if the parents will not match the filter condition. This is useful if we are interested to limit the coldplug activities to some devices or subsystems.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-w">
+<span class="sig-name descname"><span class="pre">-w</span></span><a class="headerlink" href="#systemd-option-udevadm-w" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-settle">
+<span class="sig-name descname"><span class="pre">--settle</span></span><a class="headerlink" href="#systemd-option-udevadm-settle" title="Link to this definition">¶</a></dt>
+<dd><p>Apart from triggering events, also waits for those events to finish. Note that this is different from calling <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">settle</span></code>. <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">settle</span></code> waits for all events to finish. This option only waits for events triggered by the same command to finish.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 238.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-uuid">
+<span class="sig-name descname"><span class="pre">--uuid</span></span><a class="headerlink" href="#systemd-option-udevadm-uuid" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger the synthetic device events, and associate a randomized UUID with each. These UUIDs are printed to standard output, one line for each event. These UUIDs are included in the uevent environment block (in the “SYNTH_UUID=” property) and may be used to track delivery of the generated events.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 249.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-wait-daemon-seconds">
+<span class="sig-name descname"><span class="pre">--wait-daemon[=SECONDS]</span></span><a class="headerlink" href="#systemd-option-udevadm-wait-daemon-seconds" title="Link to this definition">¶</a></dt>
+<dd><p>Before triggering uevents, wait for systemd-udevd daemon to be initialized. Optionally takes timeout value. Default timeout is 5 seconds. This is equivalent to invoking <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">control</span> <span class="pre">--ping</span></code> before <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">trigger</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 241.</span></p>
+</div>
+</dd></dl>
+
+<p>In addition, optional positional arguments can be used to specify device names or sys paths. They must start with <code class="code docutils literal notranslate"><span class="pre">/dev/</span></code> or <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code> respectively.</p>
+</section>
+<section id="udevadm-settle-options">
+<h2>udevadm settle [<em>options</em>…]<a class="headerlink" href="#udevadm-settle-options" title="Link to this heading">¶</a></h2>
+<p>Watches the udev event queue, and exits if all current events are handled.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-t-3">
+<span class="sig-name descname"><span class="pre">-t</span></span><a class="headerlink" href="#systemd-option-udevadm-t-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-timeout-seconds">
+<span class="sig-name descname"><span class="pre">--timeout=SECONDS</span></span><a class="headerlink" href="#systemd-option-udevadm-timeout-seconds" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum number of seconds to wait for the event queue to become empty. The default value is 120 seconds. A value of 0 will check if the queue is empty and always return immediately. A non-zero value will return an exit code of 0 if queue became empty before timeout was reached, non-zero otherwise.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-e-2">
+<span class="sig-name descname"><span class="pre">-E</span></span><a class="headerlink" href="#systemd-option-udevadm-e-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-exit-if-exists-file">
+<span class="sig-name descname"><span class="pre">--exit-if-exists=FILE</span></span><a class="headerlink" href="#systemd-option-udevadm-exit-if-exists-file" title="Link to this definition">¶</a></dt>
+<dd><p>Stop waiting if file exists.</p>
+</dd></dl>
+
+<p>See <a class="reference internal" href="systemd-udev-settle.service.html#systemd-udev-settle-service-8"><span class="std std-ref">systemd-udev-settle.service(8)</span></a> for more information.</p>
+</section>
+<section id="udevadm-control-options">
+<h2>udevadm control <em>options</em>…<a class="headerlink" href="#udevadm-control-options" title="Link to this heading">¶</a></h2>
+<p>Modify the internal state of the running udev daemon.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-e-3">
+<span class="sig-name descname"><span class="pre">-e</span></span><a class="headerlink" href="#systemd-option-udevadm-e-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-exit">
+<span class="sig-name descname"><span class="pre">--exit</span></span><a class="headerlink" href="#systemd-option-udevadm-exit" title="Link to this definition">¶</a></dt>
+<dd><p>Signal and wait for systemd-udevd to exit. No option except for <code class="code docutils literal notranslate"><span class="pre">--timeout</span></code> can be specified after this option. Note that <code class="code docutils literal notranslate"><span class="pre">systemd-udevd.service</span></code> contains <code class="code docutils literal notranslate"><span class="pre">Restart=always</span></code> and so as a result, this option restarts systemd-udevd. If you want to stop <code class="code docutils literal notranslate"><span class="pre">systemd-udevd.service</span></code>, please use the following:</p>
+<blockquote>
+<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>systemctl<span class="w"> </span>stop<span class="w"> </span>systemd-udevd-control.socket<span class="w"> </span>systemd-udevd-kernel.socket<span class="w"> </span>systemd-udevd-varlink.socket<span class="w"> </span>systemd-udevd.service
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-l">
+<span class="sig-name descname"><span class="pre">-l</span></span><a class="headerlink" href="#systemd-option-udevadm-l" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-log-level-value">
+<span class="sig-name descname"><span class="pre">--log-level=value</span></span><a class="headerlink" href="#systemd-option-udevadm-log-level-value" title="Link to this definition">¶</a></dt>
+<dd><p>Set the internal log level of <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>. Valid values are the numerical syslog priorities or their textual representations: <code class="code docutils literal notranslate"><span class="pre">emerg</span></code>, <code class="code docutils literal notranslate"><span class="pre">alert</span></code>, <code class="code docutils literal notranslate"><span class="pre">crit</span></code>, <code class="code docutils literal notranslate"><span class="pre">err</span></code>, <code class="code docutils literal notranslate"><span class="pre">warning</span></code>, <code class="code docutils literal notranslate"><span class="pre">notice</span></code>, <code class="code docutils literal notranslate"><span class="pre">info</span></code>, and <code class="code docutils literal notranslate"><span class="pre">debug</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-s-3">
+<span class="sig-name descname"><span class="pre">-s</span></span><a class="headerlink" href="#systemd-option-udevadm-s-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-stop-exec-queue">
+<span class="sig-name descname"><span class="pre">--stop-exec-queue</span></span><a class="headerlink" href="#systemd-option-udevadm-stop-exec-queue" title="Link to this definition">¶</a></dt>
+<dd><p>Signal systemd-udevd to stop executing new events. Incoming events will be queued.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-s-4">
+<span class="sig-name descname"><span class="pre">-S</span></span><a class="headerlink" href="#systemd-option-udevadm-s-4" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-start-exec-queue">
+<span class="sig-name descname"><span class="pre">--start-exec-queue</span></span><a class="headerlink" href="#systemd-option-udevadm-start-exec-queue" title="Link to this definition">¶</a></dt>
+<dd><p>Signal systemd-udevd to enable the execution of events.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-r-2">
+<span class="sig-name descname"><span class="pre">-R</span></span><a class="headerlink" href="#systemd-option-udevadm-r-2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-reload">
+<span class="sig-name descname"><span class="pre">--reload</span></span><a class="headerlink" href="#systemd-option-udevadm-reload" title="Link to this definition">¶</a></dt>
+<dd><p>Signal systemd-udevd to reload the rules files and other databases like the kernel module index. Reloading rules and databases does not apply any changes to already existing devices; the new configuration will only be applied to new events.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-p-4">
+<span class="sig-name descname"><span class="pre">-p</span></span><a class="headerlink" href="#systemd-option-udevadm-p-4" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-property-key-value">
+<span class="sig-name descname"><span class="pre">--property=KEY=value</span></span><a class="headerlink" href="#systemd-option-udevadm-property-key-value" title="Link to this definition">¶</a></dt>
+<dd><p>Set a global property for all events.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-m">
+<span class="sig-name descname"><span class="pre">-m</span></span><a class="headerlink" href="#systemd-option-udevadm-m" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-children-max-value">
+<span class="sig-name descname"><span class="pre">--children-max=value</span></span><a class="headerlink" href="#systemd-option-udevadm-children-max-value" title="Link to this definition">¶</a></dt>
+<dd><p>Set the maximum number of events, systemd-udevd will handle at the same time. When 0 is specified, then the maximum is determined based on the system resources.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-ping">
+<span class="sig-name descname"><span class="pre">--ping</span></span><a class="headerlink" href="#systemd-option-udevadm-ping" title="Link to this definition">¶</a></dt>
+<dd><p>Send a ping message to systemd-udevd and wait for the reply. This may be useful to check that systemd-udevd daemon is running.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 241.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-trace-bool">
+<span class="sig-name descname"><span class="pre">--trace=BOOL</span></span><a class="headerlink" href="#systemd-option-udevadm-trace-bool" title="Link to this definition">¶</a></dt>
+<dd><p>Enable/disable trace logging in <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-revert">
+<span class="sig-name descname"><span class="pre">--revert</span></span><a class="headerlink" href="#systemd-option-udevadm-revert" title="Link to this definition">¶</a></dt>
+<dd><p>Revert settings previously set with <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">control</span></code> command. When specified, settings set with <code class="code docutils literal notranslate"><span class="pre">-l/--log-level=</span></code>, <code class="code docutils literal notranslate"><span class="pre">--trace</span></code>, <code class="code docutils literal notranslate"><span class="pre">-m/--children-max=</span></code>, and <code class="code docutils literal notranslate"><span class="pre">-p/--property=</span></code> will be cleared.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-t-4">
+<span class="sig-name descname"><span class="pre">-t</span></span><a class="headerlink" href="#systemd-option-udevadm-t-4" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-timeout-seconds-2">
+<span class="sig-name descname"><span class="pre">--timeout=seconds</span></span><a class="headerlink" href="#systemd-option-udevadm-timeout-seconds-2" title="Link to this definition">¶</a></dt>
+<dd><p>The maximum number of seconds to wait for a reply from systemd-udevd.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-load-credentials">
+<span class="sig-name descname"><span class="pre">--load-credentials</span></span><a class="headerlink" href="#systemd-option-udevadm-load-credentials" title="Link to this definition">¶</a></dt>
+<dd><p>When specified, the following credentials are used when passed in:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-udev-conf">
+<span class="sig-name descname"><span class="pre">udev.conf.*</span></span><a class="headerlink" href="#systemd-option-udevadm-udev-conf" title="Link to this definition">¶</a></dt>
+<dd><p>These credentials should contain valid <a class="reference external" href="https://man7.org/linux/man-pages/man5/udev.conf.5.html">udev.conf(5)</a> configuration data. From each matching credential a separate file is created. Example: a passed credential <code class="code docutils literal notranslate"><span class="pre">udev.conf.50-foobar</span></code> will be copied into a configuration file <code class="code docutils literal notranslate"><span class="pre">/run/udev/udev.conf.d/50-foobar.conf</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-udev-rules">
+<span class="sig-name descname"><span class="pre">udev.rules.*</span></span><a class="headerlink" href="#systemd-option-udevadm-udev-rules" title="Link to this definition">¶</a></dt>
+<dd><p>These credentials should contain valid <a class="reference external" href="https://man7.org/linux/man-pages/man7/udev.7.html">udev(7)</a> rules. From each matching credential a separate file is created. Example: a passed credential <code class="code docutils literal notranslate"><span class="pre">udev.rules.50-foobar</span></code> will be copied into a configuration file <code class="code docutils literal notranslate"><span class="pre">/run/udev/rules.d/50-foobar.rules</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<p>Note, this <em>does not</em> imply imply <code class="code docutils literal notranslate"><span class="pre">--reload</span></code> option. So, if <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code> is already running, please consider to also specify <code class="code docutils literal notranslate"><span class="pre">-reload</span></code> to make the copied udev rules files used by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="udevadm-monitor-options">
+<h2>udevadm monitor [<em>options</em>…]<a class="headerlink" href="#udevadm-monitor-options" title="Link to this heading">¶</a></h2>
+<p>Listens to the kernel uevents and events sent out by a udev rule and prints the devpath of the event to the console. It can be used to analyze the event timing, by comparing the timestamps of the kernel uevent and the udev event.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-k">
+<span class="sig-name descname"><span class="pre">-k</span></span><a class="headerlink" href="#systemd-option-udevadm-k" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-kernel">
+<span class="sig-name descname"><span class="pre">--kernel</span></span><a class="headerlink" href="#systemd-option-udevadm-kernel" title="Link to this definition">¶</a></dt>
+<dd><p>Print the kernel uevents.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-u">
+<span class="sig-name descname"><span class="pre">-u</span></span><a class="headerlink" href="#systemd-option-udevadm-u" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-udev">
+<span class="sig-name descname"><span class="pre">--udev</span></span><a class="headerlink" href="#systemd-option-udevadm-udev" title="Link to this definition">¶</a></dt>
+<dd><p>Print the udev event after the rule processing.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-p-5">
+<span class="sig-name descname"><span class="pre">-p</span></span><a class="headerlink" href="#systemd-option-udevadm-p-5" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-property">
+<span class="sig-name descname"><span class="pre">--property</span></span><a class="headerlink" href="#systemd-option-udevadm-property" title="Link to this definition">¶</a></dt>
+<dd><p>Also print the properties of the event.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-s-5">
+<span class="sig-name descname"><span class="pre">-s</span></span><a class="headerlink" href="#systemd-option-udevadm-s-5" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-subsystem-match-string-string">
+<span class="sig-name descname"><span class="pre">--subsystem-match=string[/string]</span></span><a class="headerlink" href="#systemd-option-udevadm-subsystem-match-string-string" title="Link to this definition">¶</a></dt>
+<dd><p>Filter kernel uevents and udev events by subsystem[/devtype]. Only events with a matching subsystem value will pass. When this option is specified more than once, then each matching result is ORed, that is, all devices in the specified subsystems are monitored.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-t-5">
+<span class="sig-name descname"><span class="pre">-t</span></span><a class="headerlink" href="#systemd-option-udevadm-t-5" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-tag-match-string">
+<span class="sig-name descname"><span class="pre">--tag-match=string</span></span><a class="headerlink" href="#systemd-option-udevadm-tag-match-string" title="Link to this definition">¶</a></dt>
+<dd><p>Filter udev events by tag. Only udev events with a given tag attached will pass. When this option is specified more than once, then each matching result is ORed, that is, devices which have one of the specified tags are monitored.</p>
+</dd></dl>
+
+</section>
+<section id="udevadm-test-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit">
+<h2>udevadm test [<em>options</em>…] <em>devpath</em>|:emphasis:<cite>syspath</cite>|:emphasis:<cite>id</cite>|:emphasis:<cite>unit</cite><a class="headerlink" href="#udevadm-test-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit" title="Link to this heading">¶</a></h2>
+<p>Simulate a udev event run for the given device, and print debug output. The option <code class="code docutils literal notranslate"><span class="pre">--json=</span></code> may be useful for parsing the final result. See also Example section.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-a-4">
+<span class="sig-name descname"><span class="pre">-a</span></span><a class="headerlink" href="#systemd-option-udevadm-a-4" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-action-action-2">
+<span class="sig-name descname"><span class="pre">--action=ACTION</span></span><a class="headerlink" href="#systemd-option-udevadm-action-action-2" title="Link to this definition">¶</a></dt>
+<dd><p>Type of event to be simulated. Possible actions are “add”, “remove”, “change”, “move”, “online”, “offline”, “bind”, and “unbind”. Also, the special value “help” can be used to list the possible actions. The default value is “add”.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-n-3">
+<span class="sig-name descname"><span class="pre">-N</span></span><a class="headerlink" href="#systemd-option-udevadm-n-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-resolve-names-early-late-never">
+<span class="sig-name descname"><span class="pre">--resolve-names=early|late|never</span></span><a class="headerlink" href="#systemd-option-udevadm-resolve-names-early-late-never" title="Link to this definition">¶</a></dt>
+<dd><p>Specify when <code class="code docutils literal notranslate"><span class="pre">udevadm</span></code> should resolve names of users and groups specified in udev rules. When set to <code class="code docutils literal notranslate"><span class="pre">early</span></code> (the default), names will be resolved when the rules are parsed. When set to <code class="code docutils literal notranslate"><span class="pre">late</span></code>, names will be resolved during the event being processed. When set to <code class="code docutils literal notranslate"><span class="pre">never</span></code>, names will never be resolved and relevant udev rules will be ignored.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 209.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-d-dir">
+<span class="sig-name descname"><span class="pre">-D</span> <span class="pre">DIR</span></span><a class="headerlink" href="#systemd-option-udevadm-d-dir" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-extra-rules-dir-dir">
+<span class="sig-name descname"><span class="pre">--extra-rules-dir=DIR</span></span><a class="headerlink" href="#systemd-option-udevadm-extra-rules-dir-dir" title="Link to this definition">¶</a></dt>
+<dd><p>Also load udev rules files from the specified directory. This option can be specified multiple times. It may be useful for debugging udev rules by copying some udev rules files to a temporary directory, editing them, and specifying the directory with this option. Files found in the specified directories have a higher priority than rules files in the default <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories used by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>. See <a class="reference external" href="https://man7.org/linux/man-pages/man7/udev.7.html">udev(7)</a> for more details about the search paths.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-v-3">
+<span class="sig-name descname"><span class="pre">-v</span></span><a class="headerlink" href="#systemd-option-udevadm-v-3" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-verbose-2">
+<span class="sig-name descname"><span class="pre">--verbose</span></span><a class="headerlink" href="#systemd-option-udevadm-verbose-2" title="Link to this definition">¶</a></dt>
+<dd><p>Shows verbose logs in processing udev rules.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-json-mode-2">
+<span class="sig-name descname"><span class="pre">--json=MODE</span></span><a class="headerlink" href="#systemd-option-udevadm-json-mode-2" title="Link to this definition">¶</a></dt>
+<dd><p>Shows output formatted as JSON. Expects one of “short” (for the shortest possible output without any redundant whitespace or line breaks), “pretty” (for a pretty version of the same, with indentation and line breaks) or “off” (to turn off JSON output, the default).</p>
+</dd></dl>
+
+</section>
+<section id="udevadm-test-builtin-options-command-devpath-emphasis-file-emphasis-unit">
+<h2>udevadm test-builtin [<em>options</em>…] <em>command</em> <em>devpath</em>|:emphasis:<cite>file</cite>|:emphasis:<cite>unit</cite><a class="headerlink" href="#udevadm-test-builtin-options-command-devpath-emphasis-file-emphasis-unit" title="Link to this heading">¶</a></h2>
+<p>Run a built-in command <em>COMMAND</em> for device <em>DEVPATH</em>, and print debug output.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-a-5">
+<span class="sig-name descname"><span class="pre">-a</span></span><a class="headerlink" href="#systemd-option-udevadm-a-5" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-action-action-3">
+<span class="sig-name descname"><span class="pre">--action=ACTION</span></span><a class="headerlink" href="#systemd-option-udevadm-action-action-3" title="Link to this definition">¶</a></dt>
+<dd><p>Type of event to be simulated. Possible actions are “add”, “remove”, “change”, “move”, “online”, “offline”, “bind”, and “unbind”. Also, the special value “help” can be used to list the possible actions. The default value is “add”.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 250.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="udevadm-verify-options-files">
+<h2>udevadm verify [<em>options</em>…] [<em>files</em>…]<a class="headerlink" href="#udevadm-verify-options-files" title="Link to this heading">¶</a></h2>
+<p>Verify syntactic, semantic, and stylistic correctness of udev rules files.</p>
+<p>Positional arguments can be used to specify one or more files to check. Each argument must be an absolute path to a udev rules file or a directory that contains rules files, or a file name of udev rules file (e.g. <code class="code docutils literal notranslate"><span class="pre">99-systemd.rules</span></code>). If a file name is specified, the file will be searched in the <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories that are processed by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>, and searched in the current working directory if not found. If no files are specified, the udev rules are read from the files located in the same <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories that are processed by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>. See <a class="reference external" href="https://man7.org/linux/man-pages/man7/udev.7.html">udev(7)</a> for more details about the search paths.</p>
+<p>The exit status is <code class="code docutils literal notranslate"><span class="pre">0</span></code> if all specified udev rules files are syntactically, semantically, and stylistically correct, and a non-zero error code otherwise.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-n-4">
+<span class="sig-name descname"><span class="pre">-N</span></span><a class="headerlink" href="#systemd-option-udevadm-n-4" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-resolve-names-early-late-never-2">
+<span class="sig-name descname"><span class="pre">--resolve-names=early|late|never</span></span><a class="headerlink" href="#systemd-option-udevadm-resolve-names-early-late-never-2" title="Link to this definition">¶</a></dt>
+<dd><p>Specify when <code class="code docutils literal notranslate"><span class="pre">udevadm</span></code> should resolve names of users and groups specified in udev rules. When set to <code class="code docutils literal notranslate"><span class="pre">early</span></code> (the default), names will be resolved when the rules are parsed. When set to <code class="code docutils literal notranslate"><span class="pre">late</span></code>, names will not be verified, as <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code> resolves names during each event being processed. When set to <code class="code docutils literal notranslate"><span class="pre">never</span></code>, names will never be resolved and relevant rules will be ignored.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-root-path">
+<span class="sig-name descname"><span class="pre">--root=PATH</span></span><a class="headerlink" href="#systemd-option-udevadm-root-path" title="Link to this definition">¶</a></dt>
+<dd><p>When looking for udev rules files located in the <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories, operate on files underneath the specified root path <em>PATH</em>. When a file name is specified, and it is not found in the <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories, the file will be searched in the specified root path <em>PATH</em>, rather than the current working directory.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-no-summary">
+<span class="sig-name descname"><span class="pre">--no-summary</span></span><a class="headerlink" href="#systemd-option-udevadm-no-summary" title="Link to this definition">¶</a></dt>
+<dd><p>Do not show summary.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-no-style">
+<span class="sig-name descname"><span class="pre">--no-style</span></span><a class="headerlink" href="#systemd-option-udevadm-no-style" title="Link to this definition">¶</a></dt>
+<dd><p>Ignore style issues. When specified, even if style issues are found in udev rules files, the exit status is <code class="code docutils literal notranslate"><span class="pre">0</span></code> if no syntactic or semantic errors are found.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="udevadm-cat-options-file">
+<h2>udevadm cat [<em>options</em>…] [<em>file</em>…]<a class="headerlink" href="#udevadm-cat-options-file" title="Link to this heading">¶</a></h2>
+<p>Show udev rules files or udev.conf.</p>
+<p>Positional arguments can be used to specify one or more files to show. Each argument must be an absolute path to a udev rules file or a directory that contains rules files, or a file name of udev rules file (e.g. <code class="code docutils literal notranslate"><span class="pre">99-systemd.rules</span></code>). If a file name is specified, the file will be searched in the <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories that are processed by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>, and searched in the current working directory if not found. If no files are specified, the udev rules are read from the files located in the same <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories that are processed by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>. See <a class="reference external" href="https://man7.org/linux/man-pages/man7/udev.7.html">udev(7)</a> for more details about the search paths.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-root-path-2">
+<span class="sig-name descname"><span class="pre">--root=PATH</span></span><a class="headerlink" href="#systemd-option-udevadm-root-path-2" title="Link to this definition">¶</a></dt>
+<dd><p>When looking for udev rules files located in the <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories, operate on files underneath the specified root path <em>PATH</em>. When a file name is specified, and it is not found in the <code class="code docutils literal notranslate"><span class="pre">udev/rules.d</span></code> directories, the file will be searched in the specified root path <em>PATH</em>, rather than the current working directory.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-tldr">
+<span class="sig-name descname"><span class="pre">--tldr</span></span><a class="headerlink" href="#systemd-option-udevadm-tldr" title="Link to this definition">¶</a></dt>
+<dd><p>Only print the “interesting” parts of the configuration files, skipping comments and empty lines and section headers followed only by comments and empty lines.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-config">
+<span class="sig-name descname"><span class="pre">--config</span></span><a class="headerlink" href="#systemd-option-udevadm-config" title="Link to this definition">¶</a></dt>
+<dd><p>Shows <a class="reference external" href="https://man7.org/linux/man-pages/man5/udev.conf.5.html">udev.conf(5)</a> files, rather than udev rules files. When specified, no udev rules file cannot be specified.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="udevadm-wait-options-devpath-syspath">
+<h2>udevadm wait [<em>options</em>…] <em>devpath|syspath</em>…<a class="headerlink" href="#udevadm-wait-options-devpath-syspath" title="Link to this heading">¶</a></h2>
+<p>Wait for devices or device symlinks being created and initialized by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>. Each device path must start with “/dev/” or “/sys/”, e.g. “/dev/sda”, “/dev/disk/by-path/pci-0000:3c:00.0-nvme-1-part1”, “/sys/devices/pci0000:00/0000:00:1f.6/net/eth0”, or “/sys/class/net/eth0”. This can take multiple devices. This may be useful for waiting for devices being processed by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code> after e.g. partitioning or formatting the devices.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-t-6">
+<span class="sig-name descname"><span class="pre">-t</span></span><a class="headerlink" href="#systemd-option-udevadm-t-6" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-timeout-seconds-3">
+<span class="sig-name descname"><span class="pre">--timeout=SECONDS</span></span><a class="headerlink" href="#systemd-option-udevadm-timeout-seconds-3" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum number of seconds to wait for the specified devices or device symlinks being created, initialized, or removed. The default value is “infinity”.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-initialized-bool">
+<span class="sig-name descname"><span class="pre">--initialized=BOOL</span></span><a class="headerlink" href="#systemd-option-udevadm-initialized-bool" title="Link to this definition">¶</a></dt>
+<dd><p>Check if <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code> initialized devices. Defaults to true. When false, the command only checks if the specified devices exist. Set false to this setting if there is no udev rules for the specified devices, as the devices will never be considered as initialized in that case. See Initialized Devices section below for more details.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-removed">
+<span class="sig-name descname"><span class="pre">--removed</span></span><a class="headerlink" href="#systemd-option-udevadm-removed" title="Link to this definition">¶</a></dt>
+<dd><p>When specified, the command wait for devices being removed instead of created or initialized. If this is specified, <code class="code docutils literal notranslate"><span class="pre">--initialized=</span></code> will be ignored.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-settle-2">
+<span class="sig-name descname"><span class="pre">--settle</span></span><a class="headerlink" href="#systemd-option-udevadm-settle-2" title="Link to this definition">¶</a></dt>
+<dd><p>When specified, also watches the udev event queue, and wait for all queued events being processed by <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="udevadm-lock-options-command">
+<h2>udevadm lock [<em>options</em>…] <em>command</em>…<a class="headerlink" href="#udevadm-lock-options-command" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">lock</span></code> takes an (advisory) exclusive lock on a block device (or all specified devices), as per <a class="reference external" href="https://systemd.io/BLOCK_DEVICE_LOCKING">Locking Block Device Access</a> and invokes a program with the locks taken. When the invoked program exits the locks are automatically released and its return value is propagated as exit code of <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">lock</span></code>.</p>
+<p>This tool is in particular useful to ensure that <a class="reference internal" href="systemd-udevd.service.html#systemd-udevd-service-8"><span class="std std-ref">systemd-udevd.service(8)</span></a> does not probe a block device while changes are made to it, for example partitions created or file systems formatted. Note that many tools that interface with block devices natively support taking relevant locks, see for example <a class="reference external" href="https://man7.org/linux/man-pages/man8/sfdisk.8.html">sfdisk(8)</a>’s <code class="code docutils literal notranslate"><span class="pre">--lock</span></code> switch.</p>
+<p>The command expects at least one block device specified via <code class="code docutils literal notranslate"><span class="pre">--device=</span></code> or <code class="code docutils literal notranslate"><span class="pre">--backing=</span></code>, and a command line to execute as arguments.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-device-device">
+<span class="sig-name descname"><span class="pre">--device=DEVICE</span></span><a class="headerlink" href="#systemd-option-udevadm-device-device" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-d-device">
+<span class="sig-name descname"><span class="pre">-d</span> <span class="pre">DEVICE</span></span><a class="headerlink" href="#systemd-option-udevadm-d-device" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a path to a device node of the device to lock. This switch may be used multiple times (and in combination with <code class="code docutils literal notranslate"><span class="pre">--backing=</span></code>) in order to lock multiple devices. If a partition block device node is specified the containing “whole” block device is automatically determined and used for the lock, as per the specification. If multiple devices are specified, they are deduplicated, sorted by the major/minor of their device nodes and then locked in order.</p>
+<p>This switch must be used at least once, to specify at least one device to lock. (Alternatively, use <code class="code docutils literal notranslate"><span class="pre">--backing=</span></code>, see below.)</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-backing-path">
+<span class="sig-name descname"><span class="pre">--backing=PATH</span></span><a class="headerlink" href="#systemd-option-udevadm-backing-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-b-path">
+<span class="sig-name descname"><span class="pre">-b</span> <span class="pre">PATH</span></span><a class="headerlink" href="#systemd-option-udevadm-b-path" title="Link to this definition">¶</a></dt>
+<dd><p>If a path to a device node is specified, identical to <code class="code docutils literal notranslate"><span class="pre">--device=</span></code>. However, this switch alternatively accepts a path to a regular file or directory, in which case the block device of the file system the file/directory resides on is automatically determined and used as if it was specified with <code class="code docutils literal notranslate"><span class="pre">--device=</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-timeout-secs">
+<span class="sig-name descname"><span class="pre">--timeout=SECS</span></span><a class="headerlink" href="#systemd-option-udevadm-timeout-secs" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-t-secs">
+<span class="sig-name descname"><span class="pre">-t</span> <span class="pre">SECS</span></span><a class="headerlink" href="#systemd-option-udevadm-t-secs" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies how long to wait at most until all locks can be taken. Takes a value in seconds, or in the usual supported time units, see <a class="reference internal" href="systemd.time.html#systemd-time-7"><span class="std std-ref">systemd.time(7)</span></a>. If specified as zero the lock is attempted and if not successful the invocation will immediately fail. If passed as “infinity” (the default) the invocation will wait indefinitely until the lock can be acquired. If the lock cannot be taken in the specified time the specified command will not be executed and the invocation will fail.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-print">
+<span class="sig-name descname"><span class="pre">--print</span></span><a class="headerlink" href="#systemd-option-udevadm-print" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-udevadm-p-6">
+<span class="sig-name descname"><span class="pre">-p</span></span><a class="headerlink" href="#systemd-option-udevadm-p-6" title="Link to this definition">¶</a></dt>
+<dd><p>Instead of locking the specified devices and executing a command, just print the device paths that would be locked, and execute no command. This command is useful to determine the “whole” block device in case a partition block device is specified. The devices will be sorted by their device node major number as primary ordering key and the minor number as secondary ordering key (i.e. they are shown in the order they’d be locked). Note that the number of lines printed here can be less than the number of <code class="code docutils literal notranslate"><span class="pre">--device=</span></code> and <code class="code docutils literal notranslate"><span class="pre">--backing=</span></code> switches specified in case these resolve to the same “whole” devices.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 251.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="initialized-devices">
+<h2>Initialized Devices<a class="headerlink" href="#initialized-devices" title="Link to this heading">¶</a></h2>
+<p>Initialized devices are those for which at least one udev rule already completed execution – for any action but “remove” — that set a property or other device setting (and thus has an entry in the udev device database). Devices are no longer considered initialized if a “remove” action is seen for them (which removes their entry in the udev device database). Note that devices that have no udev rules are never considered initialized, but might still be announced via the sd-device API (or similar).</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
+<section id="format-a-file-system">
+<h3>Format a File System<a class="headerlink" href="#format-a-file-system" title="Link to this heading">¶</a></h3>
+<p>Take a lock on the backing block device while creating a file system, to ensure that <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code> does not probe or announce the new superblock before it is comprehensively written:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># udevadm lock --device=/dev/sda1 mkfs.ext4 /dev/sda1</span>
+</pre></div>
+</div>
+</section>
+<section id="format-a-raid-file-system">
+<h3>Format a RAID File System<a class="headerlink" href="#format-a-raid-file-system" title="Link to this heading">¶</a></h3>
+<p>Similar, but take locks on multiple devices at once:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># udevadm lock --device=/dev/sda1 --device=/dev/sdb1 mkfs.btrfs /dev/sda1 /dev/sdb1</span>
+</pre></div>
+</div>
+</section>
+<section id="copy-in-a-file-system">
+<h3>Copy in a File System<a class="headerlink" href="#copy-in-a-file-system" title="Link to this heading">¶</a></h3>
+<p>Take a lock on the backing block device while copying in a prepared file system image, to ensure that <code class="code docutils literal notranslate"><span class="pre">systemd-udevd</span></code> does not probe or announce the new superblock before it is fully written:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># udevadm lock -d /dev/sda1 dd if=fs.raw of=/dev/sda1</span>
+</pre></div>
+</div>
+</section>
+<section id="predict-network-interface-renaming">
+<h3>Predict Network Interface Renaming<a class="headerlink" href="#predict-network-interface-renaming" title="Link to this heading">¶</a></h3>
+<p>To predict a network interface name, <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">test</span></code> can be used:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>udevadm<span class="w"> </span><span class="nb">test</span><span class="w"> </span>/sys/class/net/wlan0<span class="w"> </span>--json<span class="o">=</span>pretty<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.networkInterface.name
+<span class="s2">&quot;wlp59s0&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="predict-symbolic-links-of-a-device-node">
+<h3>Predict Symbolic links of a Device Node<a class="headerlink" href="#predict-symbolic-links-of-a-device-node" title="Link to this heading">¶</a></h3>
+<p>To predict symbolic links to a device node, <code class="code docutils literal notranslate"><span class="pre">udevadm</span> <span class="pre">test</span></code> can be used:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>udevadm<span class="w"> </span><span class="nb">test</span><span class="w"> </span>/dev/nvme0n1p1<span class="w"> </span>--json<span class="o">=</span>pretty<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.node.symlinks
+<span class="o">[</span>
+<span class="w">  </span><span class="s2">&quot;/dev/disk/by-diskseq/1-part1&quot;</span>,
+<span class="w">  </span><span class="s2">&quot;/dev/disk/by-id/nvme-WDC_PC_SN720_SDAQNTW-512G-1001_192290802247-part1&quot;</span>,
+<span class="w">  </span><span class="s2">&quot;/dev/disk/by-id/nvme-WDC_PC_SN720_SDAQNTW-512G-1001_192290802247_1-part1&quot;</span>,
+<span class="w">  </span><span class="s2">&quot;/dev/disk/by-id/nvme-eui.1922908022470001001b448b44ccb9d6-part1&quot;</span>,
+<span class="w">  </span><span class="s2">&quot;/dev/disk/by-path/pci-0000:3c:00.0-nvme-1-part/by-partnum/1&quot;</span>,
+<span class="w">  </span><span class="s2">&quot;/dev/disk/by-path/pci-0000:3c:00.0-nvme-1-part1&quot;</span>
+<span class="o">]</span>
+$<span class="w"> </span>udevadm<span class="w"> </span><span class="nb">test</span><span class="w"> </span>/dev/input/event3<span class="w"> </span>--json<span class="o">=</span>pretty<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.node.symlinks
+<span class="o">[</span>
+<span class="w">  </span><span class="s2">&quot;/dev/input/by-path/platform-i8042-serio-0-event-kbd&quot;</span>
+<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://man7.org/linux/man-pages/man7/udev.7.html">udev(7)</a>, <a class="reference internal" href="systemd-udevd.service.html#systemd-udevd-service-8"><span class="std std-ref">systemd-udevd.service(8)</span></a>, <a class="reference external" href="https://man7.org/linux/man-pages/man5/udev.conf.5.html">udev.conf(5)</a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ukify.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ukify(1)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="udev_new.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">udev_new(3)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, systemd
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">udevadm(8)</a><ul>
+<li><a class="reference internal" href="#name">Name</a></li>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#udevadm-info-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit">udevadm info [<em>options</em>…] [<em>devpath</em>|:emphasis:<cite>syspath</cite>|:emphasis:<cite>id</cite>|:emphasis:<cite>unit</cite>…]</a></li>
+<li><a class="reference internal" href="#udevadm-trigger-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit">udevadm trigger [<em>options</em>…] [<em>devpath</em>|:emphasis:<cite>syspath</cite>|:emphasis:<cite>id</cite>|:emphasis:<cite>unit</cite>…]</a></li>
+<li><a class="reference internal" href="#udevadm-settle-options">udevadm settle [<em>options</em>…]</a></li>
+<li><a class="reference internal" href="#udevadm-control-options">udevadm control <em>options</em>…</a></li>
+<li><a class="reference internal" href="#udevadm-monitor-options">udevadm monitor [<em>options</em>…]</a></li>
+<li><a class="reference internal" href="#udevadm-test-options-devpath-emphasis-syspath-emphasis-id-emphasis-unit">udevadm test [<em>options</em>…] <em>devpath</em>|:emphasis:<cite>syspath</cite>|:emphasis:<cite>id</cite>|:emphasis:<cite>unit</cite></a></li>
+<li><a class="reference internal" href="#udevadm-test-builtin-options-command-devpath-emphasis-file-emphasis-unit">udevadm test-builtin [<em>options</em>…] <em>command</em> <em>devpath</em>|:emphasis:<cite>file</cite>|:emphasis:<cite>unit</cite></a></li>
+<li><a class="reference internal" href="#udevadm-verify-options-files">udevadm verify [<em>options</em>…] [<em>files</em>…]</a></li>
+<li><a class="reference internal" href="#udevadm-cat-options-file">udevadm cat [<em>options</em>…] [<em>file</em>…]</a></li>
+<li><a class="reference internal" href="#udevadm-wait-options-devpath-syspath">udevadm wait [<em>options</em>…] <em>devpath|syspath</em>…</a></li>
+<li><a class="reference internal" href="#udevadm-lock-options-command">udevadm lock [<em>options</em>…] <em>command</em>…</a></li>
+<li><a class="reference internal" href="#initialized-devices">Initialized Devices</a></li>
+<li><a class="reference internal" href="#example">Example</a><ul>
+<li><a class="reference internal" href="#format-a-file-system">Format a File System</a></li>
+<li><a class="reference internal" href="#format-a-raid-file-system">Format a RAID File System</a></li>
+<li><a class="reference internal" href="#copy-in-a-file-system">Copy in a File System</a></li>
+<li><a class="reference internal" href="#predict-network-interface-renaming">Predict Network Interface Renaming</a></li>
+<li><a class="reference internal" href="#predict-symbolic-links-of-a-device-node">Predict Symbolic links of a Device Node</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/js/custom.js?v=abe08e2c"></script>
+    </body>
+</html>

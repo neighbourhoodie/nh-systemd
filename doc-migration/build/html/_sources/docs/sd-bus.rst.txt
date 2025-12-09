@@ -1,0 +1,182 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd-bus
+:manvolnum: 3
+:summary: A lightweight D-Bus IPC client library
+
+.. _sd-bus(3):
+
+=========
+sd-bus(3)
+=========
+
+Name
+####
+
+sd-bus — A lightweight D-Bus IPC client library
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>`
+
+:code:`pkg-config --cflags --libs libsystemd`
+
+Description
+###########
+
+:code:`sd-bus.h` is part of :man-pages:`libsystemd(3)` and provides an implementation of a D-Bus IPC client. See `<https://www.freedesktop.org/software/dbus/>`_ for more information about D-Bus IPC.
+
+See
+| :ref:`sd_bus_add_match(3)`,
+| :ref:`sd_bus_add_object(3)`,
+| :ref:`sd_bus_add_object_manager(3)`,
+| :ref:`sd_bus_add_object_vtable(3)`,
+| :ref:`sd_bus_add_fallback(3)`,
+| :ref:`sd_bus_add_fallback_vtable(3)`,
+| :ref:`sd_bus_add_filter(3)`,
+| :ref:`sd_bus_add_node_enumerator(3)`,
+| :ref:`sd_bus_attach_event(3)`,
+| :ref:`sd_bus_call(3)`,
+| :ref:`sd_bus_call_async(3)`,
+| :ref:`sd_bus_call_method(3)`,
+| :ref:`sd_bus_call_method_async(3)`,
+| :ref:`sd_bus_can_send(3)`,
+| :ref:`sd_bus_close(3)`,
+| :ref:`sd_bus_creds_get_pid(3)`,
+| :ref:`sd_bus_creds_new_from_pid(3)`,
+| :ref:`sd_bus_default(3)`,
+| :ref:`sd_bus_emit_interfaces_added(3)`,
+| :ref:`sd_bus_emit_interfaces_added_strv(3)`,
+| :ref:`sd_bus_emit_interfaces_removed(3)`,
+| :ref:`sd_bus_emit_interfaces_removed_strv(3)`,
+| :ref:`sd_bus_emit_object_added(3)`,
+| :ref:`sd_bus_emit_object_removed(3)`,
+| :ref:`sd_bus_emit_properties_changed(3)`,
+| :ref:`sd_bus_emit_properties_changed_strv(3)`,
+| :ref:`sd_bus_emit_signal(3)`,
+| :ref:`sd_bus_emit_signalv(3)`,
+| :ref:`sd_bus_emit_signal_to(3)`,
+| :ref:`sd_bus_emit_signal_tov(3)`,
+| :ref:`sd_bus_enqueue_for_read(3)`,
+| :ref:`sd-bus-errors(3)`,
+| :ref:`sd_bus_error(3)`,
+| :ref:`sd_bus_error_add_map(3)`,
+| :ref:`sd_bus_get_address(3)`,
+| :ref:`sd_bus_get_allow_interactive_authorization(3)`,
+| :ref:`sd_bus_get_bus_id(3)`,
+| :ref:`sd_bus_get_creds_mask(3)`,
+| :ref:`sd_bus_get_current_handler(3)`,
+| :ref:`sd_bus_get_current_message(3)`,
+| :ref:`sd_bus_get_current_slot(3)`,
+| :ref:`sd_bus_get_current_userdata(3)`,
+| :ref:`sd_bus_get_exit_on_disconnect(3)`,
+| :ref:`sd_bus_get_fd(3)`,
+| :ref:`sd_bus_get_method_call_timeout(3)`,
+| :ref:`sd_bus_get_n_queued_read(3)`,
+| :ref:`sd_bus_get_name_creds(3)`,
+| :ref:`sd_bus_get_name_machine_id(3)`,
+| :ref:`sd_bus_get_owner_creds(3)`,
+| :ref:`sd_bus_get_property(3)`,
+| :ref:`sd_bus_get_property_string(3)`,
+| :ref:`sd_bus_get_property_strv(3)`,
+| :ref:`sd_bus_get_property_trivial(3)`,
+| :ref:`sd_bus_get_scope(3)`,
+| :ref:`sd_bus_get_tid(3)`,
+| :ref:`sd_bus_get_unique_name(3)`,
+| :ref:`sd_bus_interface_name_is_valid(3)`,
+| :ref:`sd_bus_is_bus_client(3)`,
+| :ref:`sd_bus_is_monitor(3)`,
+| :ref:`sd_bus_is_open(3)`,
+| :ref:`sd_bus_is_server(3)`,
+| :ref:`sd_bus_list_names(3)`,
+| :ref:`sd_bus_message_append(3)`,
+| :ref:`sd_bus_message_append_array(3)`,
+| :ref:`sd_bus_message_append_basic(3)`,
+| :ref:`sd_bus_message_append_string_memfd(3)`,
+| :ref:`sd_bus_message_append_strv(3)`,
+| :ref:`sd_bus_message_at_end(3)`,
+| :ref:`sd_bus_message_close_container(3)`,
+| :ref:`sd_bus_message_copy(3)`,
+| :ref:`sd_bus_message_dump(3)`,
+| :ref:`sd_bus_message_enter_container(3)`,
+| :ref:`sd_bus_message_exit_container(3)`,
+| :ref:`sd_bus_message_get_allow_interactive_authorization(3)`,
+| :ref:`sd_bus_message_get_cookie(3)`,
+| :ref:`sd_bus_message_get_creds(3)`,
+| :ref:`sd_bus_message_get_errno(3)`,
+| :ref:`sd_bus_message_get_error(3)`,
+| :ref:`sd_bus_message_get_monotonic_usec(3)`,
+| :ref:`sd_bus_message_get_sender(3)`,
+| :ref:`sd_bus_message_get_signature(3)`,
+| :ref:`sd_bus_message_get_type(3)`,
+| :ref:`sd_bus_message_new(3)`,
+| :ref:`sd_bus_message_new_method_call(3)`,
+| :ref:`sd_bus_message_new_method_error(3)`,
+| :ref:`sd_bus_message_new_signal(3)`,
+| :ref:`sd_bus_message_new_signal_to(3)`,
+| :ref:`sd_bus_message_open_container(3)`,
+| :ref:`sd_bus_message_peek_type(3)`,
+| :ref:`sd_bus_message_read(3)`,
+| :ref:`sd_bus_message_read_array(3)`,
+| :ref:`sd_bus_message_read_basic(3)`,
+| :ref:`sd_bus_message_read_strv(3)`,
+| :ref:`sd_bus_message_rewind(3)`,
+| :ref:`sd_bus_message_seal(3)`,
+| :ref:`sd_bus_message_send(3)`,
+| :ref:`sd_bus_message_sensitive(3)`,
+| :ref:`sd_bus_message_set_allow_interactive_authorization(3)`,
+| :ref:`sd_bus_message_set_destination(3)`,
+| :ref:`sd_bus_message_set_expect_reply(3)`,
+| :ref:`sd_bus_message_set_sender(3)`,
+| :ref:`sd_bus_message_skip(3)`,
+| :ref:`sd_bus_message_verify_type(3)`,
+| :ref:`sd_bus_negotiate_fds(3)`,
+| :ref:`sd_bus_new(3)`,
+| :ref:`sd_bus_path_encode(3)`,
+| :ref:`sd_bus_pending_method_calls(3)`,
+| :ref:`sd_bus_process(3)`,
+| :ref:`sd_bus_query_sender_creds(3)`,
+| :ref:`sd_bus_query_sender_privilege(3)`,
+| :ref:`sd_bus_reply_method_error(3)`,
+| :ref:`sd_bus_reply_method_return(3)`,
+| :ref:`sd_bus_request_name(3)`,
+| :ref:`sd_bus_send(3)`,
+| :ref:`sd_bus_send_to(3)`,
+| :ref:`sd_bus_set_address(3)`,
+| :ref:`sd_bus_set_allow_interactive_authorization(3)`,
+| :ref:`sd_bus_set_bus_client(3)`,
+| :ref:`sd_bus_set_close_on_exit(3)`,
+| :ref:`sd_bus_set_connected_signal(3)`,
+| :ref:`sd_bus_set_description(3)`,
+| :ref:`sd_bus_set_exit_on_disconnect(3)`,
+| :ref:`sd_bus_set_fd(3)`,
+| :ref:`sd_bus_set_method_call_timeout(3)`,
+| :ref:`sd_bus_set_monitor(3)`,
+| :ref:`sd_bus_set_property(3)`,
+| :ref:`sd_bus_set_propertyv(3)`,
+| :ref:`sd_bus_set_sender(3)`,
+| :ref:`sd_bus_set_server(3)`,
+| :ref:`sd_bus_set_watch_bind(3)`
+| :ref:`sd_bus_slot_get_current_handler(3)`,
+| :ref:`sd_bus_slot_get_current_message(3)`,
+| :ref:`sd_bus_slot_get_current_userdata(3)`,
+| :ref:`sd_bus_slot_set_description(3)`,
+| :ref:`sd_bus_slot_set_destroy_callback(3)`,
+| :ref:`sd_bus_slot_set_floating(3)`,
+| :ref:`sd_bus_slot_set_userdata(3)`,
+| :ref:`sd_bus_start(3)`,
+| :ref:`sd_bus_track_add_name(3)`,
+| :ref:`sd_bus_track_new(3)`,
+| :ref:`sd_bus_wait(3)` for more information about the functions available.
+
+The :man-pages:`busctl(1)` tool makes the functionality implemented by sd-bus available from the command line.
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :man-pages:`busctl(1)`, :ref:`sd-varlink(3)`, :man-pages:`dbus-daemon(1)`, :man-pages:`dbus-send(1)`, :die-net:`pkg-config(1)`
+
+

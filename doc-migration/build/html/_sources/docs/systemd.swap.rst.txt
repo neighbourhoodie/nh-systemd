@@ -1,0 +1,131 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.swap
+:manvolnum: 5
+:summary: Swap unit configuration
+
+.. _systemd.swap(5):
+
+===============
+systemd.swap(5)
+===============
+
+Name
+####
+
+systemd.swap — Swap unit configuration
+
+Synopsis
+########
+
+:code:`swap.swap`
+
+Description
+###########
+
+A unit configuration file whose name ends in ".swap" encodes information about a swap device or file for memory paging controlled and supervised by systemd.
+
+This man page lists the configuration options specific to this unit type. See :ref:`systemd.unit(5)` for the common options of all unit configuration files. The common configuration items are configured in the generic \[Unit] and \[Install] sections. The swap specific configuration options are configured in the \[Swap] section.
+
+Additional options are listed in :ref:`systemd.exec(5)`, which define the execution environment the :man-pages:`swapon(8)` program is executed in, in :ref:`systemd.kill(5)`, which define the way these processes are terminated, and in :ref:`systemd.resource-control(5)`, which configure resource control settings for these processes of the unit.
+
+Swap units must be named after the devices or files they control. Example: the swap device :code:`/dev/sda5` must be configured in a unit file :code:`dev-sda5.swap`. For details about the escaping logic used to convert a file system path to a unit name, see :ref:`systemd.unit(5)`. Note that swap units cannot be templated, nor is possible to add multiple names to a swap unit by creating additional symlinks to it.
+
+Note that swap support on Linux is privileged, swap units are hence only available in the system service manager (and root's user service manager), but not in unprivileged user's service manager.
+
+Automatic Dependencies
+######################
+
+Implicit Dependencies
+#####################
+
+The following dependencies are implicitly added:
+
+*    All swap units automatically get the :code:`Requires=` and :code:`After=` dependencies on the device units or the mount units of the files they are activated from.
+
+Additional implicit dependencies may be added as result of execution and resource control parameters as documented in :ref:`systemd.exec(5)` and :ref:`systemd.resource-control(5)`.
+
+Default Dependencies
+####################
+
+The following dependencies are added unless :code:`DefaultDependencies=no` is set:
+
+*    Swap units automatically acquire a :code:`Conflicts=` and a :code:`Before=` dependency on :code:`umount.target` so that they are deactivated at shutdown as well as a :code:`Before=swap.target` dependency.
+
+:code:`fstab`
+#############
+
+Swap units may either be configured via unit files, or via :code:`/etc/fstab` (see :man-pages:`fstab(5)` for details). Swaps listed in :code:`/etc/fstab` will be converted into native units dynamically at boot and when the configuration of the system manager is reloaded. See :ref:`systemd-fstab-generator(8)` for details about the conversion.
+
+If a swap device or file is configured in both :code:`/etc/fstab` and a unit file, the configuration in the latter takes precedence.
+
+When reading :code:`/etc/fstab`, a few special options are understood by systemd which influence how dependencies are created for swap units.
+
+.. systemd:option:: noauto, auto
+   :group: fstab-options
+
+   With :systemd:option:`noauto`, the swap unit will not be added as a dependency for :code:`swap.target`. This means that it will not be activated automatically during boot, unless it is pulled in by some other unit. The :systemd:option:`auto` option has the opposite meaning and is the default.
+
+   .. versionadded:: 218
+
+.. systemd:option:: nofail
+   :group: fstab-options
+
+   With :systemd:option:`nofail`, the swap unit will be only wanted, not required by :code:`swap.target`. This means that the boot will continue even if this swap device is not activated successfully.
+
+   .. versionadded:: 218
+
+.. include:: systemd.mount.rst
+    :start-after: .. inclusion-marker-do-not-remove device-timeout|
+    :end-before: .. inclusion-end-marker-do-not-remove device-timeout|
+
+.. systemd:option:: x-systemd.makefs
+   :group: fstab-options
+
+   The swap structure will be initialized on the device. If the device is not "empty", i.e. it contains any signature, the operation will be skipped. It is hence expected that this option remains set even after the device has been initialized.
+
+   Note that this option can only be used in :code:`/etc/fstab`, and will be ignored when part of the :systemd:var:`Options=` setting in a unit file.
+
+   See :ref:`systemd-mkswap@.service(8)` and the discussion of :man-pages:`wipefs(8)` in :ref:`systemd.mount(5)`.
+
+   .. versionadded:: 240
+
+Options
+#######
+
+Swap unit files may include \[Unit] and \[Install] sections, which are described in :ref:`systemd.unit(5)`.
+
+Swap unit files must include a \[Swap] section, which carries information about the swap device it supervises. A number of options that may be used in this section are shared with other unit types. These options are documented in :ref:`systemd.exec(5)`, :ref:`systemd.kill(5)` and :ref:`systemd.resource-control(5)`. The options specific to the \[Swap] section of swap units are the following:
+
+.. systemd:option:: What=
+   :group: unit-directives
+
+   Takes an absolute path or a fstab-style identifier of a device node or file to use for paging. See :man-pages:`swapon(8)` for details. If this refers to a device node, a dependency on the respective device unit is automatically created. (See :ref:`systemd.device(5)` for more information.) If this refers to a file, a dependency on the respective mount unit is automatically created. (See :ref:`systemd.mount(5)` for more information.) This option is mandatory. Note that the usual specifier expansion is applied to this setting, literal percent characters should hence be written as "%%".
+
+.. systemd:option:: Priority=
+   :group: unit-directives
+
+   Swap priority to use when activating the swap device or file. This takes an integer. This setting is optional and ignored when the priority is set by :systemd:option:`pri=` in the :systemd:var:`Options=` key.
+
+.. systemd:option:: Options=
+   :group: unit-directives
+
+   May contain an option string for the swap device. This may be used for controlling discard options among other functionality, if the swap backing device supports the discard or trim operation. (See :man-pages:`swapon(8)` for more information.) Note that the usual specifier expansion is applied to this setting, literal percent characters should hence be written as "%%".
+
+   .. versionadded:: 217
+
+.. systemd:option:: TimeoutSec=
+   :group: unit-directives
+
+   Configures the time to wait for the swapon command to finish. If a command does not exit within the configured time, the swap will be considered failed and be shut down again. All commands still running will be terminated forcibly via :systemd:constant:`SIGTERM`, and after another delay of this time with :systemd:constant:`SIGKILL`. (See :systemd:option:`KillMode=` in :ref:`systemd.kill(5)`.) Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass "0" to disable the timeout logic. Defaults to :systemd:var:`DefaultTimeoutStartSec=` from the manager configuration file (see :ref:`systemd-system.conf(5)`).
+
+.. include:: systemd.service.rst
+    :start-after: .. inclusion-marker-do-not-remove shared-unit-options|
+    :end-before: .. inclusion-end-marker-do-not-remove shared-unit-options|
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd-system.conf(5)`, :ref:`systemd.unit(5)`, :ref:`systemd.exec(5)`, :ref:`systemd.kill(5)`, :ref:`systemd.resource-control(5)`, :ref:`systemd.device(5)`, :ref:`systemd.mount(5)`, :man-pages:`swapon(8)`, :ref:`systemd-fstab-generator(8)`, :ref:`systemd.directives(7)`
+
+

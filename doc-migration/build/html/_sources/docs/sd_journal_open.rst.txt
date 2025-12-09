@@ -1,0 +1,109 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_journal_open
+:manvolnum: 3
+:summary: Open the system journal for reading
+:aliases: sd_journal_open_directory, sd_journal_open_directory_fd, sd_journal_open_files, sd_journal_open_files_fd, sd_journal_open_namespace, sd_journal_close, sd_journal, SD_JOURNAL_LOCAL_ONLY, SD_JOURNAL_RUNTIME_ONLY, SD_JOURNAL_SYSTEM, SD_JOURNAL_CURRENT_USER, SD_JOURNAL_OS_ROOT, SD_JOURNAL_ALL_NAMESPACES, SD_JOURNAL_INCLUDE_DEFAULT_NAMESPACE, SD_JOURNAL_TAKE_DIRECTORY_FD
+
+.. _sd_journal_open(3):
+
+==================
+sd_journal_open(3)
+==================
+
+Name
+####
+
+sd_journal_open, sd_journal_open_directory, sd_journal_open_directory_fd, sd_journal_open_files, sd_journal_open_files_fd, sd_journal_open_namespace, sd_journal_close, sd_journal, SD_JOURNAL_LOCAL_ONLY, SD_JOURNAL_RUNTIME_ONLY, SD_JOURNAL_SYSTEM, SD_JOURNAL_CURRENT_USER, SD_JOURNAL_OS_ROOT, SD_JOURNAL_ALL_NAMESPACES, SD_JOURNAL_INCLUDE_DEFAULT_NAMESPACE, SD_JOURNAL_TAKE_DIRECTORY_FD — Open the system journal for reading
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-journal.h>` .. code-block::
+
+   int sd_journal_open(sd_journal **ret,
+	int flags); .. code-block::
+
+   int sd_journal_open_namespace(sd_journal **ret,
+	const char *namespace,
+	int flags); .. code-block::
+
+   int sd_journal_open_directory(sd_journal **ret,
+	const char *path,
+	int flags); .. code-block::
+
+   int sd_journal_open_directory_fd(sd_journal **ret,
+	int fd,
+	int flags); .. code-block::
+
+   int sd_journal_open_files(sd_journal **ret,
+	const char **paths,
+	int flags); .. code-block::
+
+   int sd_journal_open_files_fd(sd_journal **ret,
+	int fds[],
+	unsigned n_fds,
+	int flags); .. code-block::
+
+   void sd_journal_close(sd_journal *j);
+
+Description
+###########
+
+:code:`sd_journal_open()` opens the log journal for reading. It will find all journal files automatically and interleave them automatically when reading. As first argument it takes a pointer to a :code:`sd_journal` pointer, which, on success, will contain a journal context object. The second argument is a flags field, which may consist of the following flags ORed together: :code:`SD_JOURNAL_LOCAL_ONLY` makes sure only journal files generated on the local machine will be opened. :code:`SD_JOURNAL_RUNTIME_ONLY` makes sure only volatile journal files will be opened, excluding those which are stored on persistent storage. :code:`SD_JOURNAL_SYSTEM` will cause journal files of system services and the kernel (in opposition to user session processes) to be opened. :code:`SD_JOURNAL_CURRENT_USER` will cause journal files of the current user to be opened. If neither :code:`SD_JOURNAL_SYSTEM` nor :code:`SD_JOURNAL_CURRENT_USER` are specified, all journal file types will be opened.
+
+:code:`sd_journal_open_namespace()` is similar to :code:`sd_journal_open()` but takes an additional :code:`namespace` parameter that specifies which journal namespace to operate on. If specified as :code:`NULL` the call is identical to :code:`sd_journal_open()`. If non-:code:`NULL` only data from the namespace identified by the specified parameter is accessed. This call understands two additional flags: if :code:`SD_JOURNAL_ALL_NAMESPACES` is specified the :code:`namespace` parameter is ignored and all defined namespaces are accessed simultaneously; if :code:`SD_JOURNAL_INCLUDE_DEFAULT_NAMESPACE` the specified namespace and the default namespace are accessed but no others (this flag has no effect when :code:`namespace` is passed as :code:`NULL`). For details about journal namespaces see :ref:`systemd-journald.service(8)`.
+
+:code:`sd_journal_open_directory()` is similar to :code:`sd_journal_open()` but takes an absolute directory path as argument. All journal files in this directory will be opened and interleaved automatically. This call also takes a flags argument. The flags parameters accepted by this call are :code:`SD_JOURNAL_OS_ROOT`, :code:`SD_JOURNAL_SYSTEM`, and :code:`SD_JOURNAL_CURRENT_USER`. If :code:`SD_JOURNAL_OS_ROOT` is specified, journal files are searched for below the usual :code:`/var/log/journal` and :code:`/run/log/journal` relative to the specified path, instead of directly beneath it. The other two flags limit which files are opened, the same as for :code:`sd_journal_open()`.
+
+:code:`sd_journal_open_directory_fd()` is similar to :code:`sd_journal_open_directory()`, but takes a file descriptor referencing a directory in the file system instead of an absolute file system path. In addition to the flags accepted by :code:`sd_journal_open_directory()`, this function also accepts :code:`SD_JOURNAL_TAKE_DIRECTORY_FD`. If :code:`SD_JOURNAL_TAKE_DIRECTORY_FD` is specified, the function will take the ownership of the specified file descriptor on success, and it will be closed by :code:`sd_journal_close()`, hence the caller of the function must not close the file descriptor. When the flag is not specified, :code:`sd_journal_close()` will not close the file descriptor, so the caller should close it after :code:`sd_journal_close()`.
+
+:code:`sd_journal_open_files()` is similar to :code:`sd_journal_open()` but takes a :code:`NULL`-terminated list of file paths to open. All files will be opened and interleaved automatically. This call also takes a flags argument, but it must be passed as 0 as no flags are currently understood for this call. Please note that in the case of a live journal, this function is only useful for debugging, because individual journal files can be rotated at any moment, and the opening of specific files is inherently racy.
+
+:code:`sd_journal_open_files_fd()` is similar to :code:`sd_journal_open_files()` but takes an array of open file descriptors that must reference journal files, instead of an array of file system paths. Pass the array of file descriptors as second argument, and the number of array entries in the third. The flags parameter must be passed as 0.
+
+:code:`sd_journal` objects cannot be used in the child after a fork. Functions which take a journal object as an argument (:code:`sd_journal_next()` and others) will return :code:`-ECHILD` after a fork.
+
+:code:`sd_journal_close()` will close the journal context allocated with :code:`sd_journal_open()` or :code:`sd_journal_open_directory()` and free its resources.
+
+When opening the journal only journal files accessible to the calling user will be opened. If journal files are not accessible to the caller, this will be silently ignored.
+
+See :ref:`sd_journal_next(3)` for an example of how to iterate through the journal after opening it with :code:`sd_journal_open()`.
+
+A journal context object returned by :code:`sd_journal_open()` references a specific journal entry as *current* entry, similar to a file seek index in a classic file system file, but without absolute positions. It may be altered with entry, similar to a file seek index in a classic file system file, but without absolute positions. It may be altered with :ref:`sd_journal_next(3)` and :ref:`sd_journal_seek_head(3)` and related calls. The current entry position may be exported in *cursor* strings, as accessible via strings, as accessible via :ref:`sd_journal_get_cursor(3)`. Cursor strings may be used to globally identify a specific journal entry in a stable way and then later to seek to it (or if the specific entry is not available locally, to its closest entry in time) :ref:`sd_journal_seek_cursor(3)`.
+
+Notification of journal changes is available via :code:`sd_journal_get_fd()` and related calls.
+
+Return Value
+############
+
+The :code:`sd_journal_open()`, :code:`sd_journal_open_directory()`, and :code:`sd_journal_open_files()` calls return 0 on success or a negative errno-style error code. :code:`sd_journal_close()` returns nothing.
+
+Notes
+#####
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove strict|
+    :end-before: .. inclusion-end-marker-do-not-remove strict|
+
+.. include:: libsystemd-pkgconfig.rst
+    :start-after: .. inclusion-marker-do-not-remove pkgconfig-text|
+    :end-before: .. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+History
+#######
+
+:code:`sd_journal_open()`, :code:`sd_journal_open_directory()`, and :code:`sd_journal_close()` were added in version 187.
+
+:code:`sd_journal_open_files()` was added in version 205.
+
+:code:`sd_journal_open_directory_fd()` and :code:`sd_journal_open_files_fd()` were added in version 230.
+
+:code:`sd_journal_open_namespace()` was added in version 245.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-journal(3)`, :ref:`systemd-journald.service(8)`, :ref:`sd_journal_next(3)`, :ref:`sd_journal_get_data(3)`
+
+

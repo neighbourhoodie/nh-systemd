@@ -1,0 +1,87 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_get_type
+:manvolnum: 3
+:summary: Query bus message addressing/credentials metadata
+:aliases: sd_bus_message_get_error, sd_bus_message_get_errno, sd_bus_message_get_creds, sd_bus_message_is_signal, sd_bus_message_is_method_call, sd_bus_message_is_method_error
+
+.. _sd_bus_message_get_type(3):
+
+==========================
+sd_bus_message_get_type(3)
+==========================
+
+Name
+####
+
+sd_bus_message_get_type, sd_bus_message_get_error, sd_bus_message_get_errno, sd_bus_message_get_creds, sd_bus_message_is_signal, sd_bus_message_is_method_call, sd_bus_message_is_method_error — Query bus message addressing/credentials metadata
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_get_type(sd_bus_message *m,
+	uint8_t *type); .. code-block::
+
+   sd_bus_error* sd_bus_message_get_error(sd_bus_message *m); .. code-block::
+
+   int sd_bus_message_get_errno(sd_bus_message *m); .. code-block::
+
+   sd_bus_creds* sd_bus_message_get_creds(sd_bus_message *m); .. code-block::
+
+   int sd_bus_message_is_signal(sd_bus_message *m,
+	const char *interface,
+	const char *member); .. code-block::
+
+   int sd_bus_message_is_method_call(sd_bus_message *m,
+	const char *interface,
+	const char *member); .. code-block::
+
+   int sd_bus_message_is_method_error(sd_bus_message *m,
+	const char *name);
+
+Description
+###########
+
+:code:`sd_bus_message_get_type()` returns the type of a message in the output parameter :code:`type`, one of :code:`SD_BUS_MESSAGE_METHOD_CALL`, :code:`SD_BUS_MESSAGE_METHOD_RETURN`, :code:`SD_BUS_MESSAGE_METHOD_ERROR`, :code:`SD_BUS_MESSAGE_SIGNAL`. This type is either specified as a parameter when the message is created using :ref:`sd_bus_message_new(3)`, or is set automatically when the message is created using :ref:`sd_bus_message_new_signal(3)`, :ref:`sd_bus_message_new_method_call(3)`, :ref:`sd_bus_message_new_method_error(3)` and similar functions.
+
+:code:`sd_bus_message_get_error()` returns the error stored in the message :code:`m`, if there is any. Otherwise, it returns :code:`NULL`. :code:`sd_bus_message_get_errno()` returns the error stored in the message :code:`m` as a positive errno-style value, if there is any. Otherwise, it returns zero. Errors are mapped to errno values according to the default and any additional registered error mappings. See :ref:`sd-bus-errors(3)` and :ref:`sd_bus_error_add_map(3)`.
+
+:code:`sd_bus_message_get_creds()` returns the message credentials attached to the message :code:`m`. If no credentials are attached to the message, it returns :code:`NULL`. Ownership of the credentials instance is not transferred to the caller and hence should not be freed.
+
+:code:`sd_bus_message_is_signal()` checks if message :code:`m` is a signal message. If :code:`interface` is non-null, it also checks if the message has the same interface set. If :code:`member` is non-null, it also checks if the message has the same member set. Also see :ref:`sd_bus_message_new_signal(3)`. It returns true when all checks pass.
+
+:code:`sd_bus_message_is_method_call()` checks if message :code:`m` is a method call message. If :code:`interface` is non-null, it also checks if the message has the same interface set. If :code:`member` is non-null, it also checks if the message has the same member set. Also see :ref:`sd_bus_message_new_method_call(3)`. It returns true when all checks pass.
+
+:code:`sd_bus_message_is_method_error()` checks if message :code:`m` is an error reply message. If :code:`name` is non-null, it also checks if the message has the same error identifier set. Also see :ref:`sd_bus_message_new_method_error(3)`. It returns true when all checks pass.
+
+Return Value
+############
+
+On success, these functions (except :code:`sd_bus_message_get_error()` and :code:`sd_bus_message_get_creds()`) return a non-negative integer. On failure, they return a negative errno-style error code. :code:`sd_bus_message_get_errno()` always returns a non-negative integer, even on failure.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The message parameter :code:`m` or an output parameter is :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_get_type()`, :code:`sd_bus_message_is_signal()`, :code:`sd_bus_message_is_method_call()`, and :code:`sd_bus_message_is_method_error()` were added in version 240.
+
+:code:`sd_bus_message_get_error()`, :code:`sd_bus_message_get_errno()`, and :code:`sd_bus_message_get_creds()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_new(3)`, :ref:`sd_bus_message_set_destination(3)`, :ref:`sd-bus-errors(3)`, :ref:`sd_bus_error_add_map(3)`
+
+

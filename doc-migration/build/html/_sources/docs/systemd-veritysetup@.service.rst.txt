@@ -1,0 +1,63 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-veritysetup@.service
+:manvolnum: 8
+:summary: Disk verity protection logic
+:aliases: systemd-veritysetup
+
+.. _systemd-veritysetup@.service(8):
+
+===============================
+systemd-veritysetup@.service(8)
+===============================
+
+Name
+####
+
+systemd-veritysetup@.service, systemd-veritysetup — Disk verity protection logic
+
+Synopsis
+########
+
+:code:`systemd-veritysetup@.service`
+
+:code:`/usr/lib/systemd/systemd-veritysetup`
+
+Description
+###########
+
+:code:`systemd-veritysetup@.service` is a service responsible for setting up verity protection block devices. It should be instantiated for each device that requires verity protection.
+
+At early boot and when the system manager configuration is reloaded kernel command line configuration for verity protected block devices is translated into :code:`systemd-veritysetup@.service` units by :ref:`systemd-veritysetup-generator(8)`.
+
+:code:`systemd-veritysetup@.service` calls :code:`systemd-veritysetup`.
+
+Commands
+########
+
+The following commands are understood by :code:`systemd-veritysetup`:
+
+.. systemd:option:: attach volume datadevice hashdevice roothash [option...]
+
+   Create a block device :emphasis:`volume` using :emphasis:`datadevice` and :emphasis:`hashdevice` as the backing devices. :emphasis:`roothash` forms the root of the tree of hashes stored on :emphasis:`hashdevice`. See `Kernel dm-verity <https://docs.kernel.org/admin-guide/device-mapper/verity.html>`_ documentation for details.
+
+   .. versionadded:: 250
+
+.. systemd:option:: detach volume
+
+   Detach (destroy) the block device :emphasis:`volume`.
+
+   .. versionadded:: 250
+
+.. systemd:option:: help
+
+   Print short information about command syntax.
+
+   .. versionadded:: 250
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-veritysetup-generator(8)`, :man-pages:`veritysetup(8)`
+
+

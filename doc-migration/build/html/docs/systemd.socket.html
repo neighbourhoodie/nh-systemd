@@ -1,0 +1,1343 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="systemd.special(7)" href="systemd.special.html"><link rel="prev" title="systemd.slice(5)" href="systemd.slice.html">
+        <link rel="prefetch" href="../_static/systemd-logo.svg" as="image">
+        <link rel="prefetch" href="../_static/systemd-logo-dark.svg" as="image">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>systemd.socket(5)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6e47b7e0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #35a764;
+  --color-brand-content: #35a764;
+  --color-brand-visited: #197b43;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">systemd</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/systemd-logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/systemd-logo-dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">B</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="binfmt.d.html">binfmt.d(5) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootctl.html">bootctl(1) — Control EFI firmware boot settings and manage boot loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootup.html">bootup(7) — System bootup process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="busctl.html">busctl(1) — Introspect the bus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capsule%40.service.html">capsule@.service(5) — System unit for the capsule service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredump.conf.html">coredump.conf(5) — Core dump storage configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredumpctl.html">coredumpctl(1) — Retrieve and process saved core dumps and metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypttab.html">crypttab(5) — Configuration for encrypted block devices</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">D</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daemon.html">daemon(7) — Writing and packaging system daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dnssec-trust-anchors.d.html">dnssec-trust-anchors.d(5) — DNSSEC trust anchor configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">E</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment.d.html">environment.d(5) — Definition of user service environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">F</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-hierarchy.html">file-hierarchy(7) — File system hierarchy overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">H</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="homectl.html">homectl(1) — Create, remove, change or inspect home directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homed.conf.html">homed.conf(5) — Home area/user account manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostname.html">hostname(5) — Local hostname configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostnamectl.html">hostnamectl(1) — Control the system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hwdb.html">hwdb(7) — Hardware Database</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">I</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="importctl.html">importctl(1) — Download, import or export disk images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integritytab.html">integritytab(5) — Configuration for integrity block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocost.conf.html">iocost.conf(5) — Configuration files for the iocost solution manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">J</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="journal-remote.conf.html">journal-remote.conf(5) — Configuration files for the service accepting remote journal uploads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal-upload.conf.html">journal-upload.conf(5) — Configuration files for the journal upload service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journalctl.html">journalctl(1) — Print log entries from the systemd journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journald.conf.html">journald.conf(5) — Journal service configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">K</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kernel-command-line.html">kernel-command-line(7) — Kernel command line parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-install.html">kernel-install(8) — Add and remove kernel and initrd images to and from the boot partition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">L</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libsystemd.html">libsystemd(3) — Functions for implementing services and interacting with systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libudev.html">libudev(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.conf.html">loader.conf(5) — Configuration file for systemd-boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locale.conf.html">locale.conf(5) — Configuration file for locale settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localectl.html">localectl(1) — Control the system locale and keyboard layout settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localtime.html">localtime(5) — Local timezone configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loginctl.html">loginctl(1) — Control the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logind.conf.html">logind.conf(5) — Login manager configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">M</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="machine-id.html">machine-id(5) — Local machine ID configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machine-info.html">machine-info(5) — Local machine information file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machinectl.html">machinectl(1) — Control the systemd machine manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules-load.d.html">modules-load.d(5) — Configure kernel modules to load at boot</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">N</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="networkctl.html">networkctl(1) — Query or modify the status of network links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networkd.conf.html">networkd.conf(5) — Global Network configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-myhostname.html">nss-myhostname(8) — Hostname resolution for the locally configured system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-mymachines.html">nss-mymachines(8) — Hostname resolution for local container instances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-resolve.html">nss-resolve(8) — Hostname resolution via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-systemd.html">nss-systemd(8) — UNIX user and group name resolution for user/group lookup via Varlink</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">O</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oomctl.html">oomctl(1) — Analyze the state stored in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oomd.conf.html">oomd.conf(5) — Global</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.home1.html">org.freedesktop.home1(5) — The D-Bus interface of systemd-homed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.hostname1.html">org.freedesktop.hostname1(5) — The D-Bus interface of systemd-hostnamed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.import1.html">org.freedesktop.import1(5) — The D-Bus interface of systemd-importd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.locale1.html">org.freedesktop.locale1(5) — The D-Bus interface of systemd-localed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.LogControl1.html">org.freedesktop.LogControl1(5) — D-Bus interface to query and set logging configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.login1.html">org.freedesktop.login1(5) — The D-Bus interface of systemd-logind</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.machine1.html">org.freedesktop.machine1(5) — The D-Bus interface of systemd-machined</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.network1.html">org.freedesktop.network1(5) — The D-Bus interface of systemd-networkd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.oom1.html">org.freedesktop.oom1(5) — The D-Bus interface of systemd-oomd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.portable1.html">org.freedesktop.portable1(5) — The D-Bus interface of systemd-portabled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.resolve1.html">org.freedesktop.resolve1(5) — The D-Bus interface of systemd-resolved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.systemd1.html">org.freedesktop.systemd1(5) — The D-Bus interface of systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.sysupdate1.html">org.freedesktop.sysupdate1(5) — The D-Bus interface of systemd-sysupdated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timedate1.html">org.freedesktop.timedate1(5) — The D-Bus interface of systemd-timedated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timesync1.html">org.freedesktop.timesync1(5) — The D-Bus interface of systemd-timesyncd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="os-release.html">os-release(5) — Operating system identification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">P</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd.html">pam_systemd(8) — Register user sessions in the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_home.html">pam_systemd_home(8) — Authenticate users and mount home directories via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_loadkey.html">pam_systemd_loadkey(8) — Read password from kernel keyring and set it as PAM authtok</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portablectl.html">portablectl(1) — Attach, detach or inspect portable service images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="poweroff.html">poweroff(8) — Power off, reboot, or halt the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pstore.conf.html">pstore.conf(5) — PStore configuration file</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">R</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="repart.d.html">repart.d(5) — Partition Definition Files for Automatic Boot-Time Repartitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolvectl.html">resolvectl(1) — Resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services; introspect and reconfigure the DNS resolver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolved.conf.html">resolved.conf(5) — Network Name Resolution configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run0.html">run0(1) — Elevate privileges</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">S</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="sd-bus.html">sd-bus(3) — A lightweight D-Bus IPC client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus-errors.html">sd-bus-errors(3) — Standard D-Bus error names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-daemon.html">sd-daemon(3) — APIs for new-style daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-device.html">sd-device(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-event.html">sd-event(3) — A generic event loop implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-hwdb.html">sd-hwdb(3) — Read-only access to the hardware description database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-id128.html">sd-id128(3) — APIs for processing 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-journal.html">sd-journal(3) — APIs for submitting and querying log entries to and from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-json.html">sd-json(3) — APIs for Dealing with JSON Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-login.html">sd-login(3) — APIs for tracking logins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-path.html">sd-path(3) — APIs to query file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-varlink.html">sd-varlink(3) — APIs for Varlink IPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_booted.html">sd_booted(3) — Test whether the system is running the systemd init system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_match.html">sd_bus_add_match(3) — Add a match rule for incoming message dispatching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_node_enumerator.html">sd_bus_add_node_enumerator(3) — Add a node enumerator for a D-Bus object path prefix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object.html">sd_bus_add_object(3) — Declare properties and methods for a D-Bus path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object_manager.html">sd_bus_add_object_manager(3) — Add a D-Bus object manager for a D-Bus object sub-tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_attach_event.html">sd_bus_attach_event(3) — Attach a bus connection object to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call.html">sd_bus_call(3) — Invoke a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call_method.html">sd_bus_call_method(3) — Initialize a bus message object and invoke the corresponding D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_can_send.html">sd_bus_can_send(3) — Check which types can be sent over a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_close.html">sd_bus_close(3) — Close and flush a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_get_pid.html">sd_bus_creds_get_pid(3) — Retrieve fields from a credentials object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_new_from_pid.html">sd_bus_creds_new_from_pid(3) — Retrieve credentials object for the specified PID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_default.html">sd_bus_default(3) — Acquire a connection to a system or user bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_emit_signal.html">sd_bus_emit_signal(3) — Convenience functions for emitting (standard) D-Bus signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_enqueue_for_read.html">sd_bus_enqueue_for_read(3) — Re-enqueue a bus message on a bus connection, for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error.html">sd_bus_error(3) — sd-bus error handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error_add_map.html">sd_bus_error_add_map(3) — Additional sd-dbus error mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_current_handler.html">sd_bus_get_current_handler(3) — Query information of the callback a bus object is currently running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_fd.html">sd_bus_get_fd(3) — Get the file descriptor, I/O events and timeout to wait for from a message bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_n_queued_read.html">sd_bus_get_n_queued_read(3) — Get the number of pending bus messages in the read and write queues of a bus connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_creds.html">sd_bus_get_name_creds(3) — Query bus client credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_machine_id.html">sd_bus_get_name_machine_id(3) — Retrieve a bus client's machine identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_interface_name_is_valid.html">sd_bus_interface_name_is_valid(3) — Check if a string is a valid bus name or object path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_is_open.html">sd_bus_is_open(3) — Check whether the bus connection is open or ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_list_names.html">sd_bus_list_names(3) — Retrieve information about registered names on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append.html">sd_bus_message_append(3) — Attach fields to a D-Bus message based on a type string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_array.html">sd_bus_message_append_array(3) — Append an array of fields to a D-Bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_basic.html">sd_bus_message_append_basic(3) — Attach a single field to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_string_memfd.html">sd_bus_message_append_string_memfd(3) — Attach a string to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_strv.html">sd_bus_message_append_strv(3) — Attach an array of strings to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_at_end.html">sd_bus_message_at_end(3) — Check if a message has been fully read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_copy.html">sd_bus_message_copy(3) — Copy the contents of one message to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_dump.html">sd_bus_message_dump(3) — Produce a string representation of a message for debugging purposes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_cookie.html">sd_bus_message_get_cookie(3) — Returns the transaction cookie of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_monotonic_usec.html">sd_bus_message_get_monotonic_usec(3) — Retrieve the sender timestamps and sequence number of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_signature.html">sd_bus_message_get_signature(3) — Query bus message signature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_type.html">sd_bus_message_get_type(3) — Query bus message addressing/credentials metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new.html">sd_bus_message_new(3) — Create a new bus message object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_call.html">sd_bus_message_new_method_call(3) — Create a method call message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_error.html">sd_bus_message_new_method_error(3) — Create an error reply for a method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_signal.html">sd_bus_message_new_signal(3) — Create a signal message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_open_container.html">sd_bus_message_open_container(3) — Create and move between containers in D-Bus messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read.html">sd_bus_message_read(3) — Read a sequence of values from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_array.html">sd_bus_message_read_array(3) — Access an array of elements in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_basic.html">sd_bus_message_read_basic(3) — Read a basic type from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_strv.html">sd_bus_message_read_strv(3) — Access an array of strings in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_rewind.html">sd_bus_message_rewind(3) — Return to beginning of message or current container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_seal.html">sd_bus_message_seal(3) — Prepare a D-Bus message for transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_sensitive.html">sd_bus_message_sensitive(3) — Mark a message object as containing sensitive data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_destination.html">sd_bus_message_set_destination(3) — Set and query bus message addressing information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_expect_reply.html">sd_bus_message_set_expect_reply(3) — Set and query bus message metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_skip.html">sd_bus_message_skip(3) — Skip elements in a bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_verify_type.html">sd_bus_message_verify_type(3) — Check if the message has specified type at the current location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_negotiate_fds.html">sd_bus_negotiate_fds(3) — Control feature negotiation on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_new.html">sd_bus_new(3) — Create a new bus object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_path_encode.html">sd_bus_path_encode(3) — Convert an external identifier into an object path and back</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_pending_method_calls.html">sd_bus_pending_method_calls(3) — Return the number of currently pending, outgoing method calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_process.html">sd_bus_process(3) — Drive the connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_query_sender_creds.html">sd_bus_query_sender_creds(3) — Query bus message sender credentials/privileges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_error.html">sd_bus_reply_method_error(3) — Reply with an error to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_return.html">sd_bus_reply_method_return(3) — Reply to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_request_name.html">sd_bus_request_name(3) — Request or release a well-known service name on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_send.html">sd_bus_send(3) — Queue a D-Bus message for transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_address.html">sd_bus_set_address(3) — Set or query the address of the bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_close_on_exit.html">sd_bus_set_close_on_exit(3) — Control whether to close the bus connection during the event loop exit phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_connected_signal.html">sd_bus_set_connected_signal(3) — Control emission of local connection establishment signal on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_description.html">sd_bus_set_description(3) — Set or query properties of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_exit_on_disconnect.html">sd_bus_set_exit_on_disconnect(3) — Control the exit behavior when the bus object disconnects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_fd.html">sd_bus_set_fd(3) — Set the file descriptors to use for bus communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_method_call_timeout.html">sd_bus_set_method_call_timeout(3) — Set or query the default D-Bus method call timeout of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_property.html">sd_bus_set_property(3) — Set or query D-Bus service properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_sender.html">sd_bus_set_sender(3) — Configure default sender for outgoing messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_server.html">sd_bus_set_server(3) — Configure connection mode for a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_watch_bind.html">sd_bus_set_watch_bind(3) — Control socket binding watching on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_get_bus.html">sd_bus_slot_get_bus(3) — Query information attached to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_ref.html">sd_bus_slot_ref(3) — Create and destroy references to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_description.html">sd_bus_slot_set_description(3) — Set or query the description of bus slot objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_destroy_callback.html">sd_bus_slot_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_floating.html">sd_bus_slot_set_floating(3) — Control whether a bus slot object is "floating"</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_userdata.html">sd_bus_slot_set_userdata(3) — Set and query the value in the "userdata" field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_start.html">sd_bus_start(3) — Initiate a bus connection to the D-bus broker daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_add_name.html">sd_bus_track_add_name(3) — Add, remove and retrieve bus peers tracked in a bus peer tracking object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_new.html">sd_bus_track_new(3) — Track bus peers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_wait.html">sd_bus_wait(3) — Wait for I/O on a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_add_match_parent.html">sd_device_enumerator_add_match_parent(3) — Add a filter to the device enumerator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_get_device_first.html">sd_device_enumerator_get_device_first(3) — Enumerates devices and get the first or next device.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_new.html">sd_device_enumerator_new(3) — Create, reference, and release a device enumerator object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_get_syspath.html">sd_device_get_syspath(3) — Returns various fields of device objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_ref.html">sd_device_ref(3) — Create or destroy references to a device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_child.html">sd_event_add_child(3) — Add a child process state change event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_defer.html">sd_event_add_defer(3) — Add static event sources to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_inotify.html">sd_event_add_inotify(3) — Add an "inotify" file system inode event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_io.html">sd_event_add_io(3) — Add an I/O event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_memory_pressure.html">sd_event_add_memory_pressure(3) — Add and configure an event source run as result of memory pressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_signal.html">sd_event_add_signal(3) — Add a UNIX process signal event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_time.html">sd_event_add_time(3) — Add a timer event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_exit.html">sd_event_exit(3) — Ask the event loop to exit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_get_fd.html">sd_event_get_fd(3) — Obtain a file descriptor to poll for event loop events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_new.html">sd_event_new(3) — Acquire and release an event loop object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_now.html">sd_event_now(3) — Retrieve current event loop iteration timestamp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_run.html">sd_event_run(3) — Run an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_exit_on_idle.html">sd_event_set_exit_on_idle(3) — Enable event loop exit-on-idle support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_signal_exit.html">sd_event_set_signal_exit(3) — Automatically leave event loop on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_watchdog.html">sd_event_set_watchdog(3) — Enable event loop watchdog support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_event.html">sd_event_source_get_event(3) — Retrieve the event loop of an event source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_pending.html">sd_event_source_get_pending(3) — Determine pending state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_description.html">sd_event_source_set_description(3) — Set or retrieve descriptive names of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_destroy_callback.html">sd_event_source_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_enabled.html">sd_event_source_set_enabled(3) — Enable or disable event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_exit_on_failure.html">sd_event_source_set_exit_on_failure(3) — Set or retrieve the exit-on-failure feature of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_floating.html">sd_event_source_set_floating(3) — Set or retrieve 'floating' state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_prepare.html">sd_event_source_set_prepare(3) — Set a preparation callback for event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_priority.html">sd_event_source_set_priority(3) — Set or retrieve the priority of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_ratelimit.html">sd_event_source_set_ratelimit(3) — Configure rate limiting on event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_userdata.html">sd_event_source_set_userdata(3) — Set or retrieve user data pointer of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_unref.html">sd_event_source_unref(3) — Increase or decrease event source reference counters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_wait.html">sd_event_wait(3) — Low-level event loop operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_get_seats.html">sd_get_seats(3) — Determine available seats, sessions, logged in users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_get.html">sd_hwdb_get(3) — Seek to a location in hwdb or access entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_new.html">sd_hwdb_new(3) — Create a new hwdb object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_get_machine.html">sd_id128_get_machine(3) — Retrieve 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_randomize.html">sd_id128_randomize(3) — Generate 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_to_string.html">sd_id128_to_string(3) — Format or parse 128-bit IDs as strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_is_fifo.html">sd_is_fifo(3) — Check the type of a file descriptor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_add_match.html">sd_journal_add_match(3) — Add or remove entry matches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_enumerate_fields.html">sd_journal_enumerate_fields(3) — Read used field names from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_catalog.html">sd_journal_get_catalog(3) — Retrieve message catalog entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cursor.html">sd_journal_get_cursor(3) — Get cursor string for or test cursor string against the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cutoff_realtime_usec.html">sd_journal_get_cutoff_realtime_usec(3) — Read cut-off timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_data.html">sd_journal_get_data(3) — Read data fields from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_fd.html">sd_journal_get_fd(3) — Journal change notification interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_realtime_usec.html">sd_journal_get_realtime_usec(3) — Read timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_seqnum.html">sd_journal_get_seqnum(3) — Read sequence number from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_usage.html">sd_journal_get_usage(3) — Journal disk usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_has_runtime_files.html">sd_journal_has_runtime_files(3) — Query availability of runtime or persistent journal files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_next.html">sd_journal_next(3) — Advance or set back the read pointer in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_open.html">sd_journal_open(3) — Open the system journal for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_print.html">sd_journal_print(3) — Submit log entries to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_query_unique.html">sd_journal_query_unique(3) — Read unique data fields from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_seek_head.html">sd_journal_seek_head(3) — Seek to a position in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_stream_fd.html">sd_journal_stream_fd(3) — Create log stream file descriptor to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_json_dispatch_string.html">sd_json_dispatch_string(3) — Decode JSON variant values and write them to the specified memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_listen_fds.html">sd_listen_fds(3) — Check for file descriptors passed by the system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_login_monitor_new.html">sd_login_monitor_new(3) — Monitor login sessions, seats, users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_machine_get_class.html">sd_machine_get_class(3) — Determine the class and network interface indices of a locally running virtual machine or container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_notify.html">sd_notify(3) — Notify service manager about start-up completion and other service status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_path_lookup.html">sd_path_lookup(3) — Query well-known file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pid_get_owner_uid.html">sd_pid_get_owner_uid(3) — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pidfd_get_inode_id.html">sd_pidfd_get_inode_id(3) — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_seat_get_active.html">sd_seat_get_active(3) — Determine state of a specific seat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_session_is_active.html">sd_session_is_active(3) — Determine state of a specific session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_uid_get_state.html">sd_uid_get_state(3) — Determine login state of a specific Unix user ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_is_connected.html">sd_varlink_is_connected(3) — Query if a Varlink connection object is currently connected or idle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_push_fd.html">sd_varlink_push_fd(3) — Submit a file descriptor to send along with the next outgoing Varlink message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_send.html">sd_varlink_send(3) — Enqueues a Varlink method call, not expecting a reply</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_server_new.html">sd_varlink_server_new(3) — Allocate Varlink server object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_description.html">sd_varlink_set_description(3) — Set or query description of a Varlink connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_relative_timeout.html">sd_varlink_set_relative_timeout(3) — Set method call time-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_watchdog_enabled.html">sd_watchdog_enabled(3) — Check whether the service manager expects watchdog keep-alive notifications from a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shutdown.html">shutdown(8) — Halt, power off or reboot the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smbios-type-11.html">smbios-type-11(7) — SMBIOS Type 11 strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysctl.d.html">sysctl.d(5) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysext.conf.html">sysext.conf(5) — Configuration files for systemd-sysext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemctl.html">systemctl(1) — Control the systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.html">systemd(1) — systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ac-power.html">systemd-ac-power(1) — Report whether we are connected to an external power source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-analyze.html">systemd-analyze(1) — Analyze and debug system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password.html">systemd-ask-password(1) — Query the user for a system password</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password-console.service.html">systemd-ask-password-console.service(8) — Query the user for system passwords on the console and via wall</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-backlight%40.service.html">systemd-backlight@.service(8) — Load and save the display backlight brightness at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-battery-check.service.html">systemd-battery-check.service(8) — Check battery level whether there's enough charge, and power off if not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-binfmt.service.html">systemd-binfmt.service(8) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot-generator.html">systemd-bless-boot-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot.service.html">systemd-bless-boot.service(8) — Mark current boot process as successful</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot.html">systemd-boot(7) — A simple UEFI boot manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-check-no-failures.service.html">systemd-boot-check-no-failures.service(8) — verify that the system booted up cleanly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-clear-sysfail.service.html">systemd-boot-clear-sysfail.service(8) — Clear LoaderEntrySysFail entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-random-seed.service.html">systemd-boot-random-seed.service(8) — Refresh boot loader random seed at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bsod.service.html">systemd-bsod.service(8) — Displays boot-time emergency log message in full screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cat.html">systemd-cat(1) — Connect a pipeline or program's output with the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgls.html">systemd-cgls(1) — Recursively show control group contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgtop.html">systemd-cgtop(1) — Show top control groups by their resource usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-coredump.html">systemd-coredump(8) — Acquire, save and process core dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-creds.html">systemd-creds(1) — Lists, shows, encrypts and decrypts service credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptenroll.html">systemd-cryptenroll(1) — Enroll PKCS#11, FIDO2, TPM2 token/devices to LUKS2 encrypted volumes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup.html">systemd-cryptsetup(8) — Full disk decryption logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup-generator.html">systemd-cryptsetup-generator(8) — Unit generator for</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-debug-generator.html">systemd-debug-generator(8) — Generator for enabling a runtime debug shell and masking specific units at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-delta.html">systemd-delta(1) — Find overridden configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-detect-virt.html">systemd-detect-virt(1) — Detect execution in a virtualized environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-dissect.html">systemd-dissect(1) — Dissect Discoverable Disk Images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-environment-d-generator.html">systemd-environment-d-generator(8) — Load variables specified by</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-escape.html">systemd-escape(1) — Escape strings for usage in systemd unit names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset.html">systemd-factory-reset(8) — Request or complete a factory reset operation, or query current factory reset mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset-generator.html">systemd-factory-reset-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-firstboot.html">systemd-firstboot(1) — Initialize basic system settings on or before the first boot-up of a system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fsck%40.service.html">systemd-fsck@.service(8) — File system checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fstab-generator.html">systemd-fstab-generator(8) — Unit generator for /etc/fstab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-getty-generator.html">systemd-getty-generator(8) — Generator for enabling getty instances on the console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-gpt-auto-generator.html">systemd-gpt-auto-generator(8) — Generator for automatically discovering and mounting root,</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume-generator.html">systemd-hibernate-resume-generator(8) — Unit generator for resume= kernel parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume.service.html">systemd-hibernate-resume.service(8) — Resume from hibernation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-homed.service.html">systemd-homed.service(8) — Home Area/User Account Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hostnamed.service.html">systemd-hostnamed.service(8) — Daemon to control system hostname from programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hwdb.html">systemd-hwdb(8) — hardware database management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-id128.html">systemd-id128(1) — Generate and print sd-128 identifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-import-generator.html">systemd-import-generator(8) — Generator for automatically downloading disk images at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-importd.service.html">systemd-importd.service(8) — VM and container image import and export service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-inhibit.html">systemd-inhibit(1) — Execute a program with an inhibition lock taken</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup-generator.html">systemd-integritysetup-generator(8) — Unit generator for integrity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup%40.service.html">systemd-integritysetup@.service(8) — Disk integrity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-gatewayd.service.html">systemd-journal-gatewayd.service(8) — HTTP server for journal events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-remote.service.html">systemd-journal-remote.service(8) — Receive journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-upload.service.html">systemd-journal-upload.service(8) — Send journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journald.service.html">systemd-journald.service(8) — Journal service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-keyutil.html">systemd-keyutil(1) — Perform various operations on private keys and X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-localed.service.html">systemd-localed.service(8) — Locale bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-logind.service.html">systemd-logind.service(8) — Login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-loop%40.service.html">systemd-loop@.service(8) — Attach a loopback block device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-commit.service.html">systemd-machine-id-commit.service(8) — Commit a transient machine ID to disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-setup.html">systemd-machine-id-setup(1) — Initialize the machine ID in /etc/machine-id</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machined.service.html">systemd-machined.service(8) — Virtual machine and container registration manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-makefs%40.service.html">systemd-makefs@.service(8) — Creating and growing file systems on demand</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-measure.html">systemd-measure(1) — Pre-calculate and sign expected TPM2 PCR 11 values for booted unified kernel images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-modules-load.service.html">systemd-modules-load.service(8) — Load kernel modules at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mount.html">systemd-mount(1) — Establish and destroy transient mount or auto-mount points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mountfsd.service.html">systemd-mountfsd.service(8) — Disk Image File System Mount Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mute-console.html">systemd-mute-console(1) — Temporarily mute kernel log output and service manager status output to the system console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-network-generator.service.html">systemd-network-generator.service(8) — Generate network configuration from the kernel command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd-wait-online.service.html">systemd-networkd-wait-online.service(8) — Wait for network to come online</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd.service.html">systemd-networkd.service(8) — Network manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-notify.html">systemd-notify(1) — Notify service manager about start-up completion and other daemon status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nspawn.html">systemd-nspawn(1) — Spawn a command or OS in a lightweight container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nsresourced.service.html">systemd-nsresourced.service(8) — User Namespace Resource Delegation Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-oomd.service.html">systemd-oomd.service(8) — A userspace out-of-memory (OOM) killer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-path.html">systemd-path(1) — List and query system and user paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrlock.html">systemd-pcrlock(8) — Analyze and predict TPM2 PCR states and generate an access policy from the prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrphase.service.html">systemd-pcrphase.service(8) — Measure boot phases, machine ID, product UUID and file system identity into TPM PCRs and NvPCRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-portabled.service.html">systemd-portabled.service(8) — Portable service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-poweroff.service.html">systemd-poweroff.service(8) — System shutdown logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pstore.service.html">systemd-pstore.service(8) — A service to archive contents of pstore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pty-forward.html">systemd-pty-forward(1) — Run a command with a custom terminal background color or title</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-quotacheck%40.service.html">systemd-quotacheck@.service(8) — File system quota checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-random-seed.service.html">systemd-random-seed.service(8) — Load and save the OS system random seed at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rc-local-generator.html">systemd-rc-local-generator(8) — Compatibility generator and service to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-remount-fs.service.html">systemd-remount-fs.service(8) — Remount root and kernel file systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-repart.html">systemd-repart(8) — Automatically grow and add partitions, and generate disk images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-resolved.service.html">systemd-resolved.service(8) — Network Name Resolution manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rfkill.service.html">systemd-rfkill.service(8) — Load and save the RF kill switch state at boot and change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run.html">systemd-run(1) — Run programs in transient scope units, service units, or path-, socket-, or timer-triggered service units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run-generator.html">systemd-run-generator(8) — Generator for invoking commands specified on the kernel command line as system service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sbsign.html">systemd-sbsign(1) — Sign PE binaries for EFI Secure Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sleep.conf.html">systemd-sleep.conf(5) — Suspend and hibernation configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-activate.html">systemd-socket-activate(1) — Test socket activation of daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-proxyd.html">systemd-socket-proxyd(8) — Bidirectionally proxy local sockets to another (possibly remote) socket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-soft-reboot.service.html">systemd-soft-reboot.service(8) — Userspace reboot operation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-generator.html">systemd-ssh-generator(8) — Generator for binding a socket-activated SSH server to local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-issue.html">systemd-ssh-issue(1) — Generator for SSH login prompt drop-ins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-proxy.html">systemd-ssh-proxy(1) — SSH client plugin for connecting to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stdio-bridge.html">systemd-stdio-bridge(1) — D-Bus proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-storagetm.service.html">systemd-storagetm.service(8) — Exposes all local block devices as NVMe-TCP mass storage devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stub.html">systemd-stub(7) — A simple UEFI kernel boot stub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-suspend.service.html">systemd-suspend.service(8) — System sleep state logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysctl.service.html">systemd-sysctl.service(8) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysext.html">systemd-sysext(8) — Activates System Extension Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system-update-generator.html">systemd-system-update-generator(8) — Generator for redirecting boot to offline update mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system.conf.html">systemd-system.conf(5) — System and session service manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdate.html">systemd-sysupdate(8) — Automatically Update OS or Other Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdated.service.html">systemd-sysupdated.service(8) — System Update Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysusers.html">systemd-sysusers(8) — Allocate system users and groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysv-generator.html">systemd-sysv-generator(8) — Unit generator for SysV init scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-time-wait-sync.service.html">systemd-time-wait-sync.service(8) — Wait until kernel time is synchronized</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timedated.service.html">systemd-timedated.service(8) — Time and date bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timesyncd.service.html">systemd-timesyncd.service(8) — Network Time Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tmpfiles.html">systemd-tmpfiles(8) — Create, delete, and clean up files and directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-clear.service.html">systemd-tpm2-clear.service(8) — Request that the TPM security chip is cleared on next boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-generator.html">systemd-tpm2-generator(8) — Generator for inserting TPM2 synchronization point in the boot process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-setup.service.html">systemd-tpm2-setup.service(8) — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tty-ask-password-agent.html">systemd-tty-ask-password-agent(1) — List or process pending systemd password requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udev-settle.service.html">systemd-udev-settle.service(8) — Wait for all pending udev events to be handled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udevd.service.html">systemd-udevd.service(8) — Device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-done.service.html">systemd-update-done.service(8) — Mark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-utmp.service.html">systemd-update-utmp.service(8) — Write audit and utmp updates at bootup and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-user-sessions.service.html">systemd-user-sessions.service(8) — Permit user logins after boot, prohibit user logins at shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-userdbd.service.html">systemd-userdbd.service(8) — JSON User/Group Record Query Multiplexer/NSS Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-validatefs%40.service.html">systemd-validatefs@.service(8) — Validate File System Mount Constraint Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vconsole-setup.service.html">systemd-vconsole-setup.service(8) — Configure the virtual consoles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup-generator.html">systemd-veritysetup-generator(8) — Unit generator for verity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup%40.service.html">systemd-veritysetup@.service(8) — Disk verity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vmspawn.html">systemd-vmspawn(1) — Spawn an OS in a virtual machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-volatile-root.service.html">systemd-volatile-root.service(8) — Make the root file system volatile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vpick.html">systemd-vpick(1) — Resolve paths to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-xdg-autostart-generator.html">systemd-xdg-autostart-generator(8) — User unit generator for XDG autostart files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.automount.html">systemd.automount(5) — Automount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.device.html">systemd.device(5) — Device unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dns-delegate.html">systemd.dns-delegate(5) — DNS Server Delegation Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dnssd.html">systemd.dnssd(5) — DNS-SD configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.environment-generator.html">systemd.environment-generator(7) — systemd environment file generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.exec.html">systemd.exec(5) — Execution environment configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.generator.html">systemd.generator(7) — systemd unit generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-filter.html">systemd.image-filter(7) — Disk Image Dissection Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-policy.html">systemd.image-policy(7) — Disk Image Dissection Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.journal-fields.html">systemd.journal-fields(7) — Special journal fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.kill.html">systemd.kill(5) — Process killing procedure configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.link.html">systemd.link(5) — Network device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.mount.html">systemd.mount(5) — Mount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.net-naming-scheme.html">systemd.net-naming-scheme(7) — Network device naming schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.netdev.html">systemd.netdev(5) — Virtual Network Device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.network.html">systemd.network(5) — Network configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.nspawn.html">systemd.nspawn(5) — Container settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.offline-updates.html">systemd.offline-updates(7) — Implementation of offline updates in systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.path.html">systemd.path(5) — Path unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.pcrlock.html">systemd.pcrlock(5) — PCR measurement prediction files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.preset.html">systemd.preset(5) — Service enablement presets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.resource-control.html">systemd.resource-control(5) — Resource control unit settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.scope.html">systemd.scope(5) — Scope unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.service.html">systemd.service(5) — Service unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.slice.html">systemd.slice(5) — Slice unit configuration</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">systemd.socket(5) — Socket unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.special.html">systemd.special(7) — Special systemd units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.swap.html">systemd.swap(5) — Swap unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.syntax.html">systemd.syntax(7) — General syntax of systemd configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.system-credentials.html">systemd.system-credentials(7) — System Credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.target.html">systemd.target(5) — Target unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.time.html">systemd.time(7) — Time and date specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.timer.html">systemd.timer(5) — Timer unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.unit.html">systemd.unit(5) — Unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.v.html">systemd.v(7) — Directory with Versioned Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.d.html">sysupdate.d(5) — Transfer Definition Files for Automatic Updates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.features.html">sysupdate.features(5) — Definition Files for Optional Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysusers.d.html">sysusers.d(5) — Declarative allocation of system users and groups</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">T</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timedatectl.html">timedatectl(1) — Control the system time and date</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesyncd.conf.html">timesyncd.conf(5) — Network Time Synchronization configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tmpfiles.d.html">tmpfiles.d(5) — Configuration for creation, deletion, and cleaning of files and directories</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">U</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="udev.html">udev(7) — Dynamic device management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev.conf.html">udev.conf(5) — Configuration for device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_get_syspath.html">udev_device_get_syspath(3) — Query device properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_has_tag.html">udev_device_has_tag(3) — Retrieve or set device attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_new_from_syspath.html">udev_device_new_from_syspath(3) — Create, acquire and release a udev device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_add_match_subsystem.html">udev_enumerate_add_match_subsystem(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_new.html">udev_enumerate_new(3) — Create, acquire and release a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_scan_devices.html">udev_enumerate_scan_devices(3) — Query or modify a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_list_entry.html">udev_list_entry(3) — Iterate and access udev lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_filter_update.html">udev_monitor_filter_update(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_new_from_netlink.html">udev_monitor_new_from_netlink(3) — Create, acquire and release a udev monitor object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_receive_device.html">udev_monitor_receive_device(3) — Query and modify device monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_new.html">udev_new(3) — Create, acquire and release a udev context object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udevadm.html">udevadm(8) — udev management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ukify.html">ukify(1) — Combine components into a signed Unified Kernel Image for UEFI systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updatectl.html">updatectl(1) — Control the system update service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user%40.service.html">user@.service(5) — System units to start the user manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="userdbctl.html">userdbctl(1) — Inspect users, groups and group memberships</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">V</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="varlinkctl.html">varlinkctl(1) — Introspect with and invoke Varlink services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vconsole.conf.html">vconsole.conf(5) — Configuration file for the virtual console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="veritytab.html">veritytab(5) — Configuration for verity block devices</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/blob/man_pages_in_sphinx/doc-migration/source/docs/systemd.socket.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/edit/man_pages_in_sphinx/doc-migration/source/docs/systemd.socket.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="systemd-socket-5">
+<span id="id1"></span><h1>systemd.socket(5)<a class="headerlink" href="#systemd-socket-5" title="Link to this heading">¶</a></h1>
+<section id="name">
+<h2>Name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
+<p>systemd.socket — Socket unit configuration</p>
+</section>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">socket.socket</span></code></p>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>A unit configuration file whose name ends in “.socket” encodes information about an IPC or network socket or a file system FIFO controlled and supervised by systemd, for socket-based activation.</p>
+<p>This man page lists the configuration options specific to this unit type. See <a class="reference internal" href="systemd.unit.html#systemd-unit-5"><span class="std std-ref">systemd.unit(5)</span></a> for the common options of all unit configuration files. The common configuration items are configured in the generic [Unit] and [Install] sections. The socket specific configuration options are configured in the [Socket] section.</p>
+<p>Additional options are listed in <a class="reference internal" href="systemd.exec.html#systemd-exec-5"><span class="std std-ref">systemd.exec(5)</span></a>, which define the execution environment the <code class="code docutils literal notranslate"><span class="pre">ExecStartPre=</span></code>, <code class="code docutils literal notranslate"><span class="pre">ExecStartPost=</span></code>, <code class="code docutils literal notranslate"><span class="pre">ExecStopPre=</span></code> and <code class="code docutils literal notranslate"><span class="pre">ExecStopPost=</span></code> commands are executed in, and in <a class="reference internal" href="systemd.kill.html#systemd-kill-5"><span class="std std-ref">systemd.kill(5)</span></a>, which define the way the processes are terminated, and in <a class="reference internal" href="systemd.resource-control.html#systemd-resource-control-5"><span class="std std-ref">systemd.resource-control(5)</span></a>, which configure resource control settings for the processes of the socket.</p>
+<p>For each socket unit, a matching service unit must exist, describing the service to start on incoming traffic on the socket (see <a class="reference internal" href="systemd.service.html#systemd-service-5"><span class="std std-ref">systemd.service(5)</span></a> for more information about .service units). The name of the .service unit is by default the same as the name of the .socket unit, but can be altered with the <code class="code docutils literal notranslate"><span class="pre">Service=</span></code> option described below. Depending on the setting of the <code class="code docutils literal notranslate"><span class="pre">Accept=</span></code> option described below, this .service unit must either be named like the .socket unit, but with the suffix replaced, unless overridden with <code class="code docutils literal notranslate"><span class="pre">Service=</span></code>; or it must be a template unit named the same way. Example: a socket file <code class="code docutils literal notranslate"><span class="pre">foo.socket</span></code> needs a matching service <code class="code docutils literal notranslate"><span class="pre">foo.service</span></code> if <code class="code docutils literal notranslate"><span class="pre">Accept=no</span></code> is set. If <code class="code docutils literal notranslate"><span class="pre">Accept=yes</span></code> is set, a service template <code class="code docutils literal notranslate"><span class="pre">foo&#64;.service</span></code> must exist from which services are instantiated for each incoming connection.</p>
+<p>No implicit <code class="code docutils literal notranslate"><span class="pre">WantedBy=</span></code> or <code class="code docutils literal notranslate"><span class="pre">RequiredBy=</span></code> dependency from the socket to the service is added. This means that the service may be started without the socket, in which case it must be able to open sockets by itself. To prevent this, an explicit <code class="code docutils literal notranslate"><span class="pre">Requires=</span></code> dependency may be added.</p>
+<p>Socket units may be used to implement on-demand starting of services, as well as parallelized starting of services. See the blog stories linked at the end for an introduction.</p>
+<p>Note that the daemon software configured for socket activation with socket units needs to be able to accept sockets from systemd, either via systemd’s native socket passing interface (see <a class="reference internal" href="sd_listen_fds.html#sd-listen-fds-3"><span class="std std-ref">sd_listen_fds(3)</span></a> for details about the precise protocol used and the order in which the file descriptors are passed) or via traditional <a class="reference external" href="https://www.freebsd.org/cgi/man.cgi?query=inetd&amp;sektion=8">inetd(8)</a>-style socket passing (i.e. sockets passed in via standard input and output, using <code class="code docutils literal notranslate"><span class="pre">StandardInput=socket</span></code> in the service file).</p>
+<p>All network sockets allocated through <code class="code docutils literal notranslate"><span class="pre">.socket</span></code> units are allocated in the host’s network namespace (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/network_namespaces.7.html">network_namespaces(7)</a>). This does not mean however that the service activated by a configured socket unit has to be part of the host’s network namespace as well. It is supported and even good practice to run services in their own network namespace (for example through <code class="code docutils literal notranslate"><span class="pre">PrivateNetwork=</span></code>, see <a class="reference internal" href="systemd.exec.html#systemd-exec-5"><span class="std std-ref">systemd.exec(5)</span></a>), receiving only the sockets configured through socket-activation from the host’s namespace. In such a set-up communication within the host’s network namespace is only permitted through the activation sockets passed in while all sockets allocated from the service code itself will be associated with the service’s own namespace, and thus possibly subject to a restrictive configuration.</p>
+</section>
+<section id="automatic-dependencies">
+<h2>Automatic Dependencies<a class="headerlink" href="#automatic-dependencies" title="Link to this heading">¶</a></h2>
+</section>
+<section id="implicit-dependencies">
+<h2>Implicit Dependencies<a class="headerlink" href="#implicit-dependencies" title="Link to this heading">¶</a></h2>
+<p>The following dependencies are implicitly added:</p>
+<ul class="simple">
+<li><p>Socket units automatically gain a <code class="code docutils literal notranslate"><span class="pre">Before=</span></code> dependency on the service units they activate.</p></li>
+<li><p>Socket units referring to file system paths (such as <code class="code docutils literal notranslate"><span class="pre">AF_UNIX</span></code> sockets or FIFOs) implicitly gain <code class="code docutils literal notranslate"><span class="pre">Requires=</span></code> and <code class="code docutils literal notranslate"><span class="pre">After=</span></code> dependencies on all mount units necessary to access those paths.</p></li>
+<li><p>Socket units using the <code class="code docutils literal notranslate"><span class="pre">BindToDevice=</span></code> setting automatically gain a <code class="code docutils literal notranslate"><span class="pre">BindsTo=</span></code> and <code class="code docutils literal notranslate"><span class="pre">After=</span></code> dependency on the device unit encapsulating the specified network interface.</p></li>
+</ul>
+<p>Additional implicit dependencies may be added as result of execution and resource control parameters as documented in <a class="reference internal" href="systemd.exec.html#systemd-exec-5"><span class="std std-ref">systemd.exec(5)</span></a> and <a class="reference internal" href="systemd.resource-control.html#systemd-resource-control-5"><span class="std std-ref">systemd.resource-control(5)</span></a>.</p>
+</section>
+<section id="default-dependencies">
+<h2>Default Dependencies<a class="headerlink" href="#default-dependencies" title="Link to this heading">¶</a></h2>
+<p>The following dependencies are added unless <code class="code docutils literal notranslate"><span class="pre">DefaultDependencies=no</span></code> is set:</p>
+<ul class="simple">
+<li><p>Socket units automatically gain a <code class="code docutils literal notranslate"><span class="pre">Before=</span></code> dependency on <code class="code docutils literal notranslate"><span class="pre">sockets.target</span></code>.</p></li>
+<li><p>Socket units automatically gain a pair of <code class="code docutils literal notranslate"><span class="pre">After=</span></code> and <code class="code docutils literal notranslate"><span class="pre">Requires=</span></code> dependency on <code class="code docutils literal notranslate"><span class="pre">sysinit.target</span></code>, and a pair of <code class="code docutils literal notranslate"><span class="pre">Before=</span></code> and <code class="code docutils literal notranslate"><span class="pre">Conflicts=</span></code> dependencies on <code class="code docutils literal notranslate"><span class="pre">shutdown.target</span></code>. These dependencies ensure that the socket unit is started before normal services at boot, and is stopped on shutdown. Only sockets involved with early boot or late system shutdown should disable <code class="code docutils literal notranslate"><span class="pre">DefaultDependencies=</span></code> option.</p></li>
+</ul>
+</section>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Link to this heading">¶</a></h2>
+<p>Socket unit files may include [Unit] and [Install] sections, which are described in <a class="reference internal" href="systemd.unit.html#systemd-unit-5"><span class="std std-ref">systemd.unit(5)</span></a>.</p>
+<p>Socket unit files must include a [Socket] section, which carries information about the socket or FIFO it supervises. A number of options that may be used in this section are shared with other unit types. These options are documented in <a class="reference internal" href="systemd.exec.html#systemd-exec-5"><span class="std std-ref">systemd.exec(5)</span></a>, <a class="reference internal" href="systemd.kill.html#systemd-kill-5"><span class="std std-ref">systemd.kill(5)</span></a> and <a class="reference internal" href="systemd.resource-control.html#systemd-resource-control-5"><span class="std std-ref">systemd.resource-control(5)</span></a>. The options specific to the [Socket] section of socket units are the following:</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-listenstream">
+<span class="sig-name descname"><span class="pre">ListenStream=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-listenstream" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-listendatagram">
+<span class="sig-name descname"><span class="pre">ListenDatagram=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-listendatagram" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-listensequentialpacket">
+<span class="sig-name descname"><span class="pre">ListenSequentialPacket=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-listensequentialpacket" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies an address to listen on for a stream (<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SOCK_STREAM</span></code>), datagram (<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SOCK_DGRAM</span></code>), or sequential packet (<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SOCK_SEQPACKET</span></code>) socket, respectively. The address can be written in various formats:</p>
+<p>If the address starts with a slash (“/”), it is read as file system socket in the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> socket family.</p>
+<p>If the address starts with an at symbol (“&#64;”), it is read as abstract namespace socket in the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> family. The “&#64;” is replaced with a <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">NUL</span></code> character before binding. For details, see <a class="reference external" href="https://man7.org/linux/man-pages/man7/unix.7.html">unix(7)</a>.</p>
+<p>If the address string is a single number, it is read as port number to listen on via IPv6. Depending on the value of <a class="reference internal" href="#systemd-option-systemd-socket-bindipv6only"><code class="docutils literal notranslate"><span class="pre">BindIPv6Only=</span></code></a> (see below) this might result in the service being available via both IPv6 and IPv4 (default) or just via IPv6.</p>
+<p>If the address string is a string in the format “<em>v.w.x.y</em>:<em>z</em>”, it is interpreted as IPv4 address <em>v.w.x.y</em> and port <em>z</em>.</p>
+<p>If the address string is a string in the format “[<em>x</em>]:<em>y</em>”, it is interpreted as IPv6 address <em>x</em> and port <em>y</em>. An optional interface scope (interface name or number) may be specified after a “%” symbol: “[<em>x</em>]:<em>y</em>%:emphasis:<cite>dev</cite>”. Interface scopes are only useful with link-local addresses, because the kernel ignores them in other cases. Note that if an address is specified as IPv6, it might still make the service available via IPv4 too, depending on the <a class="reference internal" href="#systemd-option-systemd-socket-bindipv6only"><code class="docutils literal notranslate"><span class="pre">BindIPv6Only=</span></code></a> setting (see below).</p>
+<p>If the address string is a string in the format “vsock:<em>x</em>:<em>y</em>”, it is read as CID <em>x</em> on a port <em>y</em> address in the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_VSOCK</span></code> family. The CID is a unique 32-bit integer identifier in <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_VSOCK</span></code> analogous to an IP address. Specifying the CID is optional, and may be set to the empty string. “vsock” may be replaced with “vsock-stream”, “vsock-dgram” or “vsock-seqpacket” to force usage of the corresponding socket type.</p>
+<p>Note that <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SOCK_SEQPACKET</span></code> (i.e. <a class="reference internal" href="#systemd-option-systemd-socket-listensequentialpacket"><code class="docutils literal notranslate"><span class="pre">ListenSequentialPacket=</span></code></a>) is only available for <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> sockets. <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SOCK_STREAM</span></code> (i.e. <a class="reference internal" href="#systemd-option-systemd-socket-listenstream"><code class="docutils literal notranslate"><span class="pre">ListenStream=</span></code></a>) when used for IP sockets refers to TCP sockets, <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SOCK_DGRAM</span></code> (i.e. <a class="reference internal" href="#systemd-option-systemd-socket-listendatagram"><code class="docutils literal notranslate"><span class="pre">ListenDatagram=</span></code></a>) to UDP.</p>
+<p>These options may be specified more than once, in which case incoming traffic on any of the sockets will trigger service activation, and all listed sockets will be passed to the service, regardless of whether there is incoming traffic on them or not. If the empty string is assigned to any of these options, the list of addresses to listen on is reset, all prior uses of any of these options will have no effect.</p>
+<p>It is also possible to have more than one socket unit for the same service when using <a class="reference internal" href="#systemd-option-systemd-socket-service"><code class="docutils literal notranslate"><span class="pre">Service=</span></code></a>, and the service will receive all the sockets configured in all the socket units. Sockets configured in one unit are passed in the order of configuration, but no ordering between socket units is specified.</p>
+<p>If an IP address is used here, it is often desirable to listen on it before the interface it is configured on is up and running, and even regardless of whether it will be up and running at any point. To deal with this, it is recommended to set the <a class="reference internal" href="#systemd-option-systemd-socket-freebind"><code class="docutils literal notranslate"><span class="pre">FreeBind=</span></code></a> option described below.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-listenfifo">
+<span class="sig-name descname"><span class="pre">ListenFIFO=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-listenfifo" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a file system FIFO (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/fifo.7.html">fifo(7)</a> for details) to listen on. This expects an absolute file system path as argument. Behavior otherwise is very similar to the <a class="reference internal" href="#systemd-option-systemd-socket-listendatagram"><code class="docutils literal notranslate"><span class="pre">ListenDatagram=</span></code></a> directive above.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-listenspecial">
+<span class="sig-name descname"><span class="pre">ListenSpecial=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-listenspecial" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a special file in the file system to listen on. This expects an absolute file system path as argument. Behavior otherwise is very similar to the <a class="reference internal" href="#systemd-option-systemd-socket-listenfifo"><code class="docutils literal notranslate"><span class="pre">ListenFIFO=</span></code></a> directive above. Use this to open character device nodes as well as special files in <code class="code docutils literal notranslate"><span class="pre">/proc/</span></code> and <code class="code docutils literal notranslate"><span class="pre">/sys/</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-listennetlink">
+<span class="sig-name descname"><span class="pre">ListenNetlink=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-listennetlink" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a Netlink family to create a socket for to listen on. This expects a short string referring to the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_NETLINK</span></code> family name (such as <a class="reference internal" href="journald.conf.html#systemd-option-journald-conf-audit"><code class="docutils literal notranslate"><span class="pre">audit</span></code></a> or <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">kobject-uevent</span></code>) as argument, optionally suffixed by a whitespace followed by a multicast group integer. Behavior otherwise is very similar to the <a class="reference internal" href="#systemd-option-systemd-socket-listendatagram"><code class="docutils literal notranslate"><span class="pre">ListenDatagram=</span></code></a> directive above.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-listenmessagequeue">
+<span class="sig-name descname"><span class="pre">ListenMessageQueue=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-listenmessagequeue" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a POSIX message queue name to listen on (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/mq_overview.7.html">mq_overview(7)</a> for details). This expects a valid message queue name (i.e. beginning with “/”). Behavior otherwise is very similar to the <a class="reference internal" href="#systemd-option-systemd-socket-listenfifo"><code class="docutils literal notranslate"><span class="pre">ListenFIFO=</span></code></a> directive above. On Linux message queue descriptors are actually file descriptors and can be inherited between processes.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-listenusbfunction">
+<span class="sig-name descname"><span class="pre">ListenUSBFunction=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-listenusbfunction" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a <a class="reference external" href="https://docs.kernel.org/usb/functionfs.html">USB FunctionFS</a> endpoints location to listen on, for implementation of USB gadget functions. This expects an absolute file system path of a FunctionFS mount point as the argument. Behavior otherwise is very similar to the <a class="reference internal" href="#systemd-option-systemd-socket-listenfifo"><code class="docutils literal notranslate"><span class="pre">ListenFIFO=</span></code></a> directive above. Use this to open the FunctionFS endpoint <code class="code docutils literal notranslate"><span class="pre">ep0</span></code>. When using this option, the activated service has to have the <a class="reference internal" href="systemd.service.html#systemd-option-systemd-service-usbfunctiondescriptors"><code class="docutils literal notranslate"><span class="pre">USBFunctionDescriptors=</span></code></a> and <a class="reference internal" href="systemd.service.html#systemd-option-systemd-service-usbfunctionstrings"><code class="docutils literal notranslate"><span class="pre">USBFunctionStrings=</span></code></a> options set.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 227.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-socketprotocol">
+<span class="sig-name descname"><span class="pre">SocketProtocol=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-socketprotocol" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one of <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">udplite</span></code>, <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">sctp</span></code> or <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">mptcp</span></code>. The socket will use the UDP-Lite (<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IPPROTO_UDPLITE</span></code>), SCTP (<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IPPROTO_SCTP</span></code>) or MPTCP (<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IPPROTO_MPTCP</span></code>) protocol, respectively.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 229.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-bindipv6only">
+<span class="sig-name descname"><span class="pre">BindIPv6Only=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-bindipv6only" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one of <a class="reference internal" href="loader.conf.html#systemd-option-loader-conf-default"><code class="docutils literal notranslate"><span class="pre">default</span></code></a>, <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">both</span></code> or <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">ipv6-only</span></code>. Controls the IPV6_V6ONLY socket option (see <a class="reference external" href="http://linux.die.net/man/7/ipv6">ipv6(7)</a> for details). If <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">both</span></code>, IPv6 sockets bound will be accessible via both IPv4 and IPv6. If <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">ipv6-only</span></code>, they will be accessible via IPv6 only. If <a class="reference internal" href="loader.conf.html#systemd-option-loader-conf-default"><code class="docutils literal notranslate"><span class="pre">default</span></code></a> (which is the default, surprise!), the system wide default setting is used, as controlled by <code class="code docutils literal notranslate"><span class="pre">/proc/sys/net/ipv6/bindv6only</span></code>, which in turn defaults to the equivalent of <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">both</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-backlog">
+<span class="sig-name descname"><span class="pre">Backlog=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-backlog" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an unsigned 32-bit integer argument. Specifies the number of connections to queue that have not been accepted yet. This setting matters only for stream and sequential packet sockets. See <a class="reference external" href="https://man7.org/linux/man-pages/man2/listen.2.html">listen(2)</a> for details. Defaults to 4294967295. Note that this value is silently capped by the “net.core.somaxconn” sysctl, which typically defaults to 4096, so typically the sysctl is the setting that actually matters.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-bindtodevice">
+<span class="sig-name descname"><span class="pre">BindToDevice=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-bindtodevice" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies a network interface name to bind this socket to. If set, traffic will only be accepted from the specified network interfaces. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_BINDTODEVICE</span></code> socket option (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/socket.7.html">socket(7)</a> for details). If this option is used, an implicit dependency from this socket unit on the network interface device unit is created (see <a class="reference internal" href="systemd.device.html#systemd-device-5"><span class="std std-ref">systemd.device(5)</span></a>). Note that setting this parameter might result in additional dependencies to be added to the unit (see above).</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-socketuser">
+<span class="sig-name descname"><span class="pre">SocketUser=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-socketuser" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-socketgroup">
+<span class="sig-name descname"><span class="pre">SocketGroup=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-socketgroup" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a UNIX user/group name. When specified, all <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> sockets, FIFO nodes, and message queues are owned by the specified user and group. If unset (the default), the nodes are owned by the root user/group (if run in system context) or the invoking user/group (if run in user context). If only a user is specified but no group, then the group is derived from the user’s default group.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 214.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-socketmode">
+<span class="sig-name descname"><span class="pre">SocketMode=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-socketmode" title="Link to this definition">¶</a></dt>
+<dd><p>If listening on a file system socket, FIFO, or message queue, this option specifies the file system access mode used when creating the file node. Takes an access mode in octal notation. Defaults to 0666.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-directorymode">
+<span class="sig-name descname"><span class="pre">DirectoryMode=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-directorymode" title="Link to this definition">¶</a></dt>
+<dd><p>If listening on a file system socket or FIFO, the parent directories are automatically created if needed. This option specifies the file system access mode used when creating these directories. Takes an access mode in octal notation. Defaults to 0755.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-accept">
+<span class="sig-name descname"><span class="pre">Accept=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-accept" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. If yes, a service instance is spawned for each incoming connection and only the connection socket is passed to it. If no, all listening sockets themselves are passed to the started service unit, and only one service unit is spawned for all connections (also see above). This value is ignored for datagram sockets and FIFOs where a single service unit unconditionally handles all incoming traffic. Defaults to <a class="reference internal" href="loader.conf.html#systemd-option-loader-conf-no"><code class="docutils literal notranslate"><span class="pre">no</span></code></a>.</p>
+<p>Typically, for performance sensitive services, a choice of <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">Accept=no</span></code> is preferable, since that way only the first connection will have to pay the activation resource cost. On the other hand, for sporadically used services <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">Accept=yes</span></code> can be preferable as it simplifies the implementation (as the service program code only has to process a single connection instead of handling multiple) and enables stronger security (since the various sandboxing options can be used to isolate parallel connections from each other, as each is serviced by a separate service instance and process).</p>
+<p>A service listening on an <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> socket may, but does not need to, call <a class="reference external" href="https://man7.org/linux/man-pages/man2/close.2.html">close(2)</a> on the received socket before exiting. However, it must not unlink the socket from a file system. It should not invoke <a class="reference external" href="https://man7.org/linux/man-pages/man2/shutdown.2.html">shutdown(2)</a> on sockets it got with <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=no</span></code>, but it may do so for sockets it got with <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=yes</span></code> set.</p>
+<p>Setting <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=yes</span></code> is in particular useful for allowing daemons designed for usage with <a class="reference external" href="https://www.freebsd.org/cgi/man.cgi?query=inetd&amp;sektion=8">inetd(8)</a> to work unmodified with systemd socket activation.</p>
+<p>Note that depending on this setting the services activated by units of this type are either regular services (in case of <a class="reference internal" href="#systemd-option-systemd-socket-accept"><code class="docutils literal notranslate"><span class="pre">Accept=</span></code></a><a class="reference internal" href="loader.conf.html#systemd-option-loader-conf-no"><code class="docutils literal notranslate"><span class="pre">no</span></code></a>) or instances of templated services (in case of <a class="reference internal" href="#systemd-option-systemd-socket-accept"><code class="docutils literal notranslate"><span class="pre">Accept=</span></code></a><a class="reference internal" href="systemd-sysext.html#systemd-option-systemd-sysext-yes"><code class="docutils literal notranslate"><span class="pre">yes</span></code></a>). See the Description section above for a more detailed discussion of the naming rules of triggered services.</p>
+<p>For IPv4 and IPv6 connections, the <a class="reference internal" href="systemd.exec.html#systemd-var-systemd-exec-remote-addr"><code class="docutils literal notranslate"><span class="pre">$REMOTE_ADDR</span></code></a> environment variable will contain the remote IP address, and <a class="reference internal" href="systemd.exec.html#systemd-var-systemd-exec-remote-port"><code class="docutils literal notranslate"><span class="pre">$REMOTE_PORT</span></code></a> will contain the remote port number. These two variables correspond to those defined by the CGI interface for web services (see <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3875">RFC 3875</a>).</p>
+<p>For <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> socket connections, the <a class="reference internal" href="systemd.exec.html#systemd-var-systemd-exec-remote-addr"><code class="docutils literal notranslate"><span class="pre">$REMOTE_ADDR</span></code></a> environment variable will contain either the remote socket’s file system path starting with a slash (“/”) or its address in the abstract namespace starting with an at symbol (“&#64;”). If the socket is unnamed, <a class="reference internal" href="systemd.exec.html#systemd-var-systemd-exec-remote-addr"><code class="docutils literal notranslate"><span class="pre">$REMOTE_ADDR</span></code></a> will not be set.</p>
+<p>If <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=yes</span></code> is used, the activated service process will have set the <a class="reference internal" href="systemd.exec.html#systemd-var-systemd-exec-so-cookie"><code class="docutils literal notranslate"><span class="pre">$SO_COOKIE</span></code></a> environment variable to the Linux socket cookie, formatted as decimal integer. The socket cookie can otherwise be acquired via <a class="reference external" href="https://man7.org/linux/man-pages/man7/getsockopt.7.html">getsockopt(7)</a>.</p>
+<p>It is recommended to set <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">CollectMode=inactive-or-failed</span></code> for service instances activated via <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=yes</span></code>, to ensure that failed connection services are cleaned up and released from memory, and do not accumulate.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-writable">
+<span class="sig-name descname"><span class="pre">Writable=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-writable" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. May only be used in conjunction with <a class="reference internal" href="#systemd-option-systemd-socket-listenspecial"><code class="docutils literal notranslate"><span class="pre">ListenSpecial=</span></code></a>. If true, the specified special file is opened in read-write mode, if false, in read-only mode. Defaults to false.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 227.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-flushpending">
+<span class="sig-name descname"><span class="pre">FlushPending=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-flushpending" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. May only be used when <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">Accept=no</span></code>. If yes, the socket’s buffers are cleared after the triggered service exited. This causes any pending data to be flushed and any pending incoming connections to be rejected. If no, the socket’s buffers will not be cleared, permitting the service to handle any pending connections after restart, which is the usually expected behaviour. Defaults to <a class="reference internal" href="loader.conf.html#systemd-option-loader-conf-no"><code class="docutils literal notranslate"><span class="pre">no</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 247.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-maxconnections">
+<span class="sig-name descname"><span class="pre">MaxConnections=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-maxconnections" title="Link to this definition">¶</a></dt>
+<dd><p>The maximum number of connections to simultaneously run services instances for, when <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">Accept=yes</span></code> is set. If more concurrent connections are coming in, they will be refused until at least one existing connection is terminated. This setting has no effect on sockets configured with <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">Accept=no</span></code> or datagram sockets. Defaults to 64.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-maxconnectionspersource">
+<span class="sig-name descname"><span class="pre">MaxConnectionsPerSource=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-maxconnectionspersource" title="Link to this definition">¶</a></dt>
+<dd><p>The maximum number of connections for a service per source IP address (in case of IPv4/IPv6), per source CID (in case of <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_VSOCK</span></code>), or source UID (in case of <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code>). This is very similar to the <a class="reference internal" href="#systemd-option-systemd-socket-maxconnections"><code class="docutils literal notranslate"><span class="pre">MaxConnections=</span></code></a> directive above. Defaults to 0, i.e. disabled.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 232.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-keepalive">
+<span class="sig-name descname"><span class="pre">KeepAlive=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-keepalive" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. If true, the TCP/IP stack will send a keep alive message after 2h (depending on the configuration of <code class="code docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/tcp_keepalive_time</span></code>) for all TCP streams accepted on this socket. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_KEEPALIVE</span></code> socket option (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/socket.7.html">socket(7)</a> and the <a class="reference external" href="http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/">TCP Keepalive HOWTO</a> for details.) Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-keepalivetimesec">
+<span class="sig-name descname"><span class="pre">KeepAliveTimeSec=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-keepalivetimesec" title="Link to this definition">¶</a></dt>
+<dd><p>Takes time (in seconds) as argument. The connection needs to remain idle before TCP starts sending keepalive probes. This controls the TCP_KEEPIDLE socket option (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/socket.7.html">socket(7)</a> and the <a class="reference external" href="http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/">TCP Keepalive HOWTO</a> for details.) Default value is 7200 seconds (2 hours).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 216.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-keepaliveintervalsec">
+<span class="sig-name descname"><span class="pre">KeepAliveIntervalSec=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-keepaliveintervalsec" title="Link to this definition">¶</a></dt>
+<dd><p>Takes time (in seconds) as argument between individual keepalive probes, if the socket option <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_KEEPALIVE</span></code> has been set on this socket. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">TCP_KEEPINTVL</span></code> socket option (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/socket.7.html">socket(7)</a> and the <a class="reference external" href="http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/">TCP Keepalive HOWTO</a> for details.) Default value is 75 seconds.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 216.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-keepaliveprobes">
+<span class="sig-name descname"><span class="pre">KeepAliveProbes=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-keepaliveprobes" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an integer as argument. It is the number of unacknowledged probes to send before considering the connection dead and notifying the application layer. This controls the TCP_KEEPCNT socket option (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/socket.7.html">socket(7)</a> and the <a class="reference external" href="http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/">TCP Keepalive HOWTO</a> for details.) Default value is 9.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 216.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-nodelay">
+<span class="sig-name descname"><span class="pre">NoDelay=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-nodelay" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. TCP Nagle’s algorithm works by combining a number of small outgoing messages, and sending them all at once. This controls the TCP_NODELAY socket option (see <a class="reference external" href="http://linux.die.net/man/7/tcp">tcp(7)</a>). Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 216.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-priority">
+<span class="sig-name descname"><span class="pre">Priority=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-priority" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an integer argument controlling the priority for all traffic sent from this socket. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_PRIORITY</span></code> socket option (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/socket.7.html">socket(7)</a> for details.).</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-deferacceptsec">
+<span class="sig-name descname"><span class="pre">DeferAcceptSec=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-deferacceptsec" title="Link to this definition">¶</a></dt>
+<dd><p>Takes time (in seconds) as argument. If set, the listening process will be awakened only when data arrives on the socket, and not immediately when connection is established. When this option is set, the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">TCP_DEFER_ACCEPT</span></code> socket option will be used (see <a class="reference external" href="http://linux.die.net/man/7/tcp">tcp(7)</a>), and the kernel will ignore initial ACK packets without any data. The argument specifies the approximate amount of time the kernel should wait for incoming data before falling back to the normal behavior of honoring empty ACK packets. This option is beneficial for protocols where the client sends the data first (e.g. HTTP, in contrast to SMTP), because the server process will not be woken up unnecessarily before it can take any action.</p>
+<p>If the client also uses the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">TCP_DEFER_ACCEPT</span></code> option, the latency of the initial connection may be reduced, because the kernel will send data in the final packet establishing the connection (the third packet in the “three-way handshake”).</p>
+<p>Disabled by default.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 216.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-receivebuffer">
+<span class="sig-name descname"><span class="pre">ReceiveBuffer=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-receivebuffer" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-sendbuffer">
+<span class="sig-name descname"><span class="pre">SendBuffer=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-sendbuffer" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an integer argument controlling the receive or send buffer sizes of this socket, respectively. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_RCVBUF</span></code> and <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_SNDBUF</span></code> socket options (see <a class="reference external" href="https://man7.org/linux/man-pages/man7/socket.7.html">socket(7)</a> for details.). The usual suffixes K, M, G are supported and are understood to the base of 1024.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-iptos">
+<span class="sig-name descname"><span class="pre">IPTOS=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-iptos" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an integer argument controlling the IP Type-Of-Service field for packets generated from this socket. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IP_TOS</span></code> socket option (see <a class="reference external" href="http://linux.die.net/man/7/ip">ip(7)</a> for details.). Either a numeric string or one of <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">low-delay</span></code>, <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">throughput</span></code>, <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">reliability</span></code> or <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">low-cost</span></code> may be specified.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-ipttl">
+<span class="sig-name descname"><span class="pre">IPTTL=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-ipttl" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an integer argument controlling the IPv4 Time-To-Live/IPv6 Hop-Count field for packets generated from this socket. This sets the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IP_TTL</span></code>/<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IPV6_UNICAST_HOPS</span></code> socket options (see <a class="reference external" href="http://linux.die.net/man/7/ip">ip(7)</a> and <a class="reference external" href="http://linux.die.net/man/7/ipv6">ipv6(7)</a> for details.)</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-mark">
+<span class="sig-name descname"><span class="pre">Mark=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-mark" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an integer value. Controls the firewall mark of packets generated by this socket. This can be used in the firewall logic to filter packets from this socket. This sets the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_MARK</span></code> socket option. See <a class="reference external" href="http://linux.die.net/man/8/iptables">iptables(8)</a> for details.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-reuseport">
+<span class="sig-name descname"><span class="pre">ReusePort=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-reuseport" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. If true, allows multiple <a class="reference external" href="https://man7.org/linux/man-pages/man2/bind.2.html">bind(2)</a> socket option. See <a class="reference external" href="https://man7.org/linux/man-pages/man7/socket.7.html">socket(7)</a> for details.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 206.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-smacklabel">
+<span class="sig-name descname"><span class="pre">SmackLabel=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-smacklabel" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-smacklabelipin">
+<span class="sig-name descname"><span class="pre">SmackLabelIPIn=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-smacklabelipin" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-smacklabelipout">
+<span class="sig-name descname"><span class="pre">SmackLabelIPOut=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-smacklabelipout" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a string value. Controls the extended attributes “security.SMACK64”, “security.SMACK64IPIN” and “security.SMACK64IPOUT”, respectively, i.e. the security label of the FIFO, or the security label for the incoming or outgoing connections of the socket, respectively. See <a class="reference external" href="https://docs.kernel.org/admin-guide/LSM/Smack.html">Smack</a> for details.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 196.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-selinuxcontextfromnet">
+<span class="sig-name descname"><span class="pre">SELinuxContextFromNet=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-selinuxcontextfromnet" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. When true, systemd will attempt to figure out the SELinux label used for the instantiated service from the information handed by the peer over the network. Note that only the security level is used from the information provided by the peer. Other parts of the resulting SELinux context originate from either the target binary that is effectively triggered by socket unit or from the value of the <a class="reference internal" href="systemd.exec.html#systemd-option-systemd-exec-selinuxcontext"><code class="docutils literal notranslate"><span class="pre">SELinuxContext=</span></code></a> option. This configuration option applies only when activated service is passed in single socket file descriptor, i.e. service instances that have standard input connected to a socket or services triggered by exactly one socket unit. Also note that this option is useful only when MLS/MCS SELinux policy is deployed. Defaults to “false”.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 217.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-pipesize">
+<span class="sig-name descname"><span class="pre">PipeSize=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-pipesize" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a size in bytes. Controls the pipe buffer size of FIFOs configured in this socket unit. See <a class="reference external" href="https://man7.org/linux/man-pages/man2/fcntl.2.html">fcntl(2)</a> for details. The usual suffixes K, M, G are supported and are understood to the base of 1024.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-messagequeuemaxmessages">
+<span class="sig-name descname"><span class="pre">MessageQueueMaxMessages=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-messagequeuemaxmessages" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-messagequeuemessagesize">
+<span class="sig-name descname"><span class="pre">MessageQueueMessageSize=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-messagequeuemessagesize" title="Link to this definition">¶</a></dt>
+<dd><p>These two settings take integer values and control the mq_maxmsg field or the mq_msgsize field, respectively, when creating the message queue. Note that either none or both of these variables need to be set. See <a class="reference external" href="http://linux.die.net/man/3/mq_setattr">mq_setattr(3)</a> for details.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-freebind">
+<span class="sig-name descname"><span class="pre">FreeBind=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-freebind" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. Controls whether the socket can be bound to non-local IP addresses. This is useful to configure sockets listening on specific IP addresses before those IP addresses are successfully configured on a network interface. This sets the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IP_FREEBIND</span></code>/<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IPV6_FREEBIND</span></code> socket option. For robustness reasons it is recommended to use this option whenever you bind a socket to a specific IP address. Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-transparent">
+<span class="sig-name descname"><span class="pre">Transparent=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-transparent" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. Controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IP_TRANSPARENT</span></code>/<code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IPV6_TRANSPARENT</span></code> socket option. Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-broadcast">
+<span class="sig-name descname"><span class="pre">Broadcast=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-broadcast" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_BROADCAST</span></code> socket option, which allows broadcast datagrams to be sent from this socket. Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-passcredentials">
+<span class="sig-name descname"><span class="pre">PassCredentials=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-passcredentials" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_PASSCRED</span></code> socket option, which allows <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> sockets to receive the credentials of the sending process in an ancillary message. Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-passpidfd">
+<span class="sig-name descname"><span class="pre">PassPIDFD=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-passpidfd" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_PASSPIDFD</span></code> socket option, which allows <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> sockets to receive the pidfd of the sending process in an ancillary message. Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-passsecurity">
+<span class="sig-name descname"><span class="pre">PassSecurity=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-passsecurity" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_PASSSEC</span></code> socket option, which allows <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> sockets to receive the security context of the sending process in an ancillary message. Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-passpacketinfo">
+<span class="sig-name descname"><span class="pre">PassPacketInfo=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-passpacketinfo" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IP_PKTINFO</span></code>, <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">IPV6_RECVPKTINFO</span></code>, <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">NETLINK_PKTINFO</span></code> or <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">PACKET_AUXDATA</span></code> socket options, which enable reception of additional per-packet metadata as ancillary message, on <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_INET</span></code>, <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_INET6</span></code>, <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> and <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_PACKET</span></code> sockets. Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 246.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-acceptfiledescriptors">
+<span class="sig-name descname"><span class="pre">AcceptFileDescriptors=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-acceptfiledescriptors" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean value. This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_PASSRIGHTS</span></code> socket option, which when disabled prohibits the peer from sending <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SCM_RIGHTS</span></code> ancillary messages (aka file descriptors) via <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> sockets. Defaults to <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-timestamping">
+<span class="sig-name descname"><span class="pre">Timestamping=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-timestamping" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one of “off”, “us” (alias: “usec”, “μs”) or “ns” (alias: “nsec”). This controls the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_TIMESTAMP</span></code> or <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SO_TIMESTAMPNS</span></code> socket options, and enables whether ingress network traffic shall carry timestamping metadata. Defaults to <a class="reference internal" href="networkctl.html#systemd-option-networkctl-off"><code class="docutils literal notranslate"><span class="pre">off</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 247.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-tcpcongestion">
+<span class="sig-name descname"><span class="pre">TCPCongestion=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-tcpcongestion" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a string value. Controls the TCP congestion algorithm used by this socket. Should be one of “westwood”, “reno”, “cubic”, “lp” or any other available algorithm supported by the IP stack. This setting applies only to stream sockets.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-execstartpre">
+<span class="sig-name descname"><span class="pre">ExecStartPre=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-execstartpre" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-execstartpost">
+<span class="sig-name descname"><span class="pre">ExecStartPost=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-execstartpost" title="Link to this definition">¶</a></dt>
+<dd><p>Takes one or more command lines, which are executed before or after the listening sockets/FIFOs are created and bound, respectively. The first token of the command line must be an absolute filename, then followed by arguments for the process. Multiple command lines may be specified following the same scheme as used for <a class="reference internal" href="#systemd-option-systemd-socket-execstartpre"><code class="docutils literal notranslate"><span class="pre">ExecStartPre=</span></code></a> of service unit files.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-execstoppre">
+<span class="sig-name descname"><span class="pre">ExecStopPre=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-execstoppre" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-execstoppost">
+<span class="sig-name descname"><span class="pre">ExecStopPost=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-execstoppost" title="Link to this definition">¶</a></dt>
+<dd><p>Additional commands that are executed before or after the listening sockets/FIFOs are closed and removed, respectively. Multiple command lines may be specified following the same scheme as used for <a class="reference internal" href="#systemd-option-systemd-socket-execstartpre"><code class="docutils literal notranslate"><span class="pre">ExecStartPre=</span></code></a> of service unit files.</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-timeoutsec">
+<span class="sig-name descname"><span class="pre">TimeoutSec=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-timeoutsec" title="Link to this definition">¶</a></dt>
+<dd><p>Configures the time to wait for the commands specified in <a class="reference internal" href="#systemd-option-systemd-socket-execstartpre"><code class="docutils literal notranslate"><span class="pre">ExecStartPre=</span></code></a>, <a class="reference internal" href="#systemd-option-systemd-socket-execstartpost"><code class="docutils literal notranslate"><span class="pre">ExecStartPost=</span></code></a>, <a class="reference internal" href="#systemd-option-systemd-socket-execstoppre"><code class="docutils literal notranslate"><span class="pre">ExecStopPre=</span></code></a> and <a class="reference internal" href="#systemd-option-systemd-socket-execstoppost"><code class="docutils literal notranslate"><span class="pre">ExecStopPost=</span></code></a> to finish. If a command does not exit within the configured time, the socket will be considered failed and be shut down again. All commands still running will be terminated forcibly via <a class="reference internal" href="systemd.html#systemd-constant-systemd-sigterm"><code class="docutils literal notranslate"><span class="pre">SIGTERM</span></code></a>, and after another delay of this time with <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">SIGKILL</span></code>. (See <a class="reference internal" href="systemd.kill.html#systemd-option-systemd-kill-killmode"><code class="docutils literal notranslate"><span class="pre">KillMode=</span></code></a> in <a class="reference internal" href="systemd.kill.html#systemd-kill-5"><span class="std std-ref">systemd.kill(5)</span></a>.) Takes a unit-less value in seconds, or a time span value such as “5min 20s”. Pass “0” to disable the timeout logic. Defaults to <a class="reference internal" href="systemd-system.conf.html#systemd-option-systemd-system-conf-defaulttimeoutstartsec"><code class="docutils literal notranslate"><span class="pre">DefaultTimeoutStartSec=</span></code></a> from the manager configuration file (see <a class="reference internal" href="systemd-system.conf.html#systemd-system-conf-5"><span class="std std-ref">systemd-system.conf(5)</span></a>).</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-service">
+<span class="sig-name descname"><span class="pre">Service=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-service" title="Link to this definition">¶</a></dt>
+<dd><p>Specifies the service unit name to activate on incoming traffic. This setting is only allowed for sockets with <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=no</span></code>. It defaults to the service that bears the same name as the socket (with the suffix replaced). In most cases, it should not be necessary to use this option. Note that setting this parameter might result in additional dependencies to be added to the unit (see above).</p>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-removeonstop">
+<span class="sig-name descname"><span class="pre">RemoveOnStop=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-removeonstop" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. If enabled, any file nodes created by this socket unit are removed when it is stopped. This applies to <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> sockets in the file system, POSIX message queues, FIFOs, as well as any symlinks to them configured with <a class="reference internal" href="#systemd-option-systemd-socket-symlinks"><code class="docutils literal notranslate"><span class="pre">Symlinks=</span></code></a>. Normally, it should not be necessary to use this option, and is not recommended as services might continue to run after the socket unit has been terminated and it should still be possible to communicate with them via their file system node. Defaults to off.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 214.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-symlinks">
+<span class="sig-name descname"><span class="pre">Symlinks=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-symlinks" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a list of file system paths. The specified paths will be created as symlinks to the <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> socket path or FIFO path of this socket unit. If this setting is used, only one <code class="xref systemd systemd-constant docutils literal notranslate"><span class="pre">AF_UNIX</span></code> socket in the file system or one FIFO may be configured for the socket unit. Use this option to manage one or more symlinked alias names for a socket, binding their lifecycle together. Note that if creation of a symlink fails this is not considered fatal for the socket unit, and the socket unit may still start. If an empty string is assigned, the list of paths is reset. Defaults to an empty list.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 214.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-filedescriptorname">
+<span class="sig-name descname"><span class="pre">FileDescriptorName=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-filedescriptorname" title="Link to this definition">¶</a></dt>
+<dd><p>Assigns a name to all file descriptors this socket unit encapsulates. This is useful to help activated services identify specific file descriptors, if multiple fds are passed. Services may use the <a class="reference internal" href="sd_listen_fds.html#sd-listen-fds-3"><span class="std std-ref">sd_listen_fds_with_names(3)</span></a> call to acquire the names configured for the received file descriptors. Names may contain any ASCII character, but must exclude control characters and “:”, and must be at most 255 characters in length. If this setting is not used, the file descriptor name defaults to the name of the socket unit (including its <code class="code docutils literal notranslate"><span class="pre">.socket</span></code> suffix) when <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=no</span></code>, “connection” otherwise.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 227.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-triggerlimitintervalsec">
+<span class="sig-name descname"><span class="pre">TriggerLimitIntervalSec=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-triggerlimitintervalsec" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-triggerlimitburst">
+<span class="sig-name descname"><span class="pre">TriggerLimitBurst=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-triggerlimitburst" title="Link to this definition">¶</a></dt>
+<dd><p>Configures a limit on how often this socket unit may be activated within a specific time interval. The <a class="reference internal" href="#systemd-option-systemd-socket-triggerlimitintervalsec"><code class="docutils literal notranslate"><span class="pre">TriggerLimitIntervalSec=</span></code></a> setting may be used to configure the length of the time interval in the usual time units “us”, “ms”, “s”, “min”, “h”, … and defaults to 2s (See <a class="reference internal" href="systemd.time.html#systemd-time-7"><span class="std std-ref">systemd.time(7)</span></a> for details on the various time units understood). The <a class="reference internal" href="#systemd-option-systemd-socket-triggerlimitburst"><code class="docutils literal notranslate"><span class="pre">TriggerLimitBurst=</span></code></a> setting takes a positive integer value and specifies the number of permitted activations per time interval, and defaults to 200 for <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=yes</span></code> sockets (thus by default permitting 200 activations per 2s), and 20 otherwise (20 activations per 2s). Set either to 0 to disable any form of trigger rate limiting.</p>
+<p>If the limit is hit, the socket unit is placed into a failure mode, and will not be connectible anymore until restarted. Note that this limit is enforced before the service activation is enqueued.</p>
+<p>Compare with <a class="reference internal" href="#systemd-option-systemd-socket-polllimitintervalsec"><code class="docutils literal notranslate"><span class="pre">PollLimitIntervalSec=</span></code></a>/<a class="reference internal" href="#systemd-option-systemd-socket-polllimitburst"><code class="docutils literal notranslate"><span class="pre">PollLimitBurst=</span></code></a> described below, which implements a temporary slowdown if a socket unit is flooded with incoming traffic, as opposed to the permanent failure state <a class="reference internal" href="#systemd-option-systemd-socket-triggerlimitintervalsec"><code class="docutils literal notranslate"><span class="pre">TriggerLimitIntervalSec=</span></code></a>/<a class="reference internal" href="#systemd-option-systemd-socket-triggerlimitburst"><code class="docutils literal notranslate"><span class="pre">TriggerLimitBurst=</span></code></a> results in.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 230.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-polllimitintervalsec">
+<span class="sig-name descname"><span class="pre">PollLimitIntervalSec=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-polllimitintervalsec" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-polllimitburst">
+<span class="sig-name descname"><span class="pre">PollLimitBurst=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-polllimitburst" title="Link to this definition">¶</a></dt>
+<dd><p>Configures a limit on how often polling events on the file descriptors backing this socket unit will be considered. This pair of settings is similar to <a class="reference internal" href="#systemd-option-systemd-socket-triggerlimitintervalsec"><code class="docutils literal notranslate"><span class="pre">TriggerLimitIntervalSec=</span></code></a>/<a class="reference internal" href="#systemd-option-systemd-socket-triggerlimitburst"><code class="docutils literal notranslate"><span class="pre">TriggerLimitBurst=</span></code></a> but instead of putting a (fatal) limit on the activation frequency puts a (transient) limit on the polling frequency. The expected parameter syntax and range are identical to that of the aforementioned options, and can be disabled the same way.</p>
+<p>If the polling limit is hit polling is temporarily disabled on it until the specified time window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger limit will not cause permanent failures. It’s the recommended mechanism to deal with DoS attempts through packet flooding.</p>
+<p>The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit which is enforced for the entire socket unit. This distinction matters for socket units that listen on multiple file descriptors (i.e. have multiple <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">ListenXYZ=</span></code> stanzas).</p>
+<p>These setting defaults to 150 (in case of <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=yes</span></code>) and 15 (otherwise) polling events per 2s. This is considerably lower than the default values for the trigger limit (see above) and means that the polling limit should typically ensure the trigger limit is never hit, unless one of them is reconfigured or disabled.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-defertrigger">
+<span class="sig-name descname"><span class="pre">DeferTrigger=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-defertrigger" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument, or “patient”. May only be used when <code class="xref systemd systemd-var docutils literal notranslate"><span class="pre">Accept=no</span></code>. If enabled, job mode “lenient” instead of “replace” is used when triggering the service, which means currently activating/running units that conflict with the service won’t be disturbed/brought down. Furthermore, if a conflict exists, the socket unit will wait for current job queue to complete and potentially defer the activation by then. An upper limit of total time to wait can be configured via <a class="reference internal" href="#systemd-option-systemd-socket-defertriggermaxsec"><code class="docutils literal notranslate"><span class="pre">DeferTriggerMaxSec=</span></code></a>. If set to <a class="reference internal" href="systemd-sysext.html#systemd-option-systemd-sysext-yes"><code class="docutils literal notranslate"><span class="pre">yes</span></code></a>, the socket unit will fail if all jobs have finished or the timeout has been reached but the conflict remains. If <code class="xref systemd systemd-option docutils literal notranslate"><span class="pre">patient</span></code>, always wait until <a class="reference internal" href="#systemd-option-systemd-socket-defertriggermaxsec"><code class="docutils literal notranslate"><span class="pre">DeferTriggerMaxSec=</span></code></a> elapses. Defaults to no.</p>
+<p>This setting is particularly useful if the socket unit should stay active across switch-root/soft-reboot operations while the triggered service is stopped.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-defertriggermaxsec">
+<span class="sig-name descname"><span class="pre">DeferTriggerMaxSec=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-defertriggermaxsec" title="Link to this definition">¶</a></dt>
+<dd><p>Configures the maximum time to defer the triggering when <a class="reference internal" href="#systemd-option-systemd-socket-defertrigger"><code class="docutils literal notranslate"><span class="pre">DeferTrigger=</span></code></a> is enabled. If the service cannot be activated within the specified time, the socket will be considered failed and get terminated. Takes a unit-less value in seconds, or a time span value such as “5min 20s”. Pass “0” or “infinity” to disable the timeout logic (the default).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-systemd-socket-passfiledescriptorstoexec">
+<span class="sig-name descname"><span class="pre">PassFileDescriptorsToExec=</span></span><a class="headerlink" href="#systemd-option-systemd-socket-passfiledescriptorstoexec" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a boolean argument. Defaults to off. If enabled, file descriptors created by the socket unit are passed to <a class="reference internal" href="#systemd-option-systemd-socket-execstartpost"><code class="docutils literal notranslate"><span class="pre">ExecStartPost=</span></code></a>, <a class="reference internal" href="#systemd-option-systemd-socket-execstoppre"><code class="docutils literal notranslate"><span class="pre">ExecStopPre=</span></code></a>, and <a class="reference internal" href="#systemd-option-systemd-socket-execstoppost"><code class="docutils literal notranslate"><span class="pre">ExecStopPost=</span></code></a> commands from the socket unit. The passed file descriptors can be accessed with <a class="reference internal" href="sd_listen_fds.html#sd-listen-fds-3"><span class="std std-ref">sd_listen_fds(3)</span></a> as if the commands were invoked from the associated service units. Note that <a class="reference internal" href="#systemd-option-systemd-socket-execstartpre"><code class="docutils literal notranslate"><span class="pre">ExecStartPre=</span></code></a> command cannot access socket file descriptors.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<p>Check <a class="reference internal" href="systemd.unit.html#systemd-unit-5"><span class="std std-ref">systemd.unit(5)</span></a>, <a class="reference internal" href="systemd.exec.html#systemd-exec-5"><span class="std std-ref">systemd.exec(5)</span></a>, and <a class="reference internal" href="systemd.kill.html#systemd-kill-5"><span class="std std-ref">systemd.kill(5)</span></a> for more settings.</p>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="systemd.html#systemd-1"><span class="std std-ref">systemd(1)</span></a>, <a class="reference external" href="https://man7.org/linux/man-pages/man1/systemctl.1.html">systemctl(1)</a>, <a class="reference internal" href="systemd-system.conf.html#systemd-system-conf-5"><span class="std std-ref">systemd-system.conf(5)</span></a>, <a class="reference internal" href="systemd.unit.html#systemd-unit-5"><span class="std std-ref">systemd.unit(5)</span></a>, <a class="reference internal" href="systemd.exec.html#systemd-exec-5"><span class="std std-ref">systemd.exec(5)</span></a>, <a class="reference internal" href="systemd.kill.html#systemd-kill-5"><span class="std std-ref">systemd.kill(5)</span></a>, <a class="reference internal" href="systemd.resource-control.html#systemd-resource-control-5"><span class="std std-ref">systemd.resource-control(5)</span></a>, <a class="reference internal" href="systemd.service.html#systemd-service-5"><span class="std std-ref">systemd.service(5)</span></a>, <a class="reference internal" href="../directives.html#systemd-directives-7"><span class="std std-ref">Directives</span></a>, <a class="reference internal" href="sd_listen_fds.html#sd-listen-fds-3"><span class="std std-ref">sd_listen_fds(3)</span></a>, <a class="reference internal" href="sd_listen_fds.html#sd-listen-fds-3"><span class="std std-ref">sd_listen_fds_with_names(3)</span></a></p>
+<p>For more extensive descriptions see the “systemd for Developers” series: <a class="reference external" href="https://0pointer.de/blog/projects/socket-activation.html">Socket Activation</a>, <a class="reference external" href="https://0pointer.de/blog/projects/socket-activation2.html">Socket Activation, part II</a>, <a class="reference external" href="https://0pointer.de/blog/projects/inetd.html">Converting inetd Services</a>, <a class="reference external" href="https://0pointer.de/blog/projects/socket-activated-containers.html">Socket Activated Internet Services and OS Containers</a>.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="systemd.special.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">systemd.special(7)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="systemd.slice.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">systemd.slice(5)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, systemd
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">systemd.socket(5)</a><ul>
+<li><a class="reference internal" href="#name">Name</a></li>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#automatic-dependencies">Automatic Dependencies</a></li>
+<li><a class="reference internal" href="#implicit-dependencies">Implicit Dependencies</a></li>
+<li><a class="reference internal" href="#default-dependencies">Default Dependencies</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/js/custom.js?v=abe08e2c"></script>
+    </body>
+</html>

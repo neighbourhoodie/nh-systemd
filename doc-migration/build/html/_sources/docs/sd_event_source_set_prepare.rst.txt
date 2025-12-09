@@ -1,0 +1,78 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_source_set_prepare
+:manvolnum: 3
+:summary: Set a preparation callback for event sources
+
+.. _sd_event_source_set_prepare(3):
+
+==============================
+sd_event_source_set_prepare(3)
+==============================
+
+Name
+####
+
+sd_event_source_set_prepare — Set a preparation callback for event sources
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   int sd_event_source_set_prepare(sd_event_source *source,
+	sd_event_handler_t callback); .. code-block::
+
+   typedef int (*sd_event_handler_t)(sd_event_source *s,
+	void *userdata);
+
+Description
+###########
+
+:code:`sd_event_source_set_prepare()` may be used to set a preparation callback for the event source object specified as :code:`source`. The callback function specified as :code:`callback` will be invoked immediately before the event loop goes to sleep to wait for incoming events. It is invoked with the user data pointer passed when the event source was created. The event source will be disabled if the callback function returns a negative error code. The callback function may be used to reconfigure the precise events to wait for. If the :code:`callback` parameter is passed as :code:`NULL` the callback function is reset.
+
+Event source objects have no preparation callback associated when they are first created with calls such as :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`. Preparation callback functions are supported for all event source types with the exception of those created with :ref:`sd_event_add_exit(3)`. Preparation callback functions are dispatched in the order indicated by the event source's priority field, as set with :ref:`sd_event_source_set_priority(3)`. Preparation callbacks of disabled event sources (see :ref:`sd_event_source_set_enabled(3)`) are not invoked.
+
+Return Value
+############
+
+On success, :code:`sd_event_source_set_prepare()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   :code:`source` is not a valid pointer to an sd_event_source object.
+
+.. systemd:option:: -ESTALE
+
+   The event loop is already terminated.
+
+.. systemd:option:: -ENOMEM
+
+   Not enough memory.
+
+.. systemd:option:: -ECHILD
+
+   The event loop has been created in a different process, library or module instance.
+
+.. systemd:option:: -EDOM
+
+   The specified event source has been created with :ref:`sd_event_add_exit(3)`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_source_set_prepare()` and :code:`sd_event_handler_t()` were added in version 229.
+
+See Also
+########
+
+:ref:`sd-event(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_source_set_enabled(3)`, :ref:`sd_event_source_set_priority(3)`, :ref:`sd_event_source_set_userdata(3)`
+
+

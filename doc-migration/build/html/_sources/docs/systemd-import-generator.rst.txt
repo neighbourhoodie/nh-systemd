@@ -1,0 +1,173 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-import-generator
+:manvolnum: 8
+:summary: Generator for automatically downloading disk images at boot
+
+.. _systemd-import-generator(8):
+
+===========================
+systemd-import-generator(8)
+===========================
+
+Name
+####
+
+systemd-import-generator — Generator for automatically downloading disk images at boot
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-import-generator`
+
+Description
+###########
+
+:code:`systemd-import-generator` may be used to automatically download disk images (tarballs or DDIs) via :ref:`systemd-importd.service(8)` at boot, based on parameters on the kernel command line or via system credentials. This is useful for automatically deploying an :ref:`systemd-confext(8)`, :ref:`systemd-sysext(8)`, :ref:`systemd-nspawn(1)`/ :ref:`systemd-vmspawn(1)` or :ref:`systemd-portabled.service(8)` image at boot. This provides functionality equivalent to :man-pages:`importctl(1)`, but accessible via the kernel command line and system credentials.
+
+:code:`systemd-import-generator` implements :ref:`systemd.generator(7)`.
+
+Kernel Command Line
+###################
+
+:code:`systemd-import-generator` understands the following :man-pages:`kernel-command-line(7)` parameters:
+
+.. systemd:option:: systemd.pull=
+   :group: kernel-commandline-options
+
+   This option takes a colon separate triplet of option string, local target image name and remote URL. The local target image name can be specified as an empty string, in which case the name is derived from the specified remote URL. The remote URL must using the "http://", "https://", "file://" schemes. The option string itself is a comma separated list of options:
+
+   .. systemd:option:: rw, ro
+      :group: kernel-commandline-options
+
+         Controls whether to mark the local image as read-only. If not specified read-only defaults to off.
+
+         .. versionadded:: 257
+
+   .. systemd:option:: verify=
+      :group: kernel-commandline-options
+
+         Controls whether to cryptographically validate the download before installing it in place. Takes one of "no", "checksum", or "signature" (the default if not specified). For details see the :systemd:option:`--verify=` of :man-pages:`importctl(1)`.
+
+         .. versionadded:: 257
+
+   .. systemd:option:: sysext, confext, machine, portable
+      :group: kernel-commandline-options
+
+         Controls the image class to download, and thus ultimately the target directory for the image, depending on this choice the target directory :code:`/var/lib/extensions/`, :code:`/var/lib/confexts/`, :code:`/var/lib/machines/` or :code:`/var/lib/portables/` is selected.
+
+         Specification of exactly one of these options is mandatory.
+
+         .. versionadded:: 257
+
+   .. systemd:option:: tar, raw
+      :group: kernel-commandline-options
+
+         Controls the type of resource to download, i.e. a (possibly compressed) tarball that needs to be unpacked into a file system tree, or (possibly compressed) raw disk image (DDI).
+
+         Specification of exactly one of these options is mandatory.
+
+         .. versionadded:: 257
+
+   .. systemd:option:: blockdev
+      :group: kernel-commandline-options
+
+         If this option is specified the downloaded image is attached to a loopback block device (via :code:`systemd-loop@.service`) after completion. This permits booting from downloaded disk images. This is only supported for "raw" disk images.
+
+         Note when this option is used with the purpose of mounting a disk image conforming to the `Discoverable Disk Image Specification <https://uapi-group.org/specifications/specs/discoverable_disk_image/>`_ as root file system, and the automatic GPT partition discovery logic as implemented by :ref:`systemd-gpt-auto-generator(8)` shall process it, it's essential to specify "rootdisk" as the local name for the import. Moreover, "root=gpt-auto" must be specified on the kernel command line explicitly. Also, prefix the "systemd.pull=" command line option with "rd." to ensure it is executed in the initial RAM disk (initrd) already, also see below.
+
+         .. versionadded:: 258
+
+   .. systemd:option:: bootorigin
+      :group: kernel-commandline-options
+
+         If this option is specified, in place of the URL a simple filename may be specified. If the system is booted via UEFI HTTP network booting the last component of the network boot origin URL is replaced by this filename and used as download source. This hence allows one to automatically derive the URLs for disk images from the original boot URL used to invoke the kernel or boot loader.
+
+         If this option is used and the system is not actually booted via UEFI HTTP network booting, the download is gracefully skipped. Or in other words without other modifications it is possible to put together an initrd image that will boot from a local disk if available, or from downloaded disk image if used via network booting.
+
+         .. versionadded:: 258
+
+   .. systemd:option:: runtime=
+      :group: kernel-commandline-options
+
+         Takes a boolean argument. If set to true, the image is downloaded below the :code:`/run/` hierarchy, if set to false below the :code:`/var/lib/` hierarchy. If not specified defaults to true in the initial RAM disk (initrd) and to false on the host system.
+
+         .. versionadded:: 258
+
+   .. versionadded:: 257
+
+.. systemd:option:: systemd.pull.success_action=, systemd.pull.failure_action=
+   :group: kernel-commandline-options
+
+   Controls whether to execute an action such as reboot, power-off and similar after completing the download successfully, or unsuccessfully. See :systemd:var:`SuccessAction=`/:systemd:var:`FailureAction=` on :ref:`systemd.unit(5)` for details about the available actions. If not specified, no action is taken, and the system will continue to boot normally.
+
+   .. versionadded:: 257
+
+These kernel command line options are interpreted by the host system only. If these options are prefixed with "rd." they are interpreted by the initial RAM disk (initrd) instead.
+
+Credentials
+###########
+
+:code:`systemd-import-generator` supports the system credentials logic. The following credentials are used when passed in:
+
+.. systemd:option:: import.pull
+   :group: system-credentials
+
+   This credential should be a text file, with each line referencing one download operation. Each line should follow the same format as the value of the :systemd:var:`systemd.pull=` kernel command line option described above.
+
+   .. versionadded:: 257
+
+Examples
+########
+
+Download Configuration Extension
+--------------------------------
+
+.. code-block:: sh
+
+   systemd.pull=raw,confext::https://example.com/myconfext.raw.gz
+
+With a kernel command line option like the above a configuration extension DDI is downloaded automatically at boot from the specified URL, validated cryptographically, uncompressed and installed.
+
+Download System Extension (Without Validation)
+----------------------------------------------
+
+.. code-block:: sh
+
+   systemd.pull=tar,sysext,verify=no::https://example.com/mysysext.tar.gz
+
+With a kernel command line option like the above a system extension tarball is downloaded automatically at boot from the specified URL, uncompressed and installed – without any cryptographic validation. This is useful for development purposes in virtual machines and containers. Warning: do not deploy a system with validation disabled like this!
+
+Download root disk image (raw) into memory, for booting into it
+---------------------------------------------------------------
+
+.. code-block:: sh
+
+   rd.systemd.pull=raw,machine,verify=no,blockdev:image:https://example.com/image.raw.xz root=/dev/disk/by-loop-ref/image.raw-part2
+
+This downloads the specified disk image, saving it locally under the name "image", and attaches it to a loopback block device on completion. It then boots from the 2nd partition in the image.
+
+Boot into disk image (raw), with URL derived from UEFI HTTP network booting
+---------------------------------------------------------------------------
+
+.. code-block:: sh
+
+   rd.systemd.pull=raw,machine,verify=no,blockdev,bootorigin:rootdisk:image.raw.xz root=gpt-auto
+
+This is similar to the previous example, but this time the source URL is automatically derived from the UEFI HTTP network boot URL. For example, if an UKI is booted from an URL "http://example.com/image.efi" this would result in a root disk being downloaded from "http://example.com/image.raw.xz". Moreover this uses the :ref:`systemd-gpt-auto-generator(8)` logic to mount the root file system from the disk image.
+
+Boot into disk image (tar), with URL derived from UEFI HTTP network booting
+---------------------------------------------------------------------------
+
+.. code-block:: sh
+
+   rd.systemd.pull=tar,machine,verify=no,bootorigin:root:image.tar.xz root=bind:/run/machines/root
+
+This is similar to the previous example, but instead of a raw (i.e. block device based) disk image the system boots into a tarball that is downloaded from the originating UEFI network server.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-importd.service(8)`, :man-pages:`kernel-command-line(7)`, :ref:`systemd.system-credentials(7)`, :man-pages:`importctl(1)`, :ref:`systemd-loop@.service(8)`, :ref:`systemd-gpt-auto-generator(8)`
+
+

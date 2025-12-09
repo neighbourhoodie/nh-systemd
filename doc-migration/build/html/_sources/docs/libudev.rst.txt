@@ -1,0 +1,55 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: libudev
+:manvolnum: 3
+:summary: API for enumerating and introspecting local devices
+
+.. _libudev(3):
+
+==========
+libudev(3)
+==========
+
+Name
+####
+
+libudev — API for enumerating and introspecting local devices
+
+Synopsis
+########
+
+:code:`#include <libudev.h>`
+
+:code:`pkg-config --cflags --libs libudev`
+
+Description
+###########
+
+:code:`libudev.h` provides an API to introspect and enumerate devices on the local system. This library is supported, but should not be used in new projects. Please see :ref:`sd-device(3)` for an equivalent replacement with a more modern API.
+
+All functions require a libudev context to operate. This context can be created via :man-pages:`udev_new(3)`. It is used to track library state and link objects together. No global state is used by libudev, everything is always linked to a udev context.
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove strict|
+    :end-before: .. inclusion-end-marker-do-not-remove strict|
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove getenv|
+    :end-before: .. inclusion-end-marker-do-not-remove getenv|
+
+To introspect a local device on a system, a udev device object can be created via :man-pages:`udev_device_new_from_syspath(3)` and friends. The device object allows one to query current state, read and write attributes and lookup properties of the device in question.
+
+To enumerate local devices on the system, an enumeration object can be created via :man-pages:`udev_enumerate_new(3)`.
+
+To monitor the local system for hotplugged or unplugged devices, a monitor can be created via :man-pages:`udev_monitor_new_from_netlink(3)`.
+
+Whenever libudev returns a list of objects, the :man-pages:`udev_list_entry(3)` API should be used to iterate, access and modify those lists.
+
+Furthermore, libudev also exports legacy APIs that should not be used by new software (and as such are not documented as part of this manual). This includes the hardware database known as :code:`udev_hwdb` (please use the new :ref:`sd-hwdb(3)` API instead) and the :code:`udev_queue` object to query the udev daemon (which should not be used by new software at all).
+
+See Also
+########
+
+:man-pages:`udev_new(3)`, :man-pages:`udev_device_new_from_syspath(3)`, :man-pages:`udev_enumerate_new(3)`, :man-pages:`udev_monitor_new_from_netlink(3)`, :man-pages:`udev_list_entry(3)`, :ref:`systemd(1)`, :ref:`sd-device(3)`, :ref:`sd-hwdb(3)`, :die-net:`pkg-config(1)`
+
+

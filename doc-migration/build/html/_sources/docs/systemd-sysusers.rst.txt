@@ -1,0 +1,159 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-sysusers
+:manvolnum: 8
+:summary: Allocate system users and groups
+:aliases: systemd-sysusers.service
+
+.. _systemd-sysusers(8):
+
+===================
+systemd-sysusers(8)
+===================
+
+Name
+####
+
+systemd-sysusers, systemd-sysusers.service — Allocate system users and groups
+
+Synopsis
+########
+
+:code:`systemd-sysusers [OPTIONS...] [<CONFIGFILE>...]`
+
+:code:`systemd-sysusers.service`
+
+Description
+###########
+
+:code:`systemd-sysusers` creates system users and groups, based on files in the format described in :man-pages:`sysusers.d(5)`.
+
+If invoked with no arguments, directives from the configuration files found in the directories specified by :man-pages:`sysusers.d(5)` are executed. When invoked with positional arguments, if option :code:`--replace=:emphasis:`PATH`` is specified, arguments specified on the command line are used instead of the configuration file :emphasis:`PATH`. Otherwise, just the configuration specified by the command line arguments is executed. If the string "-" is specified instead of a filename, the configuration is read from standard input. If the argument is a file name (without any slashes), all configuration directories are searched for a matching file and the file found that has the highest priority is executed. If the argument is a path, that file is used directly without searching the configuration directories for any other matching file.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --root=root
+
+   Takes a directory path as an argument. All paths will be prefixed with the given alternate :emphasis:`root` path, including config search paths.
+
+   .. versionadded:: 215
+
+.. systemd:option:: --image=image
+
+   Takes a path to a disk image file or block device node. If specified all operations are applied to file system in the indicated disk image. This is similar to :code:`--root=` but operates on file systems stored in disk images or block devices. The disk image should either contain just a file system or a set of file systems within a GPT partition table, following the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_. For further information on supported disk images, see :ref:`systemd-nspawn(1)`'s switch of the same name.
+
+   .. versionadded:: 247
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove image-policy-open|
+    :end-before: .. inclusion-end-marker-do-not-remove image-policy-open|
+
+.. systemd:option:: --replace=PATH
+
+   When this option is given, one or more positional arguments must be specified. All configuration files found in the directories listed in :man-pages:`sysusers.d(5)` will be read, and the configuration given on the command line will be handled instead of and with the same priority as the configuration file :emphasis:`PATH`.
+
+   This option is intended to be used when package installation scripts are running and files belonging to that package are not yet available on disk, so their contents must be given on the command line, but the admin configuration might already exist and should be given higher priority.
+
+   RPM installation script for radvd
+   ---------------------------------
+
+     .. code-block:: sh
+
+        echo 'u radvd - "radvd daemon"' | \
+                  systemd-sysusers --replace=/usr/lib/sysusers.d/radvd.conf -
+
+   This will create the radvd user as if :code:`/usr/lib/sysusers.d/radvd.conf` was already on disk. An admin might override the configuration specified on the command line by placing :code:`/etc/sysusers.d/radvd.conf` or even :code:`/etc/sysusers.d/00-overrides.conf`.
+
+   Note that this is the expanded form, and when used in a package, this would be written using a macro with "radvd" and a file containing the configuration line as arguments.
+
+   .. versionadded:: 238
+
+.. systemd:option:: --dry-run
+
+   Process the configuration and figure out what entries would be created, but do not actually write anything.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --inline
+
+   Treat each positional argument as a separate configuration line instead of a file name.
+
+   .. versionadded:: 238
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove cat-config|
+    :end-before: .. inclusion-end-marker-do-not-remove cat-config|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove tldr|
+    :end-before: .. inclusion-end-marker-do-not-remove tldr|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Credentials
+###########
+
+:code:`systemd-sysusers` supports the service credentials logic as implemented by :code:`ImportCredential=`/:code:`LoadCredential=`/:code:`SetCredential=` (see :ref:`systemd.exec(5)` for details). The following credentials are used when passed in:
+
+.. systemd:option:: passwd.hashed-password.user
+   :group: system-credentials
+
+   A UNIX hashed password string to use for the specified user, when creating an entry for it. This is particularly useful for the "root" user as it allows provisioning the default root password to use via a unit file drop-in or from a container manager passing in this credential. Note that setting this credential has no effect if the specified user account already exists. This credential is hence primarily useful in first boot scenarios or systems that are fully stateless and come up with an empty :code:`/etc/` on every boot.
+
+   .. versionadded:: 249
+
+.. systemd:option:: passwd.plaintext-password.user
+   :group: system-credentials
+
+   Similar to "passwd.hashed-password.:emphasis:`user`" but expect a literal, plaintext password, which is then automatically hashed before used for the user account. If both the hashed and the plaintext credential are specified for the same user the former takes precedence. It's generally recommended to specify the hashed version; however in test environments with weaker requirements on security it might be easier to pass passwords in plaintext instead.
+
+   .. versionadded:: 249
+
+.. systemd:option:: passwd.shell.user
+   :group: system-credentials
+
+   Specifies the shell binary to use for the specified account when creating it.
+
+   .. versionadded:: 249
+
+.. systemd:option:: sysusers.extra
+   :group: system-credentials
+
+   The contents of this credential may contain additional lines to operate on. The credential contents should follow the same format as any other :code:`sysusers.d/` drop-in. If this credential is passed it is processed after all of the drop-in files read from the file system.
+
+   .. versionadded:: 252
+
+Note that by default the :code:`systemd-sysusers.service` unit file is set up to inherit the "passwd.hashed-password.root", "passwd.plaintext-password.root", "passwd.shell.root" and "sysusers.extra" credentials from the service manager. Thus, when invoking a container with an unpopulated :code:`/etc/` for the first time it is possible to configure the root user's password to be "systemd" like this:
+
+.. code-block:: sh
+
+   # systemd-nspawn --image=… --set-credential=passwd.hashed-password.root:'$y$j9T$yAuRJu1o5HioZAGDYPU5d.$F64ni6J2y2nNQve90M/p0ZP0ECP/qqzipNyaY9fjGpC' …
+
+Note again that the data specified in this credential is consulted only when creating an account for the first time, it may not be used for changing the password or shell of an account that already exists.
+
+Use :man-pages:`mkpasswd(1)` for generating UNIX password hashes from the command line.
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`sysusers.d(5)`, `Users, Groups, UIDs and GIDs on systemd systems <https://systemd.io/UIDS-GIDS>`_, :ref:`systemd.exec(5)`, :man-pages:`mkpasswd(1)`
+
+

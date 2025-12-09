@@ -1,0 +1,130 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-socket-activate
+:manvolnum: 1
+:summary: Test socket activation of daemons
+
+.. _systemd-socket-activate(1):
+
+==========================
+systemd-socket-activate(1)
+==========================
+
+Name
+####
+
+systemd-socket-activate — Test socket activation of daemons
+
+Synopsis
+########
+
+:code:`systemd-socket-activate [OPTIONS...] COMMAND [ARGS...]`
+
+Description
+###########
+
+:code:`systemd-socket-activate` may be used to launch a socket-activated service program from the command line for testing purposes. It may also be used to launch individual instances of the service program per connection.
+
+The daemon to launch and its options should be specified after options intended for :code:`systemd-socket-activate`.
+
+If the :code:`--inetd` option is given, the socket file descriptor will be used as the standard input and output of the launched process. Otherwise, standard input and output will be inherited, and sockets will be passed through file descriptors 3 and higher. Sockets passed through :code:`$LISTEN_FDS` to :code:`systemd-socket-activate` will be passed through to the daemon, in the original positions. Other sockets specified with :code:`--listen=` will use consecutive descriptors. By default, :code:`systemd-socket-activate` listens on a stream socket, use :code:`--datagram` and :code:`--seqpacket` to listen on datagram or sequential packet sockets instead (see below).
+
+Options
+#######
+
+.. systemd:option:: -l address, --listen=address
+
+   Listen on this :emphasis:`address`. Takes a string like "2000" or "127.0.0.1:2001".
+
+   .. versionadded:: 230
+
+.. systemd:option:: -a, --accept
+
+   Launch an instance of the service program for each connection and pass the connection socket. May not be combined with :code:`--now`.
+
+   .. versionadded:: 230
+
+.. systemd:option:: -d, --datagram
+
+   Listen on a datagram socket (:code:`SOCK_DGRAM`), instead of a stream socket (:code:`SOCK_STREAM`). May not be combined with :code:`--seqpacket`.
+
+   .. versionadded:: 230
+
+.. systemd:option:: --seqpacket
+
+   Listen on a sequential packet socket (:code:`SOCK_SEQPACKET`), instead of a stream socket (:code:`SOCK_STREAM`). May not be combined with :code:`--datagram`.
+
+   .. versionadded:: 230
+
+.. systemd:option:: --inetd
+
+   Use the inetd protocol for passing file descriptors, i.e. as standard input and standard output, instead of the new-style protocol for passing file descriptors using :code:`$LISTEN_FDS` (see above).
+
+   .. versionadded:: 230
+
+.. systemd:option:: -E VAR[=VALUE], --setenv=VAR[=VALUE]
+
+   Add this variable to the environment of the launched process. If :emphasis:`VAR` is followed by "=", assume that it is a variable–value pair. Otherwise, obtain the value from the environment of :code:`systemd-socket-activate` itself.
+
+   .. versionadded:: 230
+
+.. systemd:option:: --fdname=NAME[:NAME…]
+
+   Specify names for the file descriptors passed. This is equivalent to setting :code:`FileDescriptorName=` in socket unit files, and enables use of :ref:`sd_listen_fds_with_names(3)`. Multiple entries may be specifies using separate options or by separating names with colons (":") in one option. In case more names are given than descriptors, superfluous ones will be ignored. In case less names are given than descriptors, the remaining file descriptors will be unnamed.
+
+   .. versionadded:: 230
+
+.. systemd:option:: --now
+
+   Start the service program instantly, instead of waiting for a connection on the socket(s). May not be combined with :code:`--accept`.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Environment variables
+#####################
+
+.. systemd:var:: $LISTEN_FDS, $LISTEN_PID, $LISTEN_PIDFDID, $LISTEN_FDNAMES
+   :group: environment-variables
+
+   See :ref:`sd_listen_fds(3)`.
+
+   .. versionadded:: 230
+
+.. systemd:var:: $SYSTEMD_LOG_TARGET, $SYSTEMD_LOG_LEVEL, $SYSTEMD_LOG_TIME, $SYSTEMD_LOG_COLOR, $SYSTEMD_LOG_LOCATION
+   :group: environment-variables
+
+   Same as in :ref:`systemd(1)`.
+
+   .. versionadded:: 230
+
+Examples
+########
+
+Run an echo server on port 2000
+-------------------------------
+
+.. code-block:: sh
+
+   $ systemd-socket-activate -l 2000 --inetd -a cat
+
+Run a socket-activated instance of :ref:`systemd-journal-gatewayd(8)`
+---------------------------------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-socket-activate -l 19531 /usr/lib/systemd/systemd-journal-gatewayd
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.socket(5)`, :ref:`systemd.service(5)`, :ref:`systemd-run(1)`, :ref:`sd_listen_fds(3)`, :ref:`sd_listen_fds_with_names(3)`, :man-pages:`cat(1)`
+
+

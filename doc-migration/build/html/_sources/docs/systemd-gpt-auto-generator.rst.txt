@@ -1,0 +1,218 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-gpt-auto-generator
+:manvolnum: 8
+:summary: Generator for automatically discovering and mounting root,
+
+.. _systemd-gpt-auto-generator(8):
+
+=============================
+systemd-gpt-auto-generator(8)
+=============================
+
+Name
+####
+
+systemd-gpt-auto-generator — Generator for automatically discovering and mounting root,
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-gpt-auto-generator`
+
+Description
+###########
+
+:code:`systemd-gpt-auto-generator` is a unit generator that automatically discovers the root partition, :code:`/home/`, :code:`/srv/`, :code:`/var/`, :code:`/var/tmp/`, the EFI System Partition (ESP), the Extended Boot Loader Partition (XBOOTLDR), and swap partitions and creates mount and swap units for them, based on the partition type GUIDs of GUID partition tables (GPT). See `UEFI Specification <https://uefi.org/specifications>`_, chapter 5 for more details. It implements the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_.
+
+Note that this generator has no effect on non-GPT systems. It will also not create mount point configuration for directories which already contain files or if the mount point is explicitly configured in :man-pages:`fstab(5)`. Additionally no unit will be created for the ESP or the XBOOTLDR partition if mount entries are found in the :code:`/boot/` or :code:`/efi/` hierarchies in :man-pages:`fstab(5)`.
+
+If the units this generator creates are overridden, for example by units in directories with higher precedence, drop-ins and additional dependencies created by this generator might still be used.
+
+When run in the initial RAM disk (initrd) this generator can automatically search for the root file system. Specifically: *    It will look for the root partition on the same physical disk where the EFI System Partition (ESP) is located. Note that support from the boot loader is required for this to work: the EFI variable :code:`LoaderDevicePartUUID` of the :code:`4a67b082-0a4c-41cf-b6c7-440b29bb8c4f` vendor UUID is used to determine from which partition (and hence disk) the system was booted. If the boot loader does not set this variable, this generator will not be able to detect the root partition. See the `Boot Loader Interface <https://systemd.io/BOOT_LOADER_INTERFACE>`_ for details.
+
+*    Alternatively, it will look for the root file system on a loopback block device whose ".lo_name" field is set to one of the literal strings "rootdisk" or "rootdisk.raw". This field can be set via :code:`losetup`'s :code:`--loop-ref=` string. For images downloaded via :ref:`systemd-import-generator(8)` make sure to set the "blockdev" option and set the local name string to "rootdisk" to achieve this effect. Note that discovery of the root file system on loopback block devices like this is only done if "root=gpt-auto" or "root=dissect" is specified explicitly on the kernel command line, unlike the discovery based on the boot loader reported ESP which is also enabled if no "root=" parameter is specified at all. (The latter relies on :code:`systemd-udevd.service`'s :code:`/dev/gpt-auto-root` block device symlink generation).
+
+When run on the host system (i.e. after successfully transitioning out of the initrd into the root filesystem) this generator will look for all other partitions on the same physical disk as the root partition. For this discovery, boot loader support is not required. Moreover, it is not required that the root partition was automatically discovered by the initrd (as described above) for the discovery of the non-root file partitions to take place. Or in other words: automatic discovery of the root file system and of the non-root file systems are independent operations, that do not rely on each other, and are done during two distinct phases of the boot process (one in the initrd, the other after). These partitions will not be searched for on systems where the root file system is distributed on multiple disks, for example via btrfs RAID.
+
+The root partition can be configured explicitly by symlinking :code:`/run/systemd/volatile-root` to :code:`/dev/block/$major:$minor`. This is especially useful if the root mount has been replaced by some form of volatile file system (overlayfs).
+
+:code:`systemd-gpt-auto-generator` is useful for centralizing file system configuration in the partition table and making configuration in :code:`/etc/fstab` or on the kernel command line unnecessary.
+
+This generator looks for the partitions based on their partition type GUID. The following partition type GUIDs are identified:
+
+.. list-table:: Partition Type GUIDs
+   :header-rows: 1
+
+   * - Partition Type
+     - GUID
+     - Name
+     - Mount Point
+     - Explanation
+   * - :code:`SD_GPT_ROOT_X86_64`
+     - :code:`4f68bce3-e8cd-4db1-96e7-fbcaf984b709`
+     - :code:`Root Partition (x86-64)`
+     - :code:`/`
+     - The first partition with this type UUID, located on the same disk as the ESP used for booting, is used as the root file system :code:`/` on AMD64 / 64-bit x86 systems.
+   * - :code:`SD_GPT_ROOT_ARM64`
+     - :code:`b921b045-1df0-41c3-af44-4c6f280d3fae`
+     - :code:`Root Partition (64-bit ARM)`
+     - :code:`/`
+     - The first partition with this type UUID, located on the same disk as the ESP used for booting, is used as the root file system :code:`/` on AArch64 / 64-bit ARM systems.
+   * - :code:`SD_GPT_ROOT_ALPHA` :code:`SD_GPT_ROOT_ARC` :code:`SD_GPT_ROOT_ARM` :code:`SD_GPT_ROOT_ARM64` :code:`SD_GPT_ROOT_IA64` :code:`SD_GPT_ROOT_LOONGARCH64` :code:`SD_GPT_ROOT_MIPS` :code:`SD_GPT_ROOT_MIPS64` :code:`SD_GPT_ROOT_MIPS_LE` :code:`SD_GPT_ROOT_MIPS64_LE` :code:`SD_GPT_ROOT_PARISC` :code:`SD_GPT_ROOT_PPC` :code:`SD_GPT_ROOT_PPC64` :code:`SD_GPT_ROOT_PPC64_LE` :code:`SD_GPT_ROOT_RISCV32` :code:`SD_GPT_ROOT_RISCV64` :code:`SD_GPT_ROOT_S390` :code:`SD_GPT_ROOT_S390X` :code:`SD_GPT_ROOT_TILEGX` :code:`SD_GPT_ROOT_X86` :code:`SD_GPT_ROOT_X86_64` :code:`SD_GPT_USR_ALPHA` :code:`SD_GPT_USR_ARC` :code:`SD_GPT_USR_ARM` :code:`SD_GPT_USR_IA64` :code:`SD_GPT_USR_LOONGARCH64` :code:`SD_GPT_USR_MIPS_LE` :code:`SD_GPT_USR_MIPS64_LE` :code:`SD_GPT_USR_PARISC` :code:`SD_GPT_USR_PPC` :code:`SD_GPT_USR_PPC64` :code:`SD_GPT_USR_PPC64_LE` :code:`SD_GPT_USR_RISCV32` :code:`SD_GPT_USR_RISCV64` :code:`SD_GPT_USR_S390` :code:`SD_GPT_USR_S390X` :code:`SD_GPT_USR_TILEGX` :code:`SD_GPT_USR_X86`
+     - …
+     - Root partitions for other architectures
+     - :code:`/`
+     - The first partition with the type UUID matching the architecture, located on the same disk as the ESP used for booting, is used as the root file system :code:`/`. For the full list and constant values, see `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_.
+   * - :code:`SD_GPT_HOME`
+     - :code:`933ac7e1-2eb4-4f13-b844-0e14e2aef915`
+     - Home Partition
+     - :code:`/home/`
+     - The first partition with this type UUID on the same disk as the root partition is mounted to :code:`/home/`.
+   * - :code:`SD_GPT_SRV`
+     - :code:`3b8f8425-20e0-4f3b-907f-1a25a76f98e8`
+     - Server Data Partition
+     - :code:`/srv/`
+     - The first partition with this type UUID on the same disk as the root partition is mounted to :code:`/srv/`.
+   * - :code:`SD_GPT_VAR`
+     - :code:`4d21b016-b534-45c2-a9fb-5c16e091fd2d`
+     - Variable Data Partition
+     - :code:`/var/`
+     - The first partition with this type UUID on the same disk as the root partition is mounted to :code:`/var/` — under the condition its partition UUID matches the first 128 bit of the HMAC-SHA256 of the GPT type uuid of this partition keyed by the machine ID of the installation stored in :man-pages:`machine-id(5)`. This can be generated using :ref:`systemd-id128(1)`.
+   * - :code:`SD_GPT_TMP`
+     - :code:`7ec6f557-3bc5-4aca-b293-16ef5df639d1`
+     - Temporary Data Partition
+     - :code:`/var/tmp/`
+     - The first partition with this type UUID on the same disk as the root partition is mounted to :code:`/var/tmp/`.
+   * - :code:`SD_GPT_SWAP`
+     - :code:`0657fd6d-a4ab-43c4-84e5-0933c84b4f4f`
+     - Swap
+     - n/a
+     - All partitions with this type UUID on the same disk as the root partition are used as swap.
+   * - :code:`SD_GPT_ESP`
+     - :code:`c12a7328-f81f-11d2-ba4b-00a0c93ec93b`
+     - EFI System Partition (ESP)
+     - :code:`/efi/` or :code:`/boot/`
+     - The first partition with this type UUID located on the same disk as the root partition is mounted to :code:`/boot/` or :code:`/efi/`, see below.
+   * - :code:`SD_GPT_XBOOTLDR`
+     - :code:`bc13c2ff-59e6-4262-a352-b275fd6f7172`
+     - Extended Boot Loader Partition
+     - :code:`/boot/`
+     - The first partition with this type UUID located on the same disk as the root partition is mounted to :code:`/boot/`, see below.
+
+This generator understands the following attribute flags for partitions:
+
+.. list-table:: Partition Attribute Flags
+   :header-rows: 1
+
+   * - Flag
+     - Value
+     - Applicable to
+     - Explanation
+   * - :code:`SD_GPT_FLAG_READ_ONLY`
+     - :code:`0x1000000000000000`
+     - :code:`/`, :code:`/home/`, :code:`/srv/`, :code:`/var/`, :code:`/var/tmp/`, Extended Boot Loader Partition
+     - Partition is mounted read-only
+   * - :code:`SD_GPT_FLAG_NO_AUTO`
+     - :code:`0x8000000000000000`
+     - :code:`/`, :code:`/home/`, :code:`/srv/`, :code:`/var/`, :code:`/var/tmp/`, Extended Boot Loader Partition
+     - Partition is not mounted automatically
+   * - :code:`SD_GPT_FLAG_NO_BLOCK_IO_PROTOCOL`
+     - :code:`0x0000000000000002`
+     - EFI System Partition (ESP)
+     - Partition is not mounted automatically
+
+The :code:`/home/`, :code:`/srv/`, :code:`/var/`, :code:`/var/tmp/` and swap partitions may be encrypted in LUKS format. In this case, a device mapper device is set up under the names :code:`/dev/mapper/home`, :code:`/dev/mapper/srv`, :code:`/dev/mapper/var`, :code:`/dev/mapper/tmp` or :code:`/dev/mapper/swap`. Note that this might create conflicts if the same partition is listed in :code:`/etc/crypttab` with a different device mapper device name.
+
+When systemd is running in the initrd the :code:`/` partition may be encrypted with LUKS as well. In this case, a device mapper device is set up under the name :code:`/dev/mapper/root`, and a :code:`sysroot.mount` is set up that mounts the device under :code:`/sysroot`. For more information, see :man-pages:`bootup(7)`.
+
+Mount and automount units for the EFI System Partition (ESP) and Extended Boot Loader Partition (XBOOTLDR) are generated on EFI systems. If the disk contains an XBOOTLDR partition, as defined in the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_, it is made available at :code:`/boot/`. This generator creates an automount unit; the mount will only be activated on-demand when accessed. The mount point will be created if necessary.
+
+The ESP is mounted to :code:`/boot/` if that directory exists and is not used for XBOOTLDR, and otherwise to :code:`/efi/`. Same as for :code:`/boot/`, an automount unit is used. The mount point will be created if necessary.
+
+No configuration is created for mount points that are configured in :man-pages:`fstab(5)` or when the target directory contains files.
+
+When using this generator in conjunction with btrfs file systems, make sure to set the correct default subvolumes on them, using :code:`btrfs subvolume set-default`.
+
+If the system was booted via :ref:`systemd-stub(7)` and the stub reported to userspace that the kernel image was measured to a TPM2 PCR, then any discovered root and :code:`/var/` volume identifiers (and volume encryption key in case it is encrypted) will be automatically measured into PCR 15 on activation, via :ref:`systemd-pcrfs@.service(8)`.
+
+Mount constraint metadata contained in the file systems is validated by pulling in :ref:`systemd-validatefs@.service(8)` for generated mounts.
+
+:code:`systemd-gpt-auto-generator` implements :ref:`systemd.generator(7)`.
+
+Kernel Command Line
+###################
+
+:code:`systemd-gpt-auto-generator` understands the following kernel command line parameters:
+
+.. systemd:option:: systemd.gpt_auto, rd.systemd.gpt_auto
+   :group: kernel-commandline-options
+
+   Those options take an optional boolean argument, and default to yes. The generator is enabled by default, and a false value may be used to disable it (e.g. "systemd.gpt_auto=0").
+
+   .. versionadded:: 242
+
+.. systemd:option:: systemd.image_policy=
+   :group: kernel-commandline-options
+
+   Takes an image dissection policy string as argument (as per :ref:`systemd.image-policy(7)`), and allows enforcing a policy on dissection and use of the automatically discovered GPT partition table entries.
+
+   Note that the specified image policy is not taken into account for automatic root or :code:`/usr/` file system discovery unless :systemd:var:`root=dissect`/:systemd:var:`mount.usr=dissect` (or :systemd:var:`root=dissect-force`) are specified. (The policy will always be applied to the other auto-discoverable partition types.)
+
+   .. versionadded:: 254
+
+.. systemd:option:: systemd.image_filter=
+   :group: kernel-commandline-options
+
+   Takes an image dissection filter string as argument (as per :ref:`systemd.image-filter(7)`), and allows enforcing a set of globbing patterns on the partition matching of the automatically discovered GPT partition table entries.
+
+   Note that the specified image filter is not taken into account for automatic root or :code:`/usr/` file system discovery unless :systemd:var:`root=dissect`/:systemd:var:`mount.usr=dissect` (or :systemd:var:`root=dissect-force`) are specified. (The filter will always be applied to the other auto-discoverable partition types.)
+
+   .. versionadded:: 258
+
+.. systemd:option:: root=, rootfstype=, rootflags=
+   :group: kernel-commandline-options
+
+   When :systemd:var:`root=` is used with the special value "gpt-auto", basic automatic discovery of the root partition based on the GPT partition type is enabled. Use of the root partition is delayed until factory reset mode is left, in case it is enabled during the current boot. See `Factory Reset <https://systemd.io/FACTORY_RESET>`_ for more information on that. If "gpt-auto-force" is specified automatic discovery of the root partition is enabled, ignoring any factory reset mode.
+
+   If :systemd:var:`root=` is set to the special value "dissect" full automatic discovery of the root partition based on GPT partition information is enabled. This is a superset of :systemd:var:`root=gpt-auto`, as it automatically configures Verity partitions (including signature-based setup) following the logic defined for that in the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification/>`_. Moreover it takes the configured image policy and image filter into account for all partition types, including the root file system. "root=dissect" will wait for the factory reset phase to be completed if it is in effect before activating the root file system. Use "root=dissect-force" to ignore the factory reset phase and activate the root file system immediately.
+
+   Any other value (i.e. besides "gpt-auto", "gpt-auto-force", "dissect", "dissect-force") disables automatic root file system discovery.
+
+   If :systemd:var:`root=` is not specified at all on the kernel command line automatic discovery of the root partition via the ESP reported by the boot loader is also enabled (taking factory reset state into account, i.e. equivalent to "root=gpt-auto"), however in this case discovery based on the loopback block device ".lo_name" field is not enabled.
+
+   The :systemd:var:`rootfstype=` and :systemd:var:`rootflags=` options are used to select the file system type and options when the root file system is automatically discovered.
+
+   .. versionadded:: 242
+
+.. systemd:option:: mount.usr=, mount.usrfstype=, mount.usrflags=
+   :group: kernel-commandline-options
+
+   Similar to :systemd:var:`root=`, :systemd:var:`rootfstype=`, :systemd:var:`rootflags=` (see above), but applies to the :code:`/usr/` partition instead. Note that the "gpt-auto", "gpt-auto-force", "dissect-force" settings that :code:`root=` understands are not supported by :systemd:var:`mount.usr=` (however "dissect" is).
+
+   Also note that automatic partition discovery for :code:`/usr/` must be enabled explicitly, unlike the discovery for the root file system, which is enabled if no :systemd:var:`root=` parameter is passed at all.
+
+   .. versionadded:: 258
+
+.. systemd:option:: rw, ro
+   :group: kernel-commandline-options
+
+   Mount the root partition read-write or read-only *initially*\..
+
+   Note that unlike most kernel command line options these settings do not override configuration in the file system, and the file system may be remounted later. See :ref:`systemd-remount-fs.service(8)`.
+
+   .. versionadded:: 242
+
+.. systemd:option:: systemd.swap=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument or enables the option if specified without an argument. If disabled, automatic discovery of swap partition(s) based on GPT partition type is disabled. Defaults to enabled.
+
+   .. versionadded:: 254
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.mount(5)`, :ref:`systemd.swap(5)`, :ref:`systemd-fstab-generator(8)`, :ref:`systemd-cryptsetup@.service(8)`, :ref:`systemd-pcrfs@.service(8)`, :ref:`systemd-validatefs@.service(8)`, :man-pages:`machine-id(5)`, :die-net:`cryptsetup(8)`, :man-pages:`fstab(5)`, `btrfs(8) <https://btrfs.readthedocs.io/en/latest/btrfs.html>`_
+
+

@@ -1,0 +1,66 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: oomctl
+:manvolnum: 1
+:summary: Analyze the state stored in
+
+.. _oomctl(1):
+
+=========
+oomctl(1)
+=========
+
+Name
+####
+
+oomctl — Analyze the state stored in
+
+Synopsis
+########
+
+:code:`oomctl [OPTIONS...] {COMMAND}`
+
+Description
+###########
+
+:code:`oomctl` may be used to get information about the various contexts read in by the :ref:`systemd(1)` userspace out-of-memory (OOM) killer, :ref:`systemd-oomd(8)`.
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: dump
+
+   Show the current state of the cgroups and system contexts stored by :code:`systemd-oomd`.
+
+   .. versionadded:: 247
+
+Options
+#######
+
+The following options are understood:
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-oomd.service(8)`, :man-pages:`oomd.conf(5)`
+
+

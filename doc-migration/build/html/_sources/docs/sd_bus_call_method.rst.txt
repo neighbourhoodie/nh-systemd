@@ -1,0 +1,116 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_call_method
+:manvolnum: 3
+:summary: Initialize a bus message object and invoke the corresponding D-Bus method call
+:aliases: sd_bus_call_methodv, sd_bus_call_method_async, sd_bus_call_method_asyncv
+
+.. _sd_bus_call_method(3):
+
+=====================
+sd_bus_call_method(3)
+=====================
+
+Name
+####
+
+sd_bus_call_method, sd_bus_call_methodv, sd_bus_call_method_async, sd_bus_call_method_asyncv — Initialize a bus message object and invoke the corresponding D-Bus method call
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. include:: sd_bus_add_match.rst
+    :start-after: .. inclusion-marker-do-not-remove sd_bus_message_handler_t|
+    :end-before: .. inclusion-end-marker-do-not-remove sd_bus_message_handler_t|
+
+.. code-block::
+
+   int sd_bus_call_method(sd_bus *bus,
+	const char *destination,
+	const char *path,
+	const char *interface,
+	const char *member,
+	sd_bus_error *ret_error,
+	sd_bus_message **reply,
+	const char *types,
+	...); .. code-block::
+
+   int sd_bus_call_methodv(sd_bus *bus,
+	const char *destination,
+	const char *path,
+	const char *interface,
+	const char *member,
+	sd_bus_error *ret_error,
+	sd_bus_message **reply,
+	const char *types,
+	va_list ap); .. code-block::
+
+   int sd_bus_call_method_async(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *destination,
+	const char *path,
+	const char *interface,
+	const char *member,
+	sd_bus_message_handler_t callback,
+	void *userdata,
+	const char *types,
+	...); .. code-block::
+
+   int sd_bus_call_method_asyncv(sd_bus *bus,
+	sd_bus_slot **slot,
+	const char *destination,
+	const char *path,
+	const char *interface,
+	const char *member,
+	sd_bus_message_handler_t callback,
+	void *userdata,
+	const char *types,
+	va_list ap);
+
+Description
+###########
+
+:code:`sd_bus_call_method()` is a convenience function for initializing a bus message object and calling the corresponding D-Bus method. It combines the :ref:`sd_bus_message_new_method_call(3)`, :ref:`sd_bus_message_append(3)` and :ref:`sd_bus_call(3)` functions into a single function call.
+
+:code:`sd_bus_call_method_async()` is a convenience function for initializing a bus message object and calling the corresponding D-Bus method asynchronously. It combines the :ref:`sd_bus_message_new_method_call(3)`, :ref:`sd_bus_message_append(3)` and :ref:`sd_bus_call_async(3)` functions into a single function call.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+See the man pages of :ref:`sd_bus_message_new_method_call(3)`, :ref:`sd_bus_message_append(3)`, :ref:`sd_bus_call(3)` and :ref:`sd_bus_call_async(3)` for a list of possible errors.
+
+.. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+Examples
+########
+
+Make a call to a D-Bus method that takes a single parameter
+-----------------------------------------------------------
+
+.. literalinclude:: /code-examples/c/print-unit-path-call-method.c
+    :language: c
+
+This defines a minimally useful program that will open a connection to the bus, call a method, wait for the reply, and finally extract and print the answer. It does error handling and proper memory management.
+
+History
+#######
+
+:code:`sd_bus_call_method()`, and :code:`sd_bus_call_method_async()` were added in version 221.
+
+:code:`sd_bus_call_methodv()`, :code:`sd_bus_call_method_asyncv()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_new_method_call(3)`, :ref:`sd_bus_message_append(3)`, :ref:`sd_bus_call(3)`, :ref:`sd_bus_set_property(3)`, :ref:`sd_bus_emit_signal(3)`
+
+

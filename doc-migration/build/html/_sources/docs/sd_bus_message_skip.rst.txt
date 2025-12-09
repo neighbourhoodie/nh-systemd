@@ -1,0 +1,75 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_skip
+:manvolnum: 3
+:summary: Skip elements in a bus message
+
+.. _sd_bus_message_skip(3):
+
+======================
+sd_bus_message_skip(3)
+======================
+
+Name
+####
+
+sd_bus_message_skip — Skip elements in a bus message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_skip(sd_bus_message *m,
+	const char* types);
+
+Description
+###########
+
+:code:`sd_bus_message_skip()` is somewhat similar to :ref:`sd_bus_message_read(3)`, but instead of reading the contents of the message, it only moves the "read pointer". Subsequent read operations will read the elements that are after the elements that were skipped.
+
+The :code:`types` argument has the same meaning as in :code:`sd_bus_message_read()`. It may also be :code:`NULL`, to skip a single element of any type.
+
+Return Value
+############
+
+On success, :code:`sd_bus_message_skip()` returns 0 or a positive integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`m` parameter is :code:`NULL`.
+
+.. systemd:option:: -EBADMSG
+
+   The message cannot be parsed.
+
+.. systemd:option:: -EPERM
+
+   The message is not sealed.
+
+.. systemd:option:: -ENXIO
+
+   The message end has been reached and the requested elements cannot be read.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_skip()` was added in version 240.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_message_read(3)`, :ref:`sd_bus_message_read_basic(3)`
+
+

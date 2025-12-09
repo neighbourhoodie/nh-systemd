@@ -1,0 +1,48 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-nsresourced.service
+:manvolnum: 8
+:summary: User Namespace Resource Delegation Service
+:aliases: systemd-nsresourced
+
+.. _systemd-nsresourced.service(8):
+
+==============================
+systemd-nsresourced.service(8)
+==============================
+
+Name
+####
+
+systemd-nsresourced.service, systemd-nsresourced — User Namespace Resource Delegation Service
+
+Synopsis
+########
+
+:code:`systemd-nsresourced.service`
+
+:code:`/usr/lib/systemd/systemd-nsresourced`
+
+Description
+###########
+
+:code:`systemd-nsresourced` is a system service that permits transient delegation of a UID/GID range to a user namespace (see :man-pages:`user_namespaces(7)`) allocated by a client, via a Varlink IPC API.
+
+Unprivileged clients may allocate a user namespace, and then request a UID/GID range to be assigned to it via this service. The user namespace may then be used to run containers and other sandboxes, and/or apply it to an id-mapped mount.
+
+Allocations of UIDs/GIDs this way are transient: when a user namespace goes away, its UID/GID range is returned to the pool of available ranges. In order to ensure that clients cannot gain persistency in their transient UID/GID range a BPF-LSM based policy is enforced that ensures that user namespaces set up this way can only write to file systems they allocate themselves or that are explicitly allowlisted via :code:`systemd-nsresourced`.
+
+:code:`systemd-nsresourced` automatically ensures that any registered UID ranges show up in the system's NSS database via the `User/Group Record Lookup API via Varlink <https://systemd.io/USER_GROUP_API>`_.
+
+Currently, only UID/GID ranges consisting of either exactly 1 or exactly 65536 UIDs/GIDs can be registered with this service. Moreover, UIDs and GIDs are always allocated together, and symmetrically.
+
+The service provides API calls to allowlist mounts (referenced via their mount file descriptors as per Linux :code:`fsmount()` API), to pass ownership of a cgroup subtree to the user namespace and to delegate a virtual Ethernet device pair to the user namespace. When used in combination this is sufficient to implement fully unprivileged container environments, as implemented by :ref:`systemd-nspawn(1)`, fully unprivileged :code:`RootImage=` (see :ref:`systemd.exec(5)`) or fully unprivileged disk image tools such as :ref:`systemd-dissect(1)`.
+
+This service provides one `Varlink <https://varlink.org/>`_ service: :code:`io.systemd.NamespaceResource` allows registering user namespaces, and assign mounts, cgroups and network interfaces to it.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-mountfsd.service(8)`, :ref:`systemd-nspawn(1)`, :ref:`systemd.exec(5)`, :ref:`systemd-dissect(1)`, :man-pages:`user_namespaces(7)`
+
+

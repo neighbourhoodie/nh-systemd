@@ -1,0 +1,68 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.dns-delegate
+:manvolnum: 5
+:summary: DNS Server Delegation Configuration
+
+.. _systemd.dns-delegate(5):
+
+=======================
+systemd.dns-delegate(5)
+=======================
+
+Name
+####
+
+systemd.dns-delegate — DNS Server Delegation Configuration
+
+Synopsis
+########
+
+| :code:`/etc/systemd/dns-delegate.d/\*.dns-delegate`
+| :code:`/run/systemd/dns-delegate.d/\*.dns-delegate`
+| :code:`/usr/local/lib/systemd/dns-delegate.d/\*.dns-delegate`
+| :code:`/usr/lib/systemd/dns-delegate.d/\*.dns-delegate`
+
+Description
+###########
+
+:code:`*.dns-delegate` files may be used to delegate DNS lookups in specific domains to specific DNS servers. These files are read by :ref:`systemd-resolved.service(8)`. Each such file defines a combination of one or more DNS servers and one or more DNS domains. Each such definition synthesizes a DNS lookup scope that ensure lookups below the specified domains are sent to the specified DNS servers, possibly in addition to any per-interface scopes and the global scope that :code:`systemd-resolved` maintains anyway.
+
+[Delegate] Section Options
+##########################
+
+.. systemd:option:: DNS=
+   :group: network-directives
+
+   Takes one or more DNS server specifications, in the same syntax as the option of the same name in :man-pages:`resolved.conf(5)`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: Domains=
+   :group: network-directives
+
+   Takes one or more domain name specifications, in the same syntax as the option of the same name in :man-pages:`resolved.conf(5)`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: DefaultRoute=
+   :group: network-directives
+
+   Takes a boolean value, defaults to off. Controls whether this DNS server is a candidate for looking up records for which no better route exists.
+
+   .. versionadded:: 258
+
+Examples
+########
+
+# /etc/systemd/dns-delegate.d/foobar.dns-delegate [Delegate] DNS=203.0.113.47 Domains=foobar.com
+------------------------------------------------------------------------------------------------
+
+This ensures lookups of "foobar.com" and any domains below it are directed to DNS server 203.0.113.47.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-resolved.service(8)`, :man-pages:`resolved.conf(5)`, :man-pages:`resolvectl(1)`
+
+

@@ -1,0 +1,94 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.scope
+:manvolnum: 5
+:summary: Scope unit configuration
+
+.. _systemd.scope(5):
+
+================
+systemd.scope(5)
+================
+
+Name
+####
+
+systemd.scope — Scope unit configuration
+
+Synopsis
+########
+
+:code:`scope.scope`
+
+Description
+###########
+
+Scope units are not configured via unit configuration files, but are only created programmatically using the bus interfaces of systemd. They are named similar to filenames. A unit whose name ends in ".scope" refers to a scope unit. Scopes units manage a set of system processes. Unlike service units, scope units manage externally created processes, and do not fork off processes on its own.
+
+The main purpose of scope units is grouping worker processes of a system service for organization and for managing resources.
+
+:code:`systemd-run :code:`--scope`` may be used to easily launch a command in a new scope unit from the command line.
+
+See the `New Control Group Interfaces <https://systemd.io/CONTROL_GROUP_INTERFACE>`_ for an introduction on how to make use of scope units from programs.
+
+Note that, unlike service units, scope units have no "main" process: all processes in the scope are equivalent. The lifecycle of the scope unit is thus not bound to the lifetime of one specific process, but to the existence of at least one process in the scope. This also means that the exit statuses of these processes are not relevant for the scope unit failure state. Scope units may still enter a failure state, for example due to resource exhaustion or stop timeouts being reached, but not due to programs inside of them terminating uncleanly. Since processes managed as scope units generally remain children of the original process that forked them off, it is also the job of that process to collect their exit statuses and act on them as needed.
+
+Automatic Dependencies
+######################
+
+Implicit Dependencies
+#####################
+
+Implicit dependencies may be added as result of resource control parameters as documented in :ref:`systemd.resource-control(5)`.
+
+Default Dependencies
+####################
+
+The following dependencies are added unless :code:`DefaultDependencies=no` is set:
+
+*    Scope units will automatically have dependencies of type :code:`Conflicts=` and :code:`Before=` on :code:`shutdown.target`. These ensure that scope units are removed prior to system shutdown. Only scope units involved with early boot or late system shutdown should disable :code:`DefaultDependencies=` option.
+
+Options
+#######
+
+Scope files may include a \[Unit] section, which is described in :ref:`systemd.unit(5)`.
+
+Scope files may include a \[Scope] section, which carries information about the scope and the units it contains. A number of options that may be used in this section are shared with other unit types. These options are documented in :ref:`systemd.kill(5)` and :ref:`systemd.resource-control(5)`. The options specific to the \[Scope] section of scope units are the following:
+
+.. inclusion-marker-do-not-remove oom-policy|
+
+.. systemd:option:: OOMPolicy=
+   :group: unit-directives
+
+   .. include:: systemd.service.rst
+       :start-after: .. inclusion-marker-do-not-remove xpointer(//varlistentry[@id='oom-policy']/listitem/para[position() < last()])|
+       :end-before: .. inclusion-end-marker-do-not-remove xpointer(//varlistentry[@id='oom-policy']/listitem/para[position() < last()])|
+
+   .. versionadded:: 253
+
+.. inclusion-end-marker-do-not-remove oom-policy|
+
+.. systemd:option:: RuntimeMaxSec=
+   :group: unit-directives
+
+   Configures a maximum time for the scope to run. If this is used and the scope has been active for longer than the specified time it is terminated and put into a failure state. Pass "infinity" (the default) to configure no runtime limit.
+
+   .. versionadded:: 244
+
+.. systemd:option:: RuntimeRandomizedExtraSec=
+   :group: unit-directives
+
+   This option modifies :systemd:var:`RuntimeMaxSec=` by increasing the maximum runtime by an evenly distributed duration between 0 and the specified value (in seconds). If :systemd:var:`RuntimeMaxSec=` is unspecified, then this feature will be disabled.
+
+   .. versionadded:: 250
+
+.. include:: systemd.service.rst
+    :start-after: .. inclusion-marker-do-not-remove shared-unit-options|
+    :end-before: .. inclusion-end-marker-do-not-remove shared-unit-options|
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-run(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.resource-control(5)`, :ref:`systemd.service(5)`, :ref:`systemd.directives(7)`.
+
+

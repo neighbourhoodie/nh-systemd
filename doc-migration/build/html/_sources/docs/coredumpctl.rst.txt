@@ -1,0 +1,340 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: coredumpctl
+:manvolnum: 1
+:summary: Retrieve and process saved core dumps and metadata
+
+.. _coredumpctl(1):
+
+==============
+coredumpctl(1)
+==============
+
+Name
+####
+
+coredumpctl — Retrieve and process saved core dumps and metadata
+
+Synopsis
+########
+
+:code:`coredumpctl [OPTIONS...] {COMMAND} [PID|COMM|EXE|MATCH...]`
+
+Description
+###########
+
+:code:`coredumpctl` is a tool that can be used to retrieve and process core dumps and metadata which were saved by :ref:`systemd-coredump(8)`.
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: list
+
+   List core dumps captured in the journal matching specified characteristics. If no command is specified, this is the implied default.
+
+   The output is designed to be human-readable and contains a table with the following columns:
+
+   .. systemd:constant:: TIME
+
+         The timestamp of the crash, as reported by the kernel.
+
+         .. versionadded:: 233
+
+   .. systemd:constant:: PID
+
+         The identifier of the process that crashed.
+
+         .. versionadded:: 233
+
+   .. systemd:constant:: UID, GID
+
+         The user and group identifiers of the process that crashed.
+
+         .. versionadded:: 233
+
+   .. systemd:constant:: SIGNAL
+
+         The signal that caused the process to crash, when applicable.
+
+         .. versionadded:: 233
+
+   .. systemd:constant:: COREFILE
+
+         Information whether the coredump was stored, and whether it is still accessible: "none" means the core was not stored, "-" means that it was not available (for example because the process was not terminated by a signal), "present" means that the core file is accessible by the current user, "journal" means that the core was stored in the "journal", "truncated" is the same as one of the previous two, but the core was too large and was not stored in its entirety, "error" means that the core file cannot be accessed, most likely because of insufficient permissions, and "missing" means that the core was stored in a file, but this file has since been removed.
+
+         .. versionadded:: 233
+
+   .. systemd:constant:: EXE
+
+         The full path to the executable. For backtraces of scripts this is the name of the interpreter.
+
+         .. versionadded:: 233
+
+   It's worth noting that different restrictions apply to data saved in the journal and core dump files saved in :code:`/var/lib/systemd/coredump`, see overview in :ref:`systemd-coredump(8)`. Thus it may very well happen that a particular core dump is still listed in the journal while its corresponding core dump file has already been removed.
+
+   .. versionadded:: 215
+
+.. systemd:option:: info
+
+   Show detailed information about the last core dump or core dumps matching specified characteristics captured in the journal.
+
+   .. versionadded:: 215
+
+.. systemd:option:: dump
+
+   Extract the last core dump matching specified characteristics. The core dump will be written on standard output, unless an output file is specified with :code:`--output=`.
+
+   .. versionadded:: 215
+
+.. systemd:option:: debug
+
+   Invoke a debugger on the last core dump matching specified characteristics. By default, :man-pages:`gdb(1)` will be used. This may be changed using the :code:`--debugger=` option or the :code:`$SYSTEMD_DEBUGGER` environment variable. Use the :code:`--debugger-arguments=` option to pass extra command line arguments to the debugger.
+
+   .. versionadded:: 239
+
+Options
+#######
+
+The following options are understood:
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. systemd:option:: -1
+
+   Show information of the most recent core dump only, instead of listing all known core dumps. Equivalent to :code:`--reverse -n 1`.
+
+   .. versionadded:: 215
+
+.. systemd:option:: -n INT
+
+   Show at most the specified number of entries. The specified parameter must be an integer greater or equal to 1.
+
+   .. versionadded:: 248
+
+.. systemd:option:: -S, --since
+
+   Only print entries which are since the specified date.
+
+   .. versionadded:: 233
+
+.. systemd:option:: -U, --until
+
+   Only print entries which are until the specified date.
+
+   .. versionadded:: 233
+
+.. systemd:option:: -r, --reverse
+
+   Reverse output so that the newest entries are displayed first.
+
+   .. versionadded:: 233
+
+.. systemd:option:: -F FIELD, --field=FIELD
+
+   Print all possible data values the specified field takes in matching core dump entries of the journal.
+
+   .. versionadded:: 215
+
+.. systemd:option:: -o FILE, --output=FILE
+
+   Write the core to :code:`FILE`.
+
+   .. versionadded:: 215
+
+.. systemd:option:: --debugger=DEBUGGER
+
+   Use the given debugger for the :code:`debug` command. If not given and :code:`$SYSTEMD_DEBUGGER` is unset, then :man-pages:`gdb(1)` will be used.
+
+   .. versionadded:: 239
+
+.. systemd:option:: -A ARGS, --debugger-arguments=ARGS
+
+   Pass the given :emphasis:`ARGS` as extra command line arguments to the debugger. Quote as appropriate when :emphasis:`ARGS` contain whitespace. (See Examples.)
+
+   .. versionadded:: 248
+
+.. systemd:option:: --file=GLOB
+
+   Takes a file glob as an argument. If specified, coredumpctl will operate on the specified journal files matching :emphasis:`GLOB` instead of the default runtime and system journal paths. May be specified multiple times, in which case files will be suitably interleaved.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -D DIR, --directory=DIR
+
+   Use the journal files in the specified :code:`DIR`.
+
+   .. versionadded:: 225
+
+.. systemd:option:: --root=ROOT
+
+   Use root directory :code:`ROOT` when searching for coredumps.
+
+   .. versionadded:: 252
+
+.. systemd:option:: --image=image
+
+   Takes a path to a disk image file or block device node. If specified, all operations are applied to file system in the indicated disk image. This option is similar to :code:`--root=`, but operates on file systems stored in disk images or block devices. The disk image should either contain just a file system or a set of file systems within a GPT partition table, following the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_. For further information on supported disk images, see :ref:`systemd-nspawn(1)`'s switch of the same name.
+
+   .. versionadded:: 252
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove image-policy-open|
+    :end-before: .. inclusion-end-marker-do-not-remove image-policy-open|
+
+.. systemd:option:: -q, --quiet
+
+   Suppresses informational messages about lack of access to journal files and possible in-flight coredumps.
+
+   .. versionadded:: 233
+
+.. systemd:option:: --all
+
+   Look at all available journal files in :code:`/var/log/journal/` (excluding journal namespaces) instead of only local ones.
+
+   .. versionadded:: 250
+
+Matching
+########
+
+A match can be:
+
+.. systemd:constant:: PID
+
+   Process ID of the process that dumped core. An integer.
+
+   .. versionadded:: 215
+
+.. systemd:constant:: COMM
+
+   Name of the executable (matches :code:`COREDUMP_COMM=`). Must not contain slashes.
+
+   .. versionadded:: 215
+
+.. systemd:constant:: EXE
+
+   Path to the executable (matches :code:`COREDUMP_EXE=`). Must contain at least one slash.
+
+   .. versionadded:: 215
+
+.. systemd:constant:: MATCH
+
+   General journalctl match filter, must contain an equals sign ("="). See :man-pages:`journalctl(1)`.
+
+   .. versionadded:: 215
+
+Exit status
+###########
+
+On success, 0 is returned; otherwise, a non-zero failure code is returned. Not finding any matching core dumps is treated as failure.
+
+Environment
+###########
+
+.. systemd:var:: $SYSTEMD_DEBUGGER
+   :group: environment-variables
+
+   Use the given debugger for the :code:`debug` command. See the :systemd:option:`--debugger=` option.
+
+   .. versionadded:: 239
+
+Examples
+########
+
+List all the core dumps of a program
+------------------------------------
+
+.. code-block:: sh
+
+   $ coredumpctl list /usr/lib64/firefox/firefox
+   TIME       PID  UID  GID SIG     COREFILE EXE                         SIZE
+   Tue …   8018 1000 1000 SIGSEGV missing  /usr/lib64/firefox/firefox     -
+   Wed … 251609 1000 1000 SIGTRAP missing  /usr/lib64/firefox/firefox     -
+   Fri … 552351 1000 1000 SIGSEGV present  /usr/lib64/firefox/firefox 28.7M
+
+The journal has three entries pertaining to :code:`/usr/lib64/firefox/firefox`, and only the last entry still has an available core file (in external storage on disk).
+
+Note that :code:`coredumpctl` needs access to the journal files to retrieve the relevant entries from the journal. Thus, an unprivileged user will normally only see information about crashing programs of this user.
+
+Invoke :code:`gdb` on the last core dump
+----------------------------------------
+
+.. code-block:: sh
+
+   $ coredumpctl debug
+
+Use :code:`gdb` to display full register info from the last core dump
+---------------------------------------------------------------------
+
+.. code-block:: sh
+
+   $ coredumpctl debug --debugger-arguments="-batch -ex 'info all-registers'"
+
+Show information about a core dump matched by PID
+-------------------------------------------------
+
+.. code-block:: sh
+
+   $ coredumpctl info 6654
+              PID: 6654 (bash)
+              UID: 1000 (user)
+              GID: 1000 (user)
+           Signal: 11 (SEGV)
+        Timestamp: Mon 2021-01-01 00:00:01 CET (20s ago)
+     Command Line: bash -c $'kill -SEGV $$'
+       Executable: /usr/bin/bash
+    Control Group: /user.slice/user-1000.slice/…
+             Unit: user@1000.service
+        User Unit: vte-spawn-….scope
+            Slice: user-1000.slice
+        Owner UID: 1000 (user)
+          Boot ID: …
+       Machine ID: …
+         Hostname: …
+          Storage: /var/lib/systemd/coredump/core.bash.1000.….zst (present)
+     Size on Disk: 51.7K
+          Message: Process 130414 (bash) of user 1000 dumped core.
+                   Stack trace of thread 130414:
+                   #0  0x00007f398142358b kill (libc.so.6 + 0x3d58b)
+                   #1  0x0000558c2c7fda09 kill_builtin (bash + 0xb1a09)
+                   #2  0x0000558c2c79dc59 execute_builtin.lto_priv.0 (bash + 0x51c59)
+                   #3  0x0000558c2c79709c execute_simple_command (bash + 0x4b09c)
+                   #4  0x0000558c2c798408 execute_command_internal (bash + 0x4c408)
+                   #5  0x0000558c2c7f6bdc parse_and_execute (bash + 0xaabdc)
+                   #6  0x0000558c2c85415c run_one_command.isra.0 (bash + 0x10815c)
+                   #7  0x0000558c2c77d040 main (bash + 0x31040)
+                   #8  0x00007f398140db75 __libc_start_main (libc.so.6 + 0x27b75)
+                   #9  0x0000558c2c77dd1e _start (bash + 0x31d1e)
+
+Extract the last core dump of /usr/bin/bar to a file named :code:`bar.coredump`
+-------------------------------------------------------------------------------
+
+.. code-block:: sh
+
+   $ coredumpctl -o bar.coredump dump /usr/bin/bar
+
+See Also
+########
+
+:ref:`systemd-coredump(8)`, :man-pages:`coredump.conf(5)`, :ref:`systemd-journald.service(8)`, :man-pages:`gdb(1)`
+
+

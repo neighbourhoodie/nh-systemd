@@ -1,0 +1,198 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: logind.conf
+:manvolnum: 5
+:summary: Login manager configuration files
+:aliases: logind.conf.d
+
+.. _logind.conf(5):
+
+==============
+logind.conf(5)
+==============
+
+Name
+####
+
+logind.conf, logind.conf.d — Login manager configuration files
+
+Synopsis
+########
+
+| :code:`/etc/systemd/logind.conf`
+| :code:`/run/systemd/logind.conf`
+| :code:`/usr/local/lib/systemd/logind.conf`
+| :code:`/usr/lib/systemd/logind.conf`
+| :code:`/etc/systemd/logind.conf.d/\*.conf`
+| :code:`/run/systemd/logind.conf.d/\*.conf`
+| :code:`/usr/local/lib/systemd/logind.conf.d/\*.conf`
+| :code:`/usr/lib/systemd/logind.conf.d/\*.conf`
+
+Description
+###########
+
+These files configure various parameters of the systemd login manager, :ref:`systemd-logind.service(8)`. See :ref:`systemd.syntax(7)` for a general description of the syntax.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+All options are configured in the \[Login] section:
+
+.. systemd:option:: NAutoVTs=
+   :group: config-directives
+
+   Takes a positive integer. Configures how many virtual terminals (VTs) to allocate by default that, when switched to and are previously unused, "autovt" services are automatically spawned on. These services are instantiated from the template unit :code:`autovt@.service` for the respective VT TTY name, for example, :code:`autovt@tty4.service`. By default, :code:`autovt@.service` is linked to :code:`getty@.service`. In other words, login prompts are started dynamically as the user switches to unused virtual terminals. Hence, this parameter controls how many login "gettys" are available on the VTs. If a VT is already used by some other subsystem (for example, a graphical login), this kind of activation will not be attempted. Note that the VT configured in :systemd:var:`ReserveVT=` is always subject to this kind of activation, even if it is not one of the VTs configured with the :systemd:var:`NAutoVTs=` directive. Defaults to 6. When set to 0, automatic spawning of "autovt" services is disabled.
+
+.. systemd:option:: ReserveVT=
+   :group: config-directives
+
+   Takes a positive integer. Identifies one virtual terminal that shall unconditionally be reserved for :code:`autovt@.service` activation (see above). The VT selected with this option will be marked busy unconditionally, so that no other subsystem will allocate it. This functionality is useful to ensure that, regardless of how many VTs are allocated by other subsystems, one login "getty" is always available. Defaults to 6 (in other words, there will always be a "getty" available on Alt-F6.). When set to 0, VT reservation is disabled.
+
+   .. versionadded:: 190
+
+.. systemd:option:: KillUserProcesses=
+   :group: config-directives
+
+   Takes a boolean argument. Configures whether the processes of a user should be killed when the user logs out. If true, the scope unit corresponding to the session and all processes inside that scope will be terminated. If false, the scope is "abandoned", see :ref:`systemd.scope(5)`, and processes are not killed. Defaults to "|KILL_USER_PROCESSES|", but see the options :systemd:var:`KillOnlyUsers=` and :systemd:var:`KillExcludeUsers=` below.
+
+   In addition to session processes, user process may run under the user manager unit :code:`user@.service`. Depending on the linger settings, this may allow users to run processes independent of their login sessions. See the description of :code:`enable-linger` in :man-pages:`loginctl(1)`.
+
+   Note that setting :systemd:var:`KillUserProcesses=yes` will break tools like :die-net:`screen(1)` and :die-net:`tmux(1)`, unless they are moved out of the session scope. See example in :ref:`systemd-run(1)`.
+
+.. systemd:option:: KillOnlyUsers=, KillExcludeUsers=
+   :group: config-directives
+
+   These settings take space-separated lists of usernames that override the :systemd:var:`KillUserProcesses=` setting. A user name may be added to :systemd:var:`KillExcludeUsers=` to exclude the processes in the session scopes of that user from being killed even if :systemd:var:`KillUserProcesses=yes` is set. If :systemd:var:`KillExcludeUsers=` is not set, the "root" user is excluded by default. :systemd:var:`KillExcludeUsers=` may be set to an empty value to override this default. If a user is not excluded, :systemd:var:`KillOnlyUsers=` is checked next. If this setting is specified, only the processes in the session scopes of those users will be killed. Otherwise, users are subject to the :systemd:var:`KillUserProcesses=yes` setting.
+
+.. systemd:option:: IdleAction=
+   :group: config-directives
+
+   Configures the action to take when the system is idle. Takes one of "ignore", "poweroff", "reboot", "halt", "kexec", "suspend", "hibernate", "hybrid-sleep", "suspend-then-hibernate", "sleep", and "lock". Defaults to "ignore".
+
+   Note that this requires that user sessions correctly report the idle status to the system. The system will execute the action after all sessions report that they are idle, no idle inhibitor lock is active, and subsequently, the time configured with :systemd:var:`IdleActionSec=` (see below) has expired.
+
+   .. versionadded:: 198
+
+.. systemd:option:: IdleActionSec=
+   :group: config-directives
+
+   Configures the delay after which the action configured in :systemd:var:`IdleAction=` (see above) is taken after the system is idle.
+
+   .. versionadded:: 198
+
+.. systemd:option:: InhibitDelayMaxSec=
+   :group: config-directives
+
+   Specifies the maximum time a system shutdown or sleep request is delayed due to an inhibitor lock of type "delay" being active before the inhibitor is ignored and the operation executes anyway. Defaults to 5.
+
+.. systemd:option:: UserStopDelaySec=
+   :group: config-directives
+
+   Specifies how long to keep the user record and per-user service :code:`user@.service` around for a user after they logged out fully. If set to zero, the per-user service is terminated immediately when the last session of the user has ended. If this option is configured to non-zero rapid logout/login cycles are sped up, as the user's service manager is not constantly restarted. If set to "infinity" the per-user service for a user is never terminated again after first login, and continues to run until system shutdown. Defaults to 10s.
+
+   .. versionadded:: 240
+
+.. systemd:option:: SleepOperation=
+   :group: config-directives
+
+   Takes a list of sleep operations. Possible values are "suspend", "hibernate", "hybrid-sleep", and "suspend-then-hibernate". Controls the candidate sleep operations for the "sleep" action. When "sleep" action is performed, the specified sleep operations are checked in a fixed order ("suspend-then-hibernate" → "hybrid-sleep" → "suspend" → "hibernate"), and the first one supported by the machine is used to put the system into sleep. Defaults to "suspend-then-hibernate suspend hibernate".
+
+   .. versionadded:: 256
+
+.. systemd:option:: HandlePowerKey=, HandlePowerKeyLongPress=, HandleRebootKey=, HandleRebootKeyLongPress=, HandleSuspendKey=, HandleSuspendKeyLongPress=, HandleHibernateKey=, HandleHibernateKeyLongPress=, HandleLidSwitch=, HandleLidSwitchExternalPower=, HandleLidSwitchDocked=, HandleSecureAttentionKey=
+   :group: config-directives
+
+   Controls how logind shall handle the system power, reboot and sleep keys and the lid switch to trigger actions such as system power-off, reboot or suspend. Can be one of "ignore", "poweroff", "reboot", "halt", "kexec", "suspend", "hibernate", "hybrid-sleep", "suspend-then-hibernate", "sleep", "lock", "factory-reset", and "secure-attention-key". If "ignore", :code:`systemd-logind` will never handle these keys. If "lock", all running sessions will be screen-locked; otherwise, the specified action will be taken in the respective event. Only input devices with the "power-switch" udev tag will be watched for key/lid switch events.
+
+   :systemd:var:`HandlePowerKey=` defaults to "poweroff", :systemd:var:`HandleRebootKey=` defaults to "reboot", :systemd:var:`HandleSuspendKey=` defaults to "suspend", :systemd:var:`HandleHibernateKey=` defaults to "hibernate", :systemd:var:`HandlePowerKeyLongPress=` defaults to "ignore", :systemd:var:`HandleRebootKeyLongPress=` defaults to "poweroff", :systemd:var:`HandleSuspendKeyLongPress=` defaults to "hibernate", :systemd:var:`HandleHibernateKeyLongPress=` defaults to "ignore". :systemd:var:`HandleLidSwitch=` defaults to "suspend". :systemd:var:`HandleLidSwitchExternalPower=` is completely ignored by default (for backwards compatibility) — an explicit value must be set before it will be used to determine behaviour. :systemd:var:`HandleLidSwitchDocked=` defaults to "ignore". If the system is inserted in a docking station, or if more than one display is connected, the action specified by :systemd:var:`HandleLidSwitchDocked=` occurs; if the system is on external power the action (if any) specified by :systemd:var:`HandleLidSwitchExternalPower=` occurs; otherwise the :systemd:var:`HandleLidSwitch=` action occurs. :systemd:var:`HandleSecureAttentionKey=` defaults to "secure-attention-key"
+
+   A different application may disable logind's handling of system power and sleep keys and the lid switch by taking a low-level inhibitor lock ("handle-power-key", "handle-suspend-key", "handle-hibernate-key", "handle-lid-switch", "handle-reboot-key"). This is most commonly used by graphical desktop environments to take over suspend and hibernation handling, and to use their own configuration mechanisms. If a low-level inhibitor lock is taken, logind will not take any action when that key or switch is triggered and the :systemd:var:`Handle*=` settings are irrelevant, except for :systemd:var:`HandleSecureAttentionKey=`, which is always handled since its addition in v257.
+
+   .. versionadded:: 184
+
+.. systemd:option:: PowerKeyIgnoreInhibited=, SuspendKeyIgnoreInhibited=, HibernateKeyIgnoreInhibited=, LidSwitchIgnoreInhibited=, RebootKeyIgnoreInhibited=
+   :group: config-directives
+
+   Controls whether actions that :code:`systemd-logind` takes when the power, reboot and sleep keys and the lid switch are triggered are subject to high-level inhibitor locks ("shutdown", "reboot", "sleep", "idle"). Low level inhibitor locks ("handle-power-key", "handle-suspend-key", "handle-hibernate-key", "handle-lid-switch", "handle-reboot-key"), are always honored, irrespective of this setting.
+
+   These settings take boolean arguments. If "no", the inhibitor locks taken by applications are respected. If "yes", "shutdown", "reboot" "sleep", and "idle" inhibitor locks are ignored. :systemd:var:`PowerKeyIgnoreInhibited=`, :systemd:var:`SuspendKeyIgnoreInhibited=`, :systemd:var:`HibernateKeyIgnoreInhibited=` and :systemd:var:`RebootKeyIgnoreInhibited=` default to "no". :systemd:var:`LidSwitchIgnoreInhibited=` defaults to "yes". This means that when :code:`systemd-logind` is handling events by itself (no low level inhibitor locks are taken by another application), the lid switch does not respect suspend blockers by default, but the power and sleep keys do.
+
+   .. versionadded:: 190
+
+.. systemd:option:: HoldoffTimeoutSec=
+   :group: config-directives
+
+   Specifies a period of time after system startup or system resume in which systemd will hold off on reacting to lid events. This is required for the system to properly detect any hotplugged devices so systemd can ignore lid events if external monitors, or docks, are connected. If set to 0, systemd will always react immediately, possibly before the kernel fully probed all hotplugged devices. This is safe, as long as you do not care for systemd to account for devices that have been plugged or unplugged while the system was off. Defaults to 30s.
+
+   .. versionadded:: 220
+
+.. systemd:option:: RuntimeDirectorySize=
+   :group: config-directives
+
+   Sets the size limit on the :systemd:var:`$XDG_RUNTIME_DIR` runtime directory for each user who logs in. Takes a size in bytes, optionally suffixed with the usual K, G, M, and T suffixes, to the base 1024 (IEC). Alternatively, a numerical percentage suffixed by "%" may be specified, which sets the size limit relative to the amount of physical RAM. Defaults to 10%. Note that this size is a safety limit only. As each runtime directory is a tmpfs file system, it will only consume as much memory as is needed.
+
+   .. versionadded:: 211
+
+.. systemd:option:: RuntimeDirectoryInodesMax=
+   :group: config-directives
+
+   Sets the limit on number of inodes for the :systemd:var:`$XDG_RUNTIME_DIR` runtime directory for each user who logs in. Takes a number, optionally suffixed with the usual K, G, M, and T suffixes, to the base 1024 (IEC). Defaults to :systemd:var:`RuntimeDirectorySize=` divided by 4096. Note that this size is a safety limit only. As each runtime directory is a tmpfs file system, it will only consume as much memory as is needed.
+
+   .. versionadded:: 246
+
+.. systemd:option:: InhibitorsMax=
+   :group: config-directives
+
+   Controls the maximum number of concurrent inhibitors to permit. Defaults to 8192 (8K).
+
+   .. versionadded:: 230
+
+.. systemd:option:: SessionsMax=
+   :group: config-directives
+
+   Controls the maximum number of concurrent user sessions to manage. Defaults to 8192 (8K). Depending on how the :code:`pam_systemd.so` module is included in the PAM stack configuration, further login sessions will either be refused, or permitted but not tracked by :code:`systemd-logind`.
+
+   .. versionadded:: 230
+
+.. systemd:option:: RemoveIPC=
+   :group: config-directives
+
+   Controls whether System V and POSIX IPC objects belonging to the user shall be removed when the user fully logs out. Takes a boolean argument. If enabled, the user may not consume IPC resources after the last of the user's sessions terminated. This covers System V semaphores, shared memory and message queues, as well as POSIX shared memory and message queues. Note that IPC objects of the root user and other system users are excluded from the effect of this setting. Defaults to "yes".
+
+   .. versionadded:: 212
+
+.. systemd:option:: StopIdleSessionSec=
+   :group: config-directives
+
+   Specifies a timeout in seconds, or a time span value after which :code:`systemd-logind` checks the idle state of all sessions. Every session that is idle for longer than the timeout will be stopped. Note that this option does not apply to "greeter" or "lock-screen" sessions. Defaults to "infinity" (:code:`systemd-logind` is not checking the idle state of sessions). For details about the syntax of time spans, see :ref:`systemd.time(7)`.
+
+   .. versionadded:: 252
+
+.. systemd:option:: DesignatedMaintenanceTime=
+   :group: config-directives
+
+   Specifies a default calendar event for scheduled shutdowns. So when using e.g. the command :code:`shutdown -r` to reboot the system without specifying a timeout, logind would use the configured calendar event instead. For details about the syntax of calendar events, see :ref:`systemd.time(7)`.
+
+   .. versionadded:: 257
+
+.. systemd:option:: WallMessages=
+   :group: config-directives
+
+   .. COMMENT: NB: the configuration file setting lacks the "Enable" prefix that the dbus property has. It was a mistake to have that prefix, as we generally frown on useless Enable/Disables prefix of configuration knobs.
+
+   Controls whether :die-net:`wall(1)` messages should be sent to the terminals of all currently logged in users upon shutdown or reboot. Defaults to "yes", and can be changed at runtime via the DBus "EnableWallMessages" and "WallMessagePrefix" properties.
+
+   .. versionadded:: 258
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-logind.service(8)`, :man-pages:`loginctl(1)`, :ref:`systemd-system.conf(5)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

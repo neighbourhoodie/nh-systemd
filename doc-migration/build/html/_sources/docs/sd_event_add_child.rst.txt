@@ -1,0 +1,152 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_add_child
+:manvolnum: 3
+:summary: Add a child process state change event source to an event loop
+:aliases: sd_event_add_child_pidfd, sd_event_source_get_child_pid, sd_event_source_get_child_pidfd, sd_event_source_get_child_pidfd_own, sd_event_source_set_child_pidfd_own, sd_event_source_get_child_process_own, sd_event_source_set_child_process_own, sd_event_source_send_child_signal, sd_event_child_handler_t
+
+.. _sd_event_add_child(3):
+
+=====================
+sd_event_add_child(3)
+=====================
+
+Name
+####
+
+sd_event_add_child, sd_event_add_child_pidfd, sd_event_source_get_child_pid, sd_event_source_get_child_pidfd, sd_event_source_get_child_pidfd_own, sd_event_source_set_child_pidfd_own, sd_event_source_get_child_process_own, sd_event_source_set_child_process_own, sd_event_source_send_child_signal, sd_event_child_handler_t — Add a child process state change event source to an event loop
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` :code:`:code:`typedef` struct sd_event_source sd_event_source;` .. code-block::
+
+   typedef int (*sd_event_child_handler_t)(sd_event_source *s,
+	const siginfo_t *si,
+	void *userdata); .. code-block::
+
+   int sd_event_add_child(sd_event *event,
+	sd_event_source **source,
+	pid_t pid,
+	int options,
+	sd_event_child_handler_t handler,
+	void *userdata); .. code-block::
+
+   int sd_event_add_child_pidfd(sd_event *event,
+	sd_event_source **source,
+	int pidfd,
+	int options,
+	sd_event_child_handler_t handler,
+	void *userdata); .. code-block::
+
+   int sd_event_source_get_child_pid(sd_event_source *source,
+	pid_t *ret); .. code-block::
+
+   int sd_event_source_get_child_pidfd(sd_event_source *source); .. code-block::
+
+   int sd_event_source_get_child_pidfd_own(sd_event_source *source); .. code-block::
+
+   int sd_event_source_set_child_pidfd_own(sd_event_source *source,
+	int own); .. code-block::
+
+   int sd_event_source_get_child_process_own(sd_event_source *source); .. code-block::
+
+   int sd_event_source_set_child_process_own(sd_event_source *source,
+	int own); .. code-block::
+
+   int sd_event_source_send_child_signal(sd_event_source *source,
+	int sig,
+	const siginfo_t *info,
+	unsigned flags);
+
+Description
+###########
+
+:code:`sd_event_add_child()` adds a new child process state change event source to an event loop. The event loop object is specified in the :code:`event` parameter, the event source object is returned in the :code:`source` parameter. The :code:`pid` parameter specifies the PID of the process to watch, which must be a direct child process of the invoking process. The :code:`options` parameter determines which state changes will be watched for. It must contain an OR-ed mask of :code:`WEXITED` (watch for the child process terminating), :code:`WSTOPPED` (watch for the child process being stopped by a signal), :code:`WCONTINUED` (watch for the child process being resumed by a signal) and :code:`WNOWAIT` (Do not reap the child process after it exits). See :man-pages:`waitid(2)` for further information.
+
+The :code:`handler` must be a function to call when the process changes state or :code:`NULL`. The handler function will be passed the :code:`userdata` pointer, which may be chosen freely by the caller. The handler also receives a pointer to a siginfo_t structure containing information about the child process event. The handler may return negative to signal an error (see below), other return values are ignored. If :code:`handler` is :code:`NULL`, a default handler that calls :ref:`sd_event_exit(3)` will be used.
+
+Only a single handler may be installed for a specific child process. The handler is enabled for a single event (:code:`SD_EVENT_ONESHOT`), but this may be changed with :ref:`sd_event_source_set_enabled(3)`. If the handler function returns a negative error code, it will either be disabled after the invocation, even if the :code:`SD_EVENT_ON` mode was requested before, or it will cause the loop to terminate, see :ref:`sd_event_source_set_exit_on_failure(3)`.
+
+To destroy an event source object use :ref:`sd_event_source_unref(3)`, but note that the event source is only removed from the event loop when all references to the event source are dropped. To make sure an event source does not fire anymore, even when there's still a reference to it kept, consider setting the event source to :code:`SD_EVENT_OFF` with :ref:`sd_event_source_set_enabled(3)`.
+
+The :code:`SIGCHLD` signal must be blocked in all threads before this function is called (using :man-pages:`sigprocmask(2)` or :man-pages:`pthread_sigmask(3)`).
+
+If the second parameter of :code:`sd_event_add_child()` is passed as :code:`NULL` no reference to the event source object is returned. In this case, the event source is considered "floating", and will be destroyed implicitly when the event loop itself is destroyed.
+
+Note that the :code:`handler` function is invoked at a time where the child process is not reaped yet (and thus still is exposed as a zombie process by the kernel). However, the child will be reaped automatically after the function returns. Child processes for which no child process state change event sources are installed will not be reaped by the event loop implementation.
+
+If the :code:`handler` parameter to :code:`sd_event_add_child()` is :code:`NULL`, and the event source fires, this will be considered a request to exit the event loop. In this case, the :code:`userdata` parameter, cast to an integer, is passed as the exit code parameter to :ref:`sd_event_exit(3)`.
+
+If both a child process state change event source and a :code:`SIGCHLD` signal event source is installed in the same event loop, the configured event source priorities decide which event source is dispatched first. If the signal handler is processed first, it should leave the child processes for which child process state change event sources are installed unreaped.
+
+:code:`sd_event_add_child_pidfd()` is similar to :code:`sd_event_add_child()` but takes a file descriptor referencing the process ("pidfd") instead of the numeric PID. A suitable file descriptor may be acquired via :man-pages:`pidfd_open(2)` and related calls. The passed file descriptor is not closed when the event source is freed again, unless :code:`sd_event_source_set_child_pidfd_own()` is used to turn this behaviour on. Note that regardless which of :code:`sd_event_add_child()` and :code:`sd_event_add_child_pidfd()` is used for allocating an event source, the watched process has to be a direct child process of the invoking process. Also in both cases :code:`SIGCHLD` has to be blocked in the invoking process.
+
+:code:`sd_event_source_get_child_pid()` retrieves the configured PID of a child process state change event source created previously with :code:`sd_event_add_child()`. It takes the event source object as the :code:`source` parameter and a pointer to a pid_t variable to return the process ID in.
+
+:code:`sd_event_source_get_child_pidfd()` retrieves the file descriptor referencing the watched process ("pidfd"). The event loop internally makes use of pidfds to watch child processes, regardless of whether the individual event sources are allocated via :code:`sd_event_add_child()` or :code:`sd_event_add_child_pidfd()`. If the latter call was used to allocate the event source, this function returns the original file descriptor used for allocation. This call takes the event source object as the :code:`source` parameter and returns the numeric file descriptor.
+
+:code:`sd_event_source_get_child_pidfd_own()` may be used to query whether the pidfd the event source encapsulates shall be closed when the event source is freed. This function returns zero if the pidfd shall be left open, and positive if it shall be closed automatically. By default, this setting defaults to on if the event source was allocated via :code:`sd_event_add_child()` and off if it was allocated via :code:`sd_event_add_child_pidfd()`. The :code:`sd_event_source_set_child_pidfd_own()` function may be used to change the setting and takes a boolean parameter with the new setting.
+
+:code:`sd_event_source_get_child_process_own()` may be used to query whether the process the event source watches shall be killed (with :code:`SIGKILL`) and reaped when the event source is freed. This function returns zero if the process shell be left running, and positive if it shall be killed and reaped automatically. By default, this setting defaults to off. The :code:`sd_event_source_set_child_process_own()` function may be used to change the setting and takes a boolean parameter with the new setting. Note that currently if the calling process is terminated abnormally the watched process might survive even thought the event source ceases to exist. This behaviour might change eventually.
+
+:code:`sd_event_source_send_child_signal()` may be used to send a UNIX signal to the watched process via :man-pages:`pidfd_send_signal(2)`. The specified parameters match those of the underlying system call, except that the :code:`info` is never modified (and is thus declared constant). Like for the underlying system call, the :code:`flags` parameter currently must be zero.
+
+Return Value
+############
+
+On success, these functions return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENOMEM
+
+   Not enough memory to allocate an object.
+
+.. systemd:option:: -EINVAL
+
+   An invalid argument has been passed. This includes specifying an empty mask in :code:`options` or a mask which contains values different than a combination of :code:`WEXITED`, :code:`WSTOPPED`, and :code:`WCONTINUED`.
+
+.. systemd:option:: -EBUSY
+
+   A handler is already installed for this child process, or :code:`SIGCHLD` is not blocked.
+
+.. systemd:option:: -ESTALE
+
+   The event loop is already terminated.
+
+.. systemd:option:: -ECHILD
+
+   The event loop has been created in a different process, library or module instance.
+
+.. systemd:option:: -EDOM
+
+   The passed event source is not a child process event source.
+
+.. include:: libsystemd-pkgconfig.rst
+
+Example
+#######
+
+Exit loop when the child terminates
+-----------------------------------
+
+.. literalinclude:: /code-examples/c/event-quick-child.c
+    :language: c
+
+History
+#######
+
+:code:`sd_event_add_child()`, :code:`sd_event_child_handler_t()`, and :code:`sd_event_source_get_child_pid()` were added in version 217.
+
+:code:`sd_event_add_child_pidfd()`, :code:`sd_event_source_get_child_pidfd()`, :code:`sd_event_source_get_child_pidfd_own()`, :code:`sd_event_source_set_child_pidfd_own()`, :code:`sd_event_source_get_child_process_own()`, :code:`sd_event_source_set_child_process_own()`, and :code:`sd_event_source_send_child_signal()` were added in version 245.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_new(3)`, :ref:`sd_event_now(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_source_set_enabled(3)`, :ref:`sd_event_source_set_priority(3)`, :ref:`sd_event_source_set_userdata(3)`, :ref:`sd_event_source_set_description(3)`, :ref:`sd_event_source_set_floating(3)`, :man-pages:`waitid(2)`, :man-pages:`sigprocmask(2)`, :man-pages:`pthread_sigmask(3)`, :man-pages:`pidfd_open(2)`, :man-pages:`pidfd_send_signal(2)`, :man-pages:`rt_sigqueueinfo(2)`, :man-pages:`kill(2)`
+
+

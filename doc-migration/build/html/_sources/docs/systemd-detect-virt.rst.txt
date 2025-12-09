@@ -1,0 +1,217 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-detect-virt
+:manvolnum: 1
+:summary: Detect execution in a virtualized environment
+
+.. _systemd-detect-virt(1):
+
+======================
+systemd-detect-virt(1)
+======================
+
+Name
+####
+
+systemd-detect-virt — Detect execution in a virtualized environment
+
+Synopsis
+########
+
+:code:`systemd-detect-virt [OPTIONS...]`
+
+Description
+###########
+
+:code:`systemd-detect-virt` detects execution in a virtualized environment. It identifies the virtualization technology and can distinguish full machine virtualization from container virtualization. :code:`systemd-detect-virt` exits with a return value of 0 (success) if a virtualization technology is detected, and non-zero (error) otherwise. By default, any type of virtualization is detected, and the options :code:`--container` and :code:`--vm` can be used to limit what types of virtualization are detected.
+
+When executed without :code:`--quiet` will print a short identifier for the detected virtualization technology. The following technologies are currently identified:
+
+.. list-table:: Known virtualization technologies (both VM, i.e. full hardware virtualization, and container, i.e. shared kernel virtualization)
+   :header-rows: 1
+
+   * - Type
+     - ID
+     - Product
+   * - VM
+     - :code:`qemu`
+     - QEMU software virtualization, without KVM
+   * - :code:`kvm`
+     - Linux KVM kernel virtual machine, in combination with QEMU. Not used for other virtualizers using the KVM interfaces, such as Oracle VirtualBox or Amazon EC2 Nitro, see below.
+     -
+   * - :code:`amazon`
+     - Amazon EC2 Nitro using Linux KVM
+     -
+   * - :code:`zvm`
+     - s390 z/VM
+     -
+   * - :code:`vmware`
+     - VMware Workstation or Server, and related products
+     -
+   * - :code:`microsoft`
+     - Hyper-V, also known as Viridian or Windows Server Virtualization
+     -
+   * - :code:`oracle`
+     - Oracle VM VirtualBox (historically marketed by innotek and Sun Microsystems), for legacy and KVM hypervisor
+     -
+   * - :code:`powervm`
+     - IBM PowerVM hypervisor — comes as firmware with some IBM POWER servers
+     -
+   * - :code:`xen`
+     - Xen hypervisor (only domU, not dom0)
+     -
+   * - :code:`bochs`
+     - Bochs Emulator
+     -
+   * - :code:`uml`
+     - User-mode Linux
+     -
+   * - :code:`parallels`
+     - Parallels Desktop, Parallels Server
+     -
+   * - :code:`bhyve`
+     - bhyve, FreeBSD hypervisor
+     -
+   * - :code:`qnx`
+     - QNX hypervisor
+     -
+   * - :code:`acrn`
+     - `ACRN hypervisor <https://projectacrn.org>`_
+     -
+   * - :code:`apple`
+     - `Apple virtualization framework <https://developer.apple.com/documentation/virtualization>`_
+     -
+   * - :code:`sre`
+     - `LMHS SRE hypervisor <https://www.lockheedmartin.com/en-us/products/Hardened-Security-for-Intel-Processors.html>`_
+     -
+   * - :code:`google`
+     - `Google Compute Engine <https://cloud.google.com/compute>`_
+     -
+   * - Container
+     - :code:`openvz`
+     - OpenVZ/Virtuozzo
+   * - :code:`lxc`
+     - Linux container implementation by LXC
+     -
+   * - :code:`lxc-libvirt`
+     - Linux container implementation by libvirt
+     -
+   * - :code:`systemd-nspawn`
+     - systemd's minimal container implementation, see :ref:`systemd-nspawn(1)`
+     -
+   * - :code:`docker`
+     - Docker container manager
+     -
+   * - :code:`podman`
+     - `Podman <https://podman.io>`_ container manager
+     -
+   * - :code:`rkt`
+     - rkt app container runtime
+     -
+   * - :code:`wsl`
+     - `Windows Subsystem for Linux <https://docs.microsoft.com/en-us/windows/wsl/about>`_
+     -
+   * - :code:`proot`
+     - `proot <https://proot-me.github.io/>`_ userspace chroot/bind mount emulation
+     -
+   * - :code:`pouch`
+     - `Pouch <https://github.com/alibaba/pouch>`_ Container Engine
+     -
+
+If multiple virtualization solutions are used, only the "innermost" is detected and identified. That means if both machine and container virtualization are used in conjunction, only the latter will be identified (unless :code:`--vm` is passed).
+
+Windows Subsystem for Linux is not a Linux container, but an environment for running Linux userspace applications on top of the Windows kernel using a Linux-compatible interface. WSL is categorized as a container for practical purposes. Multiple WSL environments share the same kernel and services should generally behave like when being run in a container.
+
+When executed with :code:`--cvm`, instead of printing the virtualization technology, it will display the confidential virtual machine technology, if any. The following technologies are currently identified:
+
+.. list-table:: Known confidential virtualization technologies
+   :header-rows: 1
+
+   * - Arch
+     - ID
+     - Technology
+   * - x86_64
+     - :code:`sev`
+     - AMD Secure Encrypted Virtualization
+   * - :code:`sev-es`
+     - AMD Secure Encrypted Virtualization - Encrypted State
+     -
+   * - :code:`sev-snp`
+     - AMD Secure Encrypted Virtualization - Secure Nested Paging
+     -
+   * - :code:`tdx`
+     - Intel Trust Domain Extensions
+     -
+   * - s390x
+     - :code:`protvirt`
+     - IBM Protected Virtualization (Secure Execution)
+   * - arm64
+     - :code:`cca`
+     - Arm Confidential Compute Architecture
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: -c, --container
+
+   Only detects container virtualization (i.e. shared kernel virtualization).
+
+.. systemd:option:: -v, --vm
+
+   Only detects hardware virtualization.
+
+.. systemd:option:: -r, --chroot
+
+   Detect whether invoked in a :man-pages:`chroot(2)` environment. In this mode, no output is written, but the return value indicates whether the process was invoked in a :code:`chroot()` environment or not.
+
+   .. versionadded:: 228
+
+.. systemd:option:: --private-users
+
+   Detect whether invoked in a user namespace. In this mode, no output is written, but the return value indicates whether the process was invoked inside of a user namespace or not. See :man-pages:`user_namespaces(7)` for more information.
+
+   .. versionadded:: 232
+
+.. systemd:option:: --cvm
+
+   Detect whether invoked in a confidential virtual machine. The result of this detection may be used to disable features that should not be used in confidential VMs. It must not be used to release security sensitive information. The latter must only be released after attestation of the confidential environment.
+
+   .. versionadded:: 254
+
+.. systemd:option:: -q, --quiet
+
+   Suppress output of the virtualization technology identifier.
+
+.. systemd:option:: --list
+
+   Output all currently known and detectable container and VM environments.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --list-cvm
+
+   Output all currently known and detectable confidential virtualization technologies.
+
+   .. versionadded:: 254
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Exit status
+###########
+
+If a virtualization technology is detected, 0 is returned, a non-zero code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-nspawn(1)`, :man-pages:`chroot(2)`, :man-pages:`namespaces(7)`
+
+

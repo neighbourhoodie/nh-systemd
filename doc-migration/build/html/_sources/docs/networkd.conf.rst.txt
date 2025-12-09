@@ -1,0 +1,260 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: networkd.conf
+:manvolnum: 5
+:summary: Global Network configuration files
+:aliases: networkd.conf.d
+
+.. _networkd.conf(5):
+
+================
+networkd.conf(5)
+================
+
+Name
+####
+
+networkd.conf, networkd.conf.d — Global Network configuration files
+
+Synopsis
+########
+
+| :code:`/etc/systemd/networkd.conf`
+| :code:`/run/systemd/networkd.conf`
+| :code:`/usr/local/lib/systemd/networkd.conf`
+| :code:`/usr/lib/systemd/networkd.conf`
+| :code:`/etc/systemd/networkd.conf.d/\*.conf`
+| :code:`/run/systemd/networkd.conf.d/\*.conf`
+| :code:`/usr/local/lib/systemd/networkd.conf.d/\*.conf`
+| :code:`/usr/lib/systemd/networkd.conf.d/\*.conf`
+
+Description
+###########
+
+These configuration files control global network parameters.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+[Network] Section Options
+#########################
+
+The following options are available in the \[Network] section:
+
+.. systemd:option:: SpeedMeter=
+   :group: network-directives
+
+   Takes a boolean. If set to yes, then :code:`systemd-networkd` measures the traffic of each interface, and :code:`networkctl status INTERFACE` shows the measured speed. Defaults to no.
+
+   .. versionadded:: 244
+
+.. systemd:option:: SpeedMeterIntervalSec=
+   :group: network-directives
+
+   Specifies the time interval to calculate the traffic speed of each interface. If :systemd:var:`SpeedMeter=no`, the value is ignored. Defaults to 10sec.
+
+   .. versionadded:: 244
+
+.. systemd:option:: ManageForeignRoutingPolicyRules=
+   :group: network-directives
+
+   A boolean. When true, :code:`systemd-networkd` will remove rules that are not configured in .network files (except for rules with protocol "kernel"). When false, it will not remove any foreign rules, keeping them even if they are not configured in a .network file. Defaults to yes.
+
+   .. versionadded:: 249
+
+.. systemd:option:: ManageForeignRoutes=
+   :group: network-directives
+
+   A boolean. When true, :code:`systemd-networkd` will remove routes that are not configured in .network files (except for routes with protocol "kernel", "dhcp" when :systemd:var:`KeepConfiguration=` is true or "dhcp", and "static" when :systemd:var:`KeepConfiguration=` is true or "static"). When false, it will not remove any foreign routes, keeping them even if they are not configured in a .network file. Defaults to yes.
+
+   .. versionadded:: 246
+
+.. systemd:option:: ManageForeignNextHops=
+   :group: network-directives
+
+   A boolean. When true, :code:`systemd-networkd` will remove nexthops that are not configured in .network files (except for routes with protocol "kernel"). When false, it will not remove any foreign nexthops, keeping them even if they are not configured in a .network file. Defaults to yes.
+
+   .. versionadded:: 256
+
+.. systemd:option:: RouteTable=
+   :group: network-directives
+
+   Defines the route table name. Takes a whitespace-separated list of the pairs of route table name and number. The route table name and number in each pair are separated with a colon, i.e., ":emphasis:`name`::emphasis:`number`". The route table name must not be "default", "main", or "local", as these route table names are predefined with route table number 253, 254, and 255, respectively. The route table number must be an integer in the range 1…4294967295, except for predefined numbers 253, 254, and 255. This setting can be specified multiple times. If an empty string is specified, then the list specified earlier are cleared. Defaults to unset.
+
+   .. versionadded:: 248
+
+.. systemd:option:: IPv4Forwarding=
+   :group: network-directives
+
+   Configures IPv4 packet forwarding for the system. Takes a boolean value. This controls the :code:`net.ipv4.conf.default.forwarding` and :code:`net.ipv4.conf.all.forwarding` sysctl options. See `IP Sysctl <https://docs.kernel.org/networking/ip-sysctl.html>`_ for more details about the sysctl options. Defaults to unset and the sysctl options will not be changed.
+
+   If an interface is configured with a .network file that enables :systemd:var:`IPMasquerade=` for IPv4 (that is, "ipv4" or "both"), this setting is implied unless explicitly specified. See :systemd:var:`IPMasquerade=` in :ref:`systemd.network(5)` for more details.
+
+   .. versionadded:: 256
+
+.. systemd:option:: IPv6Forwarding=
+   :group: network-directives
+
+   Configures IPv6 packet forwarding for the system. Takes a boolean value. This controls the :code:`net.ipv6.conf.default.forwarding` and :code:`net.ipv6.conf.all.forwarding` sysctl options. See `IP Sysctl <https://docs.kernel.org/networking/ip-sysctl.html>`_ for more details about the sysctl options. Defaults to unset and the sysctl options will not be changed.
+
+   If an interface is configured with a .network file that enables :systemd:var:`IPMasquerade=` for IPv6 (that is, "ipv6" or "both"), this setting is implied unless explicitly specified. See :systemd:var:`IPMasquerade=` in :ref:`systemd.network(5)` for more details.
+
+   .. versionadded:: 256
+
+.. systemd:option:: IPv6PrivacyExtensions=
+   :group: network-directives
+
+   Specifies the default value for per-network :systemd:var:`IPv6PrivacyExtensions=`. Takes a boolean or the special values "prefer-public" and "kernel". See for details in :ref:`systemd.network(5)`. Defaults to "no".
+
+   .. versionadded:: 254
+
+.. systemd:option:: UseDomains=
+   :group: network-directives
+
+   Specifies the network- and protocol-independent default value for the same settings in \[IPv6AcceptRA], \[DHCPv4], and \[DHCPv6] sections below. Takes a boolean, or the special value :systemd:option:`route`. See the same setting in :ref:`systemd.network(5)`. Defaults to "no".
+
+   .. versionadded:: 256
+
+[IPv6AcceptRA] Section Options
+##############################
+
+This section configures the default setting of the Neighbor Discovery. The following options are available in the \[IPv6AcceptRA] section:
+
+.. systemd:option:: UseDomains=
+   :group: network-directives
+
+   Specifies the network-independent default value for the same setting in the \[IPv6AcceptRA] section in :ref:`systemd.network(5)`. Takes a boolean, or the special value :systemd:option:`route`. When unspecified, the value specified in the \[Network] section in :man-pages:`networkd.conf(5)`, which defaults to "no", will be used.
+
+   .. versionadded:: 256
+
+[IPv6AddressLabel] Section Options
+##################################
+
+An \[IPv6AddressLabel] section accepts the following keys. Specify multiple \[IPv6AddressLabel] sections to configure multiple address labels. IPv6 address labels are used for address selection. See `RFC 3484 <https://tools.ietf.org/html/rfc3484>`_. Precedence is managed by userspace, and only the label itself is stored in the kernel.
+
+.. systemd:option:: Label=
+   :group: network-directives
+
+   The label for the prefix, an unsigned integer in the range 0…4294967294. 0xffffffff is reserved. This setting is mandatory.
+
+   .. versionadded:: 257
+
+.. systemd:option:: Prefix=
+   :group: network-directives
+
+   IPv6 prefix is an address with a prefix length, separated by a slash "/" character. This setting is mandatory.
+
+   .. versionadded:: 257
+
+[DHCPv4] Section Options
+########################
+
+This section configures the default configurations of DHCPv4 client. If the DHCPv4 client is enabled on an interface, then the configurations below will be used by default unless explicitly specified in the corresponding :code:`.network` file. See also :ref:`systemd.network(5)`.
+
+The following options are understood:
+
+.. systemd:option:: ClientIdentifier=
+   :group: network-directives
+
+   Specifies the default DHCPv4 client identifier to be used. Takes one of :systemd:option:`mac` or :systemd:option:`duid`. If set to :systemd:option:`mac`, the MAC address of each link will be used. If set to :systemd:option:`duid`, an RFC4361-compliant Client ID, which is the combination of IAID and DUID, is used. IAID can be configured by :systemd:var:`IAID=` in each matching :code:`.network` file. DUID can be configured by :systemd:var:`DUIDType=` and :systemd:var:`DUIDRawData=`. Defaults to :systemd:option:`duid`.
+
+   .. versionadded:: 258
+
+.. systemd:option:: DUIDType=
+   :group: network-directives
+
+   Specifies how the DUID should be generated. See `RFC 3315 <https://tools.ietf.org/html/rfc3315#section-9>`_ for a description of all the options.
+
+   This takes an integer in the range 0…65535, or one of the following string values: .. systemd:option:: vendor
+      :group: network-directives
+
+         If "DUIDType=vendor", then the DUID value will be generated using "43793" as the vendor identifier (systemd) and hashed contents of :man-pages:`machine-id(5)`. This is the default if :systemd:var:`DUIDType=` is not specified.
+
+         .. versionadded:: 230
+
+   .. systemd:option:: uuid
+      :group: network-directives
+
+         If "DUIDType=uuid", and :systemd:var:`DUIDRawData=` is not set, then the product UUID is used as a DUID value. If a system does not have valid product UUID, then an application-specific :man-pages:`machine-id(5)` is used as a DUID value. About the application-specific machine ID, see :ref:`sd_id128_get_machine_app_specific(3)`.
+
+         .. versionadded:: 230
+
+   .. systemd:option:: link-layer-time[:TIME], link-layer
+      :group: network-directives
+
+         If "link-layer-time" or "link-layer" is specified, then the MAC address of the interface is used as a DUID value. The value "link-layer-time" can take additional time value after a colon, e.g. "link-layer-time:2018-01-23 12:34:56 UTC". The default time value is "2000-01-01 00:00:00 UTC".
+
+         .. versionadded:: 240
+
+   In all cases, :systemd:var:`DUIDRawData=` can be used to override the actual DUID value that is used.
+
+   .. versionadded:: 230
+
+.. systemd:option:: DUIDRawData=
+   :group: network-directives
+
+   Specifies the DHCP DUID value as a single newline-terminated, hexadecimal string, with each byte separated by ":". The DUID that is sent is composed of the DUID type specified by :systemd:var:`DUIDType=` and the value configured here.
+
+   The DUID value specified here overrides the DUID that :ref:`systemd-networkd.service(8)` generates from the machine ID. To configure DUID per-network, see :ref:`systemd.network(5)`. The configured DHCP DUID should conform to the specification in `RFC 3315 <http://tools.ietf.org/html/rfc3315#section-9>`_, `RFC 6355 <http://tools.ietf.org/html/rfc6355>`_. To configure IAID, see :ref:`systemd.network(5)`.
+
+   A :systemd:option:`DUIDType=vendor` with a custom value
+   -------------------------------------------------------
+
+     .. code-block:: sh
+
+        DUIDType=vendor
+        DUIDRawData=00:00:ab:11:f9:2a:c2:77:29:f9:5c:00
+
+   This specifies a 14 byte DUID, with the type DUID-EN ("00:02"), enterprise number 43793 ("00:00:ab:11"), and identifier value "f9:2a:c2:77:29:f9:5c:00".
+
+   .. versionadded:: 230
+
+.. systemd:option:: UseDomains=
+   :group: network-directives
+
+   Same as the one in the \[IPv6AcceptRA] section, but applied for DHCPv4 protocol.
+
+   .. versionadded:: 256
+
+[DHCPv6] Section Options
+########################
+
+This section configures the default configurations of DHCPv6 client. If the DHCPv6 client is enabled on an interface, then the configurations below will be used by default unless explicitly specified in the corresponding :code:`.network` file. See also :ref:`systemd.network(5)`.
+
+The following options are understood:
+
+.. systemd:option:: DUIDType=, DUIDRawData=
+   :group: network-directives
+
+   As in the \[DHCPv4] section.
+
+   .. versionadded:: 249
+
+.. systemd:option:: UseDomains=
+   :group: network-directives
+
+   As in the \[DHCPv4] section.
+
+   .. versionadded:: 256
+
+[DHCPServer] Section Options
+############################
+
+This section configures the default setting of the DHCP server. The following options are available in the \[DHCPServer] section:
+
+.. systemd:option:: PersistLeases=
+   :group: network-directives
+
+   Specifies the default value for per-network :systemd:var:`PersistLeases=`. Takes a boolean or special value "runtime". See for details in :ref:`systemd.network(5)`. Defaults to "yes".
+
+   .. versionadded:: 256
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.network(5)`, :ref:`systemd-networkd.service(8)`, :man-pages:`machine-id(5)`, :ref:`sd_id128_get_machine_app_specific(3)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

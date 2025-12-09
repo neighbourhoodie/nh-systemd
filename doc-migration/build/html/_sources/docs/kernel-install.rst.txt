@@ -1,0 +1,400 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: kernel-install
+:manvolnum: 8
+:summary: Add and remove kernel and initrd images to and from the boot partition
+
+.. _kernel-install(8):
+
+=================
+kernel-install(8)
+=================
+
+Name
+####
+
+kernel-install — Add and remove kernel and initrd images to and from the boot partition
+
+Synopsis
+########
+
+:code:`kernel-install [OPTIONS...] add KERNEL-VERSION KERNEL-IMAGE [<INITRD-FILE>...]`
+
+:code:`kernel-install [OPTIONS...] add-all`
+
+:code:`kernel-install [OPTIONS...] remove KERNEL-VERSION`
+
+:code:`kernel-install [OPTIONS...] inspect [<KERNEL-VERSION>] [<KERNEL-IMAGE>] [<INITRD-FILE>...]`
+
+:code:`kernel-install [OPTIONS...] list`
+
+Description
+###########
+
+:code:`kernel-install` is used to install and remove kernel and initrd images  [#]_ to and from the boot partition, referred to as :code:`$BOOT` here. It will usually be one of :code:`/boot/`, :code:`/efi/`, or :code:`/boot/efi/`, see below.
+
+:code:`kernel-install` will run the executable files ("plugins") located in the directory :code:`/usr/lib/kernel/install.d/` and the local administration directory :code:`/etc/kernel/install.d/`. All files are collectively sorted and executed in lexicographic order, regardless of the directory in which they live. However, files with identical filenames replace each other. Files in :code:`/etc/kernel/install.d/` take precedence over files with the same name in :code:`/usr/lib/kernel/install.d/`. This can be used to override a system-supplied executables with a local file if needed; a symbolic link in :code:`/etc/kernel/install.d/` with the same name as an executable in :code:`/usr/lib/kernel/install.d/`, pointing to :code:`/dev/null`, disables the executable entirely. Executables must have the extension ".install"; other extensions are ignored.
+
+An executable placed in these directories should return :code:`0` on success. It may also return :code:`77` to cause the whole operation to terminate (executables later in lexicographic order will be skipped).
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: add \[[[KERNEL-VERSION] KERNEL-IMAGE] [INITRD-FILE ...]]
+
+   This command takes a kernel version string and a path to a kernel image file as arguments. If the former is omitted, specified as an empty string or as "-" it defaults to the current kernel version, i.e. the same string :code:`uname -r` returns. If the latter is omitted, specified as an empty string or as "-" defaults to :code:`/usr/lib/modules/KERNEL_VERSION/vmlinuz`. Optionally, one or more initrd images may be specified as well (note that plugins might generate additional ones).
+
+   The executable files from :code:`/usr/lib/kernel/install.d/\*.install` and :code:`/etc/kernel/install.d/\*.install` (i.e. the plugins) are called with the following arguments:
+
+     .. code-block:: sh
+
+        add KERNEL-VERSION  $BOOT/ENTRY-TOKEN/KERNEL-VERSION/  KERNEL-IMAGE  [INITRD-FILE  ...]
+
+   The third argument directly refers to the path where to place kernel images, initrd images and other resources for `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ Type #1 entries (the "entry directory"). If other boot loader schemes are used the parameter may be ignored.
+
+   The :emphasis:`ENTRY-TOKEN` string is typically the machine ID and is supposed to identify the local installation on the system. For details see below.
+
+   :code:`kernel-install` creates :code:`$BOOT/ENTRY-TOKEN/KERNEL-VERSION`, if enabled (see :code:`$KERNEL_INSTALL_LAYOUT`).
+
+   Three default plugins execute the following operations in this case:
+
+   .. systemd:option:: 50-depmod.install
+
+         The plugin runs :man-pages:`depmod(8)` for the :emphasis:`KERNEL-VERSION`.
+
+   .. systemd:option:: 90-loaderentry.install
+
+         The plugin copies :emphasis:`KERNEL-IMAGE` to :code:`$BOOT/ENTRY-TOKEN/KERNEL-VERSION/linux`. If :emphasis:`INITRD-FILE`\s are provided, it also copies them to :code:`$BOOT/ENTRY-TOKEN/KERNEL_VERSION/INITRD-FILE`. This can also be used to prepend microcode before the actual initrd. It also creates a boot loader entry according to the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ (Type #1) in :code:`$BOOT/loader/entries/ENTRY-TOKEN-KERNEL-VERSION.conf`. The title of the entry is the :emphasis:`PRETTY_NAME` parameter specified in :code:`/etc/os-release` or :code:`/usr/lib/os-release` (if the former is missing), or "Linux :emphasis:`KERNEL-VERSION`", if unset.
+
+         If :code:`$KERNEL_INSTALL_LAYOUT` is not "bls", this plugin does nothing.
+
+   .. systemd:option:: 90-uki-copy.install
+
+         If :code:`$KERNEL_INSTALL_STAGING_AREA/uki.efi` exists, the plugin copies it to :code:`$BOOT/EFI/Linux/ENTRY-TOKEN-KERNEL-VERSION.efi`. Also, files in :code:`$KERNEL_INSTALL_STAGING_AREA/uki.efi.extra.d"/` are copied to :code:`$BOOT/EFI/Linux/ENTRY-TOKEN-KERNEL-VERSION.efi.extra.d/`.
+
+         If :code:`$KERNEL_INSTALL_STAGING_AREA/uki.efi` does not exist, and the :emphasis:`KERNEL-IMAGE` argument has a ".efi" extension, the plugin copies the image to :code:`$BOOT/EFI/Linux/ENTRY-TOKEN-KERNEL-VERSION.efi`. Also, files in :code:`KERNEL-IMAGE.extra.d/` and :code:`$KERNEL_INSTALL_STAGING_AREA/uki.efi.extra.d"/` are copied to :code:`$BOOT/EFI/Linux/ENTRY-TOKEN-KERNEL-VERSION.efi.extra.d/`.
+
+         If :code:`$KERNEL_INSTALL_LAYOUT` is not "uki", this plugin does nothing.
+
+   .. versionadded:: 198
+
+.. systemd:option:: add-all
+
+   This is the same as :code:`add` (see above), but invokes the operation iteratively for every installed kernel in :code:`/usr/lib/modules/`. This operation is only supported on systems where the kernel image is installed in :code:`/usr/lib/modules/KERNEL-VERSION/vmlinuz`.
+
+   .. versionadded:: 255
+
+.. systemd:option:: remove KERNEL-VERSION
+
+   This command expects a kernel version string as single argument.
+
+   The executable files from :code:`/usr/lib/kernel/install.d/\*.install` and :code:`/etc/kernel/install.d/\*.install` (i.e. the plugins) are called with the following arguments:
+
+     .. code-block:: sh
+
+        remove KERNEL-VERSION  $BOOT/ENTRY-TOKEN/KERNEL-VERSION/
+
+   Afterwards, :code:`kernel-install` removes the entry directory :code:`$BOOT/ENTRY-TOKEN/KERNEL-VERSION/` and its contents, if it exists.
+
+   Three default plugins execute the following operations in this case:
+
+   .. systemd:option:: 50-depmod.install
+
+         The plugin removes the files generated by :code:`depmod` for this kernel again.
+
+   .. systemd:option:: 90-loaderentry.install
+
+         The plugin removes the file :code:`$BOOT/loader/entries/ENTRY-TOKEN-KERNEL-VERSION.conf`.
+
+   .. systemd:option:: 90-uki-copy.install
+
+         The plugin removes the file :code:`$BOOT/EFI/Linux/ENTRY-TOKEN-KERNEL-VERSION.efi` and :code:`$BOOT/EFI/Linux/ENTRY-TOKEN-KERNEL-VERSION.efi.extra.d/` directory including its contents.
+
+   .. versionadded:: 198
+
+.. systemd:option:: inspect \[[[KERNEL-VERSION] KERNEL-IMAGE] [INITRD-FILE ...]]
+
+   Takes the same parameters as :code:`add`.
+
+   Shows the various paths and parameters configured or auto-detected. In particular shows the values of the various :code:`$KERNEL_INSTALL_*` environment variables listed below, as they would be passed to plugins. The :code:`--json` option can be used to get the output of this verb as a JSON object.
+
+   .. versionadded:: 251
+
+.. systemd:option:: list
+
+   Shows the various installed kernels. This enumerates the subdirectories of :code:`/usr/lib/modules/`, and shows whether a kernel image is installed there.
+
+   .. versionadded:: 255
+
+Compatibility with the kernel build system
+##########################################
+
+:code:`installkernel [OPTIONS...] VERSION VMLINUZ [MAP] [INSTALLATION-DIR]`
+
+When invoked as :code:`installkernel`, this program accepts arguments as specified by the kernel build system's :code:`make install` command. The :code:`VERSION` and :code:`VMLINUZ` parameters specify the kernel version and the kernel binary. The other two parameters (:code:`MAP` and :code:`INSTALLATION-DIR`) are currently ignored.
+
+The :code:`$BOOT` partition
+###########################
+
+The partition where the kernels and `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ snippets are located is called :code:`$BOOT`. :code:`kernel-install` determines the location of this partition by checking :code:`/efi/`, :code:`/boot/`, and :code:`/boot/efi/` in turn. The first location where :code:`$BOOT/loader/entries/` or :code:`$BOOT/ENTRY-TOKEN/` exists is used.
+
+Options
+#######
+
+The following options are understood:
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove esp-path|
+    :end-before: .. inclusion-end-marker-do-not-remove esp-path|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove boot-path|
+    :end-before: .. inclusion-end-marker-do-not-remove boot-path|
+
+.. systemd:option:: --make-entry-directory=yes|no|auto
+
+   Controls creation and deletion of the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ Type #1 entry directory on the file system containing resources such as kernel and initrd images during :code:`add` and :code:`remove`, respectively. The directory is named after the entry token, and is placed immediately below the boot root directory. When "auto", the directory is created or removed only when the install layout is "bls". Defaults to "auto".
+
+   .. versionadded:: 254
+
+.. systemd:option:: --entry-type=type1|type2|all
+
+   Controls the type of entries handled by the command. This is typically useful when multiple types of boot entries with the same kernel version are installed, and only one should be removed. When "type1" or "type2" is specified, each plugin is invoked with :code:`$KERNEL_INSTALL_BOOT_ENTRY_TYPE` environment variable with the specified value. When "all" is specified, the environment variable will not be set. Defaults to "all".
+
+   .. versionadded:: 258
+
+.. systemd:option:: --entry-token=
+
+   Controls how to name and identify boot loader entries for this kernel installation or deletion. Takes one of "auto", "machine-id", "os-id", "os-image-id", or an arbitrary string prefixed by "literal:" as argument.
+
+   If set to :code:`machine-id` the entries are named after the machine ID of the running system (e.g. "b0e793a9baf14b5fa13ecbe84ff637ac"). See :man-pages:`machine-id(5)` for details about the machine ID concept and file.
+
+   If set to :code:`os-id` the entries are named after the OS ID of the running system, i.e. the :code:`ID=` field of :man-pages:`os-release(5)` (e.g. "fedora"). Similarly, if set to :code:`os-image-id` the entries are named after the OS image ID of the running system, i.e. the :code:`IMAGE_ID=` field of :code:`os-release` (e.g. "vendorx-cashier-system").
+
+   If set to :code:`auto` (the default), the :code:`/etc/kernel/entry-token` (or :code:`$KERNEL_INSTALL_CONF_ROOT/entry-token`) file will be read if it exists, and the stored value used. Otherwise, if the local machine ID is initialized, it is used. Otherwise, :code:`IMAGE_ID=` from :code:`os-release` will be used, if set. Otherwise, :code:`ID=` from :code:`os-release` will be used, if set. Otherwise, a randomly generated machine ID is used.
+
+   Using the machine ID for naming the entries is generally preferable, however there are cases where using the other identifiers is a good option. Specifically: if the identification data that the machine ID entails shall not be stored on the (unencrypted) :code:`$BOOT_ROOT` partition, or if the ID shall be generated on first boot and is not known when the entries are prepared. Note that using the machine ID has the benefit that multiple parallel installations of the same OS can coexist on the same medium, and they can update their boot loader entries independently. When using another identifier (such as the OS ID or the OS image ID), parallel installations of the same OS would try to use the same entry name. To support parallel installations, the installer must use a different entry token when adding a second installation.
+
+   .. versionadded:: 254
+
+.. systemd:option:: -v, --verbose
+
+   Output additional information about operations being performed.
+
+   .. versionadded:: 242
+
+.. systemd:option:: --root=root
+
+   Takes a directory path as an argument. All paths will be prefixed with the given alternate :emphasis:`root` path, including config search paths. This is useful to operate on a system image mounted to the specified directory instead of the host system itself.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --image=image
+
+   Takes a path to a disk image file or block device node. If specified, all operations are applied to the file system in the indicated disk image. This option is similar to :code:`--root=`, but operates on file systems stored in disk images or block devices. The disk image should either contain just a file system or a set of file systems within a GPT partition table, following the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_. For further information on supported disk images, see :ref:`systemd-nspawn(1)`'s switch of the same name.
+
+   .. versionadded:: 255
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove json|
+    :end-before: .. inclusion-end-marker-do-not-remove json|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove image-policy-open|
+    :end-before: .. inclusion-end-marker-do-not-remove image-policy-open|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+Environment variables
+#####################
+
+Environment variables exported for plugins
+##########################################
+
+If :code:`--verbose` is used, :code:`$KERNEL_INSTALL_VERBOSE=1` will be exported for plugins. They may output additional logs in this case.
+
+:code:`$KERNEL_INSTALL_IMAGE_TYPE=uki|pe|unknown` is set for the plugins to specify the type of the kernel image.
+
+.. systemd:option:: uki
+
+   Unified kernel image.
+
+   .. versionadded:: 254
+
+.. systemd:option:: pe
+
+   PE binary.
+
+   .. versionadded:: 254
+
+.. systemd:option:: unknown
+
+   Unknown type.
+
+   .. versionadded:: 254
+
+:code:`$KERNEL_INSTALL_MACHINE_ID` is set for the plugins to the desired machine-id to use. It's always a 128-bit ID. Normally it is read from :code:`/etc/machine-id`, but it can also be overridden via :code:`$MACHINE_ID` (see below). If not specified via these methods, a fallback value will generated by :code:`kernel-install` and used only for a single invocation.
+
+:code:`$KERNEL_INSTALL_ENTRY_TOKEN` is set for the plugins to the desired entry "token" to use. It's an identifier that shall be used to identify the local installation, and is often the machine ID, i.e. same as :code:`$KERNEL_INSTALL_MACHINE_ID`, but might also be a different type of identifier, for example a fixed string or the :code:`ID=`, :code:`IMAGE_ID=` values from :code:`/etc/os-release`. The string passed here will be used to name Boot Loader Specification entries, or the directories the kernel image and initial RAM disk images are placed into.
+
+Note that while :code:`$KERNEL_INSTALL_ENTRY_TOKEN` and :code:`$KERNEL_INSTALL_MACHINE_ID` are often set to the same value, the latter is guaranteed to be a valid 32 character ID in lowercase hexadecimals while the former can be any short string. The entry token to use is read from :code:`/etc/kernel/entry-token`, if it exists. Otherwise, a few possible candidates below :code:`$BOOT` are checked for Boot Loader Specification Type 1 entry directories, and if found the entry token is derived from that. If that is not successful, :code:`$KERNEL_INSTALL_MACHINE_ID` is used as fallback.
+
+:code:`$KERNEL_INSTALL_BOOT_ROOT` is set for the plugins to the absolute path of the root directory (mount point, usually) of the hierarchy where boot loader entries, kernel images, and associated resources should be placed. This usually is the path where the XBOOTLDR partition or the ESP (EFI System Partition) are mounted, and also conceptually referred to as :code:`$BOOT`. Can be overridden by setting :code:`$BOOT_ROOT` (see below).
+
+:code:`$KERNEL_INSTALL_LAYOUT=auto|bls|uki|other|...` is set for the plugins to specify the installation layout. Additional layout names may be defined by convention. If a plugin uses a special layout, it is encouraged to declare its own layout name and configure :code:`layout=` in :code:`install.conf` upon initial installation. The following values are currently understood:
+
+.. systemd:option:: bls
+
+   Standard `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ Type #1 layout, compatible with :ref:`systemd-boot(7)`: entries in :code:`$BOOT/loader/entries/ENTRY-TOKEN-KERNEL-VERSION[+TRIES].conf`, kernel and initrds under :code:`$BOOT/ENTRY-TOKEN/KERNEL-VERSION/`
+
+   Implemented by :code:`90-loaderentry.install`.
+
+   .. versionadded:: 250
+
+.. systemd:option:: uki
+
+   Standard `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ Type #2 layout, compatible with :ref:`systemd-boot(7)`: unified kernel images under :code:`$BOOT/EFI/Linux` as :code:`$BOOT/EFI/Linux/ENTRY-TOKEN-KERNEL-VERSION[+TRIES].efi`.
+
+   Implemented by :code:`90-uki-copy.install`.
+
+   .. versionadded:: 253
+
+.. systemd:option:: other
+
+   Some other layout not understood natively by :code:`kernel-install`.
+
+   .. versionadded:: 250
+
+.. systemd:option:: auto
+
+   Pick the layout automatically. If the kernel is a UKI set layout to :code:`uki`. If not default to :code:`bls` if :code:`$BOOT/loader/entries.srel` with content "type1" or :code:`$BOOT/ENTRY-TOKEN` exists, or :code:`other` otherwise.
+
+   Leaving layout blank has the same effect. This is the default.
+
+   .. versionadded:: 254
+
+:code:`$KERNEL_INSTALL_INITRD_GENERATOR` and :code:`$KERNEL_INSTALL_UKI_GENERATOR` are set for plugins to select the initrd and/or UKI generator. This may be configured as :code:`initrd_generator=` and :code:`uki_generator=` in :code:`install.conf`, see below.
+
+:code:`$KERNEL_INSTALL_STAGING_AREA` is set for plugins to a path to a directory. Plugins may drop files in that directory, and they will be installed as part of the loader entry, based on the file name and extension: Files named :code:`initrd*` will be installed as :emphasis:`INITRD-FILE`\s, and files named :code:`microcode*` will be prepended before :emphasis:`INITRD-FILE`\s.
+
+Environment variables understood by :code:`kernel-install`
+##########################################################
+
+:code:`$KERNEL_INSTALL_CONF_ROOT` can be set to override the location of the configuration files read by :code:`kernel-install`. When set, :code:`install.conf`, :code:`entry-token`, and other files will be read from this directory only. Note that this path is relative to the host, and in particular *symlinks in this directory are resolved relative to the host*\, even if , even if :code:`--root=:emphasis:`root`` is used. This means that it is generally *not* correct to use this variable to specify a directory underneath correct to use this variable to specify a directory underneath :emphasis:`root` if symlinks are used there.
+
+:code:`$KERNEL_INSTALL_PLUGINS` can be set to override the list of plugins executed by :code:`kernel-install`. The argument is a whitespace-separated list of paths. "KERNEL_INSTALL_PLUGINS=:" may be used to prevent any plugins from running.
+
+:code:`$MACHINE_ID` can be set for :code:`kernel-install` to override :code:`$KERNEL_INSTALL_MACHINE_ID`, the machine ID.
+
+:code:`$BOOT_ROOT` can be set for :code:`kernel-install` to override :code:`$KERNEL_INSTALL_BOOT_ROOT`, the installation location for boot entries.
+
+The last two variables may also be set in :code:`install.conf`. Variables set in the environment take precedence over the values specified in the config file.
+
+Exit status
+###########
+
+If every executable returns 0 or 77, 0 is returned, and a non-zero failure code otherwise.
+
+Files
+#####
+
+.. systemd:option:: /etc/kernel/install.d/\*.install, /usr/lib/kernel/install.d/\*.install
+
+   Drop-in files which are executed by :code:`kernel-install`.
+
+   .. versionadded:: 198
+
+.. systemd:option:: /etc/kernel/cmdline, /usr/lib/kernel/cmdline, /proc/cmdline
+
+   Specifies the kernel command line to use. The first of the files that is found will be used. :code:`$KERNEL_INSTALL_CONF_ROOT` may be used to override the search path; see below for details.
+
+   .. versionadded:: 198
+
+.. systemd:option:: /etc/kernel/devicetree, /usr/lib/kernel/devicetree
+
+   Specifies the partial path to the file containing the device tree blob to install with the kernel and use at boot. The first of the files that is found will be used. :code:`$KERNEL_INSTALL_CONF_ROOT` may be used to override the search path; see below for details.
+
+   The :code:`devicetree` file contains a path, and this path specifies a location relative to the kernel install tree. A set of locations is checked, including in particular :code:`/usr/lib/modules/KERNEL_VERSION/dtb/`, which is the recommended location to place the dtb files under. For example, with "broadcom/bcm2711-rpi-4-b.dtb" in the :code:`devicetree` file, the device tree blob for the Raspberry Pi 4 Model B would be installed, and the actual file would be :code:`/usr/lib/modules/KERNEL_VERSION/dtb/broadcom/bcm2711-rpi-4-b.dtb`.
+
+   .. versionadded:: 255
+
+.. systemd:option:: /etc/kernel/tries
+
+   Read by :code:`90-loaderentry.install` and :code:`90-uki-copy.install`. If this file exists, a numeric value is read from it and the naming of the generated entry file or UKI is altered to include it as :code:`$BOOT/loader/entries/ENTRY-TOKEN-KERNEL-VERSION+TRIES.conf` or :code:`$BOOT/EFI/Linux/ENTRY-TOKEN-KERNEL-VERSION+TRIES.efi`, respectively. This is useful for boot loaders such as :ref:`systemd-boot(7)` which implement boot attempt counting with a counter embedded in the entry file name. :code:`$KERNEL_INSTALL_CONF_ROOT` may be used to override the search path; see below for details.
+
+   .. versionadded:: 240
+
+.. systemd:option:: /etc/kernel/entry-token
+
+   If this file exists it is read and used as "entry token" for this system, i.e. is used for naming Boot Loader Specification entries. See :code:`$KERNEL_INSTALL_ENTRY_TOKEN` above for details. :code:`$KERNEL_INSTALL_CONF_ROOT` may be used to override the search path; see below for details.
+
+   .. versionadded:: 251
+
+.. systemd:option:: /etc/machine-id
+
+   The content of this file specifies the machine identification :emphasis:`MACHINE-ID`.
+
+   .. versionadded:: 198
+
+.. systemd:option:: /etc/os-release, /usr/lib/os-release
+
+   Read by :code:`90-loaderentry.install`. If available, :code:`PRETTY_NAME=` is read from these files and used as the title of the boot menu entry. Otherwise, "Linux :emphasis:`KERNEL-VERSION`" will be used.
+
+   .. versionadded:: 198
+
+.. systemd:option:: /etc/kernel/install.conf, /run/kernel/install.conf, /usr/local/lib/kernel/install.conf, /usr/lib/kernel/install.conf, /etc/kernel/install.conf.d/\*.conf, /run/kernel/install.conf.d/\*.conf, /usr/local/lib/kernel/install.conf.d/\*.conf, /usr/lib/kernel/install.conf.d/\*.conf
+
+   Configuration file with options for :code:`kernel-install`, as a series of :code:`KEY=`:emphasis:`VALUE` assignments, compatible with shell syntax, following the same rules as described in :man-pages:`os-release(5)`. The first of the files that is found will be used. :code:`$KERNEL_INSTALL_CONF_ROOT` may be used to override the search path; see below for details. Drop-in files may also be used to extend the configuration with overrides, see :ref:`systemd.unit(5)`.
+
+   Currently, the following keys are supported: :code:`MACHINE_ID=`, :code:`BOOT_ROOT=`, :code:`layout=`, :code:`initrd_generator=`, :code:`uki_generator=`. See the Environment variables section above for details.
+
+   .. versionadded:: 250
+
+.. systemd:option:: /etc/kernel/uki.conf
+
+   Ini-style configuration file for :man-pages:`ukify(1)` which is only effective when :code:`$KERNEL_INSTALL_LAYOUT` or :code:`layout=` in :code:`install.conf` is set to :code:`uki` and :code:`$KERNEL_INSTALL_UKI_GENERATOR` or :code:`uki_generator=` in :code:`install.conf` is set to :code:`ukify`, or is unset. :code:`$KERNEL_INSTALL_CONF_ROOT` may be used to override the search path; see below for details.
+
+   .. versionadded:: 255
+
+.. systemd:option:: /usr/lib/modules/KERNEL-VERSION/
+
+   Location for installed kernel modules and other kernel related resources. For each locally installed kernel a directory named after the kernel version (:code:`uname -r`) is kept.
+
+   .. versionadded:: 255
+
+.. systemd:option:: /usr/lib/modules/KERNEL-VERSION/vmlinuz
+
+   Location for installed kernel images. This is the recommended location for OS package managers to install kernel images into (as applicable), from which :code:`kernel-install add` then copies it into the final boot partition.
+
+   .. versionadded:: 255
+
+For various cases listed above, if the :code:`$KERNEL_INSTALL_CONF_ROOT` environment variable is set, it will override the search path. The files will be loaded *only* from the directory specified by the environment variable. When the variable is not set, the listed paths are tried in turn, and the first file that exists is used. from the directory specified by the environment variable. When the variable is not set, the listed paths are tried in turn, and the first file that exists is used.
+
+See Also
+########
+
+:man-pages:`machine-id(5)`, :man-pages:`os-release(5)`, :man-pages:`depmod(8)`, :ref:`systemd-boot(7)`, :man-pages:`ukify(1)`, `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_
+
+
+
+.. rubric:: Footnotes
+
+.. [#] Nowadays actually CPIO archives used as an "initramfs", rather than "initrd". See :man-pages:`bootup(7)` for an explanation.
+ 
+

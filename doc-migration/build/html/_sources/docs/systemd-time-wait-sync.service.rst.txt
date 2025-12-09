@@ -1,0 +1,47 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-time-wait-sync.service
+:manvolnum: 8
+:summary: Wait until kernel time is synchronized
+:aliases: systemd-time-wait-sync
+
+.. _systemd-time-wait-sync.service(8):
+
+=================================
+systemd-time-wait-sync.service(8)
+=================================
+
+Name
+####
+
+systemd-time-wait-sync.service, systemd-time-wait-sync — Wait until kernel time is synchronized
+
+Synopsis
+########
+
+:code:`systemd-time-wait-sync.service`
+
+:code:`/usr/lib/systemd/systemd-time-wait-sync`
+
+Description
+###########
+
+:code:`systemd-time-wait-sync` is a system service that delays the start of units that are ordered after :code:`time-sync.target` (see :ref:`systemd.special(7)` for details) until the system time has been synchronized with an accurate remote reference time source by :code:`systemd-timesyncd.service`.
+
+:code:`systemd-timesyncd.service` notifies :code:`systemd-time-wait-sync` about successful synchronization. :code:`systemd-time-wait-sync` also tries to detect when the kernel marks the system clock as synchronized, but this detection is not reliable and is intended only as a fallback for compatibility with alternative NTP services that can be used to synchronize time (e.g., ntpd, chronyd).
+
+Files
+#####
+
+.. systemd:option:: /run/systemd/timesync/synchronized
+
+   The presence of this file indicates to this service that the system clock has been synchronized.
+
+   .. versionadded:: 239
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.special(7)`, :ref:`systemd-timesyncd.service(8)`
+
+

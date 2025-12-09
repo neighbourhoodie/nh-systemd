@@ -1,0 +1,441 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: machinectl
+:manvolnum: 1
+:summary: Control the systemd machine manager
+
+.. _machinectl(1):
+
+=============
+machinectl(1)
+=============
+
+Name
+####
+
+machinectl — Control the systemd machine manager
+
+Synopsis
+########
+
+:code:`machinectl [OPTIONS...] {COMMAND} [NAME...]`
+
+Description
+###########
+
+:code:`machinectl` may be used to introspect and control the state of the :ref:`systemd(1)` virtual machine and container registration manager :ref:`systemd-machined.service(8)`.
+
+:code:`machinectl` may be used to execute operations on machines and images. Machines in this sense are considered running instances of:
+
+*    Virtual Machines (VMs) that virtualize hardware to run full operating system (OS) instances (including their kernels) in a virtualized environment on top of the host OS.
+
+*    Containers that share the hardware and OS kernel with the host OS, in order to run OS userspace instances on top the host OS.
+
+*    The host system itself.
+
+Machines are identified by names that follow the same rules as UNIX and DNS hostnames. For details, see below.
+
+Machines are instantiated from disk or file system images that frequently — but not necessarily — carry the same name as machines running from them. Images in this sense may be:
+
+*    Directory trees containing an OS, including the top-level directories :code:`/usr/`, :code:`/etc/`, and so on.
+
+*    btrfs subvolumes containing OS trees, similar to regular directory trees.
+
+*    Binary "raw" disk image files containing MBR or GPT partition tables and Linux file systems.
+
+*    Similarly, block devices containing MBR or GPT partition tables and file systems.
+
+*    The file system tree of the host OS itself.
+
+Images may be downloaded, imported and exported via the :man-pages:`importctl(1)` tool.
+
+Commands
+########
+
+The following commands are understood:
+
+Machine Commands
+################
+
+.. systemd:option:: list
+
+   List currently running (online) virtual machines and containers. To enumerate machine images that can be started, use :code:`list-images` (see below). Note that this command hides the special ".host" machine by default. Use the :code:`--all` switch to show it.
+
+   .. versionadded:: 206
+
+.. systemd:option:: status NAME…
+
+   Show runtime status information about one or more virtual machines and containers, followed by the most recent log data from the journal. This function is intended to generate human-readable output. If you are looking for computer-parsable output, use :code:`show` instead. Note that the log data shown is reported by the virtual machine or container manager, and frequently contains console output of the machine, but not necessarily journal contents of the machine itself.
+
+   .. versionadded:: 206
+
+.. systemd:option:: show [NAME…]
+
+   Show properties of one or more registered virtual machines or containers or the manager itself. If no argument is specified, properties of the manager will be shown. If a NAME is specified, properties of this virtual machine or container are shown. By default, empty properties are suppressed. Use :code:`--all` to show those too. To select specific properties to show, use :code:`--property=`. This command is intended to be used whenever computer-parsable output is required, and does not print the control group tree or journal entries. Use :code:`status` if you are looking for formatted human-readable output.
+
+   .. versionadded:: 206
+
+.. systemd:option:: start NAME…
+
+   Start a container as a system service, using :ref:`systemd-nspawn(1)`. This starts :code:`systemd-nspawn@.service`, instantiated for the specified machine name, similar to the effect of :code:`systemctl start` on the service name. :code:`systemd-nspawn` looks for a container image by the specified name in :code:`/var/lib/machines/` (and other search paths, see below) and runs it. Use :code:`list-images` (see below) for listing available container images to start.
+
+   Note that :ref:`systemd-machined.service(8)` also interfaces with a variety of other container and VM managers, :code:`systemd-nspawn` is just one implementation of it. Most of the commands available in :code:`machinectl` may be used on containers or VMs controlled by other managers, not just :code:`systemd-nspawn`. Starting VMs and container images on those managers requires manager-specific tools.
+
+   To interactively start a container on the command line with full access to the container's console, please invoke :code:`systemd-nspawn` directly. To stop a running container use :code:`machinectl poweroff`.
+
+   .. versionadded:: 219
+
+.. systemd:option:: login [NAME]
+
+   Open an interactive terminal login session in a container or on the local host. If an argument is supplied, it refers to the container machine to connect to. If none is specified, or the container name is specified as the empty string, or the special machine name ".host" (see below) is specified, the connection is made to the local host instead. This will create a TTY connection to a specific container or the local host and asks for the execution of a getty on it. Note that this is only supported for containers running :ref:`systemd(1)` as init system.
+
+   This command will open a full login prompt on the container or the local host, which then asks for username and password. Use :code:`shell` (see below) or :ref:`systemd-run(1)` with the :code:`--machine=` switch to directly invoke a single command, either interactively or in the background.
+
+   .. versionadded:: 209
+
+.. systemd:option:: shell [[NAME@]NAME [PATH [ARGUMENTS…]]]
+
+   Open an interactive shell session in a container or on the local host. The first argument refers to the container machine to connect to. If none is specified, or the machine name is specified as the empty string, or the special machine name ".host" (see below) is specified, the connection is made to the local host instead. This works similarly to :code:`login`, but immediately invokes a user process. This command runs the specified executable with the specified arguments, or the default shell for the user if none is specified, or :code:`/bin/sh` if no default shell is found. By default, :code:`--uid=`, or by prefixing the machine name with a username and an "@" character, a different user may be selected. Use :code:`--setenv=` to set environment variables for the executed process.
+
+   Note that :code:`machinectl shell` does not propagate the exit code/status of the invoked shell process. Use :code:`systemd-run` instead if that information is required (see below).
+
+   Using the :code:`shell` command without arguments (thus invoking the executed shell or command on the local host), is in many ways similar to a :die-net:`su(1)` session, but, unlike :code:`su`, completely isolates the new session from the originating session, so that it shares no process or session properties and is in a clean well-defined state. It will be tracked in a new utmp, login, audit, security, and keyring sessions, and will not inherit any environment variables or resource limits, among other properties.
+
+   Note that :ref:`systemd-run(1)` with its :code:`--machine=` switch may be used in place of the :code:`machinectl shell` command, and allows non-interactive operation, more detailed and low-level configuration of the invoked unit, as well as access to runtime and exit code/status information of the invoked shell process. In particular, use :code:`systemd-run`'s :code:`--wait` switch to propagate exit status information of the invoked process. Use :code:`systemd-run`'s :code:`--pty` switch to acquire an interactive shell, similarly to :code:`machinectl shell`. In general, :code:`systemd-run` is preferable for scripting purposes. However, note that :code:`systemd-run` might require higher privileges than :code:`machinectl shell`.
+
+   .. versionadded:: 225
+
+.. systemd:option:: enable NAME…, disable NAME…
+
+   Enable or disable a container as a system service to start at system boot, using :ref:`systemd-nspawn(1)`. This enables or disables :code:`systemd-nspawn@.service`, instantiated for the specified machine name, similarly to the effect of :code:`systemctl enable` or :code:`systemctl disable` on the service name.
+
+   This command implicitly reloads the system manager configuration after completing the operation. Note that this command does not implicitly start or power off the containers that are being operated on. If this is desired, combine the command with the :code:`--now` switch.
+
+   .. versionadded:: 219
+
+.. systemd:option:: poweroff NAME…
+
+   Power off one or more containers. This will trigger a shutdown by sending SIGRTMIN+4 to the container's init process, which causes systemd-compatible init systems to shut down cleanly. Use :code:`stop` as alias for :code:`poweroff`. This operation does not work on containers that do not run a :ref:`systemd(1)`-compatible init system, such as sysvinit. Use :code:`terminate` (see below) to immediately terminate a container or VM, without cleanly shutting it down.
+
+   .. versionadded:: 212
+
+.. systemd:option:: reboot NAME…
+
+   Reboot one or more containers. This will trigger a reboot by sending SIGINT to the container's init process, which is roughly equivalent to pressing Ctrl+Alt+Del on a non-containerized system, and is compatible with containers running any system manager. Use :code:`restart` as alias for :code:`reboot`.
+
+   .. versionadded:: 209
+
+.. systemd:option:: terminate NAME…
+
+   Immediately terminates a virtual machine or container, without cleanly shutting it down. This kills all processes of the virtual machine or container and deallocates all resources attached to that instance. Use :code:`poweroff` to issue a clean shutdown request.
+
+   .. versionadded:: 206
+
+.. systemd:option:: kill NAME…
+
+   Send a signal to one or more processes of the virtual machine or container. This means processes as seen by the host, not the processes inside the virtual machine or container. Use :code:`--kill-whom=` to select which process to kill. Use :code:`--signal=` to select the signal to send.
+
+   .. versionadded:: 206
+
+.. systemd:option:: bind NAME PATH [PATH]
+
+   Bind mounts a file or directory from the host into the specified container. The first path argument is the source file or directory on the host, the second path argument is the destination file or directory in the container. When the latter is omitted, the destination path in the container is the same as the source path on the host. When combined with the :code:`--read-only` switch, a read-only bind mount is created. When combined with the :code:`--mkdir` switch, the destination path is first created before the mount is applied. Note that this option is currently only supported for :ref:`systemd-nspawn(1)` containers, and only if user namespacing (:code:`--private-users`) is not used. This command supports bind mounting directories, regular files, device nodes, :code:`AF_UNIX` socket nodes, as well as FIFOs.
+
+   .. versionadded:: 219
+
+.. systemd:option:: copy-to NAME PATH [PATH] --force
+
+   Copies files or directories from the host system into a running container. Takes a container name, followed by the source path on the host and the destination path in the container. If the destination path is omitted, the same as the source path is used.
+
+   If host and container share the same user and group namespace, file ownership by numeric user ID and group ID is preserved for the copy, otherwise all files and directories in the copy will be owned by the root user and group (UID/GID 0).
+
+   .. versionadded:: 219
+
+.. systemd:option:: copy-from NAME PATH [PATH] --force
+
+   Copies files or directories from a container into the host system. Takes a container name, followed by the source path in the container and the destination path on the host. If the destination path is omitted, the same as the source path is used.
+
+   If host and container share the same user and group namespace, file ownership by numeric user ID and group ID is preserved for the copy, otherwise all files and directories in the copy will be owned by the root user and group (UID/GID 0).
+
+   .. versionadded:: 219
+
+Image Commands
+##############
+
+.. systemd:option:: list-images
+
+   Show a list of locally installed container and VM images. This enumerates all raw disk images and container directories and subvolumes in :code:`/var/lib/machines/` (and other search paths, see below). Use :code:`start` (see above) to run a container off one of the listed images. Note that, by default, containers whose name begins with a dot (".") are not shown. To show these too, specify :code:`--all`. Note that a special image ".host" always implicitly exists and refers to the image the host itself is booted from.
+
+   .. versionadded:: 219
+
+.. systemd:option:: image-status [NAME…]
+
+   Show terse status information about one or more container or VM images. This function is intended to generate human-readable output. Use :code:`show-image` (see below) to generate computer-parsable output instead.
+
+   .. versionadded:: 219
+
+.. systemd:option:: show-image [NAME…]
+
+   Show properties of one or more registered virtual machine or container images, or the manager itself. If no argument is specified, properties of the manager will be shown. If a NAME is specified, properties of this virtual machine or container image are shown. By default, empty properties are suppressed. Use :code:`--all` to show those too. To select specific properties to show, use :code:`--property=`. This command is intended to be used whenever computer-parsable output is required. Use :code:`image-status` if you are looking for formatted human-readable output.
+
+   .. versionadded:: 219
+
+.. systemd:option:: edit NAME|FILE
+
+   Edit the settings file of the specified machines. For the format of the settings file, refer to :man-pages:`systemd.nspawn(5)`. If an existing settings file of the given machine cannot be found, :code:`edit` automatically create a new settings file from scratch under :code:`/etc/systemd/nspawn/`.
+
+   .. versionadded:: 254
+
+.. systemd:option:: cat NAME|FILE
+
+   Show the settings file of the specified machines.
+
+   .. versionadded:: 254
+
+.. systemd:option:: clone NAME NAME
+
+   Clones a container or VM image. The arguments specify the name of the image to clone and the name of the newly cloned image. Note that plain directory container images are cloned into btrfs subvolume images with this command, if the underlying file system supports this. Note that cloning a container or VM image is optimized for file systems that support copy-on-write, and might not be efficient on others, due to file system limitations.
+
+   Note that this command leaves hostname, machine ID and all other settings that could identify the instance unmodified. The original image and the cloned copy will hence share these credentials, and it might be necessary to manually change them in the copy.
+
+   If combined with the :code:`--read-only` switch a read-only cloned image is created.
+
+   .. versionadded:: 219
+
+.. systemd:option:: rename NAME NAME
+
+   Renames a container or VM image. The arguments specify the name of the image to rename and the new name of the image.
+
+   .. versionadded:: 219
+
+.. systemd:option:: read-only NAME [BOOL]
+
+   Marks or (unmarks) a container or VM image read-only. Takes a VM or container image name, followed by a boolean as arguments. If the boolean is omitted, positive is implied, i.e. the image is marked read-only.
+
+   .. versionadded:: 219
+
+.. systemd:option:: remove NAME…
+
+   Removes one or more container or VM images. The special image ".host", which refers to the host's own directory tree, may not be removed.
+
+   .. versionadded:: 219
+
+.. systemd:option:: set-limit [NAME] BYTES
+
+   Sets the maximum size in bytes that a specific container or VM image, or all images, may grow up to on disk (disk quota). Takes either one or two parameters. The first, optional parameter refers to a container or VM image name. If specified, the size limit of the specified image is changed. If omitted, the overall size limit of the sum of all images stored locally is changed. The final argument specifies the size limit in bytes, possibly suffixed by the usual K, M, G, T units. If the size limit shall be disabled, specify "-" as size.
+
+   Note that per-container size limits are only supported on btrfs file systems.
+
+   .. versionadded:: 220
+
+.. systemd:option:: clean
+
+   Remove hidden VM or container images (or all). This command removes all hidden machine images from :code:`/var/lib/machines/`, i.e. those whose name begins with a dot. Use :code:`machinectl list-images --all` to see a list of all machine images, including the hidden ones.
+
+   When combined with the :code:`--all` switch removes all images, not just hidden ones. This command effectively empties :code:`/var/lib/machines/`.
+
+   Note that commands such as :code:`importctl pull-tar` or :code:`importctl pull-raw` usually create hidden, read-only, unmodified machine images from the downloaded image first, before cloning a writable working copy of it, in order to avoid duplicate downloads in case of images that are reused multiple times. Use :code:`machinectl clean` to remove old, hidden images created this way.
+
+   .. versionadded:: 230
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: -p, --property=
+
+   When showing machine or image properties, limit the output to certain properties as specified by the argument. If not specified, all set properties are shown. The argument should be a property name, such as "Name". If specified more than once, all properties with the specified names are shown.
+
+   .. versionadded:: 206
+
+.. systemd:option:: --value
+
+   When printing properties with :code:`show`, only print the value, and skip the property name and "=".
+
+   .. versionadded:: 230
+
+.. include:: timedatectl.rst
+    :start-after: .. inclusion-marker-do-not-remove option-P|
+    :end-before: .. inclusion-end-marker-do-not-remove option-P|
+
+.. systemd:option:: -a, --all
+
+   When showing machine or image properties, show all properties regardless of whether they are set or not.
+
+   When listing VM or container images, do not suppress images beginning in a dot character (".").
+
+   When cleaning VM or container images, remove all images, not just hidden ones.
+
+   .. versionadded:: 206
+
+.. systemd:option:: -l, --full
+
+   Do not ellipsize process tree entries or table. This implies :code:`--max-addresses=full`.
+
+   .. versionadded:: 206
+
+.. systemd:option:: --kill-whom=
+
+   When used with :code:`kill`, choose which processes to kill. Must be one of :code:`leader`, :code:`supervisor`, or :code:`all` to select whether to kill only the leader process of the machine, the supervisor process of the machine, or all processes of the machine. If omitted, defaults to :code:`all`.
+
+   .. versionadded:: 206
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove signal|
+    :end-before: .. inclusion-end-marker-do-not-remove signal|
+
+.. systemd:option:: --uid=
+
+   When used with the :code:`shell` command, chooses the user ID to open the interactive shell session as. If the argument to the :code:`shell` command also specifies a user name, this option is ignored. If the name is not specified in either way, "root" will be used by default. Note that this switch is not supported for the :code:`login` command (see below).
+
+   .. versionadded:: 225
+
+.. systemd:option:: -E NAME[=VALUE], --setenv=NAME[=VALUE]
+
+   When used with the :code:`shell` command, sets an environment variable for the executed shell. This option may be used more than once to set multiple variables. When "=" and :emphasis:`VALUE` are omitted, the value of the variable with the same name in the program environment will be used.
+
+   Note that this option is not supported for the :code:`login` command.
+
+   .. versionadded:: 230
+
+.. systemd:option:: --mkdir
+
+   When used with :code:`bind`, creates the destination file or directory before applying the bind mount. Note that even though the name of this option suggests that it is suitable only for directories, this option also creates the destination file node to mount over if the object to mount is not a directory, but a regular file, device node, socket or FIFO.
+
+   .. versionadded:: 219
+
+.. systemd:option:: --read-only
+
+   When used with :code:`bind`, creates a read-only bind mount.
+
+   When used with :code:`clone` a read-only container or VM image is created.
+
+   .. versionadded:: 219
+
+.. systemd:option:: -n, --lines=
+
+   When used with :code:`status`, controls the number of journal lines to show, counting from the most recent ones. Takes a positive integer argument. Defaults to 10.
+
+   .. versionadded:: 219
+
+.. systemd:option:: -o, --output=
+
+   When used with :code:`status`, controls the formatting of the journal entries that are shown. For the available choices, see :man-pages:`journalctl(1)`. Defaults to "short".
+
+   .. versionadded:: 219
+
+.. systemd:option:: --runner=nspawn|vmspawn
+
+   When operating on machines choose whether to use :ref:`systemd-nspawn(1)` or :ref:`systemd-vmspawn(1)`. By default :ref:`systemd-nspawn(1)` is used.
+
+   .. versionadded:: 256
+
+.. systemd:option:: -V
+
+   :code:`-V` is a shorthand for :code:`--runner=vmspawn`.
+
+   .. versionadded:: 256
+
+.. systemd:option:: --now
+
+   When used with :code:`enable` or :code:`disable`, the containers will also be started or powered off. The start or poweroff operation is only carried out when the respective enable or disable operation has been successful.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --force
+
+   Replace target file when copying files.
+
+   .. versionadded:: 219
+
+.. systemd:option:: --max-addresses=
+
+   When used with the :code:`list-machines` command, limits the number of IP addresses shown for every machine. Defaults to 1. All addresses can be requested with "all". If the limit is 0, the address column is not shown. Otherwise, if the machine has more addresses than shown, "…" follows the last address.
+
+   .. versionadded:: 232
+
+.. systemd:option:: -q, --quiet
+
+   Suppresses additional informational output while running.
+
+   .. versionadded:: 236
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. systemd:option:: -M, --machine=
+
+   Connect to :ref:`systemd-machined.service(8)` running in a local container, to perform the specified operation within the container.
+
+   .. versionadded:: 235
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-legend|
+    :end-before: .. inclusion-end-marker-do-not-remove no-legend|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Machine and Image Names
+#######################
+
+The :code:`machinectl` tool operates on machines and images whose names must be chosen following strict rules. Machine names must be suitable for use as hostnames following a conservative subset of DNS and UNIX/Linux semantics. Specifically, they must consist of one or more non-empty label strings, separated by dots. No leading or trailing dots are allowed. No sequences of multiple dots are allowed. The label strings may only consist of alphanumeric characters as well as the dash. The maximum length of a machine name is 64 characters.
+
+A special machine with the name ".host" refers to the running host system itself. This is useful for execution operations or inspecting the host system as well. Note that :code:`machinectl list` will not show this special machine unless the :code:`--all` switch is specified.
+
+Requirements on image names are less strict, however, they must be valid UTF-8, must be suitable as file names (hence not be the single or double dot, and not include a slash), and may not contain control characters. Since many operations search for an image by the name of a requested machine, it is recommended to name images in the same strict fashion as machines.
+
+A special image with the name ".host" refers to the image of the running host system. It hence conceptually maps to the special ".host" machine name described above. Note that :code:`machinectl list-images` will not show this special image either, unless :code:`--all` is specified.
+
+Files and Directories
+#####################
+
+Machine images are preferably stored in :code:`/var/lib/machines/`, but are also searched for in :code:`/usr/local/lib/machines/` and :code:`/usr/lib/machines/`. For compatibility reasons, the directory :code:`/var/lib/container/` is searched, too. Note that images stored below :code:`/usr/` are always considered read-only. It is possible to symlink machines images from other directories into :code:`/var/lib/machines/` to make them available for control with :code:`machinectl`.
+
+Note that some image operations are only supported, efficient or atomic on btrfs file systems.
+
+Disk images are understood by :ref:`systemd-nspawn(1)` and :code:`machinectl` in three formats:
+
+*    A simple directory tree, containing the files and directories of the container to boot.
+
+*    Subvolumes (on btrfs file systems), which are similar to the simple directories, described above. However, they have additional benefits, such as efficient cloning and quota reporting.
+
+*    "Raw" disk images, i.e. binary images of disks with a GPT or MBR partition table. Images of this type are regular files with the suffix ".raw".
+
+See :ref:`systemd-nspawn(1)` for more information on image formats, in particular its :code:`--directory=` and :code:`--image=` options.
+
+Examples
+########
+
+.. include:: importctl.rst
+    :start-after: .. inclusion-marker-do-not-remove example-import-raw|
+    :end-before: .. inclusion-end-marker-do-not-remove example-import-raw|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+.. include:: common-variables.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-machined.service(8)`, :ref:`systemd-nspawn(1)`, :ref:`systemd.special(7)`, :man-pages:`importctl(1)`, :die-net:`tar(1)`, :die-net:`xz(1)`, :die-net:`gzip(1)`, :die-net:`bzip2(1)`, :die-net:`zstd(1)`
+
+

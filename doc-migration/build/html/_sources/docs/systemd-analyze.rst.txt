@@ -1,0 +1,1182 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-analyze
+:manvolnum: 1
+:summary: Analyze and debug system manager
+
+.. _systemd-analyze(1):
+
+==================
+systemd-analyze(1)
+==================
+
+Name
+####
+
+systemd-analyze — Analyze and debug system manager
+
+Synopsis
+########
+
+:code:`systemd-analyze [OPTIONS...] [time]`
+
+:code:`systemd-analyze [OPTIONS...] blame`
+
+:code:`systemd-analyze [OPTIONS...] critical-chain [<UNIT>...]`
+
+:code:`systemd-analyze [OPTIONS...] dump [<PATTERN>...]`
+
+:code:`systemd-analyze [OPTIONS...] plot [>file.svg]`
+
+:code:`systemd-analyze [OPTIONS...] dot [<PATTERN>...] [>file.dot]`
+
+:code:`systemd-analyze [OPTIONS...] unit-files`
+
+:code:`systemd-analyze [OPTIONS...] unit-gdb SERVICE`
+
+:code:`systemd-analyze [OPTIONS...] unit-paths`
+
+:code:`systemd-analyze [OPTIONS...] unit-shell SERVICE [<Command>...]`
+
+:code:`systemd-analyze [OPTIONS...] exit-status [<STATUS>...]`
+
+:code:`systemd-analyze [OPTIONS...] capability [CAPABILITY... [-m --mask] MASK]`
+
+:code:`systemd-analyze [OPTIONS...] condition CONDITION…`
+
+:code:`systemd-analyze [OPTIONS...] syscall-filter [<SET>…]`
+
+:code:`systemd-analyze [OPTIONS...] filesystems [<SET>…]`
+
+:code:`systemd-analyze [OPTIONS...] calendar SPEC...`
+
+:code:`systemd-analyze [OPTIONS...] timestamp TIMESTAMP...`
+
+:code:`systemd-analyze [OPTIONS...] timespan SPAN...`
+
+:code:`systemd-analyze [OPTIONS...] cat-config NAME...|PATH...`
+
+:code:`systemd-analyze [OPTIONS...] compare-versions VERSION1 [<OP>] VERSION2`
+
+:code:`systemd-analyze [OPTIONS...] verify FILE...`
+
+:code:`systemd-analyze [OPTIONS...] security [<UNIT>...]`
+
+:code:`systemd-analyze [OPTIONS...] inspect-elf FILE...`
+
+:code:`systemd-analyze [OPTIONS...] malloc [<D-BUS SERVICE>...]`
+
+:code:`systemd-analyze [OPTIONS...] fdstore UNIT...`
+
+:code:`systemd-analyze [OPTIONS...] image-policy POLICY...`
+
+:code:`systemd-analyze [OPTIONS...] has-tpm2`
+
+:code:`systemd-analyze [OPTIONS...] pcrs [<PCR>...]`
+
+:code:`systemd-analyze [OPTIONS...] nvpcrs [<NVPCR>...]`
+
+:code:`systemd-analyze [OPTIONS...] srk [<>FILE>]`
+
+:code:`systemd-analyze [OPTIONS...] architectures [<NAME>...]`
+
+:code:`systemd-analyze [OPTIONS...] smbios11`
+
+:code:`systemd-analyze [OPTIONS...] chid`
+
+:code:`systemd-analyze [OPTIONS...] transient-settings TYPE...`
+
+Description
+###########
+
+:code:`systemd-analyze` may be used to determine system boot-up performance statistics and retrieve other state and tracing information from the system and service manager, and to verify the correctness of unit files. It is also used to access special functions useful for advanced system manager debugging.
+
+If no command is passed, :code:`systemd-analyze time` is implied.
+
+:code:`systemd-analyze time`
+############################
+
+This command prints the time spent in the kernel before userspace has been reached, the time spent in the initrd before normal system userspace has been reached, and the time normal system userspace took to initialize. Note that these measurements simply measure the time passed up to the point where all system services have been spawned, but not necessarily until they fully finished initialization or the disk is idle.
+
+:code:`Show how long the boot took`
+-----------------------------------
+
+.. code-block:: sh
+
+   # in a container
+   $ systemd-analyze time
+   Startup finished in 296ms (userspace)
+   multi-user.target reached after 275ms in userspace
+   # on a real machine
+   $ systemd-analyze time
+   Startup finished in 2.584s (kernel) + 19.176s (initrd) + 47.847s (userspace) = 1min 9.608s
+   multi-user.target reached after 47.820s in userspace
+
+:code:`systemd-analyze blame`
+#############################
+
+This command prints a list of all running units, ordered by the time they took to initialize. This information may be used to optimize boot-up times. Note that the output might be misleading as the initialization of one service might be slow simply because it waits for the initialization of another service to complete. Also note: :code:`systemd-analyze blame` does not display results for services with :code:`Type=simple`, because systemd considers such services to be started immediately, hence no measurement of the initialization delays can be done. Also note that this command only shows the time units took for starting up, it does not show how long unit jobs spent in the execution queue. In particular it shows the time units spent in "activating" state, which is not defined for units such as device units that transition directly from "inactive" to "active". This command hence gives an impression of the performance of program code, but cannot accurately reflect latency introduced by waiting for hardware and similar events.
+
+:code:`Show which units took the most time during boot`
+-------------------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze blame
+            32.875s pmlogger.service
+            20.905s systemd-networkd-wait-online.service
+            13.299s dev-vda1.device
+            ...
+               23ms sysroot.mount
+               11ms initrd-udevadm-cleanup-db.service
+                3ms sys-kernel-config.mount
+
+:code:`systemd-analyze critical-chain [UNIT...]`
+################################################
+
+This command prints a tree of the time-critical chain of units (for each of the specified :emphasis:`UNIT`\s or for the default target otherwise). The time after the unit is active or started is printed after the "@" character. The time the unit takes to start is printed after the "+" character. Note that the output might be misleading as the initialization of services might depend on socket activation and because of the parallel execution of units. Also, similarly to the :code:`blame` command, this only takes into account the time units spent in "activating" state, and hence does not cover units that never went through an "activating" state (such as device units that transition directly from "inactive" to "active"). Moreover, it does not show information on jobs (and in particular not jobs that timed out).
+
+:code:`systemd-analyze critical-chain`
+--------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze critical-chain
+   multi-user.target @47.820s
+   └─pmie.service @35.968s +548ms
+     └─pmcd.service @33.715s +2.247s
+       └─network-online.target @33.712s
+         └─systemd-networkd-wait-online.service @12.804s +20.905s
+           └─systemd-networkd.service @11.109s +1.690s
+             └─systemd-udevd.service @9.201s +1.904s
+               └─systemd-tmpfiles-setup-dev.service @7.306s +1.776s
+                 └─kmod-static-nodes.service @6.976s +177ms
+                   └─systemd-journald.socket
+                     └─system.slice
+                       └─-.slice
+
+:code:`systemd-analyze dump [pattern…]`
+#######################################
+
+Without any parameter, this command outputs a (usually very long) human-readable serialization of the complete service manager state. Optional glob pattern may be specified, causing the output to be limited to units whose names match one of the patterns. The output format is subject to change without notice and should not be parsed by applications. This command is rate limited for unprivileged users.
+
+Show the internal state of user manager
+---------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze --user dump
+   Timestamp userspace: Thu 2019-03-14 23:28:07 CET
+   Timestamp finish: Thu 2019-03-14 23:28:07 CET
+   Timestamp generators-start: Thu 2019-03-14 23:28:07 CET
+   Timestamp generators-finish: Thu 2019-03-14 23:28:07 CET
+   Timestamp units-load-start: Thu 2019-03-14 23:28:07 CET
+   Timestamp units-load-finish: Thu 2019-03-14 23:28:07 CET
+   -> Unit proc-timer_list.mount:
+           Description: /proc/timer_list
+           ...
+   -> Unit default.target:
+           Description: Main user target
+   ...
+
+:code:`systemd-analyze malloc [D-Bus service…]`
+###############################################
+
+This command can be used to request the output of the internal memory state (as returned by :man-pages:`malloc_info(3)`) of a D-Bus service. If no service is specified, the query will be sent to :code:`org.freedesktop.systemd1` (the system or user service manager). The output format is not guaranteed to be stable and should not be parsed by applications.
+
+The service must implement the :code:`org.freedesktop.MemoryAllocation1` interface. In the systemd suite, it is currently only implemented by the manager.
+
+:code:`systemd-analyze plot`
+############################
+
+This command prints either an SVG graphic, detailing which system services have been started at what time, highlighting the time they spent on initialization, or the raw time data in JSON or table format.
+
+:code:`Plot a bootchart`
+------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze plot >bootup.svg
+   $ eog bootup.svg&
+
+Note that this plot is based on the most recent per-unit timing data of loaded units. This means that if a unit gets started, then stopped and then started again the information shown will cover the most recent start cycle, not the first one. Thus it is recommended to consult this information only shortly after boot, so that this distinction does not matter. Moreover, units that are not referenced by any other unit through a dependency might be unloaded by the service manager once they terminate (and did not fail). Such units will not show up in the plot.
+
+:code:`systemd-analyze dot [pattern...]`
+########################################
+
+This command generates textual dependency graph description in dot format for further processing with the GraphViz :die-net:`dot(1)` tool. Use a command line like :code:`systemd-analyze dot | dot -Tsvg >systemd.svg` to generate a graphical dependency tree. Unless :code:`--order` or :code:`--require` is passed, the generated graph will show both ordering and requirement dependencies. Optional pattern globbing style specifications (e.g. :code:`*.target`) may be given at the end. A unit dependency is included in the graph if any of these patterns match either the origin or destination node.
+
+Plot all dependencies of any unit whose name starts with "avahi-daemon"
+-----------------------------------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze dot 'avahi-daemon.*' | dot -Tsvg >avahi.svg
+   $ eog avahi.svg
+
+Plot the dependencies between all known target units
+----------------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze dot --to-pattern='*.target' --from-pattern='*.target' \
+         | dot -Tsvg >targets.svg
+   $ eog targets.svg
+
+:code:`systemd-analyze unit-paths`
+##################################
+
+This command outputs a list of all directories from which unit files, :code:`.d` overrides, and :code:`.wants`, :code:`.requires` symlinks may be loaded. Combine with :code:`--user` to retrieve the list for the user manager instance, and :code:`--global` for the global configuration of user manager instances.
+
+:code:`Show all paths for generated units`
+------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze unit-paths | grep '^/run'
+   /run/systemd/system.control
+   /run/systemd/transient
+   /run/systemd/generator.early
+   /run/systemd/system
+   /run/systemd/system.attached
+   /run/systemd/generator
+   /run/systemd/generator.late
+
+Note that this verb prints the list that is compiled into :code:`systemd-analyze` itself, and does not communicate with the running manager. Use
+
+.. code-block:: sh
+
+   systemctl [--user] [--global] show -p UnitPath --value
+
+to retrieve the actual list that the manager uses, with any empty directories omitted.
+
+:code:`systemd-analyze exit-status [STATUS...]`
+###############################################
+
+This command prints a list of exit statuses along with their "class", i.e. the source of the definition (one of "glibc", "systemd", "LSB", or "BSD"), see the Process Exit Codes section in :ref:`systemd.exec(5)`. If no additional arguments are specified, all known statuses are shown. Otherwise, only the definitions for the specified codes are shown.
+
+:code:`Show some example exit status names`
+-------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze exit-status 0 1 {63..65}
+   NAME    STATUS CLASS
+   SUCCESS 0      glibc
+   FAILURE 1      glibc
+   -       63     -
+   USAGE   64     BSD
+   DATAERR 65     BSD
+
+:code:`systemd-analyze capability [CAPABILITY... [-m --mask] MASK]`
+###################################################################
+
+This command prints a list of Linux capabilities along with their numeric IDs. See :man-pages:`capabilities(7)` for details. If no argument is specified the full list of capabilities known to the service manager and the kernel is shown. Capabilities defined by the kernel but not known to the service manager are shown as "cap_???". Optionally, if arguments are specified they may refer to specific cabilities by name or numeric ID, in which case only the indicated capabilities are shown in the table.
+
+Alternatively, if :code:`--mask` is passed, a single numeric argument must be specified, which is interpreted as a hexadecimal capability mask. In this case, only the capabilities present in the mask are shown in the table. This mode is intended to aid in decoding capability sets available via various debugging interfaces (e.g. "/proc/PID/status").
+
+:code:`Show some example capability names`
+------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze capability 0 1 {30..32}
+   NAME              NUMBER
+   cap_chown              0
+   cap_dac_override       1
+   cap_audit_control     30
+   cap_setfcap           31
+   cap_mac_override      32
+
+:code:`Decode a capability mask extracted from /proc`
+-----------------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze capability -m 0000000000003c00
+   NAME                 NUMBER
+   cap_net_bind_service     10
+   cap_net_broadcast        11
+   cap_net_admin            12
+   cap_net_raw              13
+
+:code:`systemd-analyze condition CONDITION...`
+##############################################
+
+This command will evaluate :code:`Condition*=...` and :code:`Assert*=...` assignments, and print their values, and the resulting value of the combined condition set. See :ref:`systemd.unit(5)` for a list of available conditions and asserts.
+
+Evaluate conditions that check kernel versions
+----------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze condition 'ConditionVersion = ! <4.0' \
+           'ConditionVersion = >=5.1' \
+           'ConditionACPower=|false' \
+           'ConditionArchitecture=|!arm' \
+           'AssertPathExists=/etc/os-release'
+   test.service: AssertPathExists=/etc/os-release succeeded.
+   Asserts succeeded.
+   test.service: ConditionArchitecture=|!arm succeeded.
+   test.service: ConditionACPower=|false failed.
+   test.service: ConditionVersion=>=5.1 succeeded.
+   test.service: ConditionVersion=!<4.0 succeeded.
+   Conditions succeeded.
+
+:code:`systemd-analyze syscall-filter [SET...]`
+###############################################
+
+This command will list system calls contained in the specified system call set :emphasis:`SET`, or all known sets if no sets are specified. Argument :emphasis:`SET` must include the "@" prefix.
+
+:code:`systemd-analyze filesystems [SET...]`
+############################################
+
+This command will list filesystems in the specified filesystem set :emphasis:`SET`, or all known sets if no sets are specified. Argument :emphasis:`SET` must include the "@" prefix.
+
+:code:`systemd-analyze calendar EXPRESSION...`
+##############################################
+
+This command will parse and normalize repetitive calendar time events, and will calculate when they elapse next. This takes the same input as the :code:`OnCalendar=` setting in :ref:`systemd.timer(5)`, following the syntax described in :ref:`systemd.time(7)`. By default, only the next time the calendar expression will elapse is shown; use :code:`--iterations=` to show the specified number of next times the expression elapses. Each time the expression elapses forms a timestamp, see the :code:`timestamp` verb below.
+
+Show leap days in the near future
+---------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze calendar --iterations=5 '*-2-29 0:0:0'
+     Original form: *-2-29 0:0:0
+   Normalized form: *-02-29 00:00:00
+       Next elapse: Sat 2020-02-29 00:00:00 UTC
+          From now: 11 months 15 days left
+          Iter. #2: Thu 2024-02-29 00:00:00 UTC
+          From now: 4 years 11 months left
+          Iter. #3: Tue 2028-02-29 00:00:00 UTC
+          From now: 8 years 11 months left
+          Iter. #4: Sun 2032-02-29 00:00:00 UTC
+          From now: 12 years 11 months left
+          Iter. #5: Fri 2036-02-29 00:00:00 UTC
+          From now: 16 years 11 months left
+
+:code:`systemd-analyze timestamp TIMESTAMP...`
+##############################################
+
+This command parses a timestamp (i.e. a single point in time) and outputs the normalized form and the difference between this timestamp and now. The timestamp should adhere to the syntax documented in :ref:`systemd.time(7)`, section "PARSING TIMESTAMPS".
+
+Show parsing of timestamps
+--------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze timestamp yesterday now tomorrow
+     Original form: yesterday
+   Normalized form: Mon 2019-05-20 00:00:00 CEST
+          (in UTC): Sun 2019-05-19 22:00:00 UTC
+      UNIX seconds: @15583032000
+          From now: 1 day 9h ago
+     Original form: now
+   Normalized form: Tue 2019-05-21 09:48:39 CEST
+          (in UTC): Tue 2019-05-21 07:48:39 UTC
+      UNIX seconds: @1558424919.659757
+          From now: 43us ago
+     Original form: tomorrow
+   Normalized form: Wed 2019-05-22 00:00:00 CEST
+          (in UTC): Tue 2019-05-21 22:00:00 UTC
+      UNIX seconds: @15584760000
+          From now: 14h left
+
+:code:`systemd-analyze timespan EXPRESSION...`
+##############################################
+
+This command parses a time span (i.e. a difference between two timestamps) and outputs the normalized form and the equivalent value in microseconds. The time span should adhere to the syntax documented in :ref:`systemd.time(7)`, section "PARSING TIME SPANS". Values without units are parsed as seconds.
+
+Show parsing of timespans
+-------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze timespan 1s 300s '1year 0.000001s'
+   Original: 1s
+         μs: 1000000
+      Human: 1s
+   Original: 300s
+         μs: 300000000
+      Human: 5min
+   Original: 1year 0.000001s
+         μs: 31557600000001
+      Human: 1y 1us
+
+:code:`systemd-analyze cat-config` :emphasis:`NAME`\|:emphasis:`PATH`...
+########################################################################
+
+This command is similar to :code:`systemctl cat`, but operates on config files. It will copy the contents of a config file and any drop-ins to standard output, using the usual systemd set of directories and rules for precedence. Each argument must be either an absolute path including the prefix (such as :code:`/etc/systemd/logind.conf` or :code:`/usr/lib/systemd/logind.conf`), or a name relative to the prefix (such as :code:`systemd/logind.conf`).
+
+Showing logind configuration
+----------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze cat-config systemd/logind.conf
+   # /etc/systemd/logind.conf
+   ...
+   [Login]
+   NAutoVTs=8
+   ...
+   # /usr/lib/systemd/logind.conf.d/20-test.conf
+   ... some override from another package
+   # /etc/systemd/logind.conf.d/50-override.conf
+   ... some administrator override
+
+:code:`systemd-analyze compare-versions VERSION1 [OP] VERSION2`
+###############################################################
+
+This command has two distinct modes of operation, depending on whether the operator :emphasis:`OP` is specified.
+
+In the first mode — when :emphasis:`OP` is not specified —, it will compare the two version strings and print either ":emphasis:`VERSION1` < :emphasis:`VERSION2`", or ":emphasis:`VERSION1` == :emphasis:`VERSION2`", or ":emphasis:`VERSION1` > :emphasis:`VERSION2`" as appropriate.
+
+The exit status is :code:`0` if the versions are equal, :code:`11` if the version of the right is smaller, and :code:`12` if the version of the left is smaller. (This matches the convention used by :code:`rpmdev-vercmp`.)
+
+In the second mode — when :emphasis:`OP` is specified — it will compare the two version strings using the operation :emphasis:`OP` and return :code:`0` (success) if they condition is satisfied, and :code:`1` (failure) otherwise. :code:`OP` may be :code:`lt`, :code:`le`, :code:`eq`, :code:`ne`, :code:`ge`, :code:`gt`. In this mode, no output is printed. (This matches the convention used by :die-net:`dpkg(1)` :code:`--compare-versions`.)
+
+Compare versions of a package
+-----------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze compare-versions systemd-250~rc1.fc36.aarch64 systemd-251.fc36.aarch64
+   systemd-250~rc1.fc36.aarch64 < systemd-251.fc36.aarch64
+   $ echo $?
+   12
+   $ systemd-analyze compare-versions 1 lt 2; echo $?
+   0
+   $ systemd-analyze compare-versions 1 ge 2; echo $?
+   1
+
+:code:`systemd-analyze verify FILE...`
+######################################
+
+This command will load unit files and print warnings if any errors are detected. Files specified on the command line will be loaded, but also any other units referenced by them. A unit's name on disk can be overridden by specifying an alias after a colon; see below for an example. The full unit search path is formed by combining the directories for all command line arguments, and the usual unit load paths. The variable :code:`$SYSTEMD_UNIT_PATH` is supported, and may be used to replace or augment the compiled in set of unit load paths; see :ref:`systemd.unit(5)`. All units files present in the directories containing the command line arguments will be used in preference to the other paths. If a template unit without an instance name is specified (e.g. :code:`foo@.service`), "test_instance" will be used as the instance name, which can be controlled by :code:`--instance=` option.
+
+The following errors are currently detected:
+
+*    unknown sections and directives,
+
+*    missing dependencies which are required to start the given unit,
+
+*    man pages listed in :code:`Documentation=` which are not found in the system,
+
+*    commands listed in :code:`ExecStart=` and similar which are not found in the system or not executable.
+
+Misspelt directives
+-------------------
+
+.. code-block:: sh
+
+   $ cat ./user.slice
+   [Unit]
+   WhatIsThis=11
+   Documentation=man:nosuchfile(1)
+   Requires=different.service
+   [Service]
+   Description=x
+   $ systemd-analyze verify ./user.slice
+   [./user.slice:9] Unknown lvalue 'WhatIsThis' in section 'Unit'
+   [./user.slice:13] Unknown section 'Service'. Ignoring.
+   Error: org.freedesktop.systemd1.LoadFailed:
+      Unit different.service failed to load:
+      No such file or directory.
+   Failed to create user.slice/start: Invalid argument
+   user.slice: man nosuchfile(1) command failed with code 16
+
+Missing service units
+---------------------
+
+.. code-block:: sh
+
+   $ tail ./a.socket ./b.socket
+   ==> ./a.socket <==
+   [Socket]
+   ListenStream=100
+   ==> ./b.socket <==
+   [Socket]
+   ListenStream=100
+   Accept=yes
+   $ systemd-analyze verify ./a.socket ./b.socket
+   Service a.service not loaded, a.socket cannot be started.
+   Service b@0.service not loaded, b.socket cannot be started.
+
+Aliasing a unit
+---------------
+
+.. code-block:: sh
+
+   $ cat /tmp/source
+   [Unit]
+   Description=Hostname printer
+   [Service]
+   Type=simple
+   ExecStart=/usr/bin/echo %H
+   MysteryKey=true
+   $ systemd-analyze verify /tmp/source
+   Failed to prepare filename /tmp/source: Invalid argument
+   $ systemd-analyze verify /tmp/source:alias.service
+   alias.service:7: Unknown key name 'MysteryKey' in section 'Service', ignoring.
+
+:code:`systemd-analyze security [UNIT...]`
+##########################################
+
+This command analyzes the security and sandboxing settings of one or more specified service units. If at least one unit name is specified the security settings of the specified service units are inspected and a detailed analysis is shown. If no unit name is specified, all currently loaded, long-running service units are inspected and a terse table with results shown. The command checks for various security-related service settings, assigning each a numeric "exposure level" value, depending on how important a setting is. It then calculates an overall exposure level for the whole unit, which is an estimation in the range 0.0…10.0 indicating how exposed a service is security-wise. High exposure levels indicate very little applied sandboxing. Low exposure levels indicate tight sandboxing and strongest security restrictions. Note that this only analyzes the per-service security features systemd itself implements. This means that any additional security mechanisms applied by the service code itself are not accounted for. The exposure level determined this way should not be misunderstood: a high exposure level neither means that there is no effective sandboxing applied by the service code itself, nor that the service is actually vulnerable to remote or local attacks. High exposure levels do indicate however that most likely the service might benefit from additional settings applied to them.
+
+Please note that many of the security and sandboxing settings individually can be circumvented — unless combined with others. For example, if a service retains the privilege to establish or undo mount points many of the sandboxing options can be undone by the service code itself. Due to that is essential that each service uses the most comprehensive and strict sandboxing and security settings possible. The tool will take into account some of these combinations and relationships between the settings, but not all. Also note that the security and sandboxing settings analyzed here only apply to the operations executed by the service code itself. If a service has access to an IPC system (such as D-Bus) it might request operations from other services that are not subject to the same restrictions. Any comprehensive security and sandboxing analysis is hence incomplete if the IPC access policy is not validated too.
+
+Analyze :code:`systemd-logind.service`
+--------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze security --no-pager systemd-logind.service
+     NAME                DESCRIPTION                              EXPOSURE
+   ✗ PrivateNetwork=     Service has access to the host's network      0.5
+   ✗ User=/DynamicUser=  Service runs as root user                     0.4
+   ✗ DeviceAllow=        Service has no device ACL                     0.2
+   ✓ IPAddressDeny=      Service blocks all IP address ranges
+   ...
+   → Overall exposure level for systemd-logind.service: 4.1 OK 🙂
+
+:code:`systemd-analyze inspect-elf FILE...`
+###########################################
+
+This command will load the specified files, and if they are ELF objects (executables, libraries, core files, etc.) it will parse the embedded packaging metadata, if any, and print it in a table or json format. See the `Package Metadata for Executable Files <https://systemd.io/PACKAGE_METADATA_FOR_EXECUTABLE_FILES/>`_ document for more information.
+
+Print information about a core file as JSON
+-------------------------------------------
+
+.. code-block:: sh
+
+   $ systemd-analyze inspect-elf --json=pretty \
+           core.fsverity.1000.f77dac5dc161402aa44e15b7dd9dcf97.58561.1637106137000000
+   {
+           "elfType" : "coredump",
+           "elfArchitecture" : "AMD x86-64",
+           "/home/bluca/git/fsverity-utils/fsverity" : {
+                   "type" : "deb",
+                   "name" : "fsverity-utils",
+                   "version" : "1.3-1",
+                   "buildId" : "7c895ecd2a271f93e96268f479fdc3c64a2ec4ee"
+           },
+           "/home/bluca/git/fsverity-utils/libfsverity.so.0" : {
+                   "type" : "deb",
+                   "name" : "fsverity-utils",
+                   "version" : "1.3-1",
+                   "buildId" : "b5e428254abf14237b0ae70ed85fffbb98a78f88"
+           }
+   }
+
+:code:`systemd-analyze dlopen-metadata FILE`
+############################################
+
+This command will load the specified file, and if it is an ELF object (executables, libraries, core files, etc.) it will parse the embedded dlopen metadata, if any, and print it in a table or json format. See the `dlopen() Metadata for ELF Files <https://systemd.io/ELF_DLOPEN_METADATA/>`_ document for more information.
+
+:code:`systemd-analyze fdstore UNIT...`
+#######################################
+
+Lists the current contents of the specified service unit's file descriptor store. This shows names, inode types, device numbers, inode numbers, paths and open modes of the open file descriptors. The specified units must have :code:`FileDescriptorStoreMax=` enabled, see :ref:`systemd.service(5)` for details.
+
+Table output
+------------
+
+.. code-block:: sh
+
+   $ systemd-analyze fdstore systemd-journald.service
+   FDNAME TYPE DEVNO   INODE RDEVNO PATH             FLAGS
+   stored sock 0:8   4218620 -      socket:[4218620] ro
+   stored sock 0:8   4213198 -      socket:[4213198] ro
+   stored sock 0:8   4213190 -      socket:[4213190] ro
+   …
+
+Note: the "DEVNO" column refers to the major/minor numbers of the device node backing the file system the file descriptor's inode is on. The "RDEVNO" column refers to the major/minor numbers of the device node itself if the file descriptor refers to one. Compare with corresponding :code:`.st_dev` and :code:`.st_rdev` fields in struct stat (see :man-pages:`stat(2)` for details). The listed inode numbers in the "INODE" column are on the file system indicated by "DEVNO".
+
+:code:`systemd-analyze image-policy POLICY…`
+############################################
+
+This command analyzes the specified image policy string, as per :ref:`systemd.image-policy(7)`. The policy is normalized and simplified. For each currently defined partition identifier (as per the `Discoverable Partitions Specification <https://uapi-group.org/specifications/specs/discoverable_partitions_specification>`_) the effect of the image policy string is shown in tabular form.
+
+Example Output
+--------------
+
+.. code-block:: sh
+
+   $ systemd-analyze image-policy swap=encrypted:usr=read-only-on+verity:root=encrypted
+   Analyzing policy: root=encrypted:usr=verity+read-only-on:swap=encrypted
+          Long form: root=encrypted:usr=verity+read-only-on:swap=encrypted:=unused+absent
+   PARTITION       MODE        READ-ONLY GROWFS
+   root            encrypted   -         -
+   usr             verity      yes       -
+   home            ignore      -         -
+   srv             ignore      -         -
+   esp             ignore      -         -
+   xbootldr        ignore      -         -
+   swap            encrypted   -         -
+   root-verity     ignore      -         -
+   usr-verity      unprotected yes       -
+   root-verity-sig ignore      -         -
+   usr-verity-sig  ignore      -         -
+   tmp             ignore      -         -
+   var             ignore      -         -
+   default         ignore      -         -
+
+:code:`systemd-analyze has-tpm2`
+################################
+
+Reports whether the system is equipped with a usable TPM2 device. If a TPM2 device has been discovered, is supported, and is being used by firmware, by the OS kernel drivers and by userspace (i.e. systemd) this prints "yes" and exits with exit status zero. If no such device is discovered/supported/used, prints "no". Otherwise, prints "partial". In either of these two cases exits with non-zero exit status. It also shows five lines indicating separately whether firmware, drivers, the system, the kernel and libraries discovered/support/use TPM2. Currently, required libraries are :code:`libtss2-esys.so.0`, :code:`libtss2-rc.so.0`, and :code:`libtss2-mu.so.0`. The requirement may be changed in the future release.
+
+Note, this checks for TPM 2.0 devices only, and does not consider TPM 1.2 at all.
+
+Combine with :code:`--quiet` to suppress the output.
+
+Example Output
+--------------
+
+.. code-block:: sh
+
+   yes
+   +firmware
+   +driver
+   +system
+   +subsystem
+   +libraries
+     +libtss2-esys.so.0
+     +libtss2-rc.so.0
+     +libtss2-mu.so.0
+
+.. versionadded:: 257
+
+:code:`systemd-analyze pcrs [PCR…]`
+###################################
+
+This command shows the known TPM2 PCRs along with their identifying names and current values.
+
+Example Output
+--------------
+
+.. code-block:: sh
+
+   $ systemd-analyze pcrs
+   NR NAME                SHA256
+    0 platform-code       bcd2eb527108bbb1f5528409bcbe310aa9b74f687854cc5857605993f3d9eb11
+    1 platform-config     b60622856eb7ce52637b80f30a520e6e87c347daa679f3335f4f1a600681bb01
+    2 external-code       1471262403e9a62f9c392941300b4807fbdb6f0bfdd50abfab752732087017dd
+    3 external-config     3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
+    4 boot-loader-code    939f7fa1458e1f7ce968874d908e524fc0debf890383d355e4ce347b7b78a95c
+    5 boot-loader-config  864c61c5ea5ecbdb6951e6cb6d9c1f4b4eac79772f7fe13b8bece569d83d3768
+    6 -                   3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
+    7 secure-boot-policy  9c905bd9b9891bfb889b90a54c4b537b889cfa817c4389cc25754823a9443255
+    8 -                   0000000000000000000000000000000000000000000000000000000000000000
+    9 kernel-initrd       9caa29b128113ef42aa53d421f03437be57211e5ebafc0fa8b5d4514ee37ff0c
+   10 ima                 5ea9e3dab53eb6b483b6ec9e3b2c712bea66bca1b155637841216e0094387400
+   11 kernel-boot         0000000000000000000000000000000000000000000000000000000000000000
+   12 kernel-config       627ffa4b405e911902fe1f1a8b0164693b31acab04f805f15bccfe2209c7eace
+   13 sysexts             0000000000000000000000000000000000000000000000000000000000000000
+   14 shim-policy         0000000000000000000000000000000000000000000000000000000000000000
+   15 system-identity     0000000000000000000000000000000000000000000000000000000000000000
+   16 debug               0000000000000000000000000000000000000000000000000000000000000000
+   17 -                   ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+   18 -                   ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+   19 -                   ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+   20 -                   ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+   21 -                   ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+   22 -                   ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+   23 application-support 0000000000000000000000000000000000000000000000000000000000000000
+
+:code:`systemd-analyze nvpcrs [NVPCR…]`
+#######################################
+
+This command shows the known TPM2 NvPCRs (additional PCRs stored in TPM2 NV indexes) along with their identifying names and current values.
+
+Example Output
+--------------
+
+.. code-block:: sh
+
+   $ systemd-analyze nvpcrs
+   NAME         NVINDEX VALUE
+   cryptsetup 0x1d10201 f400543943cc7215557ce672872ace5382e6d53177cc459078ba9277e41588d9
+   hardware   0x1d10200 e155474936d7d74c893e6ece1099a2311d572cf23becea159dabf282db754284
+
+.. versionadded:: 259
+
+:code:`systemd-analyze srk [>FILE]`
+###################################
+
+This command reads the Storage Root Key (SRK) from the TPM2 device, and writes it in marshalled TPM2B_PUBLIC format to stdout. The output is non-printable data, so it should be redirected to a file or into a pipe.
+
+Save the Storage Root Key to :code:`srk.tpm2b_public`
+-----------------------------------------------------
+
+.. code-block:: sh
+
+   systemd-analyze srk >srk.tpm2b_public
+
+:code:`systemd-analyze architectures [NAME...]`
+###############################################
+
+Lists all known CPU architectures, and which ones are native. The listed architecture names are those :code:`ConditionArchitecture=` supports, see :ref:`systemd.unit(5)` for details. If architecture names are specified only those specified are listed.
+
+Table output
+------------
+
+.. code-block:: sh
+
+   $ systemd-analyze architectures
+   NAME        SUPPORT
+   alpha       foreign
+   arc         foreign
+   arc-be      foreign
+   arm         foreign
+   arm64       foreign
+   …
+   sparc       foreign
+   sparc64     foreign
+   tilegx      foreign
+   x86         secondary
+   x86-64      native
+
+:code:`systemd-analyze smbios11`
+################################
+
+Shows a list of SMBIOS Type #11 strings passed to the system. Also see :man-pages:`smbios-type-11(7)`.
+
+Example output
+--------------
+
+.. code-block:: sh
+
+   $ systemd-analyze smbios11
+   io.systemd.stub.kernel-cmdline-extra=console=ttyS0
+   io.systemd.credential.binary:ssh.ephemeral-authorized_keys-all=c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSURGd20xbFp4WlRGclJteG9ZQlozOTYzcE1uYlJCaDMwM1MxVXhLSUM2NmYgbGVubmFydEB6ZXRhCg==
+   io.systemd.credential:vmm.notify_socket=vsock-stream:2:254570042
+   3 SMBIOS Type #11 strings passed.
+
+.. versionadded:: 257
+
+:code:`systemd-analyze chid`
+############################
+
+Shows a list of Computer Hardware IDs (CHIDs) of the local system. These IDs identify the system's computer hardware, based on SMBIOS data. See `Using Computer Hardware IDs (CHIDs) <https://learn.microsoft.com/en-us/windows-hardware/drivers/dashboard/using-chids>`_ for details about CHIDs.
+
+Example output
+--------------
+
+.. code-block:: sh
+
+   $ systemd-analyze chid
+   TYPE INPUT  CHID
+      3 MFPSmp 520537c0-3b59-504f-b062-9682ea236b21
+      4 MFPS-- edf05dc8-a53d-5b2c-8023-630bca2a2463
+      5 MFP--- ebc6a4d9-ec48-537a-916b-c69fa4fdd814
+      6 M--Smp 5ebe4bba-f598-5e90-9ff2-9fd0d3211465
+      7 M--S-- 1a3fb835-b42a-5f9c-a38c-eff5bfd5c41d
+      8 M-P-mp 2a831dce-8163-5bad-8406-435b8c752dd8
+      9 M-P--- 7c21c878-4a75-50f7-9816-21e811588da0
+     10 MF--mp 9a003537-bcc5-500e-b10a-8d8892e4fc64
+     11 MF---- bb9122bb-8a5c-50d2-a742-a85beb719909
+     13 M---mp bfc36935-5032-5987-a0a3-6311f01de33a
+   LEGEND: M → sys_vendor (LENOVO) ┄ F → product_family (ThinkPad X1 Carbon Gen 9) ┄ P → product_name (20XW0055GE)
+           S → product_sku (LENOVO_MT_20XW_BU_Think_FM_ThinkPad X1 Carbon Gen 9) ┄ m → board_vendor (LENOVO)
+           p → board_name (20XW0055GE)
+
+.. versionadded:: 258
+
+:code:`systemd-analyze transient-settings TYPE...`
+##################################################
+
+Lists properties that can be set for various unit types via command line interfaces, in particular :man-pages:`systemctl(1)` :code:`set-property` and :code:`--property=`/:code:`--automount-property=` options in :ref:`systemd-run(1)`, :ref:`systemd-nspawn(1)`, and :ref:`systemd-mount(1)`. Those assignments are possible for a subset of the properties that can be set in config files, see :ref:`systemd.unit(5)`, :ref:`systemd.exec(5)`, :ref:`systemd.resource-control(5)`, and the other unit-type-specific pages. The :emphasis:`TYPE` argument must be a unit type ("service", "socket", …). The properties that apply to the specific types are listed.
+
+Note: D-Bus properties documented in :man-pages:`org.freedesktop.systemd1(5)` form a partially overlapping set with the lists generated by this command. Many D-Bus properties and transient settings share the same names, but for example, :code:`LogRateLimitIntervalSec=` is described in :ref:`systemd.exec(5)` and would be listed by this command, but the corresponding D-Bus property described in :ref:`systemd.exec(5)` is :code:`LogRateLimitIntervalUSec`.
+
+This verb is intended primarily for programmatic generation of shell completions.
+
+.. versionadded:: 258
+
+:code:`systemd-analyze unit-shell SERVICE [command...]`
+#######################################################
+
+The given command runs on the namespace of the specified running service. If no command is given, spawn and attach a shell with the namespace to the service.
+
+Example output
+--------------
+
+.. code-block:: sh
+
+   $ systemd-analyze unit-shell systemd-resolved.service ls
+   bin   dev  etc	   home  lib	lib64	lost+found  mnt  proc  run   srv  tmp  var	vmlinuz.old
+   boot  efi  exitrd  init  lib32	libx32	media	    opt  root  sbin  sys  usr  vmlinuz	work
+
+.. versionadded:: 258
+
+:code:`systemd-analyze unit-gdb SERVICE`
+########################################
+
+Spawn and attach a debugger to the given service. By default, :man-pages:`gdb(1)` will be used. This may be changed using the :code:`--debugger=` option or the :code:`$SYSTEMD_DEBUGGER` environment variable. Use the :code:`--debugger-arguments=` option to pass extra command line arguments to the debugger and quote as appropriate when :emphasis:`ARGS` contain whitespace (See Example).
+
+$ systemd-analyze --debugger-arguments="-batch -ex 'info all-registers'" unit-gdb systemd-oomd.service
+------------------------------------------------------------------------------------------------------
+
+.. versionadded:: 258
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --system
+
+   Operates on the system systemd instance. This is the implied default.
+
+   .. versionadded:: 209
+
+.. systemd:option:: --user
+
+   Operates on the user systemd instance.
+
+   .. versionadded:: 186
+
+.. systemd:option:: --global
+
+   Operates on the system-wide configuration for user systemd instance.
+
+   .. versionadded:: 238
+
+.. systemd:option:: --order, --require
+
+   When used in conjunction with the :code:`dot` command (see above), selects which dependencies are shown in the dependency graph. If :code:`--order` is passed, only dependencies of type :code:`After=` or :code:`Before=` are shown. If :code:`--require` is passed, only dependencies of type :code:`Requires=`, :code:`Requisite=`, :code:`BindsTo=`, :code:`Wants=`, and :code:`Conflicts=` are shown. If neither is passed, this shows dependencies of all these types.
+
+   .. versionadded:: 198
+
+.. systemd:option:: --from-pattern=, --to-pattern=
+
+   When used in conjunction with the :code:`dot` command (see above), this selects which relationships are shown in the dependency graph. Both options require a :man-pages:`glob(7)` pattern as an argument, which will be matched against the left-hand and the right-hand, respectively, nodes of a relationship.
+
+   Each of these can be used more than once, in which case the unit name must match one of the values. When tests for both sides of the relation are present, a relation must pass both tests to be shown. When patterns are also specified as positional arguments, they must match at least one side of the relation. In other words, patterns specified with those two options will trim the list of edges matched by the positional arguments, if any are given, and fully determine the list of edges shown otherwise.
+
+   .. versionadded:: 201
+
+.. systemd:option:: --fuzz=timespan
+
+   When used in conjunction with the :code:`critical-chain` command (see above), also show units, which finished :emphasis:`timespan` earlier, than the latest unit in the same level. The unit of :emphasis:`timespan` is seconds unless specified with a different unit, e.g. "50ms".
+
+   .. versionadded:: 203
+
+.. systemd:option:: --man=no
+
+   Do not invoke :man-pages:`man(1)` to verify the existence of man pages listed in :code:`Documentation=`.
+
+   .. versionadded:: 235
+
+.. systemd:option:: --generators
+
+   Invoke unit generators, see :ref:`systemd.generator(7)`. Some generators require root privileges. Under a normal user, running with generators enabled will generally result in some warnings.
+
+   .. versionadded:: 235
+
+.. systemd:option:: --instance=NAME
+
+   Specifies fallback instance name for template units. This will be used when one or more template units without an instance name (e.g. :code:`foo@.service`) specified for :code:`systemd-analyze condition` with :code:`--unit=`, :code:`systemd-analyze security`, and :code:`systemd-analyze verify`. If unspecified, "test_instance" will be used.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --recursive-errors=MODE
+
+   Control verification of units and their dependencies and whether :code:`systemd-analyze verify` exits with a non-zero process exit status or not. With :code:`yes`, return a non-zero process exit status when warnings arise during verification of either the specified unit or any of its associated dependencies. With :code:`no`, return a non-zero process exit status when warnings arise during verification of only the specified unit. With :code:`one`, return a non-zero process exit status when warnings arise during verification of either the specified unit or its immediate dependencies. If this option is not specified, zero is returned as the exit status regardless whether warnings arise during verification or not.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --root=PATH
+
+   With :code:`cat-config`, :code:`verify`, :code:`condition`, :code:`unit-gdb`, and :code:`security` when used with :code:`--offline=`, operate on files underneath the specified root path :emphasis:`PATH`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --image=PATH
+
+   With :code:`cat-config`, :code:`verify`, :code:`condition` and :code:`security` when used with :code:`--offline=`, operate on files inside the specified image path :emphasis:`PATH`.
+
+   .. versionadded:: 250
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove image-policy-open|
+    :end-before: .. inclusion-end-marker-do-not-remove image-policy-open|
+
+.. systemd:option:: --offline=BOOL
+
+   With :code:`security`, perform an offline security review of the specified unit files, i.e. does not have to rely on PID 1 to acquire security information for the files like the :code:`security` verb when used by itself does. This means that :code:`--offline=` can be used with :code:`--root=` and :code:`--image=` as well. If a unit's overall exposure level is above that set by :code:`--threshold=` (default value is 100), :code:`--offline=` will return an error.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --profile=PATH
+
+   With :code:`security` :code:`--offline=`, takes into consideration the specified portable profile when assessing unit settings. The profile can be passed by name, in which case the well-known system locations will be searched, or it can be the full path to a specific drop-in file.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --threshold=NUMBER
+
+   With :code:`security`, allow the user to set a custom value to compare the overall exposure level with, for the specified unit files. If a unit's overall exposure level, is greater than that set by the user, :code:`security` will return an error. :code:`--threshold=` can be used with :code:`--offline=` as well and its default value is 100.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --security-policy=PATH
+
+   With :code:`security`, allow the user to define a custom set of requirements formatted as a JSON file against which to compare the specified unit file(s) and determine their overall exposure level to security threats.
+
+   .. list-table:: Accepted Assessment Test Identifiers
+      :header-rows: 1
+
+      * - Assessment Test Identifier
+      * - UserOrDynamicUser
+      * - SupplementaryGroups
+      * - PrivateMounts
+      * - PrivateDevices
+      * - PrivateTmp
+      * - PrivateNetwork
+      * - PrivateUsers
+      * - ProtectControlGroups
+      * - ProtectKernelModules
+      * - ProtectKernelTunables
+      * - ProtectKernelLogs
+      * - ProtectClock
+      * - ProtectHome
+      * - ProtectHostname
+      * - ProtectSystem
+      * - RootDirectoryOrRootImage
+      * - LockPersonality
+      * - MemoryDenyWriteExecute
+      * - NoNewPrivileges
+      * - CapabilityBoundingSet_CAP_SYS_ADMIN
+      * - CapabilityBoundingSet_CAP_SET_UID_GID_PCAP
+      * - CapabilityBoundingSet_CAP_SYS_PTRACE
+      * - CapabilityBoundingSet_CAP_SYS_TIME
+      * - CapabilityBoundingSet_CAP_NET_ADMIN
+      * - CapabilityBoundingSet_CAP_SYS_RAWIO
+      * - CapabilityBoundingSet_CAP_SYS_MODULE
+      * - CapabilityBoundingSet_CAP_AUDIT
+      * - CapabilityBoundingSet_CAP_SYSLOG
+      * - CapabilityBoundingSet_CAP_SYS_NICE_RESOURCE
+      * - CapabilityBoundingSet_CAP_MKNOD
+      * - CapabilityBoundingSet_CAP_CHOWN_FSETID_SETFCAP
+      * - CapabilityBoundingSet_CAP_DAC_FOWNER_IPC_OWNER
+      * - CapabilityBoundingSet_CAP_KILL
+      * - CapabilityBoundingSet_CAP_NET_BIND_SERVICE_BROADCAST_RAW
+      * - CapabilityBoundingSet_CAP_SYS_BOOT
+      * - CapabilityBoundingSet_CAP_MAC
+      * - CapabilityBoundingSet_CAP_LINUX_IMMUTABLE
+      * - CapabilityBoundingSet_CAP_IPC_LOCK
+      * - CapabilityBoundingSet_CAP_SYS_CHROOT
+      * - CapabilityBoundingSet_CAP_BLOCK_SUSPEND
+      * - CapabilityBoundingSet_CAP_WAKE_ALARM
+      * - CapabilityBoundingSet_CAP_LEASE
+      * - CapabilityBoundingSet_CAP_SYS_TTY_CONFIG
+      * - CapabilityBoundingSet_CAP_BPF
+      * - UMask
+      * - KeyringMode
+      * - ProtectProc
+      * - ProcSubset
+      * - NotifyAccess
+      * - RemoveIPC
+      * - Delegate
+      * - RestrictRealtime
+      * - RestrictSUIDSGID
+      * - RestrictNamespaces_user
+      * - RestrictNamespaces_mnt
+      * - RestrictNamespaces_ipc
+      * - RestrictNamespaces_pid
+      * - RestrictNamespaces_cgroup
+      * - RestrictNamespaces_uts
+      * - RestrictNamespaces_net
+      * - RestrictAddressFamilies_AF_INET_INET6
+      * - RestrictAddressFamilies_AF_UNIX
+      * - RestrictAddressFamilies_AF_NETLINK
+      * - RestrictAddressFamilies_AF_PACKET
+      * - RestrictAddressFamilies_OTHER
+      * - SystemCallArchitectures
+      * - SystemCallFilter_swap
+      * - SystemCallFilter_obsolete
+      * - SystemCallFilter_clock
+      * - SystemCallFilter_cpu_emulation
+      * - SystemCallFilter_debug
+      * - SystemCallFilter_mount
+      * - SystemCallFilter_module
+      * - SystemCallFilter_raw_io
+      * - SystemCallFilter_reboot
+      * - SystemCallFilter_privileged
+      * - SystemCallFilter_resources
+      * - IPAddressDeny
+      * - DeviceAllow
+      * - AmbientCapabilities
+
+   See example "JSON Policy" below.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --json=MODE
+
+   With the :code:`security` command, generate a JSON formatted output of the security analysis table. The format is a JSON array with objects containing the following fields: :code:`set` which indicates if the setting has been enabled or not, :code:`name` which is what is used to refer to the setting, :code:`json_field` which is the JSON compatible identifier of the setting, :code:`description` which is an outline of the setting state, and :code:`exposure` which is a number in the range 0.0…10.0, where a higher value corresponds to a higher security threat. The JSON version of the table is printed to standard output. The :emphasis:`MODE` passed to the option can be one of three: :code:`off` which is the default, :code:`pretty` and :code:`short` which respectively output a prettified or shorted JSON version of the security table. With the :code:`plot` command, generate a JSON formatted output of the raw time data. The format is a JSON array with objects containing the following fields: :code:`name` which is the unit name, :code:`activated` which is the time after startup the service was activated, :code:`activating` which is how long after startup the service was initially started, :code:`time` which is how long the service took to activate from when it was initially started, :code:`deactivated` which is the time after startup that the service was deactivated, :code:`deactivating` which is the time after startup that the service was initially told to deactivate.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --iterations=NUMBER
+
+   When used with the :code:`calendar` command, show the specified number of iterations the specified calendar expression will elapse next. Defaults to 1.
+
+   .. versionadded:: 242
+
+.. systemd:option:: --base-time=TIMESTAMP
+
+   When used with the :code:`calendar` command, show next iterations relative to the specified point in time. If not specified, defaults to the current time.
+
+   .. versionadded:: 244
+
+.. systemd:option:: --unit=UNIT
+
+   When used with the :code:`condition` command, evaluate all the :code:`Condition*=...` and :code:`Assert*=...` assignments in the specified unit file. The full unit search path is formed by combining the directories for the specified unit with the usual unit load paths. The variable :code:`$SYSTEMD_UNIT_PATH` is supported, and may be used to replace or augment the compiled in set of unit load paths; see :ref:`systemd.unit(5)`. All units files present in the directory containing the specified unit will be used in preference to the other paths. If a template unit without an instance name is specified (e.g. :code:`foo@.service`), "test_instance" will be used as the instance name, which can be controlled by :code:`--instance=` option.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --table
+
+   When used with the :code:`plot` command, the raw time data is output in a table.
+
+   .. versionadded:: 253
+
+.. systemd:option:: --no-legend
+
+   When used with the :code:`plot` command in combination with either :code:`--table` or :code:`--json=`, no legends or hints are included in the output.
+
+   .. versionadded:: 253
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove machine|
+    :end-before: .. inclusion-end-marker-do-not-remove machine|
+
+.. systemd:option:: -q, --quiet
+
+   Suppress hints and other non-essential output.
+
+   .. versionadded:: 250
+
+.. systemd:option:: --tldr
+
+   With :code:`cat-config`, only print the "interesting" parts of the configuration files, skipping comments and empty lines and section headers followed only by comments and empty lines.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --scale-svg=FACTOR
+
+   When used with the :code:`plot` command, the x-axis of the plot can be stretched by FACTOR (default: 1.0).
+
+   .. versionadded:: 257
+
+.. systemd:option:: --detailed
+
+   When used with the :code:`plot` command, activation timestamps details can be seen in SVG plot.
+
+   .. versionadded:: 257
+
+.. systemd:option:: --drm-device=PATH
+
+   When provided with the :code:`chid` command, use this sysfs path to a DRM device to fetch EDID from. Example: :code:`/sys/class/drm/card1-HDMI-A-1/`
+
+   .. versionadded:: 258
+
+.. systemd:option:: --debugger=DEBUGGER
+
+   Use the given debugger for the :code:`unit-gdb` command. If not given and :code:`$SYSTEMD_DEBUGGER` is unset, then :man-pages:`gdb(1)` will be used.
+
+   .. versionadded:: 258
+
+.. systemd:option:: -A ARGS, --debugger-arguments=ARGS
+
+   Pass the given :emphasis:`ARGS` as extra command line arguments to the debugger.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+Exit status
+###########
+
+For most verbs, :code:`0` is returned on success, and a non-zero failure code otherwise.
+
+For the verb :code:`compare-versions`, in the two-argument form, :code:`12`, :code:`0`, or :code:`11` are returned if the second version string is respectively larger than, equal to, or smaller than the first. In the three-argument form, :code:`0` or :code:`1` are returned when the condition is respectively true or false.
+
+For the verb :code:`has-tpm2`, :code:`0` is returned if a TPM2 device is discovered, supported, and used by firmware, driver, and userspace (i.e. :code:`systemd`). Otherwise, the OR combination of the value :code:`1` (in case firmware support is missing), :code:`2` (in case driver support is missing), and :code:`4` (in case userspace support is missing). If no TPM2 support is available at all, value :code:`7` is hence returned.
+
+.. include:: common-variables.rst
+
+Examples
+########
+
+JSON Policy
+-----------
+
+The JSON file passed as a path parameter to :code:`--security-policy=` has a top-level JSON object, with keys being the assessment test identifiers mentioned above. The values in the file should be JSON objects with one or more of the following fields: :code:`description_na` (string), :code:`description_good` (string), :code:`description_bad` (string), :code:`weight` (unsigned integer), and :code:`range` (unsigned integer). If any of these fields corresponding to a specific id of the unit file is missing from the JSON object, the default built-in field value corresponding to that same id is used for security analysis as default. The weight and range fields are used in determining the overall exposure level of the unit files: the value of each setting is assigned a badness score, which is multiplied by the policy weight and divided by the policy range to determine the overall exposure that the setting implies. The computed badness is summed across all settings in the unit file, normalized to the 1…100 range, and used to determine the overall exposure level of the unit. By allowing users to manipulate these fields, the 'security' verb gives them the option to decide for themself which ids are more important and hence should have a greater effect on the exposure level. A weight of "0" means the setting will not be checked.
+
+.. code-block:: sh
+
+   {
+     "PrivateDevices":
+       {
+       "description_good": "Service has no access to hardware devices",
+       "description_bad": "Service potentially has access to hardware devices",
+       "weight": 1000,
+       "range": 1
+       },
+     "PrivateMounts":
+       {
+       "description_good": "Service cannot install system mounts",
+       "description_bad": "Service may install system mounts",
+       "weight": 1000,
+       "range": 1
+       },
+     "PrivateNetwork":
+       {
+       "description_good": "Service has no access to the host's network",
+       "description_bad": "Service has access to the host's network",
+       "weight": 2500,
+       "range": 1
+       },
+     "PrivateTmp":
+       {
+       "description_good": "Service has no access to other software's temporary files",
+       "description_bad": "Service has access to other software's temporary files",
+       "weight": 1000,
+       "range": 1
+       },
+     "PrivateUsers":
+       {
+       "description_good": "Service does not have access to other users",
+       "description_bad": "Service has access to other users",
+       "weight": 1000,
+       "range": 1
+       }
+   }
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`
+
+

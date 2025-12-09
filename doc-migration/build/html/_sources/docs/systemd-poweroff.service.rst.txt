@@ -1,0 +1,54 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-poweroff.service
+:manvolnum: 8
+:summary: System shutdown logic
+:aliases: systemd-halt.service, systemd-reboot.service, systemd-kexec.service, systemd-shutdown
+
+.. _systemd-poweroff.service(8):
+
+===========================
+systemd-poweroff.service(8)
+===========================
+
+Name
+####
+
+systemd-poweroff.service, systemd-halt.service, systemd-reboot.service, systemd-kexec.service, systemd-shutdown — System shutdown logic
+
+Synopsis
+########
+
+:code:`systemd-poweroff.service`
+
+:code:`systemd-halt.service`
+
+:code:`systemd-reboot.service`
+
+:code:`systemd-kexec.service`
+
+:code:`/usr/lib/systemd/systemd-shutdown`
+
+:code:`/usr/lib/systemd/system-shutdown/`
+
+Description
+###########
+
+:code:`systemd-poweroff.service` is a system service that is pulled in by :code:`poweroff.target` and is responsible for the actual system power-off operation. Similarly, :code:`systemd-halt.service` is pulled in by :code:`halt.target`, :code:`systemd-reboot.service` by :code:`reboot.target` and :code:`systemd-kexec.service` by :code:`kexec.target` to execute the respective actions.
+
+When these services are run, they ensure that PID 1 is replaced by the :code:`/usr/lib/systemd/systemd-shutdown` binary which is then responsible for the actual shutdown. Before shutting down, this binary will try to unmount all remaining file systems (or at least remount them read-only), disable all remaining swap devices, detach all remaining storage devices and kill all remaining processes.
+
+It is necessary to have this code in a separate binary because otherwise rebooting after an upgrade might be broken — the running PID 1 could still depend on libraries which are not available any more, thus keeping the file system busy, which then cannot be re-mounted read-only.
+
+Shortly before executing the actual system power-off/halt/reboot/kexec, :code:`systemd-shutdown` will run all executables in :code:`/usr/lib/systemd/system-shutdown/`. Those executables are called with one argument: either "poweroff", "halt", "reboot", or "kexec", depending on the chosen action. All executables in this directory are executed in parallel, and execution of the action is not continued before all executables finished. (A safety timeout of 90s is applied however.) Note that these executables are run *after* all services have been shut down, and after most mounts have been unmounted (the root file system as well as all services have been shut down, and after most mounts have been unmounted (the root file system as well as :code:`/run/` and various API file systems are still around though). This means any programs dropped into this directory must be prepared to run in such a limited execution environment and not rely on external services or hierarchies such as :code:`/var/` to be around (or writable).
+
+Note that :code:`systemd-poweroff.service` (and the related units) should never be executed directly. Instead, trigger system shutdown with a command such as "systemctl poweroff".
+
+Another form of shutdown is provided by the :ref:`systemd-soft-reboot.service(8)` functionality. It reboots only the OS userspace, leaving the kernel, firmware, and hardware as it is.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd.special(7)`, :man-pages:`reboot(2)`, :ref:`systemd-suspend.service(8)`, :ref:`systemd-soft-reboot.service(8)`, :man-pages:`bootup(7)`
+
+

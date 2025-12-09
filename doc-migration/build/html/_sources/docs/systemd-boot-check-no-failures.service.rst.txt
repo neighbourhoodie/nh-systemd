@@ -1,0 +1,38 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-boot-check-no-failures.service
+:manvolnum: 8
+:summary: verify that the system booted up cleanly
+:aliases: systemd-boot-check-no-failures
+
+.. _systemd-boot-check-no-failures.service(8):
+
+=========================================
+systemd-boot-check-no-failures.service(8)
+=========================================
+
+Name
+####
+
+systemd-boot-check-no-failures.service, systemd-boot-check-no-failures — verify that the system booted up cleanly
+
+Synopsis
+########
+
+:code:`systemd-boot-check-no-failures.service`
+
+:code:`/usr/lib/systemd/system-boot-check-no-failures`
+
+Description
+###########
+
+:code:`systemd-boot-check-no-failures.service` is a system service that checks whether the system booted up successfully. This service implements a very minimal test only: whether there are any failed units on the system. This service is disabled by default. When enabled, it is ordered before :code:`boot-complete.target`, thus ensuring the target cannot be reached when the system booted up with failed services.
+
+Note that due the simple nature of this check this service is probably not suitable for deployment in most scenarios. It is primarily useful only as example for developing more fine-grained checks to order before :code:`boot-complete.target`.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.special(7)`
+
+

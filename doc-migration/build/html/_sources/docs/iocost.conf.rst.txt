@@ -1,0 +1,55 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: iocost.conf
+:manvolnum: 5
+:summary: Configuration files for the iocost solution manager
+
+.. _iocost.conf(5):
+
+==============
+iocost.conf(5)
+==============
+
+Name
+####
+
+iocost.conf — Configuration files for the iocost solution manager
+
+Synopsis
+########
+
+:code:`/etc/systemd/iocost.conf` :code:`/etc/systemd/iocost.conf.d/\*.conf`
+
+Description
+###########
+
+This file configures the behavior of "iocost", a tool mostly used by :ref:`systemd-udevd(8)` rules to automatically apply I/O cost solutions to :code:`/sys/fs/cgroup/io.cost.*`.
+
+The qos and model values are calculated based on benchmarks collected on the `iocost-benchmark <https://github.com/iocost-benchmark/iocost-benchmarks>`_ project and turned into a set of solutions that go from most to least isolated. Isolation allows the system to remain responsive in face of high I/O load. Which solutions are available for a device can be queried from the udev metadata attached to it. By default the naive solution is used, which provides the most bandwidth.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+All options are configured in the \[IOCost] section:
+
+.. systemd:option:: TargetSolution=
+   :group: config-directives
+
+   Chooses which I/O cost solution (identified by named string) should be used for the devices in this system. The known solutions can be queried from the udev metadata attached to the devices. If a device does not have the specified solution, the first one listed in :systemd:var:`IOCOST_SOLUTIONS` is used instead.
+
+   E.g. "TargetSolution=isolated-bandwidth".
+
+   .. versionadded:: 254
+
+See Also
+########
+
+:man-pages:`udevadm(8)`, `The iocost-benchmarks github project <https://github.com/iocost-benchmark/iocost-benchmarks>`_, `The resctl-bench documentation details how the values are obtained <https://github.com/facebookexperimental/resctl-demo/tree/main/resctl-bench/doc>`_
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

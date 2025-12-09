@@ -1,0 +1,68 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_set_connected_signal
+:manvolnum: 3
+:summary: Control emission of local connection establishment signal on bus connections
+:aliases: sd_bus_get_connected_signal
+
+.. _sd_bus_set_connected_signal(3):
+
+==============================
+sd_bus_set_connected_signal(3)
+==============================
+
+Name
+####
+
+sd_bus_set_connected_signal, sd_bus_get_connected_signal — Control emission of local connection establishment signal on bus connections
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_set_connected_signal(sd_bus *bus,
+	int b); .. code-block::
+
+   int sd_bus_get_connected_signal(sd_bus *bus);
+
+Description
+###########
+
+:code:`sd_bus_set_connected_signal()` may be used to control whether a local, synthetic :code:`Connected()` signal message shall be generated and enqueued for dispatching when the connection is fully established. If the :code:`b` parameter is zero the message is not generated (the default), otherwise it is generated.
+
+:code:`sd_bus_get_connected_signal()` may be used to query whether this feature is enabled. It returns zero if not, positive otherwise.
+
+The :code:`Connected()` signal message is generated from the "org.freedesktop.DBus.Local" service and interface, and "/org/freedesktop/DBus/Local" object path. Use :ref:`sd_bus_match_signal_async(3)` to match on this signal.
+
+This message is particularly useful on slow transports where connections take a long time to be established. This is especially the case when :ref:`sd_bus_set_watch_bind(3)` is used. The signal is generated when the :ref:`sd_bus_is_ready(3)` returns positive for the first time.
+
+The :code:`Connected()` signal corresponds with the :code:`Disconnected()` signal that is synthesized locally when the connection is terminated. The latter is generated unconditionally however, unlike the former which needs to be enabled explicitly before it is generated, with :code:`sd_bus_set_connected_signal()`.
+
+Return Value
+############
+
+On success, these functions return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ECHILD
+
+   The bus connection has been created in a different process, library or module instance.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_set_connected_signal()` and :code:`sd_bus_get_connected_signal()` were added in version 237.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_match_signal_async(3)`, :ref:`sd_bus_set_watch_bind(3)`, :ref:`sd_bus_is_ready(3)`
+
+

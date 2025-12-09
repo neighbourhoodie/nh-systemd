@@ -1,0 +1,36 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-update-utmp.service
+:manvolnum: 8
+:summary: Write audit and utmp updates at bootup and shutdown
+:aliases: systemd-update-utmp
+
+.. _systemd-update-utmp.service(8):
+
+==============================
+systemd-update-utmp.service(8)
+==============================
+
+Name
+####
+
+systemd-update-utmp.service, systemd-update-utmp — Write audit and utmp updates at bootup and shutdown
+
+Synopsis
+########
+
+:code:`systemd-update-utmp.service`
+
+:code:`/usr/lib/systemd/systemd-update-utmp`
+
+Description
+###########
+
+:code:`systemd-update-utmp.service` is a service that writes system reboots and shutdown requests to utmp and wtmp, as well as the audit logs.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`utmp(5)`, :man-pages:`auditd(8)`
+
+

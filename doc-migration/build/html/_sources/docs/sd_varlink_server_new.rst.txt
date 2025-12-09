@@ -1,0 +1,79 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_varlink_server_new
+:manvolnum: 3
+:summary: Allocate Varlink server object
+
+.. _sd_varlink_server_new(3):
+
+========================
+sd_varlink_server_new(3)
+========================
+
+Name
+####
+
+sd_varlink_server_new — Allocate Varlink server object
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-varlink.h>` .. code-block::
+
+   int sd_varlink_server_new(sd_varlink_server** ret,
+	sd_varlink_server_flags_t flags);
+
+Description
+###########
+
+:code:`sd_varlink_server_new()` allocates a new Varlink server object. Initially the server does not listen on any socket or file descriptor. The newly allocated server object is returned in the :code:`ret` parameter. Use :code:`sd_varlink_server_unref()` to release the server object again after use.
+
+The following flags may be passed in the :code:`flags` parameter:
+
+*    :code:`SD_VARLINK_SERVER_ROOT_ONLY`: only allow connections from UID 0 (i.e. the root user). This has two effects: any incoming connections is authenticated via :code:`SO_PEERCRED` ensuring the UID reported by the kernel is zero. If this check fails the connection is immediately terminated. Moreover, when binding a socket inode in the file system, the access mode is set to 0600 (rather than 0666). If this option is used connections on non-:code:`AF_UNIX` sockets or via pipes are never permitted.
+
+*    :code:`SD_VARLINK_SERVER_MYSELF_ONLY`: this is very similar to :code:`SD_VARLINK_SERVER_ROOT_ONLY` but enforces that the connecting client's UID must match the server's UID (i.e. the UID this function is invoked as). For servers that run as UID 0 the flags are equivalent. If both flags are specified in combination, connections are allowed by both UID 0 and the server's own UID.
+
+*    :code:`SD_VARLINK_SERVER_ACCOUNT_UID`: if set connection accounting per client UID is enabled, and a limit on concurrent connections from the same UID is enforced. The limit can be set via :code:`sd_varlink_server_set_connections_per_uid_max()`, and defaults to 3/4th of the total concurrent connection limit, as settable via :code:`sd_varlink_server_set_connections_max()`.
+
+*    :code:`SD_VARLINK_SERVER_INHERIT_USERDATA`: if set the user data field for incoming connection (i.e. sd_varlink) objects (as settable via :code:`sd_varlink_set_userdata()`) is automatically set to the userdata field of the server (i.e. sd_varlink_server) object (as settable via :code:`sd_varlink_server_set_userdata()`). If this flag is not specified the connection's user data field will default to :code:`NULL`.
+
+*    :code:`SD_VARLINK_SERVER_INPUT_SENSITIVE`: mark all incoming method call parameters as security sensitive (equivalent to calling :code:`sd_json_variant_sensitive()`). This is useful for services that deal with secrets and similar, as it ensures that the parameters are kept out of debug logging, and memory used by the parameters is erased after use.
+
+*    :code:`SD_VARLINK_SERVER_ALLOW_FD_PASSING_INPUT`: if set, allow receiving UNIX file descriptors via the connections, equivalent to calling :code:`sd_varlink_set_allow_fd_passing_input()` immediately for each incoming connection. Note that this only has an effect if :code:`AF_UNIX` sockets are used for communication.
+
+*    :code:`SD_VARLINK_SERVER_ALLOW_FD_PASSING_OUTPUT`: similar, but controls sending of UNIX file descriptors.
+
+*    :code:`SD_VARLINK_SERVER_FD_PASSING_INPUT_STRICT`: this flag can be used in conjunction with :code:`SD_VARLINK_SERVER_ALLOW_FD_PASSING_INPUT`. If so, file descriptor passing is turned off on the listening sockets already, ensuring that the connection sockets derived from it at no time have file descriptor passing enabled. If :code:`SD_VARLINK_SERVER_ALLOW_FD_PASSING_INPUT` is used without :code:`SD_VARLINK_SERVER_FD_PASSING_INPUT_STRICT` then a choice when to prohibit or allow file descriptor passing can still be made after the connection came in, however permitting a time window where file descriptors might already be enqueued, that then need to be dropped again.
+
+*    :code:`SD_VARLINK_SERVER_HANDLE_SIGINT`: if set, and :code:`sd_varlink_server_loop_auto()` is used, incoming :code:`SIGINT` process signals will be caught gracefully and cause the event loop to exit cleanly.
+
+*    :code:`SD_VARLINK_SERVER_HANDLE_SIGTERM`: similar, but does the same for :code:`SIGTERM`.
+
+Return Value
+############
+
+On success, :code:`sd_varlink_server_new()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An argument is invalid.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_varlink_server_new()` was added in version 257.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-varlink(3)`
+
+

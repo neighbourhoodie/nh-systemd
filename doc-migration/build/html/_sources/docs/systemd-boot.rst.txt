@@ -1,0 +1,440 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-boot
+:manvolnum: 7
+:summary: A simple UEFI boot manager
+:aliases: sd-boot
+
+.. _systemd-boot(7):
+
+===============
+systemd-boot(7)
+===============
+
+Name
+####
+
+systemd-boot, sd-boot — A simple UEFI boot manager
+
+Description
+###########
+
+:code:`systemd-boot` (short: :code:`sd-boot`) is a simple UEFI boot manager. It provides a textual menu to select the entry to boot and an editor for the kernel command line. :code:`systemd-boot` supports systems with UEFI firmware only.
+
+:code:`systemd-boot` loads boot entry information from the EFI system partition (ESP), usually mounted at :code:`/efi/`, :code:`/boot/`, or :code:`/boot/efi/` during OS runtime, as well as from the Extended Boot Loader partition (XBOOTLDR) if it exists (usually mounted to :code:`/boot/`). Configuration file fragments, kernels, initrds and other EFI images to boot generally need to reside on the ESP or the Extended Boot Loader partition. Linux kernels must be built with :code:`CONFIG_EFI_STUB` to be able to be directly executed as an EFI image. During boot :code:`systemd-boot` automatically assembles a list of boot entries from the following sources:
+
+*    Boot entries defined with `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ Type #1 description files located in :code:`/loader/entries/` on the ESP and the Extended Boot Loader Partition. These usually describe Linux kernel images with associated initrd images, but alternatively may also describe other arbitrary EFI executables.
+
+*    Unified kernel images, `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ Type #2, which are executable EFI binaries in :code:`/EFI/Linux/` on the ESP and the Extended Boot Loader Partition.
+
+*    The Microsoft Windows EFI boot manager, if installed.
+
+*    The Apple macOS boot manager, if installed.
+
+*    The EFI Shell binary, if installed.
+
+*    A "Reboot Into Firmware Interface" option, if supported by the UEFI firmware.
+
+*    Secure Boot variables enrollment if the UEFI firmware is in setup-mode and files are provided on the ESP.
+
+:code:`systemd-boot` supports the following features:
+
+*    Basic boot manager configuration changes (such as timeout configuration, default boot entry selection, …) may be made directly from the boot loader UI at boot-time, as well as during system runtime with EFI variables.
+
+*    The boot manager integrates with the :code:`systemctl` command to implement features such as :code:`systemctl reboot --boot-loader-entry=…` (for rebooting into a specific boot menu entry, i.e. "reboot into Windows") and :code:`systemctl reboot --boot-loader-menu=…` (for rebooting into the boot loader menu), by implementing the `Boot Loader Interface <https://systemd.io/BOOT_LOADER_INTERFACE>`_. See :man-pages:`systemctl(1)` for details.
+
+*    An EFI variable set by the boot loader informs the OS about the EFI System Partition used during boot. This is then used to automatically mount the correct EFI System Partition to :code:`/efi/` or :code:`/boot/` during OS runtime. See :ref:`systemd-gpt-auto-generator(8)` for details.
+
+*    The boot manager provides information about the boot time spent in UEFI firmware using the `Boot Loader Interface <https://systemd.io/BOOT_LOADER_INTERFACE>`_. This information can be displayed using :ref:`systemd-analyze(1)`.
+
+*    The boot manager implements boot counting and automatic fallback to older, working boot entries on failure. See `Automatic Boot Assessment <https://systemd.io/AUTOMATIC_BOOT_ASSESSMENT>`_.
+
+*    The boot manager optionally reads a random seed from the ESP partition, combines it with a 'system token' stored in a persistent EFI variable and derives a random seed to use by the OS as entropy pool initialization, providing a full entropy pool during early boot.
+
+*    The boot manager allows for Secure Boot variables to be enrolled if the UEFI firmware is in setup-mode. Additionally, variables can be automatically enrolled if configured.
+
+:man-pages:`bootctl(1)` may be used from a running system to locate the ESP and the Extended Boot Loader Partition, list available entries, and install :code:`systemd-boot` itself.
+
+:man-pages:`kernel-install(8)` may be used to copy kernel images onto the ESP or the Extended Boot Loader Partition and to generate description files compliant with the Boot Loader Specification.
+
+:ref:`systemd-stub(7)` may be used as UEFI boot stub for executed kernels, which is useful to show graphical boot splashes before transitioning into the Linux world. It is also capable of automatically picking up auxiliary credential files (for boot parameterization) and system extension images, as companion files to the booted kernel images.
+
+Key bindings
+############
+
+The following keys may be used in the boot menu:
+
+.. COMMENT: Developer commands Q/v/Ctrl+l deliberately not advertised.
+
+.. systemd:option:: :kbd:`↑` (Up), :kbd:`↓` (Down), :kbd:`j`, :kbd:`k`, :kbd:`PageUp`, :kbd:`PageDown`, :kbd:`Home`, :kbd:`End`
+
+   Navigate up/down in the entry list
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`↵` (Enter), :kbd:`→` (Right)
+
+   Boot selected entry
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`d`
+
+   Make selected entry the default
+
+   An EFI variable is set to allow this setting to persist.
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`e`
+
+   Edit the kernel command line for selected entry
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`+`, :kbd:`t`
+
+   Increase the timeout before default entry is booted
+
+   An EFI variable is set to allow this setting to persist.
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`-`, :kbd:`T`
+
+   Decrease the timeout
+
+   An EFI variable is set to allow this setting to persist.
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`r`
+
+   Change screen resolution, skipping any unsupported modes.
+
+   An EFI variable is set to allow this setting to persist.
+
+   .. versionadded:: 250
+
+.. systemd:option:: :kbd:`R`
+
+   Reset screen resolution to firmware or configuration file default.
+
+   An EFI variable is set to allow this setting to persist.
+
+   .. versionadded:: 250
+
+.. systemd:option:: :kbd:`p`
+
+   Print status
+
+   .. versionadded:: 250
+
+.. systemd:option:: :kbd:`h`, :kbd:`?`, :kbd:`F1`
+
+   Show a help screen
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`f`
+
+   Reboot into firmware interface.
+
+   For compatibility with the keybindings of several firmware implementations this operation may also be reached with :kbd:`F2`, :kbd:`F10`, :kbd:`Del` and :kbd:`Esc`.
+
+   .. versionadded:: 250
+
+.. systemd:option:: :kbd:`Shift` + :kbd:`o`
+
+   Power off the system.
+
+   .. versionadded:: 255
+
+.. systemd:option:: :kbd:`Shift` + :kbd:`b`
+
+   Reboot the system.
+
+   .. versionadded:: 255
+
+The following keys may be pressed during bootup or in the boot menu to directly boot a specific entry:
+
+.. systemd:option:: :kbd:`l`
+
+   Linux
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`w`
+
+   Windows
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`a`
+
+   macOS
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`s`
+
+   EFI shell
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`1`, :kbd:`2`, :kbd:`3`, :kbd:`4`, :kbd:`5`, :kbd:`6`, :kbd:`7`, :kbd:`8`, :kbd:`9`
+
+   Boot entry number 1 … 9
+
+   .. versionadded:: 239
+
+The boot menu is shown when a non-zero menu timeout has been configured. If the menu timeout has been set to zero, hold down a key (:kbd:`space` is recommended) before the boot loader initializes to bring up the boot menu. Note that depending on the firmware implementation the time window where key presses are accepted before the boot loader initializes might be short. If the window is missed, reboot and try again, possibly repeatedly pressing a suitable key; on most systems it should be possible to hit the time window after a few attempts. Keys other than the space bar may be used, except for the keys listed above. If showing the menu on demand doesn't work well, consider setting a non-zero timeout to show the boot menu unconditionally. Some desktop environments might offer an option to boot directly into the boot menu, which also avoids the problem altogether. Alternatively, use the command line :code:`systemctl reboot --boot-loader-menu=` with a non-zero value from the shell.
+
+In the editor, most keys simply insert themselves, but the following keys may be used to perform additional actions:
+
+.. systemd:option:: :kbd:`←` (Left), :kbd:`→` (Right), :kbd:`Home`, :kbd:`End`
+
+   Navigate left/right
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`Esc`, :kbd:`Ctrl` + :kbd:`c`
+
+   Abort the edit and quit the editor
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`Ctrl` + :kbd:`k`
+
+   Clear the command line forwards
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`Ctrl` + :kbd:`w`, :kbd:`Alt` + :kbd:`Backspace`
+
+   Delete word backwards
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`Ctrl` + :kbd:`Del`, :kbd:`Alt` + :kbd:`d`
+
+   Delete word forwards
+
+   .. versionadded:: 239
+
+.. systemd:option:: :kbd:`↵` (Enter)
+
+   Boot entry with the edited command line
+
+   .. versionadded:: 239
+
+Note that unless configured otherwise in the UEFI firmware, systemd-boot will use the US keyboard layout, so key labels might not match for keys like +/-.
+
+Files
+#####
+
+The files :code:`systemd-boot` processes generally reside on the UEFI ESP which is usually mounted to :code:`/efi/`, :code:`/boot/` or :code:`/boot/efi/` during OS runtime. It also processes files on the Extended Boot Loader partition which is typically mounted to :code:`/boot/`, if it exists.
+
+:code:`systemd-boot` reads runtime configuration such as the boot timeout and default entry from :code:`/loader/loader.conf` on the ESP (in combination with data read from EFI variables). See :man-pages:`loader.conf(5)`.
+
+Boot entry description files following the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ are read from :code:`/loader/entries/` on the ESP and the Extended Boot Loader partition.
+
+Unified kernel boot entries following the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_ are read from :code:`/EFI/Linux/` on the ESP and the Extended Boot Loader partition.
+
+Optionally, a random seed for early boot entropy pool provisioning is stored in :code:`/loader/random-seed` in the ESP.
+
+During initialization, :code:`systemd-boot` automatically loads all driver files placed in the :code:`/EFI/systemd/drivers/` directory of the ESP. The files placed there must have an extension of the EFI architecture ID followed by :code:`.efi` (e.g. for x86-64 this means a suffix of :code:`x64.efi`). This may be used to automatically load file system drivers and similar, to extend the native firmware support.
+
+Enrollment of Secure Boot variables can be performed manually or automatically if files are available under :code:`/loader/keys/NAME/{db,dbx,KEK,PK}.auth`, :emphasis:`NAME` being the display name for the set of variables in the menu. If one of the sets is named :code:`auto` then it might be enrolled automatically depending on whether "secure-boot-enroll" is set to force or not.
+
+EFI Variables
+#############
+
+The following EFI variables are defined, and may be set or read by :code:`systemd-boot` for communication between the boot loader and the OS. The vendor UUID "4a67b082-0a4c-41cf-b6c7-440b29bb8c4f" is used in all cases.
+
+.. systemd:option:: LoaderBootCountPath
+   :group: efi-variables
+
+   If boot counting is enabled, contains the path to the file in whose name the boot counters are encoded. Set by the boot loader. :ref:`systemd-bless-boot.service(8)` uses this information to mark a boot as successful as determined by the successful activation of the :code:`boot-complete.target` target unit.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderConfigTimeout, LoaderConfigTimeoutOneShot
+   :group: efi-variables
+
+   The menu timeout in seconds. Read by the boot loader. :systemd:var:`LoaderConfigTimeout` is maintained persistently, while :systemd:var:`LoaderConfigTimeoutOneShot` is a one-time override which is read once (in which case it takes precedence over :systemd:var:`LoaderConfigTimeout`) and then removed. :systemd:var:`LoaderConfigTimeout` may be manipulated with the :kbd:`t`/:kbd:`T` keys, see above.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderConfigConsoleMode
+   :group: efi-variables
+
+   The numerical menu console mode. Read by the boot loader. :systemd:var:`LoaderConfigConsoleMode` is maintained persistently. :systemd:var:`LoaderConfigConsoleMode` may be manipulated with the :kbd:`r`/:kbd:`R` keys, see above.
+
+   .. versionadded:: 250
+
+.. systemd:option:: LoaderDevicePartUUID
+   :group: efi-variables
+
+   Contains the partition UUID of the partition the boot loader has been started from on the current boot (usually an EFI System Partition). Set by the boot loader. (Note that :ref:`systemd-stub(7)` will set this too, if not set yet, to support systems that boot directly into a unified kernel image, bypassing any boot loader.) :ref:`systemd-gpt-auto-generator(8)` uses this information to automatically find the disk booted from, in order to discover various other partitions on the same disk automatically.
+
+   .. versionadded:: 220
+
+.. systemd:option:: LoaderDeviceURL
+   :group: efi-variables
+
+   If the boot loader has been invoked via network booting this variable contains the originating URL. This may be used to automatically acquire additional resources from the same source.
+
+   .. versionadded:: 258
+
+.. systemd:option:: LoaderEntries
+   :group: efi-variables
+
+   A list of the identifiers of all discovered boot loader entries. Set by the boot loader.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderEntryDefault, LoaderEntrySysFail, LoaderEntryOneShot
+   :group: efi-variables
+
+   The identifier of the default boot loader entry. Can be set in the OS and the boot loader. :systemd:var:`LoaderEntryOneShot` sets the default entry for the next boot only, while :systemd:var:`LoaderEntryDefault` sets it persistently for all future boots. :man-pages:`bootctl(1)`'s :systemd:option:`set-default` and :systemd:option:`set-oneshot` commands make use of these variables. The boot loader modifies :systemd:var:`LoaderEntryDefault` on request, when the :kbd:`d` key is used, see above.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderEntryLastBooted
+   :group: efi-variables
+
+   The identifier of the boot loader entry last attempted. Set and read by the boot loader, only when :code:`/loader/loader.conf` has default set to "@saved". See :man-pages:`loader.conf(5)`.
+
+   The boot loader will ensure :systemd:var:`LoaderEntryLastBooted` is up-to date for every boot, updating it as needed and will omit changing it all together when :systemd:var:`LoaderEntryOneShot` is set.
+
+   The boot loader reads the variable, which takes higher priority than :systemd:var:`LoaderEntryDefault`. The variable is ignored when :systemd:var:`LoaderEntryOneShot` is set.
+
+   :systemd:var:`LoaderEntryLastBooted` cannot be used as indication that the last boot was successful or not.
+
+   .. versionadded:: 250
+
+.. systemd:option:: LoaderEntrySelected
+   :group: efi-variables
+
+   The identifier of the boot loader entry currently being booted. Set by the boot loader.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderFeatures
+   :group: efi-variables
+
+   A set of flags indicating the features the boot loader supports. Set by the boot loader. Use :man-pages:`bootctl(1)` to view this data.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderFirmwareInfo, LoaderFirmwareType
+   :group: efi-variables
+
+   Brief firmware information. Set by the boot loader. Use :man-pages:`bootctl(1)` to view this data.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderTpm2ActivePcrBanks
+   :group: efi-variables
+
+   Hexadecimal string representation of a bitmask with values defined by the TCG EFI Protocol Specification for TPM 2.0 as EFI_TCG2_BOOT_HASH_ALG_*. If no TPM2 support or no active banks were detected, will be set to :systemd:constant:`0`. Set by the boot loader. Use :ref:`systemd-analyze(1)` to view this data.
+
+   .. versionadded:: 258
+
+.. systemd:option:: LoaderImageIdentifier
+   :group: efi-variables
+
+   The file system path to the EFI executable of the boot loader for the current boot, relative to the partition's root directory (i.e. relative to the partition indicated by :systemd:var:`LoaderDevicePartUUID`, see above). Set by the boot loader. (Note that :code:`systemd-stub` will set this too, if not set yet, to support systems that directly boot into a unified kernel image, bypassing any boot loader.) Use :man-pages:`bootctl(1)` to view this data.
+
+   .. versionadded:: 220
+
+.. systemd:option:: LoaderInfo
+   :group: efi-variables
+
+   Brief information about the boot loader. Set by the boot loader. Use :man-pages:`bootctl(1)` to view this data.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderTimeExecUSec, LoaderTimeInitUSec, LoaderTimeMenuUsec
+   :group: efi-variables
+
+   Information about the time spent in various parts of the boot loader. Set by the boot loader. Use :ref:`systemd-analyze(1)` to view this data.
+
+   .. versionadded:: 240
+
+.. systemd:option:: LoaderSystemToken
+   :group: efi-variables
+
+   A binary random data field, that is used for generating the random seed to pass to the OS (see above). Note that this random data is generally only generated once, during OS installation, and is then never updated again.
+
+   .. versionadded:: 243
+
+Many of these variables are defined by the `Boot Loader Interface <https://systemd.io/BOOT_LOADER_INTERFACE>`_.
+
+SMBIOS Type 11 Strings
+######################
+
+:code:`systemd-boot` can be configured using SMBIOS Type 11 strings. Applicable strings consist of a name, followed by "=", followed by the value. Unless :code:`systemd-boot` detects it is running inside a confidential computing environment, :code:`systemd-boot` will search the table for a string with a specific name, and if found, use its value. The following strings are read:
+
+.. systemd:option:: io.systemd.boot.kernel-cmdline-extra
+
+   If set, the value of this string is added to the list of kernel command line arguments for Boot Loader Specification Type 1 entries that are measured in PCR12 and passed to the kernel.
+
+   .. versionadded:: 256
+
+.. systemd:option:: io.systemd.boot-entries.extra:ID=DEFINITION
+
+   This allows inserting additional entries into the :code:`systemd-boot` menu. Take a pair of menu entry identifier and menu entry definition string. The former should be suitable for use as a filename of a Boot Loader Specification Type #1 entry filename (note that it is used for identification purposes only, no file of this name is actually accessed), the latter shall follow the syntax of the contents of a Type #1 entry. Any menu entry defined this way is processed and shown in pretty much the same way as a Type #1 entry read from the ESP or XBOOTLDR partition. Example:
+
+     .. code-block:: sh
+
+        io.systemd.boot-entries.extra:fooos-current.conf=title FooOS (Current)
+        uki-url http://example.com/somedir/fooos.efi
+
+   Note that this example contains a newline character. When generating this string from a shell care must be taken to encode it correctly.
+
+   Pass multiple strings formatted this way to generate multiple menu entries.
+
+   .. versionadded:: 258
+
+.. systemd:option:: io.systemd.boot.loglevel
+
+   If set, the value of this string is used as log level. Valid values (from most to least critical) are "emerg", "alert", "crit", "err", "warning", "notice", "info", and "debug".
+
+   .. versionadded:: 259
+
+Boot Counting
+#############
+
+:code:`systemd-boot` implements a simple boot counting mechanism on top of the `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_, for automatic and unattended fallback to older kernel versions/boot loader entries when a specific entry continuously fails. Any boot loader entry file and unified kernel image file that contains a "+" followed by one or two numbers (if two they need to be separated by a "-"), before the :code:`.conf` or :code:`.efi` suffix is subject to boot counting: the first of the two numbers ('tries left') is decreased by one on every boot attempt, the second of the two numbers ('tries done') is increased by one (if 'tries done' is absent it is considered equivalent to 0). Depending on the current value of these two counters the boot entry is considered to be in one of three states:
+
+1.    If the 'tries left' counter of an entry is greater than zero the entry is considered to be in 'indeterminate' state. This means the entry has not completed booting successfully yet, but also has not been determined not to work.
+
+2.    If the 'tries left' counter of an entry is zero it is considered to be in 'bad' state. This means no further attempts to boot this item will be made (that is, unless all other boot entries are also in 'bad' state), as all attempts to boot this entry have not completed successfully.
+
+3.    If the 'tries left' and 'tries done' counters of an entry are absent it is considered to be in 'good' state. This means further boot counting for the entry is turned off, as it successfully booted at least once. The :ref:`systemd-bless-boot.service(8)` service moves the currently booted entry from 'indeterminate' into 'good' state when a boot attempt completed successfully.
+
+Generally, when new entries are added to the boot loader, they first start out in 'indeterminate' state, i.e. with a 'tries left' counter greater than zero. The boot entry remains in this state until either it managed to complete a full boot successfully at least once (in which case it will be in 'good' state) — or the 'tries left' counter reaches zero (in which case it will be in 'bad' state).
+
+Example: let's say a boot loader entry file :code:`foo.conf` is set up for 3 boot tries. The installer will hence create it under the name :code:`foo+3.conf`. On first boot, the boot loader will rename it to :code:`foo+2-1.conf`. If that boot does not complete successfully, the boot loader will rename it to :code:`foo+1-2.conf` on the following boot. If that fails too, it will finally be renamed :code:`foo+0-3.conf` by the boot loader on next boot, after which it will be considered 'bad'. If the boot succeeds however the entry file will be renamed to :code:`foo.conf` by the OS, so that it is considered 'good' from then on.
+
+The boot menu takes the 'tries left' counter into account when sorting the menu entries: entries in 'bad' state are ordered at the beginning of the list, and entries in 'good' or 'indeterminate' at the end. The user can freely choose to boot any entry of the menu, including those already marked 'bad'. If the menu entry to boot is automatically determined, this means that 'good' or 'indeterminate' entries are generally preferred (as the bottom item of the menu is the one booted by default), and 'bad' entries will only be considered if there are no 'good' or 'indeterminate' entries left.
+
+The :man-pages:`kernel-install(8)` kernel install framework optionally sets the initial 'tries left' counter to the value specified in :code:`/etc/kernel/tries` when a boot loader entry is first created.
+
+Using :code:`systemd-boot` in virtual machines
+##############################################
+
+When using `qemu <https://www.qemu.org/docs/master/>`_ with `OVMF <https://www.linux-kvm.org/downloads/lersek/ovmf-whitepaper-c770f8c.txt>`_ (UEFI Firmware for virtual machines) the :code:`-kernel` switch works not only for linux kernels, but for any EFI binary, including :code:`systemd-boot` and unified linux kernels (UKIs). Example command line for loading :code:`systemd-boot` on x64:
+
+:code:`qemu-system-x86_64 -drive if=pflash,format=qcow2,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE_4M.qcow2 -kernel /usr/lib/systemd/boot/efi/systemd-bootx64.efi -drive file=... [ ... ]`
+
+(The path to the firmware file might need to be adjusted depending on the distribution.) :code:`systemd-boot` will detect that it was started directly instead of being loaded from ESP and will search for the ESP in that case, taking into account boot order information from the hypervisor (if available). Note that for this to yield a useful result, another :code:`-drive` argument needs to be used to attach an actual disk image with an ESP.
+
+See Also
+########
+
+:man-pages:`bootctl(1)`, :man-pages:`loader.conf(5)`, :ref:`systemd-bless-boot.service(8)`, :ref:`systemd-boot-random-seed.service(8)`, :man-pages:`kernel-install(8)`, :ref:`systemd-stub(7)`, `Boot Loader Specification <https://uapi-group.org/specifications/specs/boot_loader_specification>`_, `Boot Loader Interface <https://systemd.io/BOOT_LOADER_INTERFACE>`_, `TPM2 PCR Measurements Made by systemd <https://systemd.io/TPM2_PCR_MEASUREMENTS>`_
+
+

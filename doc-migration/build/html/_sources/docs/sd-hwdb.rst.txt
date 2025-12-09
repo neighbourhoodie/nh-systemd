@@ -1,0 +1,39 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd-hwdb
+:manvolnum: 3
+:summary: Read-only access to the hardware description database
+
+.. _sd-hwdb(3):
+
+==========
+sd-hwdb(3)
+==========
+
+Name
+####
+
+sd-hwdb — Read-only access to the hardware description database
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-hwdb.h>`
+
+:code:`pkg-config --cflags --libs libsystemd`
+
+Description
+###########
+
+:code:`sd-hwdb.h` is part of :man-pages:`libsystemd(3)` and allows read-only access the systemd database of hardware properties. See :man-pages:`hwdb(7)` and :ref:`systemd-hwdb(8)` for more information about the database.
+
+See :ref:`sd_hwdb_new(3)` and :ref:`sd_hwdb_get(3)` for information about the functions available.
+
+.. include:: libsystemd-pkgconfig.rst
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-udevd.service(8)`
+
+

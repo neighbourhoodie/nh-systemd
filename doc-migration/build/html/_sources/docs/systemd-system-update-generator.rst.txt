@@ -1,0 +1,35 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-system-update-generator
+:manvolnum: 8
+:summary: Generator for redirecting boot to offline update mode
+
+.. _systemd-system-update-generator(8):
+
+==================================
+systemd-system-update-generator(8)
+==================================
+
+Name
+####
+
+systemd-system-update-generator — Generator for redirecting boot to offline update mode
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-system-update-generator`
+
+Description
+###########
+
+:code:`systemd-system-update-generator` is a generator that automatically redirects the boot process to :code:`system-update.target`, if :code:`/system-update` or :code:`/etc/system-update` exists. This is required to implement the logic explained in the :ref:`systemd.offline-updates(7)`.
+
+:code:`systemd-system-update-generator` implements :ref:`systemd.generator(7)`.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd.special(7)`
+
+

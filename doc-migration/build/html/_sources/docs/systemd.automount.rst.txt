@@ -1,0 +1,110 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.automount
+:manvolnum: 5
+:summary: Automount unit configuration
+
+.. _systemd.automount(5):
+
+====================
+systemd.automount(5)
+====================
+
+Name
+####
+
+systemd.automount — Automount unit configuration
+
+Synopsis
+########
+
+:code:`automount.automount`
+
+Description
+###########
+
+A unit configuration file whose name ends in ".automount" encodes information about a file system automount point controlled and supervised by systemd. Automount units may be used to implement on-demand mounting as well as parallelized mounting of file systems.
+
+This man page lists the configuration options specific to this unit type. See :ref:`systemd.unit(5)` for the common options of all unit configuration files. The common configuration items are configured in the generic \[Unit] and \[Install] sections. The automount specific configuration options are configured in the \[Automount] section.
+
+Automount units must be named after the automount directories they control. Example: the automount point :code:`/home/lennart` must be configured in a unit file :code:`home-lennart.automount`. For details about the escaping logic used to convert a file system path to a unit name see :ref:`systemd.unit(5)`. Note that automount units cannot be templated, nor is it possible to add multiple names to an automount unit by creating symlinks to its unit file.
+
+For each automount unit file a matching mount unit file (see :ref:`systemd.mount(5)` for details) must exist which is activated when the automount path is accessed. Example: if an automount unit :code:`home-lennart.automount` is active and the user accesses :code:`/home/lennart` the mount unit :code:`home-lennart.mount` will be activated.
+
+Note that automount units are separate from the mount itself, so you should not set :code:`After=` or :code:`Requires=` for mount dependencies here. For example, you should not set :code:`After=network-online.target` or similar on network filesystems. Doing so may result in an ordering cycle.
+
+Note that automount support on Linux is privileged, automount units are hence only available in the system service manager (and root's user service manager), but not in unprivileged users' service managers.
+
+Note that automount units should not be nested. (The establishment of the inner automount point would unconditionally pin the outer mount point, defeating its purpose.)
+
+Automatic Dependencies
+######################
+
+Implicit Dependencies
+#####################
+
+The following dependencies are implicitly added:
+
+*    If an automount unit is beneath another mount unit in the file system hierarchy, a requirement and ordering dependencies are created to the on the unit higher in the hierarchy.
+
+*    An implicit :code:`Before=` dependency is created between an automount unit and the mount unit it activates.
+
+Default Dependencies
+####################
+
+The following dependencies are added unless :code:`DefaultDependencies=no` is set:
+
+*    Automount units acquire automatic :code:`Before=` and :code:`Conflicts=` on :code:`umount.target` in order to be stopped during shutdown.
+
+*    Automount units automatically gain an :code:`After=` dependency on :code:`local-fs-pre.target`, and a :code:`Before=` dependency on :code:`local-fs.target`.
+
+:code:`fstab`
+#############
+
+Automount units may either be configured via unit files, or via :code:`/etc/fstab` (see :man-pages:`fstab(5)` for details).
+
+For details how systemd parses :code:`/etc/fstab` see :ref:`systemd.mount(5)`.
+
+If an automount point is configured in both :code:`/etc/fstab` and a unit file, the configuration in the latter takes precedence.
+
+Options
+#######
+
+Automount unit files may include \[Unit] and \[Install] sections, which are described in :ref:`systemd.unit(5)`.
+
+Automount unit files must include an \[Automount] section, which carries information about the file system automount points it supervises. The options specific to the \[Automount] section of automount units are the following:
+
+.. systemd:option:: Where=
+   :group: unit-directives
+
+   Takes an absolute path of a directory of the automount point. If the automount point does not exist at time that the automount point is installed, it is created. This string must be reflected in the unit filename. (See above.) This option is mandatory.
+
+.. systemd:option:: ExtraOptions=
+   :group: unit-directives
+
+   Extra mount options to use when creating the autofs mountpoint. This takes a comma-separated list of options. This setting is optional. Note that the usual specifier expansion is applied to this setting, literal percent characters should hence be written as "%%".
+
+   .. versionadded:: 250
+
+.. systemd:option:: DirectoryMode=
+   :group: unit-directives
+
+   Directories of automount points (and any parent directories) are automatically created if needed. This option specifies the file system access mode used when creating these directories. Takes an access mode in octal notation. Defaults to 0755.
+
+.. systemd:option:: TimeoutIdleSec=
+   :group: unit-directives
+
+   Configures an idle timeout. Once the mount has been idle for the specified time, systemd will attempt to unmount. Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass 0 to disable the timeout logic. The timeout is disabled by default.
+
+   .. versionadded:: 220
+
+.. include:: systemd.service.rst
+    :start-after: .. inclusion-marker-do-not-remove shared-unit-options|
+    :end-before: .. inclusion-end-marker-do-not-remove shared-unit-options|
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`, :ref:`systemd.unit(5)`, :ref:`systemd.mount(5)`, :man-pages:`mount(8)`, :die-net:`automount(8)`, :ref:`systemd.directives(7)`
+
+

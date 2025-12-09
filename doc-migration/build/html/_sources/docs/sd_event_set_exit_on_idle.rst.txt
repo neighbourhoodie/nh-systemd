@@ -1,0 +1,66 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_set_exit_on_idle
+:manvolnum: 3
+:summary: Enable event loop exit-on-idle support
+:aliases: sd_event_get_exit_on_idle
+
+.. _sd_event_set_exit_on_idle(3):
+
+============================
+sd_event_set_exit_on_idle(3)
+============================
+
+Name
+####
+
+sd_event_set_exit_on_idle, sd_event_get_exit_on_idle — Enable event loop exit-on-idle support
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   int sd_event_set_exit_on_idle(sd_event *event,
+	int b); .. code-block::
+
+   int sd_event_get_exit_on_idle(sd_event *event);
+
+Description
+###########
+
+:code:`sd_event_set_exit_on_idle()` may be used to enable or disable the exit-on-idle support in the event loop object specified in the :code:`event` parameter. If enabled, the event loop will exit with a zero exit code there are no more enabled (:code:`SD_EVENT_ON`, :code:`SD_EVENT_ONESHOT`), non-exit, non-post event sources.
+
+:code:`sd_event_get_exit_on_idle()` may be used to determine whether exit-on-idle support was previously requested by a call to :code:`sd_event_set_exit_on_idle()` with a true :code:`b` parameter and successfully enabled.
+
+Return Value
+############
+
+On success, :code:`sd_event_set_exit_on_idle()` and :code:`sd_event_get_exit_on_idle()` return a non-zero positive integer if the exit-on-idle support was successfully enabled. They return zero if the exit-on-idle support was explicitly disabled with a false :code:`b` parameter. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ECHILD
+
+   The event loop has been created in a different process, library or module instance.
+
+.. systemd:option:: -EINVAL
+
+   The passed event loop object was invalid.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_set_exit_on_idle()` and :code:`sd_event_get_exit_on_idle()` were added in version 259.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_new(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`systemd.service(5)`
+
+

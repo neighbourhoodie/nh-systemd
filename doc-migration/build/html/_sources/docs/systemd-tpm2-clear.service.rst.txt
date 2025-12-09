@@ -1,0 +1,68 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-tpm2-clear.service
+:manvolnum: 8
+:summary: Request that the TPM security chip is cleared on next boot
+
+.. _systemd-tpm2-clear.service(8):
+
+=============================
+systemd-tpm2-clear.service(8)
+=============================
+
+Name
+####
+
+systemd-tpm2-clear.service — Request that the TPM security chip is cleared on next boot
+
+Synopsis
+########
+
+:code:`systemd-tpm2-clear.service`
+
+:code:`/usr/lib/systemd/systemd-tpm2-clear`
+
+Description
+###########
+
+:code:`systemd-tpm2-clear.service` is a service that requests that the TPM is reset by the PC firmware on the next boot. It makes use of the TPM Physical Presence Interface (PPI). Note that this service does not immediately execute the clear operation, but simply asks the PC firmware to execute it at next boot, where the user will be asked for confirmation before the operation is done.
+
+:code:`systemd-tpm2-clear.service` is typically hooked into the :code:`factory-reset.target` unit in order to request the TPM request before an immediate reboot. See `Factory Reset <https://systemd.io/FACTORY_RESET>`_ for more information.
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --graceful
+
+   Exit cleanly and execute no operation if the system does not possess a TPM chip.
+
+   .. versionadded:: 258
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+Kernel Command Line
+###################
+
+:code:`systemd-tpm2-clear` understands the following kernel command line parameters:
+
+.. systemd:option:: systemd.tpm2_allow_clear=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. If false the service will succeed, but instead of requesting the TPM clear operation from the PC firmware it will not execute any operation. If not specified defaults to true.
+
+   .. versionadded:: 258
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-tpm2-setup.service(8)`, :ref:`systemd-factory-reset-request.service(8)`
+
+

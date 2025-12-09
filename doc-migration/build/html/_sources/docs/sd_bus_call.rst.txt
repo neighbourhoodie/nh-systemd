@@ -1,0 +1,114 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_call
+:manvolnum: 3
+:summary: Invoke a D-Bus method call
+:aliases: sd_bus_call_async
+
+.. _sd_bus_call(3):
+
+==============
+sd_bus_call(3)
+==============
+
+Name
+####
+
+sd_bus_call, sd_bus_call_async — Invoke a D-Bus method call
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. include:: sd_bus_add_match.rst
+    :start-after: .. inclusion-marker-do-not-remove sd_bus_message_handler_t|
+    :end-before: .. inclusion-end-marker-do-not-remove sd_bus_message_handler_t|
+
+.. code-block::
+
+   int sd_bus_call(sd_bus *bus,
+	sd_bus_message *m,
+	uint64_t usec,
+	sd_bus_error *ret_error,
+	sd_bus_message **reply); .. code-block::
+
+   int sd_bus_call_async(sd_bus *bus,
+	sd_bus_slot **slot,
+	sd_bus_message *m,
+	sd_bus_message_handler_t callback,
+	void *userdata,
+	uint64_t usec);
+
+Description
+###########
+
+:code:`sd_bus_call()` takes a complete bus message object and calls the corresponding D-Bus method. On success, the response is stored in :code:`reply`. :code:`usec` indicates the timeout in microseconds. If :code:`ret_error` is not :code:`NULL` and :code:`sd_bus_call()` fails (either because of an internal error or because it received a D-Bus error reply), :code:`ret_error` is initialized to an instance of sd_bus_error describing the error.
+
+:code:`sd_bus_call_async()` is like :code:`sd_bus_call()` but works asynchronously. The :code:`callback` indicates the function to call when the response arrives. The :code:`userdata` pointer will be passed to the callback function, and may be chosen freely by the caller. If :code:`slot` is not :code:`NULL` and :code:`sd_bus_call_async()` succeeds, :code:`slot` is set to a slot object which can be used to cancel the method call at a later time using :ref:`sd_bus_slot_unref(3)`. If :code:`slot` is :code:`NULL`, the lifetime of the method call is bound to the lifetime of the bus object itself, and it cannot be cancelled independently. See :ref:`sd_bus_slot_set_floating(3)` for details. :code:`callback` is called when a reply arrives with the reply, :code:`userdata` and an sd_bus_error output parameter as its arguments. Unlike :code:`sd_bus_call()`, the sd_bus_error output parameter passed to the callback will be empty. To determine whether the method call succeeded, use :ref:`sd_bus_message_is_method_error(3)` on the reply message passed to the callback instead. If the callback returns zero and the sd_bus_error output parameter is still empty when the callback finishes, other handlers registered with functions such as :ref:`sd_bus_add_filter(3)` or :ref:`sd_bus_add_match(3)` are given a chance to process the message. If the callback returns a non-zero value or the sd_bus_error output parameter is not empty when the callback finishes, no further processing of the message is done. Generally, you want to return zero from the callback to give other registered handlers a chance to process the reply as well. (Note that the sd_bus_error parameter is an output parameter of the callback function, not an input parameter; it can be used to propagate errors from the callback handler, it will not receive any error that was received as method reply.)
+
+The message :code:`m` passed to the callback is only borrowed, that is, the callback should not call :ref:`sd_bus_message_unref(3)` on it. If the callback wants to hold on to the message beyond the lifetime of the callback, it needs to call :ref:`sd_bus_message_ref(3)` to create a new reference.
+
+If :code:`usec` is zero, the default D-Bus method call timeout is used. See :ref:`sd_bus_get_method_call_timeout(3)`.
+
+Return Value
+############
+
+On success, these functions return a non-negative integer. On failure, they return a negative errno-style error code.
+
+.. inclusion-marker-do-not-remove errors|
+
+Errors
+######
+
+When :code:`sd_bus_call()` internally receives a D-Bus error reply, it will set :code:`ret_error` if it is not :code:`NULL`, and will return a negative value mapped from the error reply, see :ref:`sd_bus_error_get_errno(3)`.
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The input parameter :code:`m` is :code:`NULL`.
+
+   The input parameter :code:`m` is not a D-Bus method call. To create a new D-Bus method call, use :ref:`sd_bus_message_new_method_call(3)`.
+
+   The input parameter :code:`m` has the :code:`BUS_MESSAGE_NO_REPLY_EXPECTED` flag set.
+
+   The input parameter :code:`error` is non-:code:`NULL` but was not set to :code:`SD_BUS_ERROR_NULL`.
+
+.. systemd:option:: -ECHILD
+
+   The bus connection was allocated in a parent process and is being reused in a child process after :code:`fork()`.
+
+.. systemd:option:: -ENOTCONN
+
+   The input parameter :code:`bus` is :code:`NULL` or the bus is not connected.
+
+.. systemd:option:: -ECONNRESET
+
+   The bus connection was closed while waiting for the response.
+
+.. systemd:option:: -ETIMEDOUT
+
+   A response was not received within the given timeout.
+
+.. systemd:option:: -ELOOP
+
+   The message :code:`m` is addressed to its own client.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. inclusion-end-marker-do-not-remove errors|
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_call()` and :code:`sd_bus_call_async()` were added in version 221.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_call_method(3)`, :ref:`sd_bus_call_method_async(3)`, :ref:`sd_bus_message_new_method_call(3)`, :ref:`sd_bus_message_append(3)`, :ref:`sd_bus_error(3)`
+
+

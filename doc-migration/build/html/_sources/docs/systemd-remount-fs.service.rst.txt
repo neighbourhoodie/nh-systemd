@@ -1,0 +1,40 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-remount-fs.service
+:manvolnum: 8
+:summary: Remount root and kernel file systems
+:aliases: systemd-remount-fs
+
+.. _systemd-remount-fs.service(8):
+
+=============================
+systemd-remount-fs.service(8)
+=============================
+
+Name
+####
+
+systemd-remount-fs.service, systemd-remount-fs — Remount root and kernel file systems
+
+Synopsis
+########
+
+:code:`systemd-remount-fs.service`
+
+:code:`/usr/lib/systemd/systemd-remount-fs`
+
+Description
+###########
+
+:code:`systemd-remount-fs.service` is an early boot service that applies mount options listed in :man-pages:`fstab(5)`, or gathered from the partition table (when :ref:`systemd-gpt-auto-generator(8)` is active) to the root file system, the :code:`/usr/` file system, and the kernel API file systems. This is required so that the mount options of these file systems — which are pre-mounted by the kernel, the initrd, container environments or system manager code — are updated to those configured in :code:`/etc/fstab` and the other sources. This service ignores normal file systems and only changes the root file system (i.e. :code:`/`), :code:`/usr/`, and the virtual kernel API file systems such as :code:`/proc/`, :code:`/sys/` or :code:`/dev/`. This service executes no operation if no configuration is found (:code:`/etc/fstab` does not exist or lists no entries for the mentioned file systems, or the partition table does not contain relevant entries).
+
+For a longer discussion of kernel API file systems see `API File Systems <https://systemd.io/API_FILE_SYSTEMS>`_.
+
+Note: :code:`systemd-remount-fs.service` is usually pulled in by :ref:`systemd-fstab-generator(8)`, hence it is also affected by the kernel command line option :code:`fstab=`, which may be used to disable the generator. It may also be pulled in by :ref:`systemd-gpt-auto-generator(8)`, which is affected by :code:`systemd.gpt_auto` and other options.
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`fstab(5)`, :man-pages:`mount(8)`, :ref:`systemd-fstab-generator(8)`, :ref:`systemd-gpt-auto-generator(8)`
+
+

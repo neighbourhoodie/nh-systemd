@@ -1,0 +1,70 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: udev_enumerate_add_match_subsystem
+:manvolnum: 3
+:summary: Modify filters
+:aliases: udev_enumerate_add_nomatch_subsystem, udev_enumerate_add_match_sysattr, udev_enumerate_add_nomatch_sysattr, udev_enumerate_add_match_property, udev_enumerate_add_match_sysname, udev_enumerate_add_match_tag, udev_enumerate_add_match_parent, udev_enumerate_add_match_is_initialized
+
+.. _udev_enumerate_add_match_subsystem(3):
+
+=====================================
+udev_enumerate_add_match_subsystem(3)
+=====================================
+
+Name
+####
+
+udev_enumerate_add_match_subsystem, udev_enumerate_add_nomatch_subsystem, udev_enumerate_add_match_sysattr, udev_enumerate_add_nomatch_sysattr, udev_enumerate_add_match_property, udev_enumerate_add_match_sysname, udev_enumerate_add_match_tag, udev_enumerate_add_match_parent, udev_enumerate_add_match_is_initialized — Modify filters
+
+Synopsis
+########
+
+:code:`#include <libudev.h>` .. code-block::
+
+   int udev_enumerate_add_match_subsystem(struct udev_enumerate *udev_enumerate,
+	const char *subsystem); .. code-block::
+
+   int udev_enumerate_add_nomatch_subsystem(struct udev_enumerate *udev_enumerate,
+	const char *subsystem); .. code-block::
+
+   int udev_enumerate_add_match_sysattr(struct udev_enumerate *udev_enumerate,
+	const char *sysattr,
+	const char *value); .. code-block::
+
+   int udev_enumerate_add_nomatch_sysattr(struct udev_enumerate *udev_enumerate,
+	const char *sysattr,
+	const char *value); .. code-block::
+
+   int udev_enumerate_add_match_property(struct udev_enumerate *udev_enumerate,
+	const char *property,
+	const char *value); .. code-block::
+
+   int udev_enumerate_add_match_sysname(struct udev_enumerate *udev_enumerate,
+	const char *sysname); .. code-block::
+
+   int udev_enumerate_add_match_tag(struct udev_enumerate *udev_enumerate,
+	const char *tag); .. code-block::
+
+   int udev_enumerate_add_match_parent(struct udev_enumerate *udev_enumerate,
+	struct udev_device *parent); .. code-block::
+
+   int udev_enumerate_add_match_is_initialized(struct udev_enumerate *udev_enumerate);
+
+.. COMMENT: <refsect1> <title>Description</title> <para>XXX: Add short description.</para> </refsect1>
+
+Return Value
+############
+
+On success, :code:`udev_enumerate_add_match_subsystem()`, :code:`udev_enumerate_add_nomatch_subsystem()`, :code:`udev_enumerate_add_match_sysattr()`, :code:`udev_enumerate_add_nomatch_sysattr()`, :code:`udev_enumerate_add_match_property()`, :code:`udev_enumerate_add_match_sysname()`, :code:`udev_enumerate_add_match_tag()`, :code:`udev_enumerate_add_match_parent()` and :code:`udev_enumerate_add_match_is_initialized()` return an integer greater than, or equal to, :code:`0`.
+
+History
+#######
+
+:code:`udev_enumerate_add_match_subsystem()`, :code:`udev_enumerate_add_nomatch_subsystem()`, :code:`udev_enumerate_add_match_sysattr()`, :code:`udev_enumerate_add_nomatch_sysattr()`, :code:`udev_enumerate_add_match_property()`, :code:`udev_enumerate_add_match_sysname()`, :code:`udev_enumerate_add_match_tag()`, :code:`udev_enumerate_add_match_parent()`, and :code:`udev_enumerate_add_match_is_initialized()` were added in version 221.
+
+See Also
+########
+
+:man-pages:`udev_new(3)`, :man-pages:`udev_device_new_from_syspath(3)`, :man-pages:`udev_enumerate_new(3)`, :man-pages:`udev_enumerate_scan_devices(3)`, :man-pages:`udev_monitor_new_from_netlink(3)`, :man-pages:`udev_list_entry(3)`, :ref:`systemd(1)`
+
+

@@ -1,0 +1,1571 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="updatectl(1)" href="updatectl.html"><link rel="prev" title="udevadm(8)" href="udevadm.html">
+        <link rel="prefetch" href="../_static/systemd-logo.svg" as="image">
+        <link rel="prefetch" href="../_static/systemd-logo-dark.svg" as="image">
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>ukify(1)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=6e47b7e0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #35a764;
+  --color-brand-content: #35a764;
+  --color-brand-visited: #197b43;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #2fd576;
+  --color-brand-content: #2fd576;
+  --color-brand-visited: #b3efcd;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">systemd</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/systemd-logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/systemd-logo-dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">B</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="binfmt.d.html">binfmt.d(5) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootctl.html">bootctl(1) — Control EFI firmware boot settings and manage boot loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootup.html">bootup(7) — System bootup process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="busctl.html">busctl(1) — Introspect the bus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="capsule%40.service.html">capsule@.service(5) — System unit for the capsule service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredump.conf.html">coredump.conf(5) — Core dump storage configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coredumpctl.html">coredumpctl(1) — Retrieve and process saved core dumps and metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypttab.html">crypttab(5) — Configuration for encrypted block devices</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">D</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daemon.html">daemon(7) — Writing and packaging system daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dnssec-trust-anchors.d.html">dnssec-trust-anchors.d(5) — DNSSEC trust anchor configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">E</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment.d.html">environment.d(5) — Definition of user service environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">F</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-hierarchy.html">file-hierarchy(7) — File system hierarchy overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">H</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="homectl.html">homectl(1) — Create, remove, change or inspect home directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homed.conf.html">homed.conf(5) — Home area/user account manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostname.html">hostname(5) — Local hostname configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hostnamectl.html">hostnamectl(1) — Control the system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hwdb.html">hwdb(7) — Hardware Database</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">I</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="importctl.html">importctl(1) — Download, import or export disk images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integritytab.html">integritytab(5) — Configuration for integrity block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocost.conf.html">iocost.conf(5) — Configuration files for the iocost solution manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">J</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="journal-remote.conf.html">journal-remote.conf(5) — Configuration files for the service accepting remote journal uploads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal-upload.conf.html">journal-upload.conf(5) — Configuration files for the journal upload service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journalctl.html">journalctl(1) — Print log entries from the systemd journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journald.conf.html">journald.conf(5) — Journal service configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">K</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kernel-command-line.html">kernel-command-line(7) — Kernel command line parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-install.html">kernel-install(8) — Add and remove kernel and initrd images to and from the boot partition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">L</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libsystemd.html">libsystemd(3) — Functions for implementing services and interacting with systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libudev.html">libudev(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.conf.html">loader.conf(5) — Configuration file for systemd-boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locale.conf.html">locale.conf(5) — Configuration file for locale settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localectl.html">localectl(1) — Control the system locale and keyboard layout settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="localtime.html">localtime(5) — Local timezone configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loginctl.html">loginctl(1) — Control the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logind.conf.html">logind.conf(5) — Login manager configuration files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">M</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="machine-id.html">machine-id(5) — Local machine ID configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machine-info.html">machine-info(5) — Local machine information file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="machinectl.html">machinectl(1) — Control the systemd machine manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules-load.d.html">modules-load.d(5) — Configure kernel modules to load at boot</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">N</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="networkctl.html">networkctl(1) — Query or modify the status of network links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networkd.conf.html">networkd.conf(5) — Global Network configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-myhostname.html">nss-myhostname(8) — Hostname resolution for the locally configured system hostname</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-mymachines.html">nss-mymachines(8) — Hostname resolution for local container instances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-resolve.html">nss-resolve(8) — Hostname resolution via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nss-systemd.html">nss-systemd(8) — UNIX user and group name resolution for user/group lookup via Varlink</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">O</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oomctl.html">oomctl(1) — Analyze the state stored in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oomd.conf.html">oomd.conf(5) — Global</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.home1.html">org.freedesktop.home1(5) — The D-Bus interface of systemd-homed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.hostname1.html">org.freedesktop.hostname1(5) — The D-Bus interface of systemd-hostnamed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.import1.html">org.freedesktop.import1(5) — The D-Bus interface of systemd-importd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.locale1.html">org.freedesktop.locale1(5) — The D-Bus interface of systemd-localed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.LogControl1.html">org.freedesktop.LogControl1(5) — D-Bus interface to query and set logging configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.login1.html">org.freedesktop.login1(5) — The D-Bus interface of systemd-logind</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.machine1.html">org.freedesktop.machine1(5) — The D-Bus interface of systemd-machined</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.network1.html">org.freedesktop.network1(5) — The D-Bus interface of systemd-networkd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.oom1.html">org.freedesktop.oom1(5) — The D-Bus interface of systemd-oomd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.portable1.html">org.freedesktop.portable1(5) — The D-Bus interface of systemd-portabled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.resolve1.html">org.freedesktop.resolve1(5) — The D-Bus interface of systemd-resolved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.systemd1.html">org.freedesktop.systemd1(5) — The D-Bus interface of systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.sysupdate1.html">org.freedesktop.sysupdate1(5) — The D-Bus interface of systemd-sysupdated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timedate1.html">org.freedesktop.timedate1(5) — The D-Bus interface of systemd-timedated</a></li>
+<li class="toctree-l1"><a class="reference internal" href="org.freedesktop.timesync1.html">org.freedesktop.timesync1(5) — The D-Bus interface of systemd-timesyncd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="os-release.html">os-release(5) — Operating system identification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">P</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd.html">pam_systemd(8) — Register user sessions in the systemd login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_home.html">pam_systemd_home(8) — Authenticate users and mount home directories via</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pam_systemd_loadkey.html">pam_systemd_loadkey(8) — Read password from kernel keyring and set it as PAM authtok</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portablectl.html">portablectl(1) — Attach, detach or inspect portable service images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="poweroff.html">poweroff(8) — Power off, reboot, or halt the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pstore.conf.html">pstore.conf(5) — PStore configuration file</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">R</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="repart.d.html">repart.d(5) — Partition Definition Files for Automatic Boot-Time Repartitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolvectl.html">resolvectl(1) — Resolve domain names, IPV4 and IPv6 addresses, DNS resource records, and services; introspect and reconfigure the DNS resolver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resolved.conf.html">resolved.conf(5) — Network Name Resolution configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run0.html">run0(1) — Elevate privileges</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">S</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus.html">sd-bus(3) — A lightweight D-Bus IPC client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-bus-errors.html">sd-bus-errors(3) — Standard D-Bus error names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-daemon.html">sd-daemon(3) — APIs for new-style daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-device.html">sd-device(3) — API for enumerating and introspecting local devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-event.html">sd-event(3) — A generic event loop implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-hwdb.html">sd-hwdb(3) — Read-only access to the hardware description database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-id128.html">sd-id128(3) — APIs for processing 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-journal.html">sd-journal(3) — APIs for submitting and querying log entries to and from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-json.html">sd-json(3) — APIs for Dealing with JSON Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-login.html">sd-login(3) — APIs for tracking logins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-path.html">sd-path(3) — APIs to query file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd-varlink.html">sd-varlink(3) — APIs for Varlink IPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_booted.html">sd_booted(3) — Test whether the system is running the systemd init system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_match.html">sd_bus_add_match(3) — Add a match rule for incoming message dispatching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_node_enumerator.html">sd_bus_add_node_enumerator(3) — Add a node enumerator for a D-Bus object path prefix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object.html">sd_bus_add_object(3) — Declare properties and methods for a D-Bus path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_add_object_manager.html">sd_bus_add_object_manager(3) — Add a D-Bus object manager for a D-Bus object sub-tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_attach_event.html">sd_bus_attach_event(3) — Attach a bus connection object to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call.html">sd_bus_call(3) — Invoke a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_call_method.html">sd_bus_call_method(3) — Initialize a bus message object and invoke the corresponding D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_can_send.html">sd_bus_can_send(3) — Check which types can be sent over a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_close.html">sd_bus_close(3) — Close and flush a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_get_pid.html">sd_bus_creds_get_pid(3) — Retrieve fields from a credentials object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_creds_new_from_pid.html">sd_bus_creds_new_from_pid(3) — Retrieve credentials object for the specified PID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_default.html">sd_bus_default(3) — Acquire a connection to a system or user bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_emit_signal.html">sd_bus_emit_signal(3) — Convenience functions for emitting (standard) D-Bus signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_enqueue_for_read.html">sd_bus_enqueue_for_read(3) — Re-enqueue a bus message on a bus connection, for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error.html">sd_bus_error(3) — sd-bus error handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_error_add_map.html">sd_bus_error_add_map(3) — Additional sd-dbus error mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_current_handler.html">sd_bus_get_current_handler(3) — Query information of the callback a bus object is currently running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_fd.html">sd_bus_get_fd(3) — Get the file descriptor, I/O events and timeout to wait for from a message bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_n_queued_read.html">sd_bus_get_n_queued_read(3) — Get the number of pending bus messages in the read and write queues of a bus connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_creds.html">sd_bus_get_name_creds(3) — Query bus client credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_get_name_machine_id.html">sd_bus_get_name_machine_id(3) — Retrieve a bus client's machine identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_interface_name_is_valid.html">sd_bus_interface_name_is_valid(3) — Check if a string is a valid bus name or object path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_is_open.html">sd_bus_is_open(3) — Check whether the bus connection is open or ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_list_names.html">sd_bus_list_names(3) — Retrieve information about registered names on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append.html">sd_bus_message_append(3) — Attach fields to a D-Bus message based on a type string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_array.html">sd_bus_message_append_array(3) — Append an array of fields to a D-Bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_basic.html">sd_bus_message_append_basic(3) — Attach a single field to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_string_memfd.html">sd_bus_message_append_string_memfd(3) — Attach a string to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_append_strv.html">sd_bus_message_append_strv(3) — Attach an array of strings to a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_at_end.html">sd_bus_message_at_end(3) — Check if a message has been fully read</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_copy.html">sd_bus_message_copy(3) — Copy the contents of one message to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_dump.html">sd_bus_message_dump(3) — Produce a string representation of a message for debugging purposes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_cookie.html">sd_bus_message_get_cookie(3) — Returns the transaction cookie of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_monotonic_usec.html">sd_bus_message_get_monotonic_usec(3) — Retrieve the sender timestamps and sequence number of a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_signature.html">sd_bus_message_get_signature(3) — Query bus message signature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_get_type.html">sd_bus_message_get_type(3) — Query bus message addressing/credentials metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new.html">sd_bus_message_new(3) — Create a new bus message object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_call.html">sd_bus_message_new_method_call(3) — Create a method call message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_method_error.html">sd_bus_message_new_method_error(3) — Create an error reply for a method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_new_signal.html">sd_bus_message_new_signal(3) — Create a signal message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_open_container.html">sd_bus_message_open_container(3) — Create and move between containers in D-Bus messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read.html">sd_bus_message_read(3) — Read a sequence of values from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_array.html">sd_bus_message_read_array(3) — Access an array of elements in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_basic.html">sd_bus_message_read_basic(3) — Read a basic type from a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_read_strv.html">sd_bus_message_read_strv(3) — Access an array of strings in a message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_rewind.html">sd_bus_message_rewind(3) — Return to beginning of message or current container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_seal.html">sd_bus_message_seal(3) — Prepare a D-Bus message for transmission</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_sensitive.html">sd_bus_message_sensitive(3) — Mark a message object as containing sensitive data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_destination.html">sd_bus_message_set_destination(3) — Set and query bus message addressing information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_set_expect_reply.html">sd_bus_message_set_expect_reply(3) — Set and query bus message metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_skip.html">sd_bus_message_skip(3) — Skip elements in a bus message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_message_verify_type.html">sd_bus_message_verify_type(3) — Check if the message has specified type at the current location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_negotiate_fds.html">sd_bus_negotiate_fds(3) — Control feature negotiation on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_new.html">sd_bus_new(3) — Create a new bus object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_path_encode.html">sd_bus_path_encode(3) — Convert an external identifier into an object path and back</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_pending_method_calls.html">sd_bus_pending_method_calls(3) — Return the number of currently pending, outgoing method calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_process.html">sd_bus_process(3) — Drive the connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_query_sender_creds.html">sd_bus_query_sender_creds(3) — Query bus message sender credentials/privileges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_error.html">sd_bus_reply_method_error(3) — Reply with an error to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_reply_method_return.html">sd_bus_reply_method_return(3) — Reply to a D-Bus method call</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_request_name.html">sd_bus_request_name(3) — Request or release a well-known service name on a bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_send.html">sd_bus_send(3) — Queue a D-Bus message for transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_address.html">sd_bus_set_address(3) — Set or query the address of the bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_close_on_exit.html">sd_bus_set_close_on_exit(3) — Control whether to close the bus connection during the event loop exit phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_connected_signal.html">sd_bus_set_connected_signal(3) — Control emission of local connection establishment signal on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_description.html">sd_bus_set_description(3) — Set or query properties of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_exit_on_disconnect.html">sd_bus_set_exit_on_disconnect(3) — Control the exit behavior when the bus object disconnects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_fd.html">sd_bus_set_fd(3) — Set the file descriptors to use for bus communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_method_call_timeout.html">sd_bus_set_method_call_timeout(3) — Set or query the default D-Bus method call timeout of a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_property.html">sd_bus_set_property(3) — Set or query D-Bus service properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_sender.html">sd_bus_set_sender(3) — Configure default sender for outgoing messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_server.html">sd_bus_set_server(3) — Configure connection mode for a bus object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_set_watch_bind.html">sd_bus_set_watch_bind(3) — Control socket binding watching on bus connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_get_bus.html">sd_bus_slot_get_bus(3) — Query information attached to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_ref.html">sd_bus_slot_ref(3) — Create and destroy references to a bus slot object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_description.html">sd_bus_slot_set_description(3) — Set or query the description of bus slot objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_destroy_callback.html">sd_bus_slot_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_floating.html">sd_bus_slot_set_floating(3) — Control whether a bus slot object is "floating"</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_slot_set_userdata.html">sd_bus_slot_set_userdata(3) — Set and query the value in the "userdata" field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_start.html">sd_bus_start(3) — Initiate a bus connection to the D-bus broker daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_add_name.html">sd_bus_track_add_name(3) — Add, remove and retrieve bus peers tracked in a bus peer tracking object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_track_new.html">sd_bus_track_new(3) — Track bus peers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_bus_wait.html">sd_bus_wait(3) — Wait for I/O on a bus connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_add_match_parent.html">sd_device_enumerator_add_match_parent(3) — Add a filter to the device enumerator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_get_device_first.html">sd_device_enumerator_get_device_first(3) — Enumerates devices and get the first or next device.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_enumerator_new.html">sd_device_enumerator_new(3) — Create, reference, and release a device enumerator object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_get_syspath.html">sd_device_get_syspath(3) — Returns various fields of device objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_device_ref.html">sd_device_ref(3) — Create or destroy references to a device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_child.html">sd_event_add_child(3) — Add a child process state change event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_defer.html">sd_event_add_defer(3) — Add static event sources to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_inotify.html">sd_event_add_inotify(3) — Add an "inotify" file system inode event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_io.html">sd_event_add_io(3) — Add an I/O event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_memory_pressure.html">sd_event_add_memory_pressure(3) — Add and configure an event source run as result of memory pressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_signal.html">sd_event_add_signal(3) — Add a UNIX process signal event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_add_time.html">sd_event_add_time(3) — Add a timer event source to an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_exit.html">sd_event_exit(3) — Ask the event loop to exit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_get_fd.html">sd_event_get_fd(3) — Obtain a file descriptor to poll for event loop events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_new.html">sd_event_new(3) — Acquire and release an event loop object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_now.html">sd_event_now(3) — Retrieve current event loop iteration timestamp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_run.html">sd_event_run(3) — Run an event loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_exit_on_idle.html">sd_event_set_exit_on_idle(3) — Enable event loop exit-on-idle support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_signal_exit.html">sd_event_set_signal_exit(3) — Automatically leave event loop on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_set_watchdog.html">sd_event_set_watchdog(3) — Enable event loop watchdog support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_event.html">sd_event_source_get_event(3) — Retrieve the event loop of an event source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_get_pending.html">sd_event_source_get_pending(3) — Determine pending state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_description.html">sd_event_source_set_description(3) — Set or retrieve descriptive names of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_destroy_callback.html">sd_event_source_set_destroy_callback(3) — Define the callback function for resource cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_enabled.html">sd_event_source_set_enabled(3) — Enable or disable event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_exit_on_failure.html">sd_event_source_set_exit_on_failure(3) — Set or retrieve the exit-on-failure feature of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_floating.html">sd_event_source_set_floating(3) — Set or retrieve 'floating' state of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_prepare.html">sd_event_source_set_prepare(3) — Set a preparation callback for event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_priority.html">sd_event_source_set_priority(3) — Set or retrieve the priority of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_ratelimit.html">sd_event_source_set_ratelimit(3) — Configure rate limiting on event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_set_userdata.html">sd_event_source_set_userdata(3) — Set or retrieve user data pointer of event sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_source_unref.html">sd_event_source_unref(3) — Increase or decrease event source reference counters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_event_wait.html">sd_event_wait(3) — Low-level event loop operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_get_seats.html">sd_get_seats(3) — Determine available seats, sessions, logged in users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_get.html">sd_hwdb_get(3) — Seek to a location in hwdb or access entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_hwdb_new.html">sd_hwdb_new(3) — Create a new hwdb object and create or destroy references to it</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_get_machine.html">sd_id128_get_machine(3) — Retrieve 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_randomize.html">sd_id128_randomize(3) — Generate 128-bit IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_id128_to_string.html">sd_id128_to_string(3) — Format or parse 128-bit IDs as strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_is_fifo.html">sd_is_fifo(3) — Check the type of a file descriptor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_add_match.html">sd_journal_add_match(3) — Add or remove entry matches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_enumerate_fields.html">sd_journal_enumerate_fields(3) — Read used field names from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_catalog.html">sd_journal_get_catalog(3) — Retrieve message catalog entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cursor.html">sd_journal_get_cursor(3) — Get cursor string for or test cursor string against the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_cutoff_realtime_usec.html">sd_journal_get_cutoff_realtime_usec(3) — Read cut-off timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_data.html">sd_journal_get_data(3) — Read data fields from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_fd.html">sd_journal_get_fd(3) — Journal change notification interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_realtime_usec.html">sd_journal_get_realtime_usec(3) — Read timestamps from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_seqnum.html">sd_journal_get_seqnum(3) — Read sequence number from the current journal entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_get_usage.html">sd_journal_get_usage(3) — Journal disk usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_has_runtime_files.html">sd_journal_has_runtime_files(3) — Query availability of runtime or persistent journal files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_next.html">sd_journal_next(3) — Advance or set back the read pointer in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_open.html">sd_journal_open(3) — Open the system journal for reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_print.html">sd_journal_print(3) — Submit log entries to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_query_unique.html">sd_journal_query_unique(3) — Read unique data fields from the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_seek_head.html">sd_journal_seek_head(3) — Seek to a position in the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_journal_stream_fd.html">sd_journal_stream_fd(3) — Create log stream file descriptor to the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_json_dispatch_string.html">sd_json_dispatch_string(3) — Decode JSON variant values and write them to the specified memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_listen_fds.html">sd_listen_fds(3) — Check for file descriptors passed by the system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_login_monitor_new.html">sd_login_monitor_new(3) — Monitor login sessions, seats, users and virtual machines/containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_machine_get_class.html">sd_machine_get_class(3) — Determine the class and network interface indices of a locally running virtual machine or container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_notify.html">sd_notify(3) — Notify service manager about start-up completion and other service status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_path_lookup.html">sd_path_lookup(3) — Query well-known file system paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pid_get_owner_uid.html">sd_pid_get_owner_uid(3) — Determine the owner uid of the user unit or session, or the session, user unit, system unit, container/VM or slice that a specific PID or socket peer belongs to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_pidfd_get_inode_id.html">sd_pidfd_get_inode_id(3) — Acquire the 64-bit inode ID of a PID file descriptor (PIDFD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_seat_get_active.html">sd_seat_get_active(3) — Determine state of a specific seat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_session_is_active.html">sd_session_is_active(3) — Determine state of a specific session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_uid_get_state.html">sd_uid_get_state(3) — Determine login state of a specific Unix user ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_is_connected.html">sd_varlink_is_connected(3) — Query if a Varlink connection object is currently connected or idle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_push_fd.html">sd_varlink_push_fd(3) — Submit a file descriptor to send along with the next outgoing Varlink message</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_send.html">sd_varlink_send(3) — Enqueues a Varlink method call, not expecting a reply</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_server_new.html">sd_varlink_server_new(3) — Allocate Varlink server object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_description.html">sd_varlink_set_description(3) — Set or query description of a Varlink connection object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_varlink_set_relative_timeout.html">sd_varlink_set_relative_timeout(3) — Set method call time-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sd_watchdog_enabled.html">sd_watchdog_enabled(3) — Check whether the service manager expects watchdog keep-alive notifications from a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shutdown.html">shutdown(8) — Halt, power off or reboot the machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smbios-type-11.html">smbios-type-11(7) — SMBIOS Type 11 strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysctl.d.html">sysctl.d(5) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysext.conf.html">sysext.conf(5) — Configuration files for systemd-sysext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemctl.html">systemctl(1) — Control the systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.html">systemd(1) — systemd system and service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ac-power.html">systemd-ac-power(1) — Report whether we are connected to an external power source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-analyze.html">systemd-analyze(1) — Analyze and debug system manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password.html">systemd-ask-password(1) — Query the user for a system password</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ask-password-console.service.html">systemd-ask-password-console.service(8) — Query the user for system passwords on the console and via wall</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-backlight%40.service.html">systemd-backlight@.service(8) — Load and save the display backlight brightness at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-battery-check.service.html">systemd-battery-check.service(8) — Check battery level whether there's enough charge, and power off if not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-binfmt.service.html">systemd-binfmt.service(8) — Configure additional binary formats for executables at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot-generator.html">systemd-bless-boot-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bless-boot.service.html">systemd-bless-boot.service(8) — Mark current boot process as successful</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot.html">systemd-boot(7) — A simple UEFI boot manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-check-no-failures.service.html">systemd-boot-check-no-failures.service(8) — verify that the system booted up cleanly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-clear-sysfail.service.html">systemd-boot-clear-sysfail.service(8) — Clear LoaderEntrySysFail entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-boot-random-seed.service.html">systemd-boot-random-seed.service(8) — Refresh boot loader random seed at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-bsod.service.html">systemd-bsod.service(8) — Displays boot-time emergency log message in full screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cat.html">systemd-cat(1) — Connect a pipeline or program's output with the journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgls.html">systemd-cgls(1) — Recursively show control group contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cgtop.html">systemd-cgtop(1) — Show top control groups by their resource usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-coredump.html">systemd-coredump(8) — Acquire, save and process core dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-creds.html">systemd-creds(1) — Lists, shows, encrypts and decrypts service credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptenroll.html">systemd-cryptenroll(1) — Enroll PKCS#11, FIDO2, TPM2 token/devices to LUKS2 encrypted volumes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup.html">systemd-cryptsetup(8) — Full disk decryption logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-cryptsetup-generator.html">systemd-cryptsetup-generator(8) — Unit generator for</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-debug-generator.html">systemd-debug-generator(8) — Generator for enabling a runtime debug shell and masking specific units at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-delta.html">systemd-delta(1) — Find overridden configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-detect-virt.html">systemd-detect-virt(1) — Detect execution in a virtualized environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-dissect.html">systemd-dissect(1) — Dissect Discoverable Disk Images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-environment-d-generator.html">systemd-environment-d-generator(8) — Load variables specified by</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-escape.html">systemd-escape(1) — Escape strings for usage in systemd unit names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset.html">systemd-factory-reset(8) — Request or complete a factory reset operation, or query current factory reset mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-factory-reset-generator.html">systemd-factory-reset-generator(8) — Pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-firstboot.html">systemd-firstboot(1) — Initialize basic system settings on or before the first boot-up of a system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fsck%40.service.html">systemd-fsck@.service(8) — File system checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-fstab-generator.html">systemd-fstab-generator(8) — Unit generator for /etc/fstab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-getty-generator.html">systemd-getty-generator(8) — Generator for enabling getty instances on the console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-gpt-auto-generator.html">systemd-gpt-auto-generator(8) — Generator for automatically discovering and mounting root,</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume-generator.html">systemd-hibernate-resume-generator(8) — Unit generator for resume= kernel parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hibernate-resume.service.html">systemd-hibernate-resume.service(8) — Resume from hibernation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-homed.service.html">systemd-homed.service(8) — Home Area/User Account Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hostnamed.service.html">systemd-hostnamed.service(8) — Daemon to control system hostname from programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-hwdb.html">systemd-hwdb(8) — hardware database management tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-id128.html">systemd-id128(1) — Generate and print sd-128 identifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-import-generator.html">systemd-import-generator(8) — Generator for automatically downloading disk images at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-importd.service.html">systemd-importd.service(8) — VM and container image import and export service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-inhibit.html">systemd-inhibit(1) — Execute a program with an inhibition lock taken</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup-generator.html">systemd-integritysetup-generator(8) — Unit generator for integrity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-integritysetup%40.service.html">systemd-integritysetup@.service(8) — Disk integrity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-gatewayd.service.html">systemd-journal-gatewayd.service(8) — HTTP server for journal events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-remote.service.html">systemd-journal-remote.service(8) — Receive journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journal-upload.service.html">systemd-journal-upload.service(8) — Send journal messages over the network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-journald.service.html">systemd-journald.service(8) — Journal service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-keyutil.html">systemd-keyutil(1) — Perform various operations on private keys and X.509 certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-localed.service.html">systemd-localed.service(8) — Locale bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-logind.service.html">systemd-logind.service(8) — Login manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-loop%40.service.html">systemd-loop@.service(8) — Attach a loopback block device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-commit.service.html">systemd-machine-id-commit.service(8) — Commit a transient machine ID to disk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machine-id-setup.html">systemd-machine-id-setup(1) — Initialize the machine ID in /etc/machine-id</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-machined.service.html">systemd-machined.service(8) — Virtual machine and container registration manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-makefs%40.service.html">systemd-makefs@.service(8) — Creating and growing file systems on demand</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-measure.html">systemd-measure(1) — Pre-calculate and sign expected TPM2 PCR 11 values for booted unified kernel images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-modules-load.service.html">systemd-modules-load.service(8) — Load kernel modules at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mount.html">systemd-mount(1) — Establish and destroy transient mount or auto-mount points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mountfsd.service.html">systemd-mountfsd.service(8) — Disk Image File System Mount Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-mute-console.html">systemd-mute-console(1) — Temporarily mute kernel log output and service manager status output to the system console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-network-generator.service.html">systemd-network-generator.service(8) — Generate network configuration from the kernel command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd-wait-online.service.html">systemd-networkd-wait-online.service(8) — Wait for network to come online</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-networkd.service.html">systemd-networkd.service(8) — Network manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-notify.html">systemd-notify(1) — Notify service manager about start-up completion and other daemon status changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nspawn.html">systemd-nspawn(1) — Spawn a command or OS in a lightweight container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-nsresourced.service.html">systemd-nsresourced.service(8) — User Namespace Resource Delegation Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-oomd.service.html">systemd-oomd.service(8) — A userspace out-of-memory (OOM) killer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-path.html">systemd-path(1) — List and query system and user paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrlock.html">systemd-pcrlock(8) — Analyze and predict TPM2 PCR states and generate an access policy from the prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pcrphase.service.html">systemd-pcrphase.service(8) — Measure boot phases, machine ID, product UUID and file system identity into TPM PCRs and NvPCRs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-portabled.service.html">systemd-portabled.service(8) — Portable service manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-poweroff.service.html">systemd-poweroff.service(8) — System shutdown logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pstore.service.html">systemd-pstore.service(8) — A service to archive contents of pstore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-pty-forward.html">systemd-pty-forward(1) — Run a command with a custom terminal background color or title</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-quotacheck%40.service.html">systemd-quotacheck@.service(8) — File system quota checker logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-random-seed.service.html">systemd-random-seed.service(8) — Load and save the OS system random seed at boot and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rc-local-generator.html">systemd-rc-local-generator(8) — Compatibility generator and service to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-remount-fs.service.html">systemd-remount-fs.service(8) — Remount root and kernel file systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-repart.html">systemd-repart(8) — Automatically grow and add partitions, and generate disk images (DDIs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-resolved.service.html">systemd-resolved.service(8) — Network Name Resolution manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-rfkill.service.html">systemd-rfkill.service(8) — Load and save the RF kill switch state at boot and change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run.html">systemd-run(1) — Run programs in transient scope units, service units, or path-, socket-, or timer-triggered service units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-run-generator.html">systemd-run-generator(8) — Generator for invoking commands specified on the kernel command line as system service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sbsign.html">systemd-sbsign(1) — Sign PE binaries for EFI Secure Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sleep.conf.html">systemd-sleep.conf(5) — Suspend and hibernation configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-activate.html">systemd-socket-activate(1) — Test socket activation of daemons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-socket-proxyd.html">systemd-socket-proxyd(8) — Bidirectionally proxy local sockets to another (possibly remote) socket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-soft-reboot.service.html">systemd-soft-reboot.service(8) — Userspace reboot operation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-generator.html">systemd-ssh-generator(8) — Generator for binding a socket-activated SSH server to local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-issue.html">systemd-ssh-issue(1) — Generator for SSH login prompt drop-ins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-ssh-proxy.html">systemd-ssh-proxy(1) — SSH client plugin for connecting to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stdio-bridge.html">systemd-stdio-bridge(1) — D-Bus proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-storagetm.service.html">systemd-storagetm.service(8) — Exposes all local block devices as NVMe-TCP mass storage devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-stub.html">systemd-stub(7) — A simple UEFI kernel boot stub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-suspend.service.html">systemd-suspend.service(8) — System sleep state logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysctl.service.html">systemd-sysctl.service(8) — Configure kernel parameters at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysext.html">systemd-sysext(8) — Activates System Extension Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system-update-generator.html">systemd-system-update-generator(8) — Generator for redirecting boot to offline update mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-system.conf.html">systemd-system.conf(5) — System and session service manager configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdate.html">systemd-sysupdate(8) — Automatically Update OS or Other Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysupdated.service.html">systemd-sysupdated.service(8) — System Update Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysusers.html">systemd-sysusers(8) — Allocate system users and groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-sysv-generator.html">systemd-sysv-generator(8) — Unit generator for SysV init scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-time-wait-sync.service.html">systemd-time-wait-sync.service(8) — Wait until kernel time is synchronized</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timedated.service.html">systemd-timedated.service(8) — Time and date bus mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-timesyncd.service.html">systemd-timesyncd.service(8) — Network Time Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tmpfiles.html">systemd-tmpfiles(8) — Create, delete, and clean up files and directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-clear.service.html">systemd-tpm2-clear.service(8) — Request that the TPM security chip is cleared on next boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-generator.html">systemd-tpm2-generator(8) — Generator for inserting TPM2 synchronization point in the boot process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tpm2-setup.service.html">systemd-tpm2-setup.service(8) — Set up the TPM2 Storage Root Key (SRK) and initialize NvPCRs at boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-tty-ask-password-agent.html">systemd-tty-ask-password-agent(1) — List or process pending systemd password requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udev-settle.service.html">systemd-udev-settle.service(8) — Wait for all pending udev events to be handled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-udevd.service.html">systemd-udevd.service(8) — Device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-done.service.html">systemd-update-done.service(8) — Mark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-update-utmp.service.html">systemd-update-utmp.service(8) — Write audit and utmp updates at bootup and shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-user-sessions.service.html">systemd-user-sessions.service(8) — Permit user logins after boot, prohibit user logins at shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-userdbd.service.html">systemd-userdbd.service(8) — JSON User/Group Record Query Multiplexer/NSS Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-validatefs%40.service.html">systemd-validatefs@.service(8) — Validate File System Mount Constraint Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vconsole-setup.service.html">systemd-vconsole-setup.service(8) — Configure the virtual consoles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup-generator.html">systemd-veritysetup-generator(8) — Unit generator for verity protected block devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-veritysetup%40.service.html">systemd-veritysetup@.service(8) — Disk verity protection logic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vmspawn.html">systemd-vmspawn(1) — Spawn an OS in a virtual machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-volatile-root.service.html">systemd-volatile-root.service(8) — Make the root file system volatile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-vpick.html">systemd-vpick(1) — Resolve paths to</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd-xdg-autostart-generator.html">systemd-xdg-autostart-generator(8) — User unit generator for XDG autostart files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.automount.html">systemd.automount(5) — Automount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.device.html">systemd.device(5) — Device unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dns-delegate.html">systemd.dns-delegate(5) — DNS Server Delegation Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.dnssd.html">systemd.dnssd(5) — DNS-SD configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.environment-generator.html">systemd.environment-generator(7) — systemd environment file generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.exec.html">systemd.exec(5) — Execution environment configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.generator.html">systemd.generator(7) — systemd unit generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-filter.html">systemd.image-filter(7) — Disk Image Dissection Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.image-policy.html">systemd.image-policy(7) — Disk Image Dissection Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.journal-fields.html">systemd.journal-fields(7) — Special journal fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.kill.html">systemd.kill(5) — Process killing procedure configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.link.html">systemd.link(5) — Network device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.mount.html">systemd.mount(5) — Mount unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.net-naming-scheme.html">systemd.net-naming-scheme(7) — Network device naming schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.netdev.html">systemd.netdev(5) — Virtual Network Device configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.network.html">systemd.network(5) — Network configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.nspawn.html">systemd.nspawn(5) — Container settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.offline-updates.html">systemd.offline-updates(7) — Implementation of offline updates in systemd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.path.html">systemd.path(5) — Path unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.pcrlock.html">systemd.pcrlock(5) — PCR measurement prediction files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.preset.html">systemd.preset(5) — Service enablement presets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.resource-control.html">systemd.resource-control(5) — Resource control unit settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.scope.html">systemd.scope(5) — Scope unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.service.html">systemd.service(5) — Service unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.slice.html">systemd.slice(5) — Slice unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.socket.html">systemd.socket(5) — Socket unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.special.html">systemd.special(7) — Special systemd units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.swap.html">systemd.swap(5) — Swap unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.syntax.html">systemd.syntax(7) — General syntax of systemd configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.system-credentials.html">systemd.system-credentials(7) — System Credentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.target.html">systemd.target(5) — Target unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.time.html">systemd.time(7) — Time and date specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.timer.html">systemd.timer(5) — Timer unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.unit.html">systemd.unit(5) — Unit configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="systemd.v.html">systemd.v(7) — Directory with Versioned Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.d.html">sysupdate.d(5) — Transfer Definition Files for Automatic Updates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysupdate.features.html">sysupdate.features(5) — Definition Files for Optional Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sysusers.d.html">sysusers.d(5) — Declarative allocation of system users and groups</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">T</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timedatectl.html">timedatectl(1) — Control the system time and date</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesyncd.conf.html">timesyncd.conf(5) — Network Time Synchronization configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tmpfiles.d.html">tmpfiles.d(5) — Configuration for creation, deletion, and cleaning of files and directories</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">U</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="udev.html">udev(7) — Dynamic device management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev.conf.html">udev.conf(5) — Configuration for device event managing daemon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_get_syspath.html">udev_device_get_syspath(3) — Query device properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_has_tag.html">udev_device_has_tag(3) — Retrieve or set device attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_device_new_from_syspath.html">udev_device_new_from_syspath(3) — Create, acquire and release a udev device object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_add_match_subsystem.html">udev_enumerate_add_match_subsystem(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_new.html">udev_enumerate_new(3) — Create, acquire and release a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_enumerate_scan_devices.html">udev_enumerate_scan_devices(3) — Query or modify a udev enumerate object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_list_entry.html">udev_list_entry(3) — Iterate and access udev lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_filter_update.html">udev_monitor_filter_update(3) — Modify filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_new_from_netlink.html">udev_monitor_new_from_netlink(3) — Create, acquire and release a udev monitor object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_monitor_receive_device.html">udev_monitor_receive_device(3) — Query and modify device monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udev_new.html">udev_new(3) — Create, acquire and release a udev context object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udevadm.html">udevadm(8) — udev management tool</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">ukify(1) — Combine components into a signed Unified Kernel Image for UEFI systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updatectl.html">updatectl(1) — Control the system update service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user%40.service.html">user@.service(5) — System units to start the user manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="userdbctl.html">userdbctl(1) — Inspect users, groups and group memberships</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">V</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="varlinkctl.html">varlinkctl(1) — Introspect with and invoke Varlink services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vconsole.conf.html">vconsole.conf(5) — Configuration file for the virtual console</a></li>
+<li class="toctree-l1"><a class="reference internal" href="veritytab.html">veritytab(5) — Configuration for verity block devices</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/blob/man_pages_in_sphinx/doc-migration/source/docs/ukify.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/neighbourhoodie/nh-systemd/edit/man_pages_in_sphinx/doc-migration/source/docs/ukify.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="ukify-1">
+<span id="id1"></span><h1>ukify(1)<a class="headerlink" href="#ukify-1" title="Link to this heading">¶</a></h1>
+<section id="name">
+<h2>Name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
+<p>ukify — Combine components into a signed Unified Kernel Image for UEFI systems</p>
+</section>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">ukify</span> <span class="pre">[OPTIONS...]</span> <span class="pre">build</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">ukify</span> <span class="pre">[OPTIONS...]</span> <span class="pre">genkey</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">ukify</span> <span class="pre">[OPTIONS...]</span> <span class="pre">inspect</span> <span class="pre">FILE</span></code></p>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">ukify</span></code> is a tool whose primary purpose is to combine components (usually a kernel, an initrd, and the <a class="reference internal" href="systemd-stub.html#systemd-stub-7"><span class="std std-ref">systemd-stub(7)</span></a> UEFI stub) to create a <a class="reference external" href="https://uapi-group.org/specifications/specs/unified_kernel_image/">Unified Kernel Image (UKI)</a> — a single PE binary that boots the system. When the UKI is executed, the stub extracts and boots the embedded linux kernel. The UKI can be started directly by the firmware or through a boot loader. When used with <a class="reference external" href="https://www.qemu.org/docs/master/">qemu</a>, a UKI can also be executed through “direct kernel boot”, see example below.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">ukify</span></code> can also be used generate other types of UKI-like images, in particular extensions. See the description of the <code class="code docutils literal notranslate"><span class="pre">build</span></code> verb below. <code class="code docutils literal notranslate"><span class="pre">ukify</span></code> can also generate certificates and keys for SecureBoot and PCR signing, see the description of the <code class="code docutils literal notranslate"><span class="pre">genkey</span></code> verb below. <code class="code docutils literal notranslate"><span class="pre">ukify</span></code> can also print detailed information about unified kernel images, see the description of <code class="code docutils literal notranslate"><span class="pre">inspect</span></code> verb below.</p>
+</section>
+<section id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Link to this heading">¶</a></h2>
+<p>The following commands are understood:</p>
+</section>
+<section id="build">
+<h2><code class="code docutils literal notranslate"><span class="pre">build</span></code><a class="headerlink" href="#build" title="Link to this heading">¶</a></h2>
+<p>This command creates a Unified Kernel Image. The two primary options that should be specified for the <code class="code docutils literal notranslate"><span class="pre">build</span></code> verb are <code class="code docutils literal notranslate"><span class="pre">Linux=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--linux=</span></code>, and <code class="code docutils literal notranslate"><span class="pre">Initrd=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--initrd=</span></code>. <code class="code docutils literal notranslate"><span class="pre">Initrd=</span></code> accepts multiple whitespace-separated paths and <code class="code docutils literal notranslate"><span class="pre">--initrd=</span></code> can be specified multiple times.</p>
+<p>Additional sections will be inserted into the UKI, either automatically or only if a specific option is provided. See the discussions of <code class="code docutils literal notranslate"><span class="pre">Microcode=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--microcode=</span></code>, <code class="code docutils literal notranslate"><span class="pre">Cmdline=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--cmdline=</span></code>, <code class="code docutils literal notranslate"><span class="pre">OSRelease=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--os-release=</span></code>, <code class="code docutils literal notranslate"><span class="pre">DeviceTree=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--devicetree=</span></code>, <code class="code docutils literal notranslate"><span class="pre">DeviceTreeAuto=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--devicetree-auto=</span></code>, <code class="code docutils literal notranslate"><span class="pre">HWIDs=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--hwids=</span></code>, <code class="code docutils literal notranslate"><span class="pre">Splash=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--splash=</span></code>, <code class="code docutils literal notranslate"><span class="pre">PCRPKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcrpkey=</span></code>, <code class="code docutils literal notranslate"><span class="pre">Uname=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--uname=</span></code>, <code class="code docutils literal notranslate"><span class="pre">SBAT=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--sbat=</span></code>, and <code class="code docutils literal notranslate"><span class="pre">--section=</span></code> below.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">ukify</span></code> can also be used to assemble a PE binary that is not executable but contains auxiliary data, for example additional kernel command line entries.</p>
+<p>If PCR signing keys are provided via the <code class="code docutils literal notranslate"><span class="pre">PCRPrivateKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code> and <code class="code docutils literal notranslate"><span class="pre">PCRPublicKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-public-key=</span></code> or <code class="code docutils literal notranslate"><span class="pre">PCRCertificate=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-certificate=</span></code> options, PCR values that will be seen after booting with the given kernel, initrd, and other sections, will be calculated, signed, and embedded in the UKI. <a class="reference internal" href="systemd-measure.html#systemd-measure-1"><span class="std std-ref">systemd-measure(1)</span></a> is used to perform this calculation and signing.</p>
+<p>The calculation of PCR values is done for specific boot phase paths. Those can be specified with the <code class="code docutils literal notranslate"><span class="pre">Phases=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--phases=</span></code> option. If not specified, the default provided by <code class="code docutils literal notranslate"><span class="pre">systemd-measure</span></code> is used. It is also possible to specify the <code class="code docutils literal notranslate"><span class="pre">PCRPrivateKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code>, <code class="code docutils literal notranslate"><span class="pre">PCRPublicKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-public-key=</span></code> or <code class="code docutils literal notranslate"><span class="pre">PCRCertificate=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-certificate=</span></code>, and <code class="code docutils literal notranslate"><span class="pre">Phases=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--phases=</span></code> arguments more than once. Signatures will then be performed with each of the specified keys. On the command line, when both <code class="code docutils literal notranslate"><span class="pre">--phases=</span></code> and <code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code> are used, they must be specified the same number of times, and then the n-th boot phase path set will be signed by the n-th key. This can be used to build different trust policies for different phases of the boot. In the config file, <code class="code docutils literal notranslate"><span class="pre">PCRPrivateKey=</span></code>, <code class="code docutils literal notranslate"><span class="pre">PCRPublicKey=</span></code>, and <code class="code docutils literal notranslate"><span class="pre">Phases=</span></code> are grouped into separate sections, describing separate boot phases. If one of <code class="code docutils literal notranslate"><span class="pre">SigningEngine=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signing-engine=</span></code> or <code class="code docutils literal notranslate"><span class="pre">SigningProvider=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signing-provider=</span></code> is specified, then the private key arguments will be passed verbatim to <a class="reference external" href="https://docs.openssl.org/master/man1/openssl">openssl(1)</a> as URIs, and the public key arguments will be loaded as X.509 certificates, so that signing can be performed with an OpenSSL engine or provider respectively.</p>
+<p>If a SecureBoot signing key is provided via the <code class="code docutils literal notranslate"><span class="pre">SecureBootPrivateKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--secureboot-private-key=</span></code> option, the resulting PE binary will be signed as a whole, allowing the resulting UKI to be trusted by SecureBoot. Also see the discussion of automatic enrollment in <a class="reference internal" href="systemd-boot.html#systemd-boot-7"><span class="std std-ref">systemd-boot(7)</span></a>.</p>
+<p>If the stub and/or the kernel contain “.sbat” sections they will be merged in the UKI so that revocation updates affecting either are considered when the UKI is loaded by Shim. For more information on SBAT see <a class="reference external" href="https://github.com/rhboot/shim/blob/main/SBAT.md">Shim documentation</a>.</p>
+</section>
+<section id="genkey">
+<h2><code class="code docutils literal notranslate"><span class="pre">genkey</span></code><a class="headerlink" href="#genkey" title="Link to this heading">¶</a></h2>
+<p>This command creates the keys for PCR signing and the key and certificate used for SecureBoot signing. The same configuration options that determine what keys and in which paths will be needed for signing when <code class="code docutils literal notranslate"><span class="pre">build</span></code> is used, here determine which keys will be created. See the discussion of <code class="code docutils literal notranslate"><span class="pre">PCRPrivateKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code>, <code class="code docutils literal notranslate"><span class="pre">PCRPublicKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-public-key=</span></code>, and <code class="code docutils literal notranslate"><span class="pre">SecureBootPrivateKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--secureboot-private-key=</span></code> below.</p>
+<p>The output files must not exist.</p>
+</section>
+<section id="inspect">
+<h2><code class="code docutils literal notranslate"><span class="pre">inspect</span></code><a class="headerlink" href="#inspect" title="Link to this heading">¶</a></h2>
+<p>Display information about the sections in a given binary or binaries. If <code class="code docutils literal notranslate"><span class="pre">--all</span></code> is given, all sections are shown. Otherwise, if <code class="code docutils literal notranslate"><span class="pre">--section=</span></code> option is specified at least once, only those sections are shown. Otherwise, well-known sections that are typically included in an UKI are shown. For each section, its name, size, and sha256-digest is printed. For text sections, the contents are printed.</p>
+<p>Also see the description of <code class="code docutils literal notranslate"><span class="pre">-j</span></code>/<code class="code docutils literal notranslate"><span class="pre">--json=</span></code> and <code class="code docutils literal notranslate"><span class="pre">--section=</span></code>.</p>
+<p>Other tools that may be useful for inspect UKIs: <a class="reference external" href="https://man7.org/linux/man-pages/man1/llvm-objdump.1.html">llvm-objdump(1)</a> <code class="code docutils literal notranslate"><span class="pre">-p</span></code> and <code class="code docutils literal notranslate"><span class="pre">pe-inspect</span></code>.</p>
+</section>
+<section id="configuration-settings">
+<h2>Configuration settings<a class="headerlink" href="#configuration-settings" title="Link to this heading">¶</a></h2>
+<p>Settings can appear in configuration files (the syntax with <code class="code docutils literal notranslate"><span class="pre">SomeSetting=:emphasis:`value`</span></code>) and on the command line (the syntax with <code class="code docutils literal notranslate"><span class="pre">--some-setting=:emphasis:`value`</span></code>). For some command line parameters, a single-letter shortcut is also allowed. In the configuration files, the setting must be in the appropriate section, so the descriptions are grouped by section below. When the same setting appears in the configuration file and on the command line, generally the command line setting has higher priority and overwrites the config file setting completely. If some setting behaves differently, this is described below.</p>
+<p>If no config file is provided via the option <code class="code docutils literal notranslate"><span class="pre">--config=:emphasis:`PATH`</span></code>, <code class="code docutils literal notranslate"><span class="pre">ukify</span></code> will try to look for a default configuration file in the following paths in this order: <code class="code docutils literal notranslate"><span class="pre">/etc/systemd/ukify.conf</span></code>, <code class="code docutils literal notranslate"><span class="pre">/run/systemd/ukify.conf</span></code>, <code class="code docutils literal notranslate"><span class="pre">/usr/local/lib/systemd/ukify.conf</span></code>, and <code class="code docutils literal notranslate"><span class="pre">/usr/lib/systemd/ukify.conf</span></code>, and then load the first one found. <code class="code docutils literal notranslate"><span class="pre">ukify</span></code> will proceed normally if no configuration file is specified and no default one is found.</p>
+<p>The <em>LINUX</em> and <em>INITRD</em> positional arguments, or the equivalent <code class="code docutils literal notranslate"><span class="pre">Linux=</span></code> and <code class="code docutils literal notranslate"><span class="pre">Initrd=</span></code> settings, are optional. If more than one initrd is specified, they will all be combined into a single PE section. This is useful to, for example, prepend microcode before the actual initrd.</p>
+<p>The following options and settings are understood:</p>
+</section>
+<section id="command-line-only-options">
+<h2>Command line-only options<a class="headerlink" href="#command-line-only-options" title="Link to this heading">¶</a></h2>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-config-path">
+<span class="sig-name descname"><span class="pre">--config=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-config-path" title="Link to this definition">¶</a></dt>
+<dd><p>Load configuration from the given config file. In general, settings specified in the config file have lower precedence than the settings specified via options. In cases where the command line option does not fully override the config file setting are explicitly mentioned in the descriptions of individual options.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-measure">
+<span class="sig-name descname"><span class="pre">--measure</span></span><a class="headerlink" href="#systemd-option-ukify-measure" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-no-measure">
+<span class="sig-name descname"><span class="pre">--no-measure</span></span><a class="headerlink" href="#systemd-option-ukify-no-measure" title="Link to this definition">¶</a></dt>
+<dd><p>Enable or disable a call to <a class="reference internal" href="systemd-measure.html#systemd-measure-1"><span class="std std-ref">systemd-measure(1)</span></a> to print pre-calculated PCR values. Defaults to false.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-policy-digest">
+<span class="sig-name descname"><span class="pre">--policy-digest</span></span><a class="headerlink" href="#systemd-option-ukify-policy-digest" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-no-policy-digest">
+<span class="sig-name descname"><span class="pre">--no-policy-digest</span></span><a class="headerlink" href="#systemd-option-ukify-no-policy-digest" title="Link to this definition">¶</a></dt>
+<dd><p>Enable or disable a call to <a class="reference internal" href="systemd-measure.html#systemd-measure-1"><span class="std std-ref">systemd-measure(1)</span></a> to print pre-calculated TPM2 policy digests. Useful for offline signing of PCR policies. Defaults to false.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-section-name-text-path">
+<span class="sig-name descname"><span class="pre">--section=NAME:</span><a class="reference external" href="mailto:TEXT|&#37;&#52;&#48;PATH"><span class="pre">TEXT|&#64;PATH</span></a></span><a class="headerlink" href="#systemd-option-ukify-section-name-text-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-section-name-text-binary-path">
+<span class="sig-name descname"><span class="pre">--section=NAME:text|binary[&#64;PATH]</span></span><a class="headerlink" href="#systemd-option-ukify-section-name-text-binary-path" title="Link to this definition">¶</a></dt>
+<dd><p>For all verbs except <code class="code docutils literal notranslate"><span class="pre">inspect</span></code>, the first syntax is used. Specify an arbitrary additional section “<em>NAME</em>”. The argument may be a literal string, or “&#64;” followed by a path name. This option may be specified more than once. Any sections specified in this fashion will be inserted (in order) before the “.linux” section which is always last.</p>
+<p>For the <code class="code docutils literal notranslate"><span class="pre">inspect</span></code> verb, the second syntax is used. The section <em>NAME</em> will be inspected (if found). If the second argument is “text”, the contents will be printed. If the third argument is given, the contents will be saved to the file named <em>PATH</em>.</p>
+<p>Note that the name is used as-is, and if the section name should start with a dot, it must be included in <em>NAME</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-join-profile-path">
+<span class="sig-name descname"><span class="pre">--join-profile=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-join-profile-path" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a path to an existing PE file containing an additional profile to add to the unified kernel image. The profile can be generated beforehand with <code class="code docutils literal notranslate"><span class="pre">ukify</span></code>. The profile does not need to be signed or contain PCR measurements. All UKI PE sections of the specified PE file are copied into the generated UKI. This is useful for generating multi-profile UKIs. Note that this only copies PE sections that are defined by the UKI specification, and ignores any other, for example “.text” or similar.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-sign-profile-id">
+<span class="sig-name descname"><span class="pre">--sign-profile=ID</span></span><a class="headerlink" href="#systemd-option-ukify-sign-profile-id" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a profile ID for which signed PCR measurements should be generated by ukify. This option can be used together with <code class="code docutils literal notranslate"><span class="pre">--join-profile=</span></code> when building the final unified kernel image. If not specified, signed PCR measurements will be added for all profiles.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-join-pcrsig-path">
+<span class="sig-name descname"><span class="pre">--join-pcrsig=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-join-pcrsig-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcrsig-text-path">
+<span class="sig-name descname"><a class="reference external" href="mailto:--pcrsig=TEXT|&#37;&#52;&#48;PATH"><span class="pre">--pcrsig=TEXT|&#64;PATH</span></a></span><a class="headerlink" href="#systemd-option-ukify-pcrsig-text-path" title="Link to this definition">¶</a></dt>
+<dd><p><code class="code docutils literal notranslate"><span class="pre">--join-pcrsig=</span></code> takes a path to an existing PE file containing a previously built UKI. <code class="code docutils literal notranslate"><span class="pre">--pcrsig=</span></code> takes a path to an existing pcrsig JSON blob, or a verbatim inline blob. They must be used together, and without specifying any other UKI section parameters. <code class="code docutils literal notranslate"><span class="pre">ukify</span></code> will attach the pcrsig JSON blob to the UKI. This is useful in combination with <code class="code docutils literal notranslate"><span class="pre">--policy-digest</span></code> to create a UKI and then sign the TPM2 policy digests offline.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-tools-dirs">
+<span class="sig-name descname"><span class="pre">--tools=DIRS</span></span><a class="headerlink" href="#systemd-option-ukify-tools-dirs" title="Link to this definition">¶</a></dt>
+<dd><p>Specify one or more directories with helper tools. <code class="code docutils literal notranslate"><span class="pre">ukify</span></code> will look for helper tools in those directories first, and if not found, try to load them from <code class="code docutils literal notranslate"><span class="pre">$PATH</span></code> in the usual fashion.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-output-filename">
+<span class="sig-name descname"><span class="pre">--output=FILENAME</span></span><a class="headerlink" href="#systemd-option-ukify-output-filename" title="Link to this definition">¶</a></dt>
+<dd><p>The output filename. If not specified, the name of the <em>LINUX</em> argument, with the suffix “.unsigned.efi” or “.signed.efi” will be used, depending on whether signing for SecureBoot was performed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-summary">
+<span class="sig-name descname"><span class="pre">--summary</span></span><a class="headerlink" href="#systemd-option-ukify-summary" title="Link to this definition">¶</a></dt>
+<dd><p>Print a summary of loaded config and exit. This is useful to check how the options from the configuration file and the command line are combined.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-all">
+<span class="sig-name descname"><span class="pre">--all</span></span><a class="headerlink" href="#systemd-option-ukify-all" title="Link to this definition">¶</a></dt>
+<dd><p>Print all sections (with <code class="code docutils literal notranslate"><span class="pre">inspect</span></code> verb).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-json">
+<span class="sig-name descname"><span class="pre">--json</span></span><a class="headerlink" href="#systemd-option-ukify-json" title="Link to this definition">¶</a></dt>
+<dd><p>Generate JSON output (with <code class="code docutils literal notranslate"><span class="pre">inspect</span></code> verb).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 255.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-h">
+<span class="sig-name descname"><span class="pre">-h</span></span><a class="headerlink" href="#systemd-option-ukify-h" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-help">
+<span class="sig-name descname"><span class="pre">--help</span></span><a class="headerlink" href="#systemd-option-ukify-help" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-version">
+<span class="sig-name descname"><span class="pre">--version</span></span><a class="headerlink" href="#systemd-option-ukify-version" title="Link to this definition">¶</a></dt>
+<dd><p>Print a short version string and exit.</p>
+</dd></dl>
+
+</section>
+<section id="uki-section">
+<h2>[UKI] section<a class="headerlink" href="#uki-section" title="Link to this heading">¶</a></h2>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-linux-linux">
+<span class="sig-name descname"><span class="pre">Linux=LINUX</span></span><a class="headerlink" href="#systemd-option-ukify-linux-linux" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--linux=LINUX</span></span></dt>
+<dd><p>A path to the kernel binary.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-osrelease-text-path">
+<span class="sig-name descname"><a class="reference external" href="mailto:OSRelease=TEXT|&#37;&#52;&#48;PATH"><span class="pre">OSRelease=TEXT|&#64;PATH</span></a></span><a class="headerlink" href="#systemd-option-ukify-osrelease-text-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-os-release-text-path">
+<span class="sig-name descname"><a class="reference external" href="mailto:--os-release=TEXT|&#37;&#52;&#48;PATH"><span class="pre">--os-release=TEXT|&#64;PATH</span></a></span><a class="headerlink" href="#systemd-option-ukify-os-release-text-path" title="Link to this definition">¶</a></dt>
+<dd><p>The os-release description (the “.osrel” section). The argument may be a literal string, or “&#64;” followed by a path name. If not specified, the <a class="reference external" href="https://man7.org/linux/man-pages/man5/os-release.5.html">os-release(5)</a> file will be picked up from the host system.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-cmdline-text-path">
+<span class="sig-name descname"><a class="reference external" href="mailto:Cmdline=TEXT|&#37;&#52;&#48;PATH"><span class="pre">Cmdline=TEXT|&#64;PATH</span></a></span><a class="headerlink" href="#systemd-option-ukify-cmdline-text-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><a class="reference external" href="mailto:--cmdline=TEXT|&#37;&#52;&#48;PATH"><span class="pre">--cmdline=TEXT|&#64;PATH</span></a></span></dt>
+<dd><p>The kernel command line (the “.cmdline” section). The argument may be a literal string, or “&#64;” followed by a path name. If not specified, no command line will be embedded.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-initrd-initrd">
+<span class="sig-name descname"><span class="pre">Initrd=INITRD...</span></span><a class="headerlink" href="#systemd-option-ukify-initrd-initrd" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-initrd-linux">
+<span class="sig-name descname"><span class="pre">--initrd=LINUX</span></span><a class="headerlink" href="#systemd-option-ukify-initrd-linux" title="Link to this definition">¶</a></dt>
+<dd><p>Zero or more initrd paths. In the configuration file, items are separated by whitespace. The initrds are combined in the order of specification, with the initrds specified in the config file first.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-microcode-ucode">
+<span class="sig-name descname"><span class="pre">Microcode=UCODE</span></span><a class="headerlink" href="#systemd-option-ukify-microcode-ucode" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--microcode=UCODE</span></span></dt>
+<dd><p>Path to initrd containing microcode updates. If not specified, the section will not be present.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 256.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-splash-path">
+<span class="sig-name descname"><span class="pre">Splash=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-splash-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--splash=PATH</span></span></dt>
+<dd><p>A picture to display during boot (the “.splash” section). The argument is a path to a BMP file. If not specified, the section will not be present.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-devicetree-path">
+<span class="sig-name descname"><span class="pre">DeviceTree=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-devicetree-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--devicetree=PATH</span></span></dt>
+<dd><p>The devicetree description (the “.dtb” section). The argument is a path to a compiled binary DeviceTree file. If not specified, the section will not be present.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-devicetreeauto-path">
+<span class="sig-name descname"><span class="pre">DeviceTreeAuto=PATH...</span></span><a class="headerlink" href="#systemd-option-ukify-devicetreeauto-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-devicetree-auto-path">
+<span class="sig-name descname"><span class="pre">--devicetree-auto=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-devicetree-auto-path" title="Link to this definition">¶</a></dt>
+<dd><p>Zero or more automatically selectable DeviceTree files. In the configuration file, items are separated by whitespace. Each DeviceTree will be in a separate “.dtbauto” section.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-hwids-path">
+<span class="sig-name descname"><span class="pre">HWIDs=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-hwids-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--hwids=PATH</span></span></dt>
+<dd><p>The hardware ID device table (the “.hwids” section). The argument is a path to a directory with JSON HWID device description files. Each file needs to contain a single JSON object with a “name”, “compatible” and “hwids” keys. The “name” and “compatible” keys must have string values and the “hwids” key must have a list of strings as value, where the strings must be valid UUIDs that represent CHIDs/HWIDs. Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;devicetree&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Example Laptop 16 Gen 7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;compatible&quot;</span><span class="p">:</span> <span class="s2">&quot;example,laptop-16-g7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hwids&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;5dc05bf4-01f6-4089-b464-a08c47ea9295&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;3e3f8f3c-2003-46f2-811c-85554f7d5952&quot;</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here “Example Laptop 16 Gen 7” is the device “name” (as defined by the manufacturer), “example,laptop-16-g7” is the “compatible” (as defined by the kernel) and “hwids” is an array of CHIDs/HWIDs (extracted i.e. from <code class="code docutils literal notranslate"><span class="pre">fwupdtool</span> <span class="pre">hwids</span></code> output). If not specified, the section will not be present. It is recommended to specify this parameter if automatically selectable DeviceTrees are to be used.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-uname-version">
+<span class="sig-name descname"><span class="pre">Uname=VERSION</span></span><a class="headerlink" href="#systemd-option-ukify-uname-version" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--uname=VERSION</span></span></dt>
+<dd><p>Specify the kernel version (as in <code class="code docutils literal notranslate"><span class="pre">uname</span> <span class="pre">-r</span></code>, the “.uname” section). If not specified, an attempt will be made to extract the version string from the kernel image. It is recommended to pass this explicitly if known, because the extraction is based on heuristics and not very reliable. If not specified and extraction fails, the section will not be present.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd constant">
+<dt class="sig sig-object systemd" id="systemd-constant-ukify-sbat-text-path">
+<span class="sig-name descname"><a class="reference external" href="mailto:SBAT=TEXT|&#37;&#52;&#48;PATH"><span class="pre">SBAT=TEXT|&#64;PATH</span></a></span><a class="headerlink" href="#systemd-constant-ukify-sbat-text-path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-sbat-text-path">
+<span class="sig-name descname"><a class="reference external" href="mailto:--sbat=TEXT|&#37;&#52;&#48;PATH"><span class="pre">--sbat=TEXT|&#64;PATH</span></a></span><a class="headerlink" href="#systemd-option-ukify-sbat-text-path" title="Link to this definition">¶</a></dt>
+<dd><p>SBAT metadata associated with the UKI or addon. SBAT policies are useful to revoke whole groups of UKIs or addons with a single, static policy update that does not take space in DBX/MOKX. If not specified manually, a default metadata entry consisting of</p>
+<blockquote>
+<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uki,1,UKI,uki,1,https://uapi-group.org/specifications/specs/unified_kernel_image/
+</pre></div>
+</div>
+</div></blockquote>
+<p>for UKIs and</p>
+<blockquote>
+<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uki-addon,1,UKI<span class="w"> </span>Addon,addon,1,https://www.freedesktop.org/software/systemd/man/latest/systemd-stub.html
+</pre></div>
+</div>
+</div></blockquote>
+<p>for addons will be used, to ensure it is always possible to revoke them. For more information on SBAT see <a class="reference external" href="https://github.com/rhboot/shim/blob/main/SBAT.md">Shim documentation</a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcrpkey-path">
+<span class="sig-name descname"><span class="pre">PCRPKey=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcrpkey-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--pcrpkey=PATH</span></span></dt>
+<dd><p>A path to a public key to embed in the “.pcrpkey” section. If not specified, and there’s exactly one <code class="code docutils literal notranslate"><span class="pre">PCRPublicKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-public-key=</span></code> or <code class="code docutils literal notranslate"><span class="pre">PCRCertificate=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--pcr-certificate=</span></code> argument, that key will be used. Otherwise, the section will not be present.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-profile-path">
+<span class="sig-name descname"><span class="pre">Profile=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-profile-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--profile=PATH</span></span></dt>
+<dd><p>A path to a UKI profile to place in an “.profile” section. This option is useful for creating multi-profile UKIs, and is typically used in combination with <code class="code docutils literal notranslate"><span class="pre">--join-profile=</span></code>, to extend the specified UKI with an additional profile.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcrbanks-path">
+<span class="sig-name descname"><span class="pre">PCRBanks=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcrbanks-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcr-banks-path">
+<span class="sig-name descname"><span class="pre">--pcr-banks=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcr-banks-path" title="Link to this definition">¶</a></dt>
+<dd><p>A comma or space-separated list of PCR banks to sign a policy for. If not present, all known banks will be used (“sha1”, “sha256”, “sha384”, “sha512”), which will fail if not supported by the system.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-securebootsigningtool-signer">
+<span class="sig-name descname"><span class="pre">SecureBootSigningTool=SIGNER</span></span><a class="headerlink" href="#systemd-option-ukify-securebootsigningtool-signer" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-signtool-signer">
+<span class="sig-name descname"><span class="pre">--signtool=SIGNER</span></span><a class="headerlink" href="#systemd-option-ukify-signtool-signer" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to use “sbsign”, “pesign”, or “systemd-sbsign”. Depending on this choice, different parameters are required in order to sign an image. Defaults to “sbsign”.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-securebootprivatekey-sb-key">
+<span class="sig-name descname"><span class="pre">SecureBootPrivateKey=SB_KEY</span></span><a class="headerlink" href="#systemd-option-ukify-securebootprivatekey-sb-key" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-secureboot-private-key-sb-key">
+<span class="sig-name descname"><span class="pre">--secureboot-private-key=SB_KEY</span></span><a class="headerlink" href="#systemd-option-ukify-secureboot-private-key-sb-key" title="Link to this definition">¶</a></dt>
+<dd><p>A path to a private key to use for signing of the resulting binary. If the <code class="code docutils literal notranslate"><span class="pre">SigningEngine=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signing-engine=</span></code> or <code class="code docutils literal notranslate"><span class="pre">SigningProvider=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signing-provider=</span></code> option is used, this may also be an engine or provider specific designation. This option is required by <code class="code docutils literal notranslate"><span class="pre">SecureBootSigningTool=sbsign</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signtool=sbsign</span></code> and <code class="code docutils literal notranslate"><span class="pre">SecureBootSigningTool=systemd-sbsign</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signtool=systemd-sbsign</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-securebootcertificate-sb-cert">
+<span class="sig-name descname"><span class="pre">SecureBootCertificate=SB_CERT</span></span><a class="headerlink" href="#systemd-option-ukify-securebootcertificate-sb-cert" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-secureboot-certificate-sb-cert">
+<span class="sig-name descname"><span class="pre">--secureboot-certificate=SB_CERT</span></span><a class="headerlink" href="#systemd-option-ukify-secureboot-certificate-sb-cert" title="Link to this definition">¶</a></dt>
+<dd><p>A path to a certificate to use for signing of the resulting binary. If the <code class="code docutils literal notranslate"><span class="pre">SigningEngine=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signing-engine=</span></code> or <code class="code docutils literal notranslate"><span class="pre">SigningProvider=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signing-provider=</span></code> option is used, this may also be an engine or provider specific designation. This option is required by <code class="code docutils literal notranslate"><span class="pre">SecureBootSigningTool=sbsign</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signtool=sbsign</span></code> and <code class="code docutils literal notranslate"><span class="pre">SecureBootSigningTool=systemd-sbsign</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signtool=systemd-sbsign</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-securebootcertificatedir-sb-path">
+<span class="sig-name descname"><span class="pre">SecureBootCertificateDir=SB_PATH</span></span><a class="headerlink" href="#systemd-option-ukify-securebootcertificatedir-sb-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-secureboot-certificate-dir-sb-path">
+<span class="sig-name descname"><span class="pre">--secureboot-certificate-dir=SB_PATH</span></span><a class="headerlink" href="#systemd-option-ukify-secureboot-certificate-dir-sb-path" title="Link to this definition">¶</a></dt>
+<dd><p>A path to a nss certificate database directory to use for signing of the resulting binary. Takes effect when <code class="code docutils literal notranslate"><span class="pre">SecureBootSigningTool=pesign</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signtool=pesign</span></code> is used. Defaults to <code class="code docutils literal notranslate"><span class="pre">/etc/pki/pesign</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-securebootcertificatename-sb-certname">
+<span class="sig-name descname"><span class="pre">SecureBootCertificateName=SB_CERTNAME</span></span><a class="headerlink" href="#systemd-option-ukify-securebootcertificatename-sb-certname" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-secureboot-certificate-name-sb-certname">
+<span class="sig-name descname"><span class="pre">--secureboot-certificate-name=SB_CERTNAME</span></span><a class="headerlink" href="#systemd-option-ukify-secureboot-certificate-name-sb-certname" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the nss certificate database entry to use for signing of the resulting binary. This option is required by <code class="code docutils literal notranslate"><span class="pre">SecureBootSigningTool=pesign</span></code>/<code class="code docutils literal notranslate"><span class="pre">--signtool=pesign</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-securebootcertificatevalidity-days">
+<span class="sig-name descname"><span class="pre">SecureBootCertificateValidity=DAYS</span></span><a class="headerlink" href="#systemd-option-ukify-securebootcertificatevalidity-days" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-secureboot-certificate-validity-days">
+<span class="sig-name descname"><span class="pre">--secureboot-certificate-validity=DAYS</span></span><a class="headerlink" href="#systemd-option-ukify-secureboot-certificate-validity-days" title="Link to this definition">¶</a></dt>
+<dd><p>Period of validity (in days) for a certificate created by <code class="code docutils literal notranslate"><span class="pre">genkey</span></code>. Defaults to 3650, i.e. 10 years.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 254.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-signingengine-engine">
+<span class="sig-name descname"><span class="pre">SigningEngine=ENGINE</span></span><a class="headerlink" href="#systemd-option-ukify-signingengine-engine" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-signing-engine-engine">
+<span class="sig-name descname"><span class="pre">--signing-engine=ENGINE</span></span><a class="headerlink" href="#systemd-option-ukify-signing-engine-engine" title="Link to this definition">¶</a></dt>
+<dd><p>An OpenSSL engine to be used for signing the resulting binary and PCR measurements, see <a class="reference external" href="https://docs.openssl.org/master/man1/openssl-engine">openssl-engine(1)</a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-signingprovider-provider">
+<span class="sig-name descname"><span class="pre">SigningProvider=PROVIDER</span></span><a class="headerlink" href="#systemd-option-ukify-signingprovider-provider" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-signing-provider-provider">
+<span class="sig-name descname"><span class="pre">--signing-provider=PROVIDER</span></span><a class="headerlink" href="#systemd-option-ukify-signing-provider-provider" title="Link to this definition">¶</a></dt>
+<dd><p>An OpenSSL provider to be used for signing the resulting binary and PCR measurements, see <a class="reference external" href="https://docs.openssl.org/master/man7/provider">provider(7)</a>. This option can only be used when <code class="code docutils literal notranslate"><span class="pre">systemd-sbsign</span></code> is used as the signing tool.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-certificateprovider-provider">
+<span class="sig-name descname"><span class="pre">CertificateProvider=PROVIDER</span></span><a class="headerlink" href="#systemd-option-ukify-certificateprovider-provider" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-certificate-provider-provider">
+<span class="sig-name descname"><span class="pre">--certificate-provider=PROVIDER</span></span><a class="headerlink" href="#systemd-option-ukify-certificate-provider-provider" title="Link to this definition">¶</a></dt>
+<dd><p>An OpenSSL provider to be used for loading the certificate used to sign the resulting binary and PCR measurements, see <a class="reference external" href="https://docs.openssl.org/master/man7/provider">provider(7)</a>. This option can only be used when <code class="code docutils literal notranslate"><span class="pre">systemd-sbsign</span></code> is used as the signing tool.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 257.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-signkernel-bool">
+<span class="sig-name descname"><span class="pre">SignKernel=BOOL</span></span><a class="headerlink" href="#systemd-option-ukify-signkernel-bool" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-sign-kernel">
+<span class="sig-name descname"><span class="pre">--sign-kernel</span></span><a class="headerlink" href="#systemd-option-ukify-sign-kernel" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-no-sign-kernel">
+<span class="sig-name descname"><span class="pre">--no-sign-kernel</span></span><a class="headerlink" href="#systemd-option-ukify-no-sign-kernel" title="Link to this definition">¶</a></dt>
+<dd><p>Override the detection of whether to sign the Linux binary itself before it is embedded in the combined image. If not specified, it will be signed if a SecureBoot signing key is provided via the <code class="code docutils literal notranslate"><span class="pre">SecureBootPrivateKey=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--secureboot-private-key=</span></code> option and the binary has not already been signed. If <code class="code docutils literal notranslate"><span class="pre">SignKernel=</span></code>/<code class="code docutils literal notranslate"><span class="pre">--sign-kernel</span></code> is true, and the binary has already been signed, the signature will be appended anyway.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="pcrsignature-name-section">
+<h2>[PCRSignature:<em>NAME</em>] section<a class="headerlink" href="#pcrsignature-name-section" title="Link to this heading">¶</a></h2>
+<p>In the config file, those options are grouped by section. On the command line, they must be specified in the same order. The sections specified in both sources are combined.</p>
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcrprivatekey-path">
+<span class="sig-name descname"><span class="pre">PCRPrivateKey=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcrprivatekey-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcr-private-key-path">
+<span class="sig-name descname"><span class="pre">--pcr-private-key=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcr-private-key-path" title="Link to this definition">¶</a></dt>
+<dd><p>A private key to use for signing PCR policies. On the command line, this option may be specified more than once, in which case multiple signatures will be made.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcrpublickey-path">
+<span class="sig-name descname"><span class="pre">PCRPublicKey=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcrpublickey-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcr-public-key-path">
+<span class="sig-name descname"><span class="pre">--pcr-public-key=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcr-public-key-path" title="Link to this definition">¶</a></dt>
+<dd><p>A public key to use for signing PCR policies.</p>
+<p>On the command line, this option may be specified more than once, similarly to the <code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code> option. If not present, the public keys will be extracted from the private keys. On the command line, if present, this option must be specified the same number of times as the <code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code> option. Cannot be specified if <code class="code docutils literal notranslate"><span class="pre">--pcr-certificate=</span></code> is used.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcrcertificate-path">
+<span class="sig-name descname"><span class="pre">PCRCertificate=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcrcertificate-path" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd" id="systemd-option-ukify-pcr-certificate-path">
+<span class="sig-name descname"><span class="pre">--pcr-certificate=PATH</span></span><a class="headerlink" href="#systemd-option-ukify-pcr-certificate-path" title="Link to this definition">¶</a></dt>
+<dd><p>An X.509 certificate to use for signing PCR policies.</p>
+<p>On the command line, this option may be specified more than once, similarly to the <code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code> option. If not present, the public keys will be extracted from the private keys. On the command line, if present, this option must be specified the same number of times as the <code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code> option. Cannot be specified if <code class="code docutils literal notranslate"><span class="pre">--pcr-public-key=</span></code> is used.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 258.</span></p>
+</div>
+</dd></dl>
+
+<dl class="systemd option">
+<dt class="sig sig-object systemd" id="systemd-option-ukify-phases-list">
+<span class="sig-name descname"><span class="pre">Phases=LIST</span></span><a class="headerlink" href="#systemd-option-ukify-phases-list" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object systemd">
+<span class="sig-name descname"><span class="pre">--phases=LIST</span></span></dt>
+<dd><p>A comma or space-separated list of colon-separated phase paths to sign a policy for. Each set of boot phase paths will be signed with the corresponding private key. If not present, the default of <a class="reference internal" href="systemd-measure.html#systemd-measure-1"><span class="std std-ref">systemd-measure(1)</span></a> will be used.</p>
+<p>On the command line, when this argument is present, it must appear the same number of times as the <code class="code docutils literal notranslate"><span class="pre">--pcr-private-key=</span></code> option.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 253.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<section id="minimal-invocation">
+<h3>Minimal invocation<a class="headerlink" href="#minimal-invocation" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--linux<span class="o">=</span>/lib/modules/6.0.9-300.fc37.x86_64/vmlinuz<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--initrd<span class="o">=</span>/some/path/initramfs-6.0.9-300.fc37.x86_64.img<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--cmdline<span class="o">=</span><span class="s1">&#39;quiet rw&#39;</span>
+</pre></div>
+</div>
+<p>This creates an unsigned UKI <code class="code docutils literal notranslate"><span class="pre">./vmlinuz.unsigned.efi</span></code>.</p>
+</section>
+<section id="direct-kernel-boot-in-a-virtual-machine">
+<h3>Direct kernel boot in a virtual machine<a class="headerlink" href="#direct-kernel-boot-in-a-virtual-machine" title="Link to this heading">¶</a></h3>
+<p>When using <a class="reference external" href="https://www.qemu.org/docs/master/">qemu</a> with <a class="reference external" href="https://www.linux-kvm.org/downloads/lersek/ovmf-whitepaper-c770f8c.txt">OVMF</a> (UEFI Firmware for virtual machines) the <code class="code docutils literal notranslate"><span class="pre">-kernel</span></code> switch can be used directly with a UKI. Example:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">qemu-kvm</span> <span class="pre">-drive</span> <span class="pre">if=pflash,format=qcow2,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE_4M.qcow2</span> <span class="pre">-kernel</span> <span class="pre">./vmlinuz.unsigned.efi</span> <span class="pre">[</span> <span class="pre">...</span> <span class="pre">]</span></code></p>
+<p>(The path to the firmware file might need to be adjusted depending on the distribution.) Usually, another <code class="code docutils literal notranslate"><span class="pre">-drive</span></code> argument would to be used to attach an actual disk image, but this is not required.</p>
+</section>
+<section id="all-the-bells-and-whistles">
+<h3>All the bells and whistles<a class="headerlink" href="#all-the-bells-and-whistles" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--linux<span class="o">=</span>/lib/modules/6.0.9-300.fc37.x86_64/vmlinuz<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--initrd<span class="o">=</span>early_cpio<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--initrd<span class="o">=</span>/some/path/initramfs-6.0.9-300.fc37.x86_64.img<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--sbat<span class="o">=</span><span class="s1">&#39;sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md</span>
+<span class="s1">      uki.author.myimage,1,UKI for System,uki.author.myimage,1,https://uapi-group.org/specifications/specs/unified_kernel_image/&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pcr-private-key<span class="o">=</span>tpm2-pcr-initrd-private-key.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pcr-public-key<span class="o">=</span>tpm2-pcr-initrd-public-key.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--phases<span class="o">=</span><span class="s1">&#39;enter-initrd&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pcr-private-key<span class="o">=</span>tpm2-pcr-private-key-system.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pcr-public-key<span class="o">=</span>tpm2-pcr-public-key-system.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--phases<span class="o">=</span><span class="s1">&#39;enter-initrd:leave-initrd enter-initrd:leave-initrd:sysinit \</span>
+<span class="s1">                enter-initrd:leave-initrd:sysinit:ready&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pcr-banks<span class="o">=</span>sha384,sha512<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--secureboot-private-key<span class="o">=</span>secureboot-private-key.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--secureboot-certificate<span class="o">=</span>secureboot-certificate.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--sign-kernel<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--cmdline<span class="o">=</span><span class="s1">&#39;quiet rw rhgb&#39;</span>
+</pre></div>
+</div>
+<p>This creates a signed UKI <code class="code docutils literal notranslate"><span class="pre">./vmlinuz.signed.efi</span></code>. The initrd section contains two concatenated parts, <code class="code docutils literal notranslate"><span class="pre">early_cpio</span></code> and <code class="code docutils literal notranslate"><span class="pre">initramfs-6.0.9-300.fc37.x86_64.img</span></code>. The policy embedded in the “.pcrsig” section will be signed for the initrd (the <code class="code docutils literal notranslate"><span class="pre">enter-initrd</span></code> phase) with the key <code class="code docutils literal notranslate"><span class="pre">tpm2-pcr-initrd-private-key.pem</span></code>, and for the main system (phases <code class="code docutils literal notranslate"><span class="pre">leave-initrd</span></code>, <code class="code docutils literal notranslate"><span class="pre">sysinit</span></code>, <code class="code docutils literal notranslate"><span class="pre">ready</span></code>) with the key <code class="code docutils literal notranslate"><span class="pre">tpm2-pcr-private-key-system.pem</span></code>. The Linux binary and the resulting combined image will be signed with the SecureBoot key <code class="code docutils literal notranslate"><span class="pre">secureboot-private-key.pem</span></code>.</p>
+</section>
+<section id="all-the-bells-and-whistles-via-a-config-file">
+<h3>All the bells and whistles, via a config file<a class="headerlink" href="#all-the-bells-and-whistles-via-a-config-file" title="Link to this heading">¶</a></h3>
+<p>This is the same as the previous example, but this time the configuration is stored in a file:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cat<span class="w"> </span>ukify.conf
+<span class="o">[</span>UKI<span class="o">]</span>
+<span class="nv">Initrd</span><span class="o">=</span>early_cpio
+<span class="nv">Cmdline</span><span class="o">=</span>quiet<span class="w"> </span>rw<span class="w"> </span>rhgb
+<span class="nv">SecureBootPrivateKey</span><span class="o">=</span>secureboot-private-key.pem
+<span class="nv">SecureBootCertificate</span><span class="o">=</span>secureboot-certificate.pem
+<span class="nv">SignKernel</span><span class="o">=</span>yes
+<span class="nv">PCRBanks</span><span class="o">=</span>sha384,sha512
+<span class="o">[</span>PCRSignature:initrd<span class="o">]</span>
+<span class="nv">PCRPrivateKey</span><span class="o">=</span>tpm2-pcr-initrd-private-key.pem
+<span class="nv">PCRPublicKey</span><span class="o">=</span>tpm2-pcr-initrd-public-key.pem
+<span class="nv">Phases</span><span class="o">=</span>enter-initrd
+<span class="o">[</span>PCRSignature:system<span class="o">]</span>
+<span class="nv">PCRPrivateKey</span><span class="o">=</span>tpm2-pcr-private-key-system.pem
+<span class="nv">PCRPublicKey</span><span class="o">=</span>tpm2-pcr-public-key-system.pem
+<span class="nv">Phases</span><span class="o">=</span>enter-initrd:leave-initrd
+<span class="w">       </span>enter-initrd:leave-initrd:sysinit
+<span class="w">       </span>enter-initrd:leave-initrd:sysinit:ready
+$<span class="w"> </span>ukify<span class="w"> </span>-c<span class="w"> </span>ukify.conf<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--linux<span class="o">=</span>/lib/modules/6.0.9-300.fc37.x86_64/vmlinuz<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--initrd<span class="o">=</span>/some/path/initramfs-6.0.9-300.fc37.x86_64.img
+</pre></div>
+</div>
+<p>One “initrd” (<code class="code docutils literal notranslate"><span class="pre">early_cpio</span></code>) is specified in the config file, and the other initrd (<code class="code docutils literal notranslate"><span class="pre">initramfs-6.0.9-300.fc37.x86_64.img</span></code>) is specified on the command line. This may be useful for example when the first initrd contains microcode for the CPU and does not need to be updated when the kernel version changes, unlike the actual initrd.</p>
+</section>
+<section id="kernel-command-line-pe-addon">
+<h3>Kernel command line PE addon<a class="headerlink" href="#kernel-command-line-pe-addon" title="Link to this heading">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--secureboot-private-key<span class="o">=</span>secureboot-private-key.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--secureboot-certificate<span class="o">=</span>secureboot-certificate.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--cmdline<span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--sbat<span class="o">=</span><span class="s1">&#39;sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md</span>
+<span class="s1">      uki-addon.author,1,UKI Addon for System,uki-addon.author,1,https://www.freedesktop.org/software/systemd/man/systemd-stub.html&#39;</span>
+<span class="w">      </span>--output<span class="o">=</span>debug.addon.efi
+</pre></div>
+</div>
+<p>This creates a signed PE binary that contains the additional kernel command line parameter “debug” with SBAT metadata referring to the owner of the addon.</p>
+</section>
+<section id="decide-signing-policy-and-create-certificate-and-keys">
+<h3>Decide signing policy, and create certificate and keys<a class="headerlink" href="#decide-signing-policy-and-create-certificate-and-keys" title="Link to this heading">¶</a></h3>
+<p>First, let’s create a configuration file that specifies what signatures shall be made:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">UKI</span><span class="p">]</span>
+<span class="n">SecureBootPrivateKey</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">kernel</span><span class="o">/</span><span class="n">secureboot</span><span class="o">-</span><span class="n">private</span><span class="o">-</span><span class="n">key</span><span class="o">.</span><span class="n">pem</span>
+<span class="n">SecureBootCertificate</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">kernel</span><span class="o">/</span><span class="n">secureboot</span><span class="o">-</span><span class="n">certificate</span><span class="o">.</span><span class="n">pem</span>
+
+<span class="p">[</span><span class="n">PCRSignature</span><span class="p">:</span><span class="n">initrd</span><span class="p">]</span>
+<span class="n">Phases</span><span class="o">=</span><span class="n">enter</span><span class="o">-</span><span class="n">initrd</span>
+<span class="n">PCRPrivateKey</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">tpm2</span><span class="o">-</span><span class="n">pcr</span><span class="o">-</span><span class="n">initrd</span><span class="o">-</span><span class="n">private</span><span class="o">-</span><span class="n">key</span><span class="o">.</span><span class="n">pem</span>
+<span class="n">PCRPublicKey</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">tpm2</span><span class="o">-</span><span class="n">pcr</span><span class="o">-</span><span class="n">initrd</span><span class="o">-</span><span class="n">public</span><span class="o">-</span><span class="n">key</span><span class="o">.</span><span class="n">pem</span>
+
+<span class="p">[</span><span class="n">PCRSignature</span><span class="p">:</span><span class="n">system</span><span class="p">]</span>
+<span class="n">Phases</span><span class="o">=</span><span class="n">enter</span><span class="o">-</span><span class="n">initrd</span><span class="p">:</span><span class="n">leave</span><span class="o">-</span><span class="n">initrd</span> <span class="n">enter</span><span class="o">-</span><span class="n">initrd</span><span class="p">:</span><span class="n">leave</span><span class="o">-</span><span class="n">initrd</span><span class="p">:</span><span class="n">sysinit</span>
+       <span class="n">enter</span><span class="o">-</span><span class="n">initrd</span><span class="p">:</span><span class="n">leave</span><span class="o">-</span><span class="n">initrd</span><span class="p">:</span><span class="n">sysinit</span><span class="p">:</span><span class="n">ready</span>
+<span class="n">PCRPrivateKey</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">tpm2</span><span class="o">-</span><span class="n">pcr</span><span class="o">-</span><span class="n">private</span><span class="o">-</span><span class="n">key</span><span class="o">-</span><span class="n">system</span><span class="o">.</span><span class="n">pem</span>
+<span class="n">PCRPublicKey</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">tpm2</span><span class="o">-</span><span class="n">pcr</span><span class="o">-</span><span class="n">public</span><span class="o">-</span><span class="n">key</span><span class="o">-</span><span class="n">system</span><span class="o">.</span><span class="n">pem</span>
+</pre></div>
+</div>
+<p>Next, we can generate the certificate and keys:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># ukify genkey --config=/etc/kernel/uki.conf</span>
+Writing<span class="w"> </span>SecureBoot<span class="w"> </span>private<span class="w"> </span>key<span class="w"> </span>to<span class="w"> </span>/etc/kernel/secureboot-private-key.pem
+Writing<span class="w"> </span>SecureBoot<span class="w"> </span>certificate<span class="w"> </span>to<span class="w"> </span>/etc/kernel/secureboot-certificate.pem
+Writing<span class="w"> </span>private<span class="w"> </span>key<span class="w"> </span><span class="k">for</span><span class="w"> </span>PCR<span class="w"> </span>signing<span class="w"> </span>to<span class="w"> </span>/etc/systemd/tpm2-pcr-initrd-private-key.pem
+Writing<span class="w"> </span>public<span class="w"> </span>key<span class="w"> </span><span class="k">for</span><span class="w"> </span>PCR<span class="w"> </span>signing<span class="w"> </span>to<span class="w"> </span>/etc/systemd/tpm2-pcr-initrd-public-key.pem
+Writing<span class="w"> </span>private<span class="w"> </span>key<span class="w"> </span><span class="k">for</span><span class="w"> </span>PCR<span class="w"> </span>signing<span class="w"> </span>to<span class="w"> </span>/etc/systemd/tpm2-pcr-private-key-system.pem
+Writing<span class="w"> </span>public<span class="w"> </span>key<span class="w"> </span><span class="k">for</span><span class="w"> </span>PCR<span class="w"> </span>signing<span class="w"> </span>to<span class="w"> </span>/etc/systemd/tpm2-pcr-public-key-system.pem
+</pre></div>
+</div>
+<p>(Both operations need to be done as root to allow write access to <code class="code docutils literal notranslate"><span class="pre">/etc/kernel/</span></code>.)</p>
+<p>Subsequent invocations using the config file (<code class="code docutils literal notranslate"><span class="pre">ukify</span> <span class="pre">build</span> <span class="pre">--config=/etc/kernel/uki.conf</span></code>) will use this certificate and key files. Note that the <a class="reference external" href="https://man7.org/linux/man-pages/man8/kernel-install.8.html">kernel-install(8)</a> plugin <code class="code docutils literal notranslate"><span class="pre">60-ukify.install</span></code> uses <code class="code docutils literal notranslate"><span class="pre">/etc/kernel/uki.conf</span></code> by default, so after this file has been created, installations of kernels that create a UKI on the local machine using <code class="code docutils literal notranslate"><span class="pre">kernel-install</span></code> will perform signing using this config.</p>
+</section>
+<section id="multi-profile-uki">
+<h3>Multi-Profile UKI<a class="headerlink" href="#multi-profile-uki" title="Link to this heading">¶</a></h3>
+<p>First, create a few profiles:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--profile<span class="o">=</span><span class="s1">&#39;TITLE=Base&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--output<span class="o">=</span>profile0.efi
+</pre></div>
+</div>
+<p>Add a second profile (&#64;1):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--profile<span class="o">=</span><span class="s1">&#39;TITLE=Boot into Storage Target Mode</span>
+<span class="s1">ID=storagetm&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--cmdline<span class="o">=</span><span class="s1">&#39;quiet rw rd.systemd.unit=storage-target-mode.target&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--output<span class="o">=</span>profile1.efi
+</pre></div>
+</div>
+<p>Add a third profile (&#64;2):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--profile<span class="o">=</span><span class="s1">&#39;TITLE=Factory Reset</span>
+<span class="s1">ID=factory-reset&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--cmdline<span class="o">=</span><span class="s1">&#39;quiet rw systemd.unit=factory-reset.target&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--output<span class="o">=</span>profile2.efi
+</pre></div>
+</div>
+<p>Then, create a UKI and include all the generated profiles:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--linux<span class="o">=</span>/lib/modules/6.0.9-300.fc37.x86_64/vmlinuz<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--initrd<span class="o">=</span>/some/path/initramfs-6.0.9-300.fc37.x86_64.img<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--cmdline<span class="o">=</span><span class="s1">&#39;quiet rw&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--join-profile<span class="o">=</span>profile0.efi<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--join-profile<span class="o">=</span>profile1.efi<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--join-profile<span class="o">=</span>profile2.efi<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--output<span class="o">=</span>base.efi
+</pre></div>
+</div>
+<p>The resulting UKI <code class="code docutils literal notranslate"><span class="pre">base-with-profile-0-1-2.efi</span></code> will now contain three profiles.</p>
+</section>
+<section id="offline-signing-of-pcrsig-section">
+<h3>Offline signing of pcrsig section<a class="headerlink" href="#offline-signing-of-pcrsig-section" title="Link to this heading">¶</a></h3>
+<p>First, create a UKI and save the PCR JSON blob:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--linux<span class="o">=</span>/lib/modules/6.0.9-300.fc37.x86_64/vmlinuz<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--initrd<span class="o">=</span>/some/path/initramfs-6.0.9-300.fc37.x86_64.img<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--cmdline<span class="o">=</span><span class="s1">&#39;quiet rw&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pcr-public-key<span class="o">=</span>tpm2-pcr-initrd-public-key.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--policy-digest<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--json<span class="o">=</span>short<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--output<span class="o">=</span>base.efi<span class="w"> </span>&gt;base.pcrs
+</pre></div>
+</div>
+<p>Then, sign the PCR digests offline and insert them in the JSON blob:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3</span>
+import<span class="w"> </span>base64,<span class="w"> </span>json,<span class="w"> </span>subprocess
+<span class="nv">priv_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;/home/zbyszek/src/systemd/tpm2-pcr-private.pem&#39;</span>
+<span class="nv">base_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;base.pcrs&#39;</span>
+<span class="nv">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>json.load<span class="o">(</span>open<span class="o">(</span>base_file<span class="o">))</span>
+<span class="k">for</span><span class="w"> </span>bank,policies<span class="w"> </span><span class="k">in</span><span class="w"> </span>base.items<span class="o">()</span>:
+<span class="w">    </span><span class="k">for</span><span class="w"> </span>policy<span class="w"> </span><span class="k">in</span><span class="w"> </span>policies:
+<span class="w">        </span><span class="nv">pol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>base64.b16decode<span class="o">(</span>policy<span class="o">[</span><span class="s1">&#39;pol&#39;</span><span class="o">]</span>.upper<span class="o">())</span>
+<span class="w">        </span><span class="nv">call</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>subprocess.run<span class="o">([</span><span class="s1">&#39;openssl&#39;</span>,<span class="w"> </span><span class="s1">&#39;dgst&#39;</span>,<span class="w"> </span>f<span class="s1">&#39;-{bank}&#39;</span>,<span class="w"> </span><span class="s1">&#39;-sign&#39;</span>,<span class="w"> </span>priv_key<span class="o">]</span>,
+<span class="w">                              </span><span class="nv">input</span><span class="o">=</span>pol,
+<span class="w">                              </span><span class="nv">check</span><span class="o">=</span>True,
+<span class="w">                              </span><span class="nv">capture_output</span><span class="o">=</span>True<span class="o">)</span>
+<span class="w">        </span><span class="nv">sig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>base64.b64encode<span class="o">(</span>call.stdout<span class="o">)</span>.decode<span class="o">()</span>
+<span class="w">        </span>policy<span class="o">[</span><span class="s1">&#39;sig&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>sig
+print<span class="o">(</span>json.dumps<span class="o">(</span>base<span class="o">))</span>
+</pre></div>
+</div>
+<p>Finally, attach the updated JSON blob to the UKI:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ukify<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--join-pcrsig<span class="o">=</span>base.efi<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pcrsig<span class="o">=</span>@base.pcrs<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--json<span class="o">=</span>short<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--output<span class="o">=</span>base-signed.efi
+</pre></div>
+</div>
+<p>The resulting UKI <code class="code docutils literal notranslate"><span class="pre">base-signed.efi</span></code> will now contain the signed PCR digests.</p>
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="systemd.html#systemd-1"><span class="std std-ref">systemd(1)</span></a>, <a class="reference internal" href="systemd-stub.html#systemd-stub-7"><span class="std std-ref">systemd-stub(7)</span></a>, <a class="reference internal" href="systemd-boot.html#systemd-boot-7"><span class="std std-ref">systemd-boot(7)</span></a>, <a class="reference internal" href="systemd-measure.html#systemd-measure-1"><span class="std std-ref">systemd-measure(1)</span></a>, <a class="reference internal" href="systemd-pcrphase.service.html#systemd-pcrphase-service-8"><span class="std std-ref">systemd-pcrphase.service(8)</span></a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="updatectl.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">updatectl(1)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="udevadm.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">udevadm(8)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, systemd
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ukify(1)</a><ul>
+<li><a class="reference internal" href="#name">Name</a></li>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#commands">Commands</a></li>
+<li><a class="reference internal" href="#build"><code class="code docutils literal notranslate"><span class="pre">build</span></code></a></li>
+<li><a class="reference internal" href="#genkey"><code class="code docutils literal notranslate"><span class="pre">genkey</span></code></a></li>
+<li><a class="reference internal" href="#inspect"><code class="code docutils literal notranslate"><span class="pre">inspect</span></code></a></li>
+<li><a class="reference internal" href="#configuration-settings">Configuration settings</a></li>
+<li><a class="reference internal" href="#command-line-only-options">Command line-only options</a></li>
+<li><a class="reference internal" href="#uki-section">[UKI] section</a></li>
+<li><a class="reference internal" href="#pcrsignature-name-section">[PCRSignature:<em>NAME</em>] section</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#minimal-invocation">Minimal invocation</a></li>
+<li><a class="reference internal" href="#direct-kernel-boot-in-a-virtual-machine">Direct kernel boot in a virtual machine</a></li>
+<li><a class="reference internal" href="#all-the-bells-and-whistles">All the bells and whistles</a></li>
+<li><a class="reference internal" href="#all-the-bells-and-whistles-via-a-config-file">All the bells and whistles, via a config file</a></li>
+<li><a class="reference internal" href="#kernel-command-line-pe-addon">Kernel command line PE addon</a></li>
+<li><a class="reference internal" href="#decide-signing-policy-and-create-certificate-and-keys">Decide signing policy, and create certificate and keys</a></li>
+<li><a class="reference internal" href="#multi-profile-uki">Multi-Profile UKI</a></li>
+<li><a class="reference internal" href="#offline-signing-of-pcrsig-section">Offline signing of pcrsig section</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/js/custom.js?v=abe08e2c"></script>
+    </body>
+</html>

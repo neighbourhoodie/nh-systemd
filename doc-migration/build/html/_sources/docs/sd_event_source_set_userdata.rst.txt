@@ -1,0 +1,53 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_source_set_userdata
+:manvolnum: 3
+:summary: Set or retrieve user data pointer of event sources
+:aliases: sd_event_source_get_userdata
+
+.. _sd_event_source_set_userdata(3):
+
+===============================
+sd_event_source_set_userdata(3)
+===============================
+
+Name
+####
+
+sd_event_source_set_userdata, sd_event_source_get_userdata — Set or retrieve user data pointer of event sources
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   void* sd_event_source_set_userdata(sd_event_source *source,
+	void *userdata); .. code-block::
+
+   void* sd_event_source_get_userdata(sd_event_source *source);
+
+Description
+###########
+
+:code:`sd_event_source_set_userdata()` may be used to set an arbitrary user data pointer for the event source object specified as :code:`source`. The user data pointer is usually specified when creating an event source object with calls such as :ref:`sd_event_add_io(3)` or :ref:`sd_event_add_time(3)`, and may be updated with this call. The user data pointer is also passed to all handler callback functions associated with the event source. The :code:`userdata` parameter specifies the new user data pointer to set, the function returns the previous user data pointer. Note that :code:`NULL` is a valid user data pointer.
+
+:code:`sd_event_source_get_userdata()` may be used to query the current user data pointer assigned to the event source object :code:`source`.
+
+Return Value
+############
+
+On success, :code:`sd_event_source_set_userdata()` and :code:`sd_event_source_get_userdata()` return the previously set user data pointer. On failure, they return :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_source_set_userdata()` and :code:`sd_event_source_get_userdata()` were added in version 229.
+
+See Also
+########
+
+:ref:`sd-event(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_source_set_description(3)`
+
+

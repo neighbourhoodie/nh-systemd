@@ -1,0 +1,194 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-fstab-generator
+:manvolnum: 8
+:summary: Unit generator for /etc/fstab
+
+.. _systemd-fstab-generator(8):
+
+==========================
+systemd-fstab-generator(8)
+==========================
+
+Name
+####
+
+systemd-fstab-generator — Unit generator for /etc/fstab
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-fstab-generator`
+
+Description
+###########
+
+:code:`systemd-fstab-generator` is a generator that translates :code:`/etc/fstab` (see :man-pages:`fstab(5)` for details) into native systemd units early at boot and when configuration of the system manager is reloaded. This will instantiate mount and swap units as necessary.
+
+The :code:`passno` field is treated like a simple boolean, and the ordering information is discarded. However, if the root file system is checked, it is checked before all the other file systems.
+
+See :ref:`systemd.mount(5)` and :ref:`systemd.swap(5)` for more information about special :code:`/etc/fstab` mount options this generator understands.
+
+One special topic is handling of symbolic links. Historical init implementations supported symlinks in :code:`/etc/fstab`. Because mount units will refuse mounts where the target is a symbolic link, this generator will resolve any symlinks as far as possible when processing :code:`/etc/fstab` in order to enhance backwards compatibility. If a symlink target does not exist at the time that this generator runs, it is assumed that the symlink target is the final target of the mount.
+
+:code:`systemd-fstab-generator` implements :ref:`systemd.generator(7)`.
+
+Kernel Command Line
+###################
+
+:code:`systemd-fstab-generator` understands the following kernel command line parameters:
+
+.. systemd:option:: fstab=, rd.fstab=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument. Defaults to "yes". If "no", causes the generator to ignore any mounts or swap devices configured in :code:`/etc/fstab`. :systemd:var:`rd.fstab=` is honored only in the initrd, while :systemd:var:`fstab=` is honored by both the main system and the initrd.
+
+   .. versionadded:: 186
+
+.. systemd:option:: root=
+   :group: kernel-commandline-options
+
+   Configures the operating system's root filesystem to mount when running in the initrd. This accepts a device node path (usually :code:`/dev/disk/by-uuid/…` or :code:`/dev/disk/by-label/…` or similar), or the special values "gpt-auto", "gpt-auto-force", "dissect", "dissect-force", "fstab", "fstab", and "off".
+
+   Set to "gpt-auto", "gpt-auto-force", "dissect", "dissect-force" to explicitly request automatic root file system discovery, implemented in :ref:`systemd-gpt-auto-generator(8)`.
+
+   Use "fstab" to explicitly request automatic root file system discovery via the initrd :code:`/etc/fstab` rather than via kernel command line.
+
+   Use "tmpfs" in order to mount a :man-pages:`tmpfs(5)` file system as root file system of the OS. This is useful in combination with :systemd:var:`mount.usr=` (see below) in order to combine a volatile root file system with a separate, immutable :code:`/usr/` file system. Also see :systemd:var:`systemd.volatile=` below.
+
+   Use "bind:…" to bind mount another directory as operating system root filesystems (added in v258). Expects an absolute path name referencing an existing directory within the initrd's file hierarchy to boot into.
+
+   Set to "off" to turn off mounting of a root file system.
+
+   Note that further :systemd:var:`root=` values may be supported, implemented in additional packages.
+
+   .. versionadded:: 217
+
+.. systemd:option:: rootfstype=
+   :group: kernel-commandline-options
+
+   Takes the root filesystem type that will be passed to the mount command. :systemd:var:`rootfstype=` is honored by the initrd.
+
+   .. versionadded:: 217
+
+.. systemd:option:: rootflags=
+   :group: kernel-commandline-options
+
+   Takes the root filesystem mount options to use. :systemd:var:`rootflags=` is honored by the initrd.
+
+   Note that unlike most kernel command line options this setting does not override settings made in configuration files (specifically: the mount option string in :code:`/etc/fstab`). See :ref:`systemd-remount-fs.service(8)`.
+
+   .. versionadded:: 217
+
+.. systemd:option:: mount.usr=
+   :group: kernel-commandline-options
+
+   Takes the :code:`/usr/` filesystem to be mounted by the initrd. If :systemd:var:`mount.usrfstype=` or :systemd:var:`mount.usrflags=` is set, then the mount configured via :systemd:var:`mount.usr=` will default to the the same value set in :systemd:var:`root=`.
+
+   Set to "dissect" to explicitly request automatic :code:`/usr/` file system discovery, implemented in :ref:`systemd-gpt-auto-generator(8)`.
+
+   Set to "off" to turn off mounting of a separate :code:`/usr/` file system.
+
+   :systemd:var:`mount.usr=` is honored by the initrd.
+
+   .. versionadded:: 217
+
+.. systemd:option:: mount.usrfstype=
+   :group: kernel-commandline-options
+
+   Takes the :code:`/usr/` filesystem type that will be passed to the mount command. If :systemd:var:`mount.usr=` or :systemd:var:`mount.usrflags=` is set, then :systemd:var:`mount.usrfstype=` will default to the value set in :systemd:var:`rootfstype=`.
+
+   Otherwise, this value will be read from the :code:`/usr/` entry in :code:`/etc/fstab` on the root filesystem.
+
+   :systemd:var:`mount.usrfstype=` is honored by the initrd.
+
+   .. versionadded:: 217
+
+.. systemd:option:: mount.usrflags=
+   :group: kernel-commandline-options
+
+   Takes the :code:`/usr/` filesystem mount options to use. If :systemd:var:`mount.usr=` or :systemd:var:`mount.usrfstype=` is set, then :systemd:var:`mount.usrflags=` will default to the value set in :systemd:var:`rootflags=`.
+
+   Otherwise, this value will be read from the :code:`/usr/` entry in :code:`/etc/fstab` on the root filesystem.
+
+   :systemd:var:`mount.usrflags=` is honored by the initrd.
+
+   .. versionadded:: 217
+
+.. systemd:option:: roothash=, usrhash=
+   :group: kernel-commandline-options
+
+   These options are primarily read by :ref:`systemd-veritysetup-generator(8)`. When set this indicates that the root file system (or :code:`/usr/`) shall be mounted from Verity volumes with the specified hashes. If these kernel command line options are set the root (or :code:`/usr/`) file system is thus mounted from a device mapper volume :code:`/dev/mapper/root` (or :code:`/dev/mapper/usr`).
+
+   .. versionadded:: 251
+
+.. systemd:option:: systemd.volatile=
+   :group: kernel-commandline-options
+
+   Controls whether the system shall boot up in volatile mode. Takes a boolean argument or the special value :systemd:option:`state`.
+
+   If false (the default), this generator makes no changes to the mount tree and the system is booted up in normal mode.
+
+   If true the generator ensures :ref:`systemd-volatile-root.service(8)` is run in the initrd. This service changes the mount table before transitioning to the host system, so that a volatile memory file system ("tmpfs") is used as root directory, with only :code:`/usr/` mounted into it from the configured root file system, in read-only mode. This way the system operates in fully stateless mode, with all configuration and state reset at boot and lost at shutdown, as :code:`/etc/` and :code:`/var/` will be served from the (initially unpopulated) volatile memory file system.
+
+   If set to :systemd:option:`state` the generator will leave the root directory mount point unaltered, however will mount a "tmpfs" file system to :code:`/var/`. In this mode the normal system configuration (i.e. the contents of "/etc/") is in effect (and may be modified during system runtime), however the system state (i.e. the contents of "/var/") is reset at boot and lost at shutdown.
+
+   If this setting is set to "overlay" the root file system is set up as "overlayfs" mount combining the read-only root directory with a writable "tmpfs", so that no modifications are made to disk, but the file system may be modified nonetheless with all changes being lost at reboot.
+
+   Note that in none of these modes the root directory, :code:`/etc/`, :code:`/var/` or any other resources stored in the root file system are physically removed. It's thus safe to boot a system that is normally operated in non-volatile mode temporarily into volatile mode, without losing data.
+
+   Note that with the exception of "overlay" mode, enabling this setting will only work correctly on operating systems that can boot up with only :code:`/usr/` mounted, and are able to automatically populate :code:`/etc/`, and also :code:`/var/` in case of "systemd.volatile=yes".
+
+   Also see :systemd:var:`root=tmpfs` above, for a method to combine a "tmpfs" file system with a regular :code:`/usr/` file system (as configured via :systemd:var:`mount.usr=`). The main distinction between :systemd:var:`systemd.volatile=yes`, and :systemd:var:`root=tmpfs` in combination :systemd:var:`mount.usr=` is that the former operates on top of a regular root file system and temporarily obstructs the files and directories above its :code:`/usr/` subdirectory, while the latter does not hide any files, but simply mounts a unpopulated tmpfs as root file system and combines it with a user picked :code:`/usr/` file system.
+
+   .. versionadded:: 233
+
+.. systemd:option:: systemd.swap=
+   :group: kernel-commandline-options
+
+   Takes a boolean argument or enables the option if specified without an argument. If disabled, causes the generator to ignore any swap devices configured in :code:`/etc/fstab`. Defaults to enabled.
+
+   .. versionadded:: 246
+
+.. systemd:option:: systemd.mount-extra=WHAT:WHERE[:FSTYPE[:OPTIONS]], rd.systemd.mount-extra=WHAT:WHERE[:FSTYPE[:OPTIONS]]
+   :group: kernel-commandline-options
+
+   Specifies the mount unit. Takes at least two and at most four fields separated with a colon (":"). Each field is handled as the corresponding fstab field. This option can be specified multiple times. :systemd:var:`rd.systemd.mount-extra=` is honored only in the initrd, while :systemd:var:`systemd.mount-extra=` is honored by both the main system and the initrd. In the initrd, the mount point (and also source path if the mount is bind mount) specified in :systemd:var:`systemd.mount-extra=` is prefixed with :code:`/sysroot/`.
+
+   Example:
+
+     .. code-block:: sh
+
+        systemd.mount-extra=/dev/sda1:/mount-point:ext4:rw,noatime
+
+   .. versionadded:: 254
+
+.. systemd:option:: systemd.swap-extra=WHAT[:OPTIONS], rd.systemd.swap-extra=WHAT[:OPTIONS]
+   :group: kernel-commandline-options
+
+   Specifies the swap unit. Takes the block device to be used as a swap device, and optionally takes mount options followed by a colon (":"). This option can be specified multiple times. :systemd:var:`rd.systemd.swap-extra=` is honored only in the initrd, while :systemd:var:`systemd.swap-extra=` is honored by both the main system and the initrd.
+
+   Example:
+
+     .. code-block:: sh
+
+        systemd.swap-extra=/dev/sda2:x-systemd.makefs
+
+   .. versionadded:: 254
+
+System Credentials
+##################
+
+.. systemd:option:: fstab.extra
+   :group: system-credentials
+
+   This credential may contain addition mounts to establish, in the same format as :man-pages:`fstab(5)`, with one mount per line. It is read in addition to :code:`/etc/fstab`.
+
+   .. versionadded:: 254
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`fstab(5)`, :ref:`systemd.mount(5)`, :ref:`systemd.swap(5)`, :ref:`systemd-cryptsetup-generator(8)`, :ref:`systemd-gpt-auto-generator(8)`, :man-pages:`kernel-command-line(7)`, `Known Environment Variables <https://systemd.io/ENVIRONMENT/>`_
+
+

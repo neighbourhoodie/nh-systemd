@@ -1,0 +1,368 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.nspawn
+:manvolnum: 5
+:summary: Container settings
+
+.. _systemd.nspawn(5):
+
+=================
+systemd.nspawn(5)
+=================
+
+Name
+####
+
+systemd.nspawn — Container settings
+
+Synopsis
+########
+
+| :code:`/etc/systemd/nspawn/machine.nspawn`
+| :code:`/run/systemd/nspawn/machine.nspawn`
+| :code:`/var/lib/machines/machine.nspawn`
+
+Description
+###########
+
+An nspawn container settings file (suffix :code:`.nspawn`) contains runtime configuration for a local container, and is used by :ref:`systemd-nspawn(1)`. Files of this type are named after the containers they define settings for. They are optional, and only required for containers whose execution environment shall differ from the defaults. Files of this type mostly contain settings that may also be set on the :code:`systemd-nspawn` command line, and make it easier to persistently attach specific settings to specific containers. The syntax of these files is inspired by :code:`.desktop` files, similarly to other configuration files supported by the systemd project. See :ref:`systemd.syntax(7)` for an overview.
+
+:code:`.nspawn` File Discovery
+##############################
+
+Files are searched for by appending the :code:`.nspawn` suffix to the machine name of the container, as specified with the :code:`--machine=` switch of :code:`systemd-nspawn`, or derived from the directory or image file name. This file is first searched for in :code:`/etc/systemd/nspawn/` and :code:`/run/systemd/nspawn/`. If found there, the settings are read and all of them take full effect (but may still be overridden by corresponding command line arguments). Otherwise, the file will then be searched for next to the image file or in the immediate parent of the root directory of the container. If the file is found there, only a subset of the settings will take effect however. All settings that possibly elevate privileges or grant additional access to resources of the host (such as files or directories) are ignored. To which options this applies is documented below.
+
+Persistent settings files created and maintained by the administrator (and thus trusted) should be placed in :code:`/etc/systemd/nspawn/`, while automatically downloaded (and thus potentially untrusted) settings files are placed in :code:`/var/lib/machines/` instead (next to the container images), where their security impact is limited. In order to add privileged settings to :code:`.nspawn` files acquired from the image vendor, it is recommended to copy the settings files into :code:`/etc/systemd/nspawn/` and edit them there, so that the privileged options become available. The precise algorithm for how the files are searched and interpreted may be configured with :code:`systemd-nspawn`'s :code:`--settings=` switch, see :ref:`systemd-nspawn(1)` for details.
+
+[Exec] Section Options
+######################
+
+Settings files may include an \[Exec] section, which carries various execution parameters:
+
+.. systemd:option:: Boot=
+   :group: nspawn-directives
+
+   Takes a boolean argument, which defaults to off. If enabled, :code:`systemd-nspawn` will automatically search for an :code:`init` executable and invoke it. In this case, the specified parameters using :systemd:var:`Parameters=` are passed as additional arguments to the :code:`init` process. This setting corresponds to the :systemd:option:`--boot` switch on the :code:`systemd-nspawn` command line. This option may not be combined with :systemd:var:`ProcessTwo=yes`. This option is specified by default in the :code:`systemd-nspawn@.service` template unit.
+
+   .. versionadded:: 226
+
+.. systemd:option:: Ephemeral=
+   :group: nspawn-directives
+
+   Takes a boolean argument, which defaults to off, If enabled, the container is run with a temporary snapshot of its file system that is removed immediately when the container terminates. This is equivalent to the :systemd:option:`--ephemeral` command line switch. See :ref:`systemd-nspawn(1)` for details about the specific options supported.
+
+   .. versionadded:: 240
+
+.. systemd:option:: ProcessTwo=
+   :group: nspawn-directives
+
+   Takes a boolean argument, which defaults to off. If enabled, the specified program is run as PID 2. A stub init process is run as PID 1. This setting corresponds to the :systemd:option:`--as-pid2` switch on the :code:`systemd-nspawn` command line. This option may not be combined with :systemd:var:`Boot=yes`.
+
+   .. versionadded:: 229
+
+.. systemd:option:: Parameters=
+   :group: nspawn-directives
+
+   Takes a whitespace-separated list of arguments. Single ("'") and double (""") quotes may be used around arguments with whitespace. This is either a command line, beginning with the binary name to execute, or – if :systemd:var:`Boot=` is enabled – the list of arguments to pass to the init process. This setting corresponds to the command line parameters passed on the :code:`systemd-nspawn` command line.
+
+   Note: :systemd:option:`Boot=no`, :systemd:option:`Parameters=a b "c c"` is the same as :code:`systemd-nspawn a b "c c"`, and :systemd:option:`Boot=yes`, :systemd:option:`Parameters=b 'c c'` is the same as :code:`systemd-nspawn --boot b 'c c'`.
+
+   .. versionadded:: 226
+
+.. systemd:option:: Environment=
+   :group: nspawn-directives
+
+   Takes an environment variable assignment consisting of key and value, separated by "=". Sets an environment variable for the main process invoked in the container. This setting may be used multiple times to set multiple environment variables. It corresponds to the :systemd:option:`--setenv=` command line switch.
+
+   .. versionadded:: 226
+
+.. systemd:option:: User=
+   :group: nspawn-directives
+
+   Takes a UNIX user name. Specifies the user name to invoke the main process of the container as. This user must be known in the container's user database. This corresponds to the :systemd:option:`--user=` command line switch.
+
+   .. versionadded:: 226
+
+.. systemd:option:: WorkingDirectory=
+   :group: nspawn-directives
+
+   Selects the working directory for the process invoked in the container. Expects an absolute path in the container's file system namespace. This corresponds to the :systemd:option:`--chdir=` command line switch.
+
+   .. versionadded:: 229
+
+.. systemd:option:: PivotRoot=
+   :group: nspawn-directives
+
+   Selects a directory to pivot to :code:`/` inside the container when starting up. Takes a single path, or a pair of two paths separated by a colon. Both paths must be absolute, and are resolved in the container's file system namespace. This corresponds to the :systemd:option:`--pivot-root=` command line switch.
+
+   .. versionadded:: 233
+
+.. systemd:option:: Capability=, DropCapability=
+   :group: nspawn-directives
+
+   Takes a space-separated list of Linux process capabilities (see :man-pages:`capabilities(7)` for details). The :systemd:var:`Capability=` setting specifies additional capabilities to pass on top of the default set of capabilities. The :systemd:var:`DropCapability=` setting specifies capabilities to drop from the default set. These settings correspond to the :systemd:option:`--capability=` and :systemd:option:`--drop-capability=` command line switches. Note that :systemd:var:`Capability=` is a privileged setting, and only takes effect in :code:`.nspawn` files in :code:`/etc/systemd/nspawn/` and :code:`/run/system/nspawn/` (see above). On the other hand, :systemd:var:`DropCapability=` takes effect in all cases. If the special value "all" is passed, all capabilities are retained (or dropped).
+
+   These settings change the bounding set of capabilities which also limits the ambient capabilities as given with the :systemd:var:`AmbientCapability=`.
+
+   .. versionadded:: 226
+
+.. systemd:option:: AmbientCapability=
+   :group: nspawn-directives
+
+   Takes a space-separated list of Linux process capabilities (see :man-pages:`capabilities(7)` for details). The :systemd:var:`AmbientCapability=` setting specifies capabilities which will be passed to the started program in the inheritable and ambient capability sets. This will grant these capabilities to this process. This setting correspond to the :systemd:option:`--ambient-capability=` command line switch.
+
+   The value "all" is not supported for this setting.
+
+   The setting of :systemd:var:`AmbientCapability=` must be covered by the bounding set settings which were established by :systemd:var:`Capability=` and :systemd:var:`DropCapability=`.
+
+   Note that :systemd:var:`AmbientCapability=` is a privileged setting (see above).
+
+   .. versionadded:: 248
+
+.. systemd:option:: NoNewPrivileges=
+   :group: nspawn-directives
+
+   Takes a boolean argument that controls the :systemd:constant:`PR_SET_NO_NEW_PRIVS` flag for the container payload. This is equivalent to the :systemd:option:`--no-new-privileges=` command line switch. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 239
+
+.. systemd:option:: KillSignal=
+   :group: nspawn-directives
+
+   Specify the process signal to send to the container's PID 1 when nspawn itself receives SIGTERM, in order to trigger an orderly shutdown of the container. Defaults to SIGRTMIN+3 if :systemd:option:`Boot=` is used (on systemd-compatible init systems SIGRTMIN+3 triggers an orderly shutdown). For a list of valid signals, see :man-pages:`signal(7)`.
+
+   .. versionadded:: 230
+
+.. systemd:option:: Personality=
+   :group: nspawn-directives
+
+   Configures the kernel personality for the container. This is equivalent to the :systemd:option:`--personality=` switch.
+
+   .. versionadded:: 226
+
+.. systemd:option:: MachineID=
+   :group: nspawn-directives
+
+   Configures the 128-bit machine ID (UUID) to pass to the container. This is equivalent to the :systemd:option:`--uuid=` command line switch. This option is privileged (see above).
+
+   .. versionadded:: 226
+
+.. systemd:option:: PrivateUsers=
+   :group: nspawn-directives
+
+   Configures support for usernamespacing. This is equivalent to the :systemd:option:`--private-users=` command line switch, and takes the same options. This option is privileged (see above). This option is the default if the :code:`systemd-nspawn@.service` template unit file is used.
+
+   .. versionadded:: 230
+
+.. systemd:option:: NotifyReady=
+   :group: nspawn-directives
+
+   Configures support for notifications from the container's init process. This is equivalent to the :systemd:option:`--notify-ready=` command line switch, and takes the same parameters. See :ref:`systemd-nspawn(1)` for details about the specific options supported.
+
+   .. versionadded:: 231
+
+.. systemd:option:: SystemCallFilter=
+   :group: nspawn-directives
+
+   Configures the system call filter applied to containers. This is equivalent to the :systemd:option:`--system-call-filter=` command line switch, and takes the same list parameter. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 235
+
+.. systemd:option:: LimitCPU=, LimitFSIZE=, LimitDATA=, LimitSTACK=, LimitCORE=, LimitRSS=, LimitNOFILE=, LimitAS=, LimitNPROC=, LimitMEMLOCK=, LimitLOCKS=, LimitSIGPENDING=, LimitMSGQUEUE=, LimitNICE=, LimitRTPRIO=, LimitRTTIME=
+   :group: nspawn-directives
+
+   Configures various types of resource limits applied to containers. This is equivalent to the :systemd:option:`--rlimit=` command line switch, and takes the same arguments. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 239
+
+.. systemd:option:: OOMScoreAdjust=
+   :group: nspawn-directives
+
+   Configures the OOM score adjustment value. This is equivalent to the :systemd:option:`--oom-score-adjust=` command line switch, and takes the same argument. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 239
+
+.. systemd:option:: CPUAffinity=
+   :group: nspawn-directives
+
+   Configures the CPU affinity. This is equivalent to the :systemd:option:`--cpu-affinity=` command line switch, and takes the same argument. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 239
+
+.. systemd:option:: Hostname=
+   :group: nspawn-directives
+
+   Configures the kernel hostname set for the container. This is equivalent to the :systemd:option:`--hostname=` command line switch, and takes the same argument. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 239
+
+.. systemd:option:: ResolvConf=
+   :group: nspawn-directives
+
+   Configures how :code:`/etc/resolv.conf` in the container shall be handled. This is equivalent to the :systemd:option:`--resolv-conf=` command line switch, and takes the same argument. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 239
+
+.. systemd:option:: Timezone=
+   :group: nspawn-directives
+
+   Configures how :code:`/etc/localtime` in the container shall be handled. This is equivalent to the :systemd:option:`--timezone=` command line switch, and takes the same argument. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 239
+
+.. systemd:option:: LinkJournal=
+   :group: nspawn-directives
+
+   Configures how to link host and container journal setups. This is equivalent to the :systemd:option:`--link-journal=` command line switch, and takes the same parameter. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 239
+
+.. systemd:option:: SuppressSync=
+   :group: nspawn-directives
+
+   Configures whether to suppress disk synchronization for the container payload. This is equivalent to the :systemd:option:`--suppress-sync=` command line switch, and takes the same parameter. See :ref:`systemd-nspawn(1)` for details.
+
+   .. versionadded:: 250
+
+[Files] Section Options
+#######################
+
+Settings files may include a \[Files] section, which carries various parameters configuring the file system of the container:
+
+.. systemd:option:: ReadOnly=
+   :group: nspawn-directives
+
+   Takes a boolean argument, which defaults to off. If specified, the container will be run with a read-only file system. This setting corresponds to the :systemd:option:`--read-only` command line switch.
+
+   .. versionadded:: 226
+
+.. systemd:option:: Volatile=
+   :group: nspawn-directives
+
+   Takes a boolean argument, or the special value "state". This configures whether to run the container with volatile state and/or configuration. This option is equivalent to :systemd:option:`--volatile=`, see :ref:`systemd-nspawn(1)` for details about the specific options supported.
+
+   .. versionadded:: 226
+
+.. systemd:option:: Bind=, BindReadOnly=
+   :group: nspawn-directives
+
+   Adds a bind mount from the host into the container. Takes a single path, a pair of two paths separated by a colon, or a triplet of two paths plus an option string separated by colons. This option may be used multiple times to configure multiple bind mounts. This option is equivalent to the command line switches :systemd:option:`--bind=` and :systemd:option:`--bind-ro=`, see :ref:`systemd-nspawn(1)` for details about the specific options supported. This setting is privileged (see above).
+
+   .. versionadded:: 226
+
+.. systemd:option:: BindUser=
+   :group: nspawn-directives
+
+   Binds a user from the host into the container. This option is equivalent to the command line switch :systemd:option:`--bind-user=`, see :ref:`systemd-nspawn(1)` for details about the specific options supported. This setting is privileged (see above).
+
+   .. versionadded:: 249
+
+.. systemd:option:: BindUserShell=
+   :group: nspawn-directives
+
+   When used with :systemd:var:`BindUser`, specifies the shell that is included in the user record of users bound from the host into the container. This option is equivalent to the command line switch :systemd:option:`--bind-user-shell=`, see :ref:`systemd-nspawn(1)` for details about the specific options supported. This setting is privileged (see above).
+
+   .. versionadded:: 258
+
+.. systemd:option:: TemporaryFileSystem=
+   :group: nspawn-directives
+
+   Adds a "tmpfs" mount to the container. Takes a path or a pair of path and option string, separated by a colon. This option may be used multiple times to configure multiple "tmpfs" mounts. This option is equivalent to the command line switch :systemd:option:`--tmpfs=`, see :ref:`systemd-nspawn(1)` for details about the specific options supported. This setting is privileged (see above).
+
+   .. versionadded:: 226
+
+.. systemd:option:: Inaccessible=
+   :group: nspawn-directives
+
+   Masks the specified file or directory in the container, by over-mounting it with an empty file node of the same type with the most restrictive access mode. Takes a file system path as argument. This option may be used multiple times to mask multiple files or directories. This option is equivalent to the command line switch :systemd:option:`--inaccessible=`, see :ref:`systemd-nspawn(1)` for details about the specific options supported. This setting is privileged (see above).
+
+   .. versionadded:: 242
+
+.. systemd:option:: Overlay=, OverlayReadOnly=
+   :group: nspawn-directives
+
+   Adds an overlay mount point. Takes a colon-separated list of paths. This option may be used multiple times to configure multiple overlay mounts. This option is equivalent to the command line switches :systemd:option:`--overlay=` and :systemd:option:`--overlay-ro=`, see :ref:`systemd-nspawn(1)` for details about the specific options supported. This setting is privileged (see above).
+
+   .. versionadded:: 233
+
+.. systemd:option:: PrivateUsersOwnership=
+   :group: nspawn-directives
+
+   Configures whether the ownership of the files and directories in the container tree shall be adjusted to the UID/GID range used, if necessary and user namespacing is enabled. This is equivalent to the :systemd:option:`--private-users-ownership=` command line switch. This option is privileged (see above).
+
+   .. versionadded:: 249
+
+[Network] Section Options
+#########################
+
+Settings files may include a \[Network] section, which carries various parameters configuring the network connectivity of the container:
+
+.. systemd:option:: Private=
+   :group: nspawn-directives
+
+   Takes a boolean argument, which defaults to off. If enabled, the container will run in its own network namespace and not share network interfaces and configuration with the host. This setting corresponds to the :systemd:option:`--private-network` command line switch.
+
+   .. versionadded:: 226
+
+.. systemd:option:: NamespacePath=
+   :group: nspawn-directives
+
+   Takes the path to a file representing a kernel network namespace that the container shall run in. The specified path should refer to a (possibly bind-mounted) network namespace file, as exposed by the kernel below :code:`/proc/$PID/ns/net`. This makes the container enter the given network namespace. One of the typical use cases is to give a network namespace under :code:`/run/netns` created by :man-pages:`ip-netns(8)`, for example, :systemd:var:`NamespacePath=/run/netns/foo`. Note that this option cannot be used together with other network-related options, such as :systemd:var:`Private=` or :systemd:var:`Interface=`. This option corresponds to the :systemd:option:`--network-namespace-path` command line switch.
+
+   .. versionadded:: 259
+
+.. systemd:option:: VirtualEthernet=
+   :group: nspawn-directives
+
+   Takes a boolean argument. Configures whether to create a virtual Ethernet connection ("veth") between host and the container. This setting implies :systemd:var:`Private=yes`. This setting corresponds to the :systemd:option:`--network-veth` command line switch. This option is the default if the :code:`systemd-nspawn@.service` template unit file is used.
+
+   .. versionadded:: 226
+
+.. systemd:option:: VirtualEthernetExtra=
+   :group: nspawn-directives
+
+   Takes a colon-separated pair of interface names. Configures an additional virtual Ethernet connection ("veth") between host and the container. The first specified name is the interface name on the host, the second the interface name in the container. The latter may be omitted in which case it is set to the same name as the host side interface. This setting implies :systemd:var:`Private=yes`. This setting corresponds to the :systemd:option:`--network-veth-extra=` command line switch, and may be used multiple times. It is independent of :systemd:var:`VirtualEthernet=`. Note that this option is unrelated to the :systemd:var:`Bridge=` setting below, and thus any connections created this way are not automatically added to any bridge device on the host side. This option is privileged (see above).
+
+   .. versionadded:: 228
+
+.. systemd:option:: Interface=
+   :group: nspawn-directives
+
+   Takes a space-separated list of interfaces to add to the container. The interface object is defined either by a single interface name, referencing the name on the host, or a colon-separated pair of interfaces, in which case the first one references the name on the host, and the second one the name in the container. This option corresponds to the :systemd:option:`--network-interface=` command line switch and implies :systemd:var:`Private=yes`. This option is privileged (see above).
+
+   .. versionadded:: 226
+
+.. systemd:option:: MACVLAN=, IPVLAN=
+   :group: nspawn-directives
+
+   Takes a space-separated list of interfaces to add MACLVAN or IPVLAN interfaces to, which are then added to the container. The interface object is defined either by a single interface name, referencing the name on the host, or a colon-separated pair of interfaces, in which case the first one references the name on the host, and the second one the name in the container. These options correspond to the :systemd:option:`--network-macvlan=` and :systemd:option:`--network-ipvlan=` command line switches and imply :systemd:var:`Private=yes`. These options are privileged (see above).
+
+   .. versionadded:: 226
+
+.. systemd:option:: Bridge=
+   :group: nspawn-directives
+
+   Takes an interface name. This setting implies :systemd:var:`VirtualEthernet=yes` and :systemd:var:`Private=yes` and has the effect that the host side of the created virtual Ethernet link is connected to the specified bridge interface. This option corresponds to the :systemd:option:`--network-bridge=` command line switch. This option is privileged (see above).
+
+   .. versionadded:: 226
+
+.. systemd:option:: Zone=
+   :group: nspawn-directives
+
+   Takes a network zone name. This setting implies :systemd:var:`VirtualEthernet=yes` and :systemd:var:`Private=yes` and has the effect that the host side of the created virtual Ethernet link is connected to an automatically managed bridge interface named after the passed argument, prefixed with "vz-". This option corresponds to the :systemd:option:`--network-zone=` command line switch. This option is privileged (see above).
+
+   .. versionadded:: 230
+
+.. systemd:option:: Port=
+   :group: nspawn-directives
+
+   Exposes a TCP or UDP port of the container on the host. This option corresponds to the :systemd:option:`--port=` command line switch, see :ref:`systemd-nspawn(1)` for the precise syntax of the argument this option takes. This option is privileged (see above).
+
+   .. versionadded:: 226
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-nspawn(1)`, :ref:`systemd.directives(7)`
+
+

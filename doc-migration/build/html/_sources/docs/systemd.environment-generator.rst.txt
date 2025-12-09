@@ -1,0 +1,84 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd.environment-generator
+:manvolnum: 7
+:summary: systemd environment file generators
+
+.. _systemd.environment-generator(7):
+
+================================
+systemd.environment-generator(7)
+================================
+
+Name
+####
+
+systemd.environment-generator — systemd environment file generators
+
+Synopsis
+########
+
+:code:`|SYSTEM_ENV_GENERATOR_DIR|/some-generator`
+
+:code:`|USER_ENV_GENERATOR_DIR|/some-generator`
+
+| :code:`/run/systemd/system-environment-generators/*`
+| :code:`/etc/systemd/system-environment-generators/*`
+| :code:`/usr/local/lib/systemd/system-environment-generators/*`
+| :code:`|SYSTEM_ENV_GENERATOR_DIR|/*`
+
+| :code:`/run/systemd/user-environment-generators/*`
+| :code:`/etc/systemd/user-environment-generators/*`
+| :code:`/usr/local/lib/systemd/user-environment-generators/*`
+| :code:`|USER_ENV_GENERATOR_DIR|/*`
+
+Description
+###########
+
+Generators are small executables that live in :code:`|SYSTEM_ENV_GENERATOR_DIR|/` and other directories listed above. :ref:`systemd(1)` will execute those binaries very early at the startup of each manager and at configuration reload time, before running the generators described in :ref:`systemd.generator(7)` and before starting any units. Environment generators can override the environment that the manager exports to services and other processes.
+
+Generators are loaded from a set of paths determined during compilation, as listed above. System and user environment generators are loaded from directories with names ending in :code:`system-environment-generators/` and :code:`user-environment-generators/`, respectively. Generators found in directories listed earlier override the ones with the same name in directories lower in the list [#usrlocalfootnote]_. A symlink to :code:`/dev/null` or an empty file can be used to mask a generator, thereby preventing it from running. Please note that the order of the two directories with the highest priority is reversed with respect to the unit load path, and generators in :code:`/run/` overwrite those in :code:`/etc/`.
+
+After installing new generators or updating the configuration, :code:`systemctl daemon-reload` may be executed. This will re-run all generators, updating environment configuration. It will be used for any services that are started subsequently.
+
+Environment file generators are executed similarly to unit file generators described in :ref:`systemd.generator(7)`, with the following differences:
+
+*    Generators are executed sequentially in the alphanumerical order of the final component of their name. The output of each generator output is immediately parsed and used to update the environment for generators that run after that. Thus, later generators can use and/or modify the output of earlier generators.
+
+*    Generators are run by every manager instance, their output can be different for each user.
+
+It is recommended to use numerical prefixes for generator names to simplify ordering.
+
+Examples
+########
+
+A simple generator that extends an environment variable if a directory exists in the file system
+------------------------------------------------------------------------------------------------
+
+.. literalinclude:: /code-examples/sh/50-xdg-data-dirs.sh
+    :language: shell
+
+A more complicated generator which reads existing configuration and mutates one variable
+----------------------------------------------------------------------------------------
+
+.. literalinclude:: /code-examples/py/90-rearrange-path.py
+    :language: python
+
+Debugging a generator
+---------------------
+
+.. code-block:: sh
+
+   SYSTEMD_LOG_LEVEL=debug VAR_A=something VAR_B="something else" \
+   |SYSTEM_ENV_GENERATOR_DIR|/path-to-generator
+
+See Also
+########
+
+:ref:`systemd-environment-d-generator(8)`, :ref:`systemd.generator(7)`, :ref:`systemd(1)`, :man-pages:`systemctl(1)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

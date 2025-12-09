@@ -1,0 +1,60 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: binfmt.d
+:manvolnum: 5
+:summary: Configure additional binary formats for executables at boot
+
+.. _binfmt.d(5):
+
+===========
+binfmt.d(5)
+===========
+
+Name
+####
+
+binfmt.d — Configure additional binary formats for executables at boot
+
+Synopsis
+########
+
+| :code:`/etc/binfmt.d/\*.conf`
+| :code:`/run/binfmt.d/\*.conf`
+| :code:`/usr/local/lib/binfmt.d/\*.conf`
+| :code:`/usr/lib/binfmt.d/\*.conf`
+
+Description
+###########
+
+At boot, :ref:`systemd-binfmt.service(8)` reads configuration files from the above directories to register in the kernel additional binary formats for executables.
+
+Configuration Format
+####################
+
+Each file contains a list of binfmt_misc kernel binary format rules. Consult the kernel's `Kernel Support for miscellaneous Binary Formats (binfmt_misc) <https://docs.kernel.org/admin-guide/binfmt-misc.html>`_ documentation file for more information on registration of additional binary formats and how to write rules.
+
+Empty lines and lines beginning with ";" and "#" are ignored. Note that this means you may not use those symbols as the delimiter in binary format rules.
+
+%% include="standard-conf.rst" id="confd|" %%
+
+Example
+#######
+
+/etc/binfmt.d/wine.conf example:
+--------------------------------
+
+.. code-block:: sh
+
+   # Start WINE on Windows executables
+   :DOSWin:M::MZ::/usr/bin/wine:
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-binfmt.service(8)`, :ref:`systemd-delta(1)`, :die-net:`wine(8)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

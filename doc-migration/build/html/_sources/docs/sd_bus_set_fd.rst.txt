@@ -1,0 +1,86 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_set_fd
+:manvolnum: 3
+:summary: Set the file descriptors to use for bus communication
+
+.. _sd_bus_set_fd(3):
+
+================
+sd_bus_set_fd(3)
+================
+
+Name
+####
+
+sd_bus_set_fd — Set the file descriptors to use for bus communication
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_set_fd(sd_bus *bus,
+	int input_fd,
+	int output_fd);
+
+Description
+###########
+
+:code:`sd_bus_set_fd()` sets the file descriptors used to communicate by a bus connection object. Both :code:`input_fd` and :code:`output_fd` must be valid file descriptors, referring to stream-based file objects (e.g. a stream socket, a pair of pipes or FIFOs, or even a TTY device). :code:`input_fd` must be readable, and :code:`output_fd` must be writable. The same file descriptor may be used (and typically is used) as both the input and the output file descriptor. This function must be called before the bus connection is started via :ref:`sd_bus_start(3)`.
+
+The bus connection object will take possession of the passed file descriptors and will close them automatically when it is freed. Use :ref:`sd_bus_set_close_on_exit(3)` to turn off this behaviour.
+
+Return Value
+############
+
+On success, :code:`sd_bus_set_fd()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   An invalid bus object was passed.
+
+   .. versionadded:: 248
+
+.. systemd:option:: -ECHILD
+
+   The bus connection was allocated in a parent process and is being reused in a child process after :code:`fork()`.
+
+   .. versionadded:: 248
+
+.. systemd:option:: -EBADF
+
+   An invalid file descriptor was passed to :code:`sd_bus_set_fd()`.
+
+   .. versionadded:: 248
+
+.. systemd:option:: -ENOPKG
+
+   The bus cannot be resolved.
+
+   .. versionadded:: 248
+
+.. systemd:option:: -EPERM
+
+   The bus connection has already been started.
+
+   .. versionadded:: 248
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_set_fd()` was added in version 248.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_get_fd(3)`, :ref:`sd_bus_start(3)`
+
+

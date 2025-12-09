@@ -1,0 +1,108 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: nss-resolve
+:manvolnum: 8
+:summary: Hostname resolution via
+:aliases: libnss_resolve.so.2
+
+.. _nss-resolve(8):
+
+==============
+nss-resolve(8)
+==============
+
+Name
+####
+
+nss-resolve, libnss_resolve.so.2 — Hostname resolution via
+
+Synopsis
+########
+
+:code:`libnss_resolve.so.2`
+
+Description
+###########
+
+:code:`nss-resolve` is a plug-in module for the GNU Name Service Switch (NSS) functionality of the GNU C Library (:code:`glibc`) enabling it to resolve hostnames via the :ref:`systemd-resolved(8)` local network name resolution service. It replaces the :code:`nss-dns` plug-in module that traditionally resolves hostnames via DNS.
+
+To activate the NSS module, add "resolve \[!UNAVAIL=return]" to the line starting with "hosts:" in :code:`/etc/nsswitch.conf`. Specifically, it is recommended to place "resolve" early in :code:`/etc/nsswitch.conf`'s "hosts:" line. It should be before the "files" entry, since :code:`systemd-resolved` supports :code:`/etc/hosts` internally, but with caching. To the contrary, it should be after "mymachines", to give hostnames given to local VMs and containers precedence over names received over DNS. Finally, we recommend placing "dns" somewhere after "resolve", to fall back to :code:`nss-dns` if :code:`systemd-resolved.service` is not available.
+
+Note that :code:`systemd-resolved` will synthesize DNS resource records in a few cases, for example for "localhost" and the current local hostname, see :ref:`systemd-resolved(8)` for the full list. This duplicates the functionality of :man-pages:`nss-myhostname(8)`, but it is still recommended (see examples below) to keep :code:`nss-myhostname` configured in :code:`/etc/nsswitch.conf`, to keep those names resolvable if :code:`systemd-resolved` is not running.
+
+Please keep in mind that :code:`nss-myhostname` (and :code:`nss-resolve`) also resolve in the other direction — from locally attached IP addresses to hostnames. If you rely on that lookup being provided by DNS, you might want to order things differently.
+
+Communication between :code:`nss-resolve` and :code:`systemd-resolved.service` takes place via the :code:`/run/systemd/resolve/io.systemd.Resolve` :code:`AF_UNIX` socket.
+
+Environment variables
+#####################
+
+.. systemd:var:: $SYSTEMD_NSS_RESOLVE_VALIDATE
+   :group: environment-variables
+
+   Takes a boolean argument. When false, cryptographic validation of resource records via DNSSEC will be disabled. This may be useful for testing, or when system time is known to be unreliable.
+
+   .. versionadded:: 250
+
+.. systemd:var:: $SYSTEMD_NSS_RESOLVE_SYNTHESIZE
+   :group: environment-variables
+
+   Takes a boolean argument. When false, synthetic records, e.g. for the local host name, will not be returned. See section SYNTHETIC RECORDS in :ref:`systemd-resolved.service(8)` for more information. This may be useful to query the "public" resource records, independent of the configuration of the local machine.
+
+   .. versionadded:: 250
+
+.. systemd:var:: $SYSTEMD_NSS_RESOLVE_CACHE
+   :group: environment-variables
+
+   Takes a boolean argument. When false, the cache of previously queried records will not be used by :ref:`systemd-resolved(8)`.
+
+   .. versionadded:: 250
+
+.. systemd:var:: $SYSTEMD_NSS_RESOLVE_ZONE
+   :group: environment-variables
+
+   Takes a boolean argument. When false, answers using locally registered public LLMNR/mDNS resource records will not be returned.
+
+   .. versionadded:: 250
+
+.. systemd:var:: $SYSTEMD_NSS_RESOLVE_TRUST_ANCHOR
+   :group: environment-variables
+
+   Takes a boolean argument. When false, answers using locally configured trust anchors will not be used.
+
+   .. versionadded:: 250
+
+.. systemd:var:: $SYSTEMD_NSS_RESOLVE_NETWORK
+   :group: environment-variables
+
+   Takes a boolean argument. When false, answers will be returned without using the network, i.e. either from local sources or the cache in :ref:`systemd-resolved(8)`.
+
+   .. versionadded:: 250
+
+Example
+#######
+
+Here is an example :code:`/etc/nsswitch.conf` file that enables :code:`nss-resolve` correctly:
+
+.. COMMENT: synchronize with other nss-* man pages and factory/etc/nsswitch.conf
+
+.. code-block:: sh
+
+   passwd:         files systemd
+   group:          files [SUCCESS=merge] systemd
+   shadow:         files systemd
+   gshadow:        files systemd
+   hosts:          mymachines resolve \[!UNAVAIL=return]  files myhostname dns
+   networks:       files
+   protocols:      db files
+   services:       db files
+   ethers:         db files
+   rpc:            db files
+   netgroup:       nis
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`systemd-resolved(8)`, :man-pages:`nss-systemd(8)`, :man-pages:`nss-myhostname(8)`, :man-pages:`nss-mymachines(8)`, :man-pages:`nsswitch.conf(5)`, :ref:`systemd.syntax(7)`
+
+

@@ -1,0 +1,129 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: journal-upload.conf
+:manvolnum: 5
+:summary: Configuration files for the journal upload service
+:aliases: journal-upload.conf.d
+
+.. _journal-upload.conf(5):
+
+======================
+journal-upload.conf(5)
+======================
+
+Name
+####
+
+journal-upload.conf, journal-upload.conf.d — Configuration files for the journal upload service
+
+Synopsis
+########
+
+:code:`/etc/systemd/journal-upload.conf`
+
+:code:`/run/systemd/journal-upload.conf`
+
+:code:`/usr/lib/systemd/journal-upload.conf`
+
+:code:`/etc/systemd/journal-upload.conf.d/\*.conf`
+
+:code:`/run/systemd/journal-upload.conf.d/\*.conf`
+
+:code:`/usr/lib/systemd/journal-upload.conf.d/\*.conf`
+
+Description
+###########
+
+These files configure various parameters of :ref:`systemd-journal-upload.service(8)`. See :ref:`systemd.syntax(7)` for a general description of the syntax.
+
+%% include="standard-conf.rst" id="main-conf|" %%
+
+Options
+#######
+
+All options are configured in the \[Upload] section:
+
+.. systemd:option:: URL=
+   :group: config-directives
+
+   The URL to upload the journal entries to. See the description of :systemd:option:`--url=` option in :ref:`systemd-journal-upload(8)` for the description of possible values. There is no default value, so either this option or the command-line option must be always present to make an upload.
+
+   .. versionadded:: 232
+
+.. systemd:option:: ServerKeyFile=
+   :group: config-directives
+
+   SSL key in PEM format.
+
+   .. versionadded:: 232
+
+.. systemd:option:: ServerCertificateFile=
+   :group: config-directives
+
+   SSL CA certificate in PEM format.
+
+   .. versionadded:: 232
+
+.. systemd:option:: TrustedCertificateFile=
+   :group: config-directives
+
+   SSL CA certificate.
+
+   .. versionadded:: 232
+
+.. systemd:option:: NetworkTimeoutSec=
+   :group: config-directives
+
+   When network connectivity to the server is lost, this option configures the time to wait for the connectivity to get restored. If the server is not reachable over the network for the configured time, :code:`systemd-journal-upload` exits. Takes a value in seconds (or in other time units if suffixed with "ms", "min", "h", etc). For details, see :ref:`systemd.time(7)`.
+
+   .. versionadded:: 249
+
+.. systemd:option:: Compression=
+   :group: config-directives
+
+   Configures compression algorithm to be applied to logs data before sending. Takes a space separated list of compression algorithms, or "no". Supported algorithms are "zstd", "xz", or "lz4". Optionally, each algorithm followed by a colon (":") and its compression level, for example "zstd:4". The compression level is expected to be a positive integer. When "no" is specified, no compression algorithm will be applied to data to be sent. This option can be specified multiple times. If an empty string is assigned, then all previous assignments are cleared. Defaults to unset, and all supported compression algorithms with their default compression levels are listed.
+
+   Example:
+
+     .. code-block:: sh
+
+        Compression=zstd:4 lz4:2
+
+   Even when compression is enabled, the initial requests are sent without compression. It becomes effective either if "ForceCompression=" is enabled, or the server response contains "Accept-Encoding" headers with a list of compression algorithms that contains one of the algorithms specified in this option.
+
+   .. versionadded:: 258
+
+.. systemd:option:: ForceCompression=
+   :group: config-directives
+
+   Takes a boolean value, enforces using compression without content encoding negotiation. Defaults to "false".
+
+   .. versionadded:: 258
+
+.. systemd:option:: Header=
+   :group: config-directives
+
+   Specifies an additional HTTP header to be added to each request to a URL. Takes a pair of header name and value separated with a colon(":"), e.g. "Name:Value". Header name can contain alphanumeric values, "_" and "-" symbols additionally. This option may be specified more than once, in which case all listed headers will be set. If the same header name is listed more than once, all its unique values will be concatenated with comma. Setting :systemd:var:`Header=` to empty string clears all previous assignments.
+
+   Example:
+
+     .. code-block:: sh
+
+        Header=HeaderName: HeaderValue
+        Header=HeaderName: NewValue
+        Header=HeaderName: HeaderValue
+
+   adds "HeaderName" header with "HeaderValue, NewValue" to each HTTP request.
+
+   .. versionadded:: 258
+
+See Also
+########
+
+:ref:`systemd-journal-upload.service(8)`, :ref:`systemd(1)`, :ref:`systemd-journald.service(8)`
+
+
+
+.. rubric:: Footnotes
+
+%% include="standard-conf.rst" id="usr-local-footnote|" %%

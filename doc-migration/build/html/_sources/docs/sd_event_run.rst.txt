@@ -1,0 +1,80 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_event_run
+:manvolnum: 3
+:summary: Run an event loop
+:aliases: sd_event_loop
+
+.. _sd_event_run(3):
+
+===============
+sd_event_run(3)
+===============
+
+Name
+####
+
+sd_event_run, sd_event_loop — Run an event loop
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-event.h>` .. code-block::
+
+   int sd_event_run(sd_event *event,
+	uint64_t usec); .. code-block::
+
+   int sd_event_loop(sd_event *event);
+
+Description
+###########
+
+:code:`sd_event_run()` may be used to run a single iteration of the event loop specified in the :code:`event` parameter. The function waits until an event to process is available, and dispatches the registered handler for it. The :code:`usec` parameter specifies the maximum time (in microseconds) to wait for an event. Use :code:`(uint64_t) -1` to specify an infinite timeout.
+
+:code:`sd_event_loop()` invokes :code:`sd_event_run()` in a loop, thus implementing the actual event loop. The call returns as soon as exiting was requested using :ref:`sd_event_exit(3)`.
+
+The event loop object :code:`event` is created with :ref:`sd_event_new(3)`. Events sources to wait for and their handlers may be registered with :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_add_post(3)` and :ref:`sd_event_add_exit(3)`.
+
+For low-level control of event loop execution, use :ref:`sd_event_prepare(3)`, :ref:`sd_event_wait(3)` and :ref:`sd_event_dispatch(3)` which are wrapped by :code:`sd_event_run()`. Along with :ref:`sd_event_get_fd(3)`, these functions allow integration of an :ref:`sd-event(3)` event loop into foreign event loop implementations.
+
+Return Value
+############
+
+On failure, these functions return a negative errno-style error code. :code:`sd_event_run()` returns a positive, non-zero integer if an event source was dispatched, and zero when the specified timeout hit before an event source has seen any event, and hence no event source was dispatched. :code:`sd_event_loop()` returns the exit code specified when invoking :code:`sd_event_exit()`.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`event` parameter is invalid or :code:`NULL`.
+
+.. systemd:option:: -EBUSY
+
+   The event loop object is not in the right state (see :ref:`sd_event_prepare(3)` for an explanation of possible states).
+
+.. systemd:option:: -ESTALE
+
+   The event loop is already terminated.
+
+.. systemd:option:: -ECHILD
+
+   The event loop has been created in a different process, library or module instance.
+
+Other errors are possible, too.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_event_run()` and :code:`sd_event_loop()` were added in version 220.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-event(3)`, :ref:`sd_event_new(3)`, :ref:`sd_event_add_io(3)`, :ref:`sd_event_add_time(3)`, :ref:`sd_event_add_signal(3)`, :ref:`sd_event_add_child(3)`, :ref:`sd_event_add_inotify(3)`, :ref:`sd_event_add_defer(3)`, :ref:`sd_event_exit(3)`, :ref:`sd_event_get_fd(3)`, :ref:`sd_event_wait(3)`, `GLib Main Event Loop <https://developer.gnome.org/glib/unstable/glib-The-Main-Event-Loop.html>`_
+
+

@@ -1,0 +1,20 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+Notes
+#####
+
+.. inclusion-marker-do-not-remove pkgconfig-text|
+
+.. inclusion-marker-do-not-remove pkgconfig-text|
+
+Functions described here are available as a shared library, which can be compiled against and linked to with the :code:`libsystemd` :die-net:`pkg-config(1)` file.
+
+.. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+.. inclusion-end-marker-do-not-remove pkgconfig-text|
+
+.. include:: threads-aware.rst
+    :start-after: .. inclusion-marker-do-not-remove getenv|
+    :end-before: .. inclusion-end-marker-do-not-remove getenv|
+
+

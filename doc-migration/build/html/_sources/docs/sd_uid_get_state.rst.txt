@@ -1,0 +1,100 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_uid_get_state
+:manvolnum: 3
+:summary: Determine login state of a specific Unix user ID
+:aliases: sd_uid_is_on_seat, sd_uid_get_sessions, sd_uid_get_seats, sd_uid_get_display, sd_uid_get_login_time
+
+.. _sd_uid_get_state(3):
+
+===================
+sd_uid_get_state(3)
+===================
+
+Name
+####
+
+sd_uid_get_state, sd_uid_is_on_seat, sd_uid_get_sessions, sd_uid_get_seats, sd_uid_get_display, sd_uid_get_login_time — Determine login state of a specific Unix user ID
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-login.h>` .. code-block::
+
+   int sd_uid_get_state(uid_t uid,
+	char **state); .. code-block::
+
+   int sd_uid_is_on_seat(uid_t uid,
+	int require_active,
+	const char *seat); .. code-block::
+
+   int sd_uid_get_sessions(uid_t uid,
+	int require_active,
+	char ***sessions); .. code-block::
+
+   int sd_uid_get_seats(uid_t uid,
+	int require_active,
+	char ***seats); .. code-block::
+
+   int sd_uid_get_display(uid_t uid,
+	char **session); .. code-block::
+
+   int sd_uid_get_login_time(uid_t uid,
+	uint64_t *usec);
+
+Description
+###########
+
+:code:`sd_uid_get_state()` may be used to determine the login state of a specific Unix user identifier. The following states are currently known: "offline" (user not logged in at all), "lingering" (user not logged in, but some user services running), "online" (user logged in, but not active, i.e. has no session in the foreground), "active" (user logged in, and has at least one active session, i.e. one session in the foreground), "closing" (user not logged in, and not lingering, but some processes are still around). In the future additional states might be defined, client code should be written to be robust in regards to additional state strings being returned. The returned string needs to be freed with the libc :man-pages:`free(3)` call after use.
+
+:code:`sd_uid_is_on_seat()` may be used to determine whether a specific user is logged in or active on a specific seat. Accepts a Unix user identifier and a seat identifier string as parameters. The :code:`require_active` parameter is a boolean value. If non-zero (true), this function will test if the user is active (i.e. has a session that is in the foreground and accepting user input) on the specified seat, otherwise (false) only if the user is logged in (and possibly inactive) on the specified seat.
+
+:code:`sd_uid_get_sessions()` may be used to determine the current sessions of the specified user. Accepts a Unix user identifier as parameter. The :code:`require_active` parameter controls whether the returned list shall consist of only those sessions where the user is currently active (> 0), where the user is currently online but possibly inactive (= 0), or logged in but possibly closing the session (< 0). The call returns a :code:`NULL` terminated string array of session identifiers in :code:`sessions` which needs to be freed by the caller with the libc :man-pages:`free(3)` call after use, including all the strings referenced. If the string array parameter is passed as :code:`NULL`, the array will not be filled in, but the return code still indicates the number of current sessions. Note that instead of an empty array :code:`NULL` may be returned and should be considered equivalent to an empty array.
+
+Similarly, :code:`sd_uid_get_seats()` may be used to determine the list of seats on which the user currently has sessions. Similar semantics apply, however note that the user may have multiple sessions on the same seat as well as sessions with no attached seat and hence the number of entries in the returned array may differ from the one returned by :code:`sd_uid_get_sessions()`.
+
+:code:`sd_uid_get_display()` returns the name of the "primary" session of a user. If the user has graphical sessions, it will be the oldest graphical session. Otherwise, it will be the oldest open session.
+
+:code:`sd_uid_get_login_time()` may be used to determine the time the user's service manager has been invoked, which is the time when the user's first active session, since which they stayed logged in continuously, began. The :code:`usec` is in microseconds since the epoch (:code:`CLOCK_REALTIME`). This call will fail with :code:`-ENXIO` if the user is not currently logged in.
+
+Return Value
+############
+
+On success, :code:`sd_uid_get_state()` and :code:`sd_uid_get_login_time()` returns 0 or a positive integer. If the test succeeds, :code:`sd_uid_is_on_seat()` returns a positive integer; if it fails, 0. :code:`sd_uid_get_sessions()` and :code:`sd_uid_get_seats()` return the number of entries in the returned arrays. :code:`sd_uid_get_display()` returns a non-negative code on success. On failure, these calls return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -ENODATA
+
+   The given field is not specified for the described user.
+
+.. systemd:option:: -ENXIO
+
+   The specified seat is unknown.
+
+.. systemd:option:: -EINVAL
+
+   An input parameter was invalid (out of range, or :code:`NULL`, where that is not accepted). This is also returned if the passed user ID is :code:`0xFFFF` or :code:`0xFFFFFFFF`, which are undefined on Linux.
+
+.. systemd:option:: -ENOMEM
+
+   Memory allocation failed.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_uid_get_display()` was added in version 213.
+
+:code:`sd_uid_get_login_time()` was added in version 254.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-login(3)`, :ref:`sd_pid_get_owner_uid(3)`
+
+

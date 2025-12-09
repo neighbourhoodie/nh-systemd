@@ -1,0 +1,78 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_set_exit_on_disconnect
+:manvolnum: 3
+:summary: Control the exit behavior when the bus object disconnects
+:aliases: sd_bus_get_exit_on_disconnect
+
+.. _sd_bus_set_exit_on_disconnect(3):
+
+================================
+sd_bus_set_exit_on_disconnect(3)
+================================
+
+Name
+####
+
+sd_bus_set_exit_on_disconnect, sd_bus_get_exit_on_disconnect — Control the exit behavior when the bus object disconnects
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_set_exit_on_disconnect(sd_bus *bus,
+	int b); .. code-block::
+
+   int sd_bus_get_exit_on_disconnect(sd_bus *bus);
+
+Description
+###########
+
+:code:`sd_bus_set_exit_on_disconnect()` may be used to configure the exit behavior when the given bus object disconnects. If :code:`b` is zero, no special logic is executed when the bus object disconnects. If :code:`b` is non-zero, the behavior on disconnect depends on whether the bus object is attached to an event loop or not. If the bus object is attached to an event loop (see :ref:`sd_bus_attach_event(3)`), the event loop is closed when the bus object disconnects (as if calling :ref:`sd_event_exit(3)`). Otherwise, :man-pages:`exit(3)` is called. The exit code passed to :code:`sd_event_exit()` and :code:`exit()` is :code:`EXIT_FAILURE`. If the bus object has already disconnected when enabling the exit behavior, the exit behavior is executed immediately. By default, the exit behavior is disabled.
+
+:code:`sd_bus_get_exit_on_disconnect()` returns whether the exit on disconnect behavior is enabled for the given bus object.
+
+Return Value
+############
+
+On success, :code:`sd_bus_set_exit_on_disconnect()` returns a non-negative integer. On failure, it returns a negative errno-style error code.
+
+:code:`sd_bus_get_exit_on_disconnect()` returns a positive integer if the exit on disconnect behavior is enabled. Otherwise, it returns zero.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   A required parameter was :code:`NULL`.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ENOPKG
+
+   The bus object could not be resolved.
+
+   .. versionadded:: 246
+
+.. systemd:option:: -ECHILD
+
+   The bus connection was created in a different process, library or module instance.
+
+   .. versionadded:: 246
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_set_exit_on_disconnect()` and :code:`sd_bus_get_exit_on_disconnect()` were added in version 246.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_attach_event(3)`, :ref:`sd-event(3)`, :ref:`sd_event_exit(3)`
+
+

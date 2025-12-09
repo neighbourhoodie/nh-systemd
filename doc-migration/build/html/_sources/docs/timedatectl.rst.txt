@@ -1,0 +1,254 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: timedatectl
+:manvolnum: 1
+:summary: Control the system time and date
+
+.. _timedatectl(1):
+
+==============
+timedatectl(1)
+==============
+
+Name
+####
+
+timedatectl — Control the system time and date
+
+Synopsis
+########
+
+:code:`timedatectl [OPTIONS...] {COMMAND}`
+
+Description
+###########
+
+:code:`timedatectl` may be used to query and change the system clock and its settings, and enable or disable time synchronization services.
+
+Use :ref:`systemd-firstboot(1)` to initialize the system time zone for mounted (but not booted) system images.
+
+:code:`timedatectl` may be used to show the current status of time synchronization services, for example :ref:`systemd-timesyncd.service(8)`.
+
+Commands
+########
+
+The following commands are understood:
+
+.. systemd:option:: status
+
+   Show current settings of the system clock and RTC, including whether network time synchronization is active. If no command is specified, this is the implied default.
+
+   .. versionadded:: 195
+
+.. systemd:option:: show
+
+   Show the same information as :code:`status`, but in machine readable form. This command is intended to be used whenever computer-parsable output is required. Use :code:`status` if you are looking for formatted human-readable output.
+
+   By default, empty properties are suppressed. Use :code:`--all` to show those too. To select specific properties to show, use :code:`--property=`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: set-time \[TIME]
+
+   Set the system clock to the specified timestamp. This will also update the RTC time accordingly. The timestamp may be specified in the format "2012-10-30 18:17:16". See :ref:`systemd.time(7)` for more details about acceptable timestamp format.
+
+   .. versionadded:: 195
+
+.. systemd:option:: set-timezone \[TIMEZONE]
+
+   Set the system time zone to the specified value. Available timezones can be listed with :code:`list-timezones`. If the RTC is configured to be in the local time, this will also update the RTC time. This call will alter the :code:`/etc/localtime` symlink. See :man-pages:`localtime(5)` for more information.
+
+   .. versionadded:: 195
+
+.. systemd:option:: list-timezones
+
+   List available time zones, one per line. Entries from the list can be set as the system timezone with :code:`set-timezone`.
+
+   .. versionadded:: 195
+
+.. systemd:option:: set-local-rtc \[BOOL]
+
+   Takes a boolean argument. If "0", the system is configured to maintain the RTC in universal time. If "1", it will maintain the RTC in local time instead. Note that maintaining the RTC in the local timezone is not fully supported and will create various problems with time zone changes and daylight saving adjustments. If at all possible, keep the RTC in UTC mode. Note that invoking this will also synchronize the RTC from the system clock, unless :code:`--adjust-system-clock` is passed (see above). This command will change the 3rd line of :code:`/etc/adjtime`, as documented in :man-pages:`hwclock(8)`.
+
+   .. versionadded:: 195
+
+.. systemd:option:: set-ntp \[BOOL]
+
+   Takes a boolean argument. Controls whether network time synchronization is active and enabled (if available). If the argument is true, this enables and starts the first existing network synchronization service. If the argument is false, then this disables and stops the known network synchronization services. The way that the list of services is built is described in :ref:`systemd-timedated.service(8)`.
+
+   .. versionadded:: 195
+
+systemd-timesyncd Commands
+##########################
+
+The following commands are specific to :ref:`systemd-timesyncd.service(8)`.
+
+.. systemd:option:: timesync-status
+
+   Show current status of :ref:`systemd-timesyncd.service(8)`. If :code:`--monitor` is specified, then this will monitor the status updates.
+
+   .. versionadded:: 239
+
+.. systemd:option:: show-timesync
+
+   Show the same information as :code:`timesync-status`, but in machine readable form. This command is intended to be used whenever computer-parsable output is required. Use :code:`timesync-status` if you are looking for formatted human-readable output.
+
+   By default, empty properties are suppressed. Use :code:`--all` to show those too. To select specific properties to show, use :code:`--property=`.
+
+   .. versionadded:: 239
+
+.. systemd:option:: ntp-servers INTERFACE SERVER…
+
+   Set the interface specific NTP servers. This command can be used only when the interface is managed by :code:`systemd-networkd`.
+
+   .. versionadded:: 243
+
+.. systemd:option:: revert INTERFACE
+
+   Revert the interface specific NTP servers. This command can be used only when the interface is managed by :code:`systemd-networkd`.
+
+   .. versionadded:: 243
+
+Options
+#######
+
+The following options are understood:
+
+.. systemd:option:: --adjust-system-clock
+
+   If :code:`set-local-rtc` is invoked and this option is passed, the system clock is synchronized from the RTC again, taking the new setting into account. Otherwise, the RTC is synchronized from the system clock.
+
+   .. versionadded:: 195
+
+.. systemd:option:: --monitor
+
+   If :code:`timesync-status` is invoked and this option is passed, then :code:`timedatectl` monitors the status of :ref:`systemd-timesyncd.service(8)` and updates the outputs. Use :kbd:`Ctrl` + :kbd:`C` to terminate the monitoring.
+
+   .. versionadded:: 239
+
+.. systemd:option:: -a, --all
+
+   When showing properties of :ref:`systemd-timesyncd.service(8)`, show all properties regardless of whether they are set or not.
+
+   .. versionadded:: 239
+
+.. systemd:option:: -p, --property=
+
+   When showing properties of :ref:`systemd-timesyncd.service(8)`, limit display to certain properties as specified as argument. If not specified, all set properties are shown. The argument should be a property name, such as "ServerName". If specified more than once, all properties with the specified names are shown.
+
+   .. versionadded:: 239
+
+.. systemd:option:: --value
+
+   When printing properties with :code:`show-timesync`, only print the value, and skip the property name and "=".
+
+   .. versionadded:: 239
+
+.. inclusion-marker-do-not-remove option-P|
+
+.. systemd:option:: -P
+
+   .. include:: standard-options.rst
+       :start-after: .. inclusion-marker-do-not-remove xpointer(//varlistentry[@id='option-P']/listitem/para)|
+       :end-before: .. inclusion-end-marker-do-not-remove xpointer(//varlistentry[@id='option-P']/listitem/para)|
+
+   .. versionadded:: 256
+
+.. inclusion-end-marker-do-not-remove option-P|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove host|
+    :end-before: .. inclusion-end-marker-do-not-remove host|
+
+.. include:: user-system-options.rst
+    :start-after: .. inclusion-marker-do-not-remove machine|
+    :end-before: .. inclusion-end-marker-do-not-remove machine|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-ask-password|
+    :end-before: .. inclusion-end-marker-do-not-remove no-ask-password|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove no-pager|
+    :end-before: .. inclusion-end-marker-do-not-remove no-pager|
+
+Exit status
+###########
+
+On success, 0 is returned, a non-zero failure code otherwise.
+
+.. include:: common-variables.rst
+
+Examples
+########
+
+Show current settings:
+
+.. code-block:: sh
+
+   $ timedatectl
+                  Local time: Thu 2017-09-21 16:08:56 CEST
+              Universal time: Thu 2017-09-21 14:08:56 UTC
+                    RTC time: Thu 2017-09-21 14:08:56
+                   Time zone: Europe/Warsaw (CEST, +0200)
+   System clock synchronized: yes
+                 NTP service: active
+             RTC in local TZ: no
+
+Enable network time synchronization:
+
+.. code-block:: sh
+
+   $ timedatectl set-ntp true
+   ==== AUTHENTICATING FOR org.freedesktop.timedate1.set-ntp ===
+   Authentication is required to control whether network time synchronization shall be enabled.
+   Authenticating as: user
+   Password: ********
+   ==== AUTHENTICATION COMPLETE ===
+
+.. code-block:: sh
+
+   $ systemctl status systemd-timesyncd.service
+   ● systemd-timesyncd.service - Network Time Synchronization
+      Loaded: loaded (/usr/lib/systemd/system/systemd-timesyncd.service; enabled)
+      Active: active (running) since Mo 2015-03-30 14:20:38 CEST; 5s ago
+        Docs: man:systemd-timesyncd.service(8)
+    Main PID: 595 (systemd-timesyn)
+      Status: "Using Time Server 216.239.38.15:123 (time4.google.com)."
+      CGroup: /system.slice/systemd-timesyncd.service
+              └─595 /usr/lib/systemd/systemd-timesyncd
+   …
+
+Show current status of :ref:`systemd-timesyncd.service(8)`:
+
+.. code-block:: sh
+
+   $ timedatectl timesync-status
+          Server: 216.239.38.15 (time4.google.com)
+   Poll interval: 1min 4s (min: 32s; max 34min 8s)
+            Leap: normal
+         Version: 4
+         Stratum: 1
+       Reference: GPS
+       Precision: 1us (-20)
+   Root distance: 335us (max: 5s)
+          Offset: +316us
+           Delay: 349us
+          Jitter: 0
+    Packet count: 1
+       Frequency: -8.802ppm
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`hwclock(8)`, :man-pages:`date(1)`, :man-pages:`localtime(5)`, :man-pages:`systemctl(1)`, :ref:`systemd-timedated.service(8)`, :ref:`systemd-timesyncd.service(8)`, :ref:`systemd-firstboot(1)`
+
+

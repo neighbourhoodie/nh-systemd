@@ -1,0 +1,75 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_slot_set_destroy_callback
+:manvolnum: 3
+:summary: Define the callback function for resource cleanup
+:aliases: sd_bus_slot_get_destroy_callback, sd_bus_track_set_destroy_callback, sd_bus_track_get_destroy_callback, sd_bus_destroy_t
+
+.. _sd_bus_slot_set_destroy_callback(3):
+
+===================================
+sd_bus_slot_set_destroy_callback(3)
+===================================
+
+Name
+####
+
+sd_bus_slot_set_destroy_callback, sd_bus_slot_get_destroy_callback, sd_bus_track_set_destroy_callback, sd_bus_track_get_destroy_callback, sd_bus_destroy_t — Define the callback function for resource cleanup
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   typedef int (*sd_bus_destroy_t)(void *userdata); .. code-block::
+
+   int sd_bus_slot_set_destroy_callback(sd_bus_slot *slot,
+	sd_bus_destroy_t callback); .. code-block::
+
+   int sd_bus_slot_get_destroy_callback(sd_bus_slot *slot,
+	sd_bus_destroy_t *callback); .. code-block::
+
+   int sd_bus_track_set_destroy_callback(sd_bus_track *track,
+	sd_bus_destroy_t callback); .. code-block::
+
+   int sd_bus_track_get_destroy_callback(sd_bus_track *track,
+	sd_bus_destroy_t *callback);
+
+Description
+###########
+
+:code:`sd_bus_slot_set_destroy_callback()` sets :code:`callback` as the callback function to be called right before the bus slot object :code:`slot` is deallocated. The :code:`userdata` pointer from the slot object will be passed as the :code:`userdata` parameter. This pointer can be set by an argument to the constructor functions, see :ref:`sd_bus_add_match(3)`, or directly, see :ref:`sd_bus_slot_set_userdata(3)`. This callback function is called even if :code:`userdata` is :code:`NULL`. Note that this callback is invoked at a time where the bus slot object itself is already invalidated, and executing operations or taking new references to the bus slot object is not permissible.
+
+:code:`sd_bus_slot_get_destroy_callback()` returns the current callback for :code:`slot` in the :code:`callback` parameter.
+
+:code:`sd_bus_track_set_destroy_callback()` and :code:`sd_bus_track_get_destroy_callback()` provide equivalent functionality for the :code:`userdata` pointer associated with bus peer tracking objects. For details about bus peer tracking objects, see :ref:`sd_bus_track_new(3)`.
+
+Return Value
+############
+
+On success, :code:`sd_bus_slot_set_destroy_callback()` and :code:`sd_bus_track_set_destroy_callback()` return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+:code:`sd_bus_slot_get_destroy_callback()` and :code:`sd_bus_track_get_destroy_callback()` return positive if the destroy callback function is set, 0 if not. On failure, they return a negative errno-style error code.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   The :code:`slot` or :code:`track` parameter is :code:`NULL`.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_destroy_t()`, :code:`sd_bus_slot_set_destroy_callback()`, :code:`sd_bus_slot_get_destroy_callback()`, :code:`sd_bus_track_set_destroy_callback()`, and :code:`sd_bus_track_get_destroy_callback()` were added in version 239.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_slot_set_floating(3)`, :ref:`sd_bus_add_match(3)`, :ref:`sd_bus_track_new(3)`, :ref:`sd_bus_slot_set_userdata(3)`, :ref:`sd_bus_track_set_userdata(3)`
+
+

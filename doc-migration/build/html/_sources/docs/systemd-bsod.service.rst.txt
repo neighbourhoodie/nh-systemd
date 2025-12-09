@@ -1,0 +1,66 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-bsod.service
+:manvolnum: 8
+:summary: Displays boot-time emergency log message in full screen
+:aliases: systemd-bsod
+
+.. _systemd-bsod.service(8):
+
+=======================
+systemd-bsod.service(8)
+=======================
+
+Name
+####
+
+systemd-bsod.service, systemd-bsod — Displays boot-time emergency log message in full screen
+
+Synopsis
+########
+
+:code:`systemd-bsod.service`
+
+:code:`/usr/lib/systemd/systemd-bsod [OPTIONS...]`
+
+Description
+###########
+
+:code:`systemd-bsod.service` is used to display a blue screen which contains a message relating to a boot failure, including a QR code which can be scanned to get helpful information about the failure.
+
+Options
+#######
+
+The following options are understood by :code:`systemd-bsod`:
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove help|
+    :end-before: .. inclusion-end-marker-do-not-remove help|
+
+.. include:: standard-options.rst
+    :start-after: .. inclusion-marker-do-not-remove version|
+    :end-before: .. inclusion-end-marker-do-not-remove version|
+
+.. systemd:option:: -c, --continuous
+
+   When specified, :code:`systemd-bsod` waits continuously for changes in the journal if it does not find any emergency messages on the initial attempt.
+
+   .. versionadded:: 255
+
+.. systemd:option:: --tty=
+
+   Specify the TTY to output to. By default, :code:`systemd-bsod` will automatically find a free VT to display the message on. If this option is specified a TTY may be selected explicitly. Use :code:`--tty=/dev/tty` to direct output to the terminal the command is invoked on.
+
+   .. versionadded:: 256
+
+Exit status
+###########
+
+On success (displaying the journal message successfully), 0 is returned, a non-zero failure code otherwise.
+
+See Also
+########
+
+:ref:`systemd(1)`
+
+

@@ -1,0 +1,29 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+.. inclusion-marker-do-not-remove table|
+
+.. list-table:: Unit ACTIVE states
+   :header-rows: 1
+
+   * - State
+     - Description
+   * - :code:`active`
+     - Started, bound, plugged in, …, depending on the unit type.
+   * - :code:`inactive`
+     - Stopped, unbound, unplugged, …, depending on the unit type.
+   * - :code:`failed`
+     - Similar to :code:`inactive`, but the unit failed in some way (process returned error code on exit, crashed, an operation timed out, or after too many restarts).
+   * - :code:`activating`
+     - Changing from :code:`inactive` to :code:`active`.
+   * - :code:`deactivating`
+     - Changing from :code:`active` to :code:`inactive`.
+   * - :code:`maintenance`
+     - Unit is :code:`inactive` and a maintenance operation is in progress.
+   * - :code:`reloading`
+     - Unit is :code:`active` and it is reloading its configuration.
+   * - :code:`refreshing`
+     - Unit is :code:`active` and a new mount is being activated in its namespace.
+
+.. inclusion-end-marker-do-not-remove table|
+
+

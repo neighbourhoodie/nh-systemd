@@ -1,0 +1,56 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: systemd-rc-local-generator
+:manvolnum: 8
+:summary: Compatibility generator and service to start
+:aliases: rc-local.service
+
+.. _systemd-rc-local-generator(8):
+
+=============================
+systemd-rc-local-generator(8)
+=============================
+
+Name
+####
+
+systemd-rc-local-generator, rc-local.service — Compatibility generator and service to start
+
+Synopsis
+########
+
+:code:`/usr/lib/systemd/system-generators/systemd-rc-local-generator`
+
+:code:`rc-local.service`
+
+Description
+###########
+
+:code:`systemd-rc-local-generator` is a generator that checks whether :code:`|SYSTEM_SYSVRCLOCAL_PATH|` exists and is executable, and if it is, pulls the :code:`rc-local.service` unit into the boot process. This unit is responsible for running this script during late boot. The script is run after :code:`network.target`, but in parallel with most other regular system services.
+
+Note that :code:`rc-local.service` runs with slightly different semantics than the original System V version, which was executed "last" in the boot process, which is a concept that does not translate to systemd.
+
+Also note that :code:`rc-local.service` is ordered after :code:`network.target`, which does not mean that the network is functional, see :ref:`systemd.special(7)`. If the script requires a configured network connection, it may be desirable to pull in and order it after :code:`network-online.target` with a drop-in:
+
+.. code-block:: sh
+
+   # /etc/systemd/system/rc-local.service.d/network.conf
+   [Unit]
+   Wants=network-online.target
+   After=network-online.target
+
+Support for :code:`|SYSTEM_SYSVRCLOCAL_PATH|` is provided for compatibility with specific System V systems only. However, it is strongly recommended to avoid using this script today, and instead provide proper unit files with appropriate dependencies for any scripts to run during the boot process. Note that the path to the script is set at compile time and varies between distributions.
+
+:code:`systemd-rc-local-generator` implements :ref:`systemd.generator(7)`.
+
+Notes
+#####
+
+On systems with SELinux, when creating the file, make sure to set the appropriate context, e.g. with ":code:`sudo restorecon -v \|SYSTEM_SYSVRCLOCAL_PATH|`".
+
+See Also
+########
+
+:ref:`systemd(1)`, :man-pages:`systemctl(1)`
+
+

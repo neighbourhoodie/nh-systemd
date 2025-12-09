@@ -1,0 +1,71 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+:title: sd_bus_message_get_cookie
+:manvolnum: 3
+:summary: Returns the transaction cookie of a message
+:aliases: sd_bus_message_get_reply_cookie
+
+.. _sd_bus_message_get_cookie(3):
+
+============================
+sd_bus_message_get_cookie(3)
+============================
+
+Name
+####
+
+sd_bus_message_get_cookie, sd_bus_message_get_reply_cookie — Returns the transaction cookie of a message
+
+Synopsis
+########
+
+:code:`#include <systemd/sd-bus.h>` .. code-block::
+
+   int sd_bus_message_get_cookie(sd_bus_message *message,
+	uint64_t *cookie); .. code-block::
+
+   int sd_bus_message_get_reply_cookie(sd_bus_message *message,
+	uint64_t *cookie);
+
+Description
+###########
+
+:code:`sd_bus_message_get_cookie()` returns the transaction cookie of a message. The cookie uniquely identifies a message within each bus peer, but is not globally unique. It is assigned when a message is sent.
+
+:code:`sd_bus_message_get_reply_cookie()` returns the transaction cookie of the message the specified message is a response to. When a reply message is generated for a method call message, its cookie is copied over into this field. Note that while every message that is transferred is identified by a cookie, only response messages carry a reply cookie field.
+
+Both functions take a message object as first parameter and a place to store the 64-bit cookie in.
+
+Return Value
+############
+
+On success, these calls return 0 or a positive integer. On failure, they return a negative errno-style error code.
+
+On success, the cookie/reply cookie is returned in the specified 64-bit unsigned integer variable.
+
+Errors
+######
+
+Returned errors may indicate the following problems:
+
+.. systemd:option:: -EINVAL
+
+   A specified parameter is invalid.
+
+.. systemd:option:: -ENODATA
+
+   No cookie has been assigned to this message. This either indicates that the message has not been sent yet and hence has no cookie assigned, or that the message is not a method response message and hence carries a reply cookie field.
+
+.. include:: libsystemd-pkgconfig.rst
+
+History
+#######
+
+:code:`sd_bus_message_get_cookie()` and :code:`sd_bus_message_get_reply_cookie()` were added in version 209.
+
+See Also
+########
+
+:ref:`systemd(1)`, :ref:`sd-bus(3)`, :ref:`sd_bus_new(3)`
+
+

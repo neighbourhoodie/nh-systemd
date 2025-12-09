@@ -1,0 +1,13 @@
+.. SPDX-License-Identifier: LGPL-2.1-or-later
+
+.. inclusion-marker-do-not-remove controllers-text|
+
+.. inclusion-marker-do-not-remove controllers-text|
+
+The following controller names may be specified: :code:`cpu`, :code:`cpuset`, :code:`io`, :code:`memory`, :code:`pids`, :code:`bpf-firewall`, :code:`bpf-devices`, :code:`bpf-foreign`, :code:`bpf-socket-bind`, and :code:`bpf-restrict-network-interfaces`.
+
+.. inclusion-end-marker-do-not-remove controllers-text|
+
+.. inclusion-end-marker-do-not-remove controllers-text|
+
+
